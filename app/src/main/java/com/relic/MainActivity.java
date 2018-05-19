@@ -3,8 +3,10 @@ package com.relic;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.relic.data.Authenticator;
 
@@ -24,16 +26,18 @@ public class MainActivity extends AppCompatActivity {
     // sets client to allow view to open in app
     webView.setWebViewClient(new LoginClient());
     webView.loadUrl(auth.getUrl());
+    setContentView(webView);
   }
 
   class LoginClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+      String checkUrl = auth.getRedirect();
       // closes app once user logs in
-      if (url.contains(auth.getRedirect())) {
-        finish();
+      if (url.substring(0, checkUrl.length()).equals(checkUrl)) {
+        onBackPressed();
       }
-      return true;
+      return false;
     }
 
   }

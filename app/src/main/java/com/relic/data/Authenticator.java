@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-import android.view.View;
 import android.webkit.WebView;
 
 import com.android.volley.Request;
@@ -29,6 +28,21 @@ public class Authenticator {
 
   public Authenticator(Context context) {
     appContext = context;
+    //requestQueue = Volley.newRequestQueue(context);
+    // make request to url
+//    StringRequest request = new StringRequest(Request.Method.GET, requestURL,
+//        new Response.Listener<String>() {
+//          @Override
+//          public void onResponse(String response) {
+//            Log.d(TAG, response);
+//          }
+//        },
+//        new Response.ErrorListener() {
+//          @Override
+//          public void onErrorResponse(VolleyError error) {
+//            Log.d(TAG, error.getMessage());
+//          }
+//        });
   }
 
   public String getUrl() {
@@ -41,6 +55,8 @@ public class Authenticator {
   }
 
   public String getRedirect() {
-    return REDIRECT_URI;
+    return this.REDIRECT_URI;
   }
+
+
 }
