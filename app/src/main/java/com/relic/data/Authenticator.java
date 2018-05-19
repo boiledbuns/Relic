@@ -1,7 +1,11 @@
 package com.relic.data;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -15,39 +19,28 @@ public class Authenticator {
   final String TAG = "AUTHENTICATOR";
   final String BASE = "https://www.reddit.com/api/v1/authorize.compact?";
   final String REDIRECT_URI = "https://github.com/13ABEL/Relic";
-  final String DURATION="PERMANENT";
-  String clientID = ""; //TODO retreieve from secret file
+  final String DURATION="permanent";
   String responseType = "code";
   String state = "random0101"; // any random value
   String scope = "edit";
 
+  Context appContext;
   RequestQueue requestQueue;
 
   public Authenticator(Context context) {
-    requestQueue = Volley.newRequestQueue(context);
-
-    String requestURL = BASE + "client_id=" + context.getString(R.string.client_id)
-        + "&response_type=" + responseType
-        + "&state=" + responseType
-        + "&redirect_uri=" + state
-        + "&duration=" + DURATION
-        + "&scope=" + scope;
-
-    // make request to url
-    StringRequest request = new StringRequest(Request.Method.GET, requestURL,
-        new Response.Listener<String>() {
-          @Override
-          public void onResponse(String response) {
-
-          }
-        },
-        new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, error.getMessage());
-          }
-        });
-
+    appContext = context;
   }
 
+  public String getUrl() {
+    return BASE + "client_id=" + appContext.getString(R.string.client_id)
+        + "&response_type=" + responseType
+        + "&state=" + state
+        + "&redirect_uri=" + REDIRECT_URI
+        + "&duration=" + DURATION
+        + "&scope=" + scope;
+  }
+
+  public String getRedirect() {
+    return REDIRECT_URI;
+  }
 }
