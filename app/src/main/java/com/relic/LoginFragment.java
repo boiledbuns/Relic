@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,8 @@ import android.widget.Toast;
 import com.relic.data.Authenticator;
 
 
-public class LoginFragment extends Fragment{
+public class LoginFragment extends Fragment {
+  final String TAG = "LOGIN_FRAGMENT";
   View rootView;
   Authenticator auth;
 
@@ -43,8 +45,13 @@ public class LoginFragment extends Fragment{
       // closes the login fragment once the user has successfully been authenticated
       if (url.substring(0, checkUrl.length()).equals(checkUrl)) {
         FragmentActivity parentActivity = getActivity();
+
         Toast.makeText(parentActivity, "You've been authenticated!", Toast.LENGTH_SHORT).show();
         parentActivity.getSupportFragmentManager().popBackStack();
+
+        // retrieves the access token using the redirect url
+        Log.d(TAG, url);
+        auth.retrieveAccessToken(url);
       }
       return false;
     }
