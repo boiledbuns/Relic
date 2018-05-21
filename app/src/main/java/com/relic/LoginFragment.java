@@ -1,14 +1,16 @@
 package com.relic;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.relic.data.Authenticator;
 
@@ -20,8 +22,7 @@ public class LoginFragment extends Fragment{
   @Nullable
   @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-    super.onCreateView(inflater, container, savedInstanceState);
-    rootView = inflater.inflate(R.layout.web_auth, container);
+    rootView = inflater.inflate(R.layout.web_auth, container, false);
 
     auth = new Authenticator(this.getContext());
 
@@ -41,7 +42,9 @@ public class LoginFragment extends Fragment{
       String checkUrl = auth.getRedirect();
       // closes the login fragment once the user has successfully been authenticated
       if (url.substring(0, checkUrl.length()).equals(checkUrl)) {
-        getActivity().getFragmentManager().popBackStack();
+        FragmentActivity parentActivity = getActivity();
+        Toast.makeText(parentActivity, "You've been authenticated!", Toast.LENGTH_SHORT).show();
+        parentActivity.getSupportFragmentManager().popBackStack();
       }
       return false;
     }
