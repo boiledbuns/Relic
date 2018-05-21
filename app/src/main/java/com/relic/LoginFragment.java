@@ -28,12 +28,16 @@ public class LoginFragment extends Fragment {
 
     auth = new Authenticator(this.getContext());
 
-    // TODO check if the user is authenticated
-
-    WebView webView = rootView.findViewById(R.id.auth_web_view);
-    // sets client to allow view to open in app
-    webView.setWebViewClient(new LoginClient());
-    webView.loadUrl(auth.getUrl());
+    // proceeds with authentication if the user is not already logged in
+    if (!auth.checkAuth()) {
+      WebView webView = rootView.findViewById(R.id.auth_web_view);
+      // sets client to allow view to open in app
+      webView.setWebViewClient(new LoginClient());
+      webView.loadUrl(auth.getUrl());
+    }
+    else {
+      Toast.makeText(getContext(), "Signed back in", Toast.LENGTH_SHORT).show();
+    }
 
     return rootView;
   }
@@ -55,7 +59,6 @@ public class LoginFragment extends Fragment {
       }
       return false;
     }
-
   }
 
 
