@@ -101,7 +101,7 @@ public class Authenticator {
    * checks if the user is currently signed in by checking shared preferences
    * @return whether the user is signed in
    */
-  public boolean checkAuth() {
+  public boolean isAuthenticated() {
     return appContext.getSharedPreferences("auth", Context.MODE_PRIVATE)
         .contains(TOKEN_KEY);
   }

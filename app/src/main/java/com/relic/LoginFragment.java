@@ -1,6 +1,5 @@
 package com.relic;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,7 +28,7 @@ public class LoginFragment extends Fragment {
     auth = new Authenticator(this.getContext());
 
     // proceeds with authentication if the user is not already logged in
-    if (!auth.checkAuth()) {
+    if (!auth.isAuthenticated()) {
       WebView webView = rootView.findViewById(R.id.auth_web_view);
       // sets client to allow view to open in app
       webView.setWebViewClient(new LoginClient());
@@ -51,7 +50,7 @@ public class LoginFragment extends Fragment {
         FragmentActivity parentActivity = getActivity();
 
         Toast.makeText(parentActivity, "You've been authenticated!", Toast.LENGTH_SHORT).show();
-        parentActivity.getSupportFragmentManager().popBackStack();
+        parentActivity.onBackPressed();
 
         // retrieves the access token using the redirect url
         Log.d(TAG, url);
