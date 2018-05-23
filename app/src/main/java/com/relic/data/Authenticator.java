@@ -1,12 +1,8 @@
 package com.relic.data;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -14,7 +10,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
@@ -24,23 +19,22 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Authenticator {
-  final String TAG = "AUTHENTICATOR";
-  final String BASE = "https://www.reddit.com/api/v1/authorize.compact?";
-  final String ACCESS_TOKEN_URI = "https://www.reddit.com/api/v1/access_token";
-  final String REDIRECT_URI = "https://github.com/13ABEL/Relic";
-  final String DURATION="permanent";
+  private final String TAG = "AUTHENTICATOR";
+  private final String BASE = "https://www.reddit.com/api/v1/authorize.compact?";
+  private final String ACCESS_TOKEN_URI = "https://www.reddit.com/api/v1/access_token";
+  private final String REDIRECT_URI = "https://github.com/13ABEL/Relic";
+  private final String DURATION="permanent";
 
-  final String PREFERENCE = "auth";
-  final String TOKEN_KEY = "access_token";
+  private String preference;
+  private String tokenKey;
 
 
-  String responseType = "code";
-  String state = "random0101"; // any random value
-  String scope = "edit";
+  private String responseType = "code";
+  private String state = "random0101"; // any random value
+  private String scope = "edit";
 
   Context appContext;
   RequestQueue requestQueue;
@@ -48,7 +42,9 @@ public class Authenticator {
   public Authenticator(Context context) {
     appContext = context;
     requestQueue = Volley.newRequestQueue(context);
-    // make request to url
+    // retrieve the strings from res
+    preference = context.getResources().getString(R.string.AUTH_PREF);
+    tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
   }
 
   public String getUrl() {
@@ -102,8 +98,8 @@ public class Authenticator {
    * @return whether the user is signed in
    */
   public boolean isAuthenticated() {
-    return appContext.getSharedPreferences("auth", Context.MODE_PRIVATE)
-        .contains(TOKEN_KEY);
+    return appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
+        .contains(tokenKey);
   }
 
   private void saveReturn(String response) {
@@ -112,7 +108,7 @@ public class Authenticator {
       JSONObject data = (JSONObject) parser.parse(response);
       // stores the token in shared preferences
       appContext.getSharedPreferences("auth", Context.MODE_PRIVATE).edit()
-          .putString(TOKEN_KEY, (String) data.get(TOKEN_KEY)).apply();
+          .putString(tokenKey, (String) data.get(tokenKey)).apply();
 
       Log.d(TAG, "token saved!");
     } catch (ParseException e) {

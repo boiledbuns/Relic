@@ -16,9 +16,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
+    def lifecycle_ver = "1.1.1"
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
@@ -38,4 +43,7 @@ dependencies {
 
     // Room (use 1.1.0-beta1 for latest beta)
     implementation 'android.arch.persistence.room:runtime:1.1.0'
+
+    // Viewmodel and LiveData
+    implementation "android.arch.lifecycle:extensions:$lifecycle_ver"
 }

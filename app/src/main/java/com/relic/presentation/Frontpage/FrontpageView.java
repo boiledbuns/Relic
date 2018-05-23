@@ -1,5 +1,7 @@
 package com.relic.presentation.Frontpage;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,26 +14,34 @@ import com.relic.R;
 import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
 
-public class FrontpageView extends Fragment implements FrontpageContract.View{
+public class FrontpageView extends Fragment {
+  FrontpageContract.VM viewModel;
   View rootView;
+
+  /**
+   * Recall: fragment calls "onCreate" once when it's first initialized, so this is where
+   * we'll initialize and inject dependencies into the viewmodel
+   * @param savedInstanceState
+   */
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    // initializes the instance of the post repo and injects it into the VM
+    PostRepository postRepo = new PostRepositoryImpl(getContext());
+    viewModel = ViewModelProviders.of(this).get(FrontpageVM.class);
+    viewModel.init(postRepo);
+  }
 
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
     rootView = inflater.inflate(R.layout.frontpage, container, false);
 
-
-
     return rootView;
   }
 
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    // initializes the instance of the post repo and injects it into the VM
-    PostRepository postRepo = new PostRepositoryImpl(getContext());
 
-  }
 
 
 }
