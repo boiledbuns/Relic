@@ -67,7 +67,6 @@ public class Authenticator {
     String[] queryPairs = queryStrings.split("&");
 
     final Map<String, String> queryMap = new HashMap<>();
-    String key = "";
     for (String queryPair : queryPairs) {
       String[] mapping = queryPair.split("=");
       queryMap.put(mapping[0], mapping[1]);
