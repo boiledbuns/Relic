@@ -100,7 +100,7 @@ public class Authenticator {
 
   /**
    * Refreshes the current access token using the refresh token to get a permanent
-   * auth token that can be used forver
+   * auth token that can be used forever
    */
   public void refreshToken() {
     requestQueue.add(new RedditGetRefreshRequest(Request.Method.POST, ACCESS_TOKEN_URI,
@@ -108,7 +108,7 @@ public class Authenticator {
           @Override
           public void onResponse(String response) {
             Log.d(TAG, "REFRESH = " + response);
-            //saveReturn(response);
+            saveReturn(response);
           }
         },
         new Response.ErrorListener() {
@@ -141,17 +141,22 @@ public class Authenticator {
     try {
       JSONObject data = (JSONObject) parser.parse(response);
 
-      // stores the token in shared preferences
-      appContext.getSharedPreferences("auth", Context.MODE_PRIVATE).edit()
-          .putString(tokenKey, (String) data.get(tokenKey))
-          .putString(refreshTokenKey, (String) data.get(refreshTokenKey))
-          .apply();
 
-      Log.d(TAG, "token saved!");
+      // stores the token in shared preferences
+      SharedPreferences.Editor prefEditor = appContext.
+          getSharedPreferences("auth", Context.MODE_PRIVATE).edit();
+
+      // checks if there is an refresh token to be stored
+      if (data.containsKey(refreshTokenKey)) {
+          prefEditor.putString(refreshTokenKey, (String) data.get(refreshTokenKey)).apply();
+      }
+
+      prefEditor.putString(tokenKey, (String) data.get(tokenKey)).apply();
+
+      Log.d(TAG, "token saved! " + (String) data.get(tokenKey));
     } catch (ParseException e) {
       Toast.makeText(appContext, "yikes", Toast.LENGTH_SHORT).show();
     }
-
   }
 
 
