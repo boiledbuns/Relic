@@ -20,8 +20,7 @@ public class MainActivity extends AppCompatActivity {
     // take the user to the frontpage
     getSupportFragmentManager().beginTransaction()
         .replace(R.id.main_content_frame, new FrontpageView()).commit();
-
-
+    
     if (!auth.isAuthenticated()) {
       // create the login fragment for the user if not authenticated
       LoginFragment loginFragment = new LoginFragment();

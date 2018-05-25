@@ -14,11 +14,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class PostRepositoryImpl implements PostRepository {
@@ -54,7 +56,7 @@ public class PostRepositoryImpl implements PostRepository {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            Log.d(TAG, response);
+            //Log.d(TAG, response);
             try {
               parsePosts(response);
             }
@@ -73,7 +75,16 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
   private void parsePosts(String response) throws ParseException {
-    JSONObject object = (JSONObject) JSONParser.parse(response);
+    JSONArray listingChildren = (JSONArray) ((JSONObject) ((JSONObject) JSONParser.parse(response))
+        .get("data")).get("children");
+
+    Iterator postIterator = listingChildren.iterator();
+
+    while (postIterator.hasNext()) {
+      JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
+      Log.d(TAG, "post = " + post.get("author").toString());
+
+    }
 
   }
 

@@ -1,6 +1,7 @@
 package com.relic.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,7 +31,9 @@ public class Authenticator {
 
   private String preference;
   private String tokenKey;
+  private String refreshTokenKey;
 
+  private String authCode;
 
   private String responseType = "code";
   private String state = "random0101"; // any random value
@@ -46,6 +49,7 @@ public class Authenticator {
     // retrieve the strings from res
     preference = context.getResources().getString(R.string.AUTH_PREF);
     tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
+    refreshTokenKey = context.getResources().getString(R.string.REFRESH_TOKEN_KEY);
   }
 
   public String getUrl() {
@@ -62,7 +66,6 @@ public class Authenticator {
   }
 
 
-
   public void retrieveAccessToken(String redirectUrl) {
     String queryStrings = redirectUrl.substring(REDIRECT_URI.length() + 1);
     String[] queryPairs = queryStrings.split("&");
@@ -73,13 +76,16 @@ public class Authenticator {
       queryMap.put(mapping[0], mapping[1]);
     }
     Log.d(TAG, queryMap.keySet().toString() + " " + queryMap.get("code"));
+    authCode = queryMap.get("code");
 
-    RedditGetTokenRequest req = new RedditGetTokenRequest(Request.Method.POST, ACCESS_TOKEN_URI,
+    // get the access and refresh token
+    requestQueue.add(new RedditGetTokenRequest(Request.Method.POST, ACCESS_TOKEN_URI,
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
             Log.d(TAG, response);
             saveReturn(response);
+            refreshToken();
           }
         },
         new Response.ErrorListener() {
@@ -87,11 +93,33 @@ public class Authenticator {
           public void onErrorResponse(VolleyError error) {
             Log.d(TAG, error.toString());
           }
-        },
-        queryMap.get("code"));
-
-    requestQueue.add(req);
+        })
+    );
   }
+
+
+  /**
+   * Refreshes the current access token using the refresh token to get a permanent
+   * auth token that can be used forver
+   */
+  public void refreshToken() {
+    requestQueue.add(new RedditGetRefreshRequest(Request.Method.POST, ACCESS_TOKEN_URI,
+        new Response.Listener<String>() {
+          @Override
+          public void onResponse(String response) {
+            Log.d(TAG, "REFRESH = " + response);
+            //saveReturn(response);
+          }
+        },
+        new Response.ErrorListener() {
+          @Override
+          public void onErrorResponse(VolleyError error) {
+            Log.d(TAG, "REFRESH = " + error.toString());
+          }
+        })
+    );
+  }
+
 
   /**
    * checks if the user is currently signed in by checking shared preferences
@@ -102,28 +130,38 @@ public class Authenticator {
         .contains(tokenKey);
   }
 
+
+  /**
+   * parses the successful auth response to store the oauth and refresh token in the shared
+   * preferences. Then refreshes the token to get the permanent token
+   * @param response
+   */
   private void saveReturn(String response) {
     JSONParser parser = new JSONParser();
     try {
       JSONObject data = (JSONObject) parser.parse(response);
+
       // stores the token in shared preferences
       appContext.getSharedPreferences("auth", Context.MODE_PRIVATE).edit()
-          .putString(tokenKey, (String) data.get(tokenKey)).apply();
+          .putString(tokenKey, (String) data.get(tokenKey))
+          .putString(refreshTokenKey, (String) data.get(refreshTokenKey))
+          .apply();
 
       Log.d(TAG, "token saved!");
     } catch (ParseException e) {
       Toast.makeText(appContext, "yikes", Toast.LENGTH_SHORT).show();
     }
+
   }
 
 
   class RedditGetTokenRequest extends StringRequest {
     private String redirectCode;
-    private RedditGetTokenRequest(int method, String url, Response.Listener<String> listener,
-                                 Response.ErrorListener errorListener, String redirectCode) {
 
+    private RedditGetTokenRequest(int method, String url, Response.Listener<String> listener,
+                                 Response.ErrorListener errorListener) {
       super(method, url, listener, errorListener);
-      this.redirectCode = redirectCode;
+      redirectCode = authCode;
     }
 
     // override headers to add custom credentials in client_secret:redirect_code format
@@ -147,6 +185,39 @@ public class Authenticator {
       params.put("grant_type", "authorization_code");
       params.put("code", redirectCode);
       params.put("redirect_uri", REDIRECT_URI);
+      return params;
+    }
+  }
+
+
+  class RedditGetRefreshRequest extends StringRequest{
+    private RedditGetRefreshRequest(int method, String url, Response.Listener<String> listener,
+                                  Response.ErrorListener errorListener) {
+      super(method, url, listener, errorListener);
+    }
+
+    // override headers to add custom credentials in client_secret:redirect_code format
+    @Override
+    public Map<String, String> getHeaders() throws AuthFailureError {
+      // create a new header map and add the right headers to it
+      Map<String, String> headers = new HashMap<>();
+
+      // generate encoded credential string with client id and code from redirect
+      String credentials = appContext.getString(R.string.client_id) + ":" + authCode;
+      String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+      headers.put("Authorization", auth);
+
+      return headers;
+    }
+
+    public Map<String, String> getParams() throws AuthFailureError {
+      Map<String, String> params = new HashMap<>();
+
+      String refreshToken = appContext.getSharedPreferences("auth", Context.MODE_PRIVATE)
+          .getString(refreshTokenKey, "DEFAULT");
+
+      params.put("grant_type", refreshTokenKey);
+      params.put("refresh_token", refreshToken);
 
       return params;
     }
