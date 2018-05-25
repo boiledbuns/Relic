@@ -4,6 +4,8 @@
     <string name="AUTH_PREF">auth</string>
     <string name="TOKEN_KEY">access_token</string>
     <string name="REFRESH_TOKEN_KEY">refresh_token</string>
+    <string name="REDIRECT_CODE">code</string>
+
 
 
 </resources>

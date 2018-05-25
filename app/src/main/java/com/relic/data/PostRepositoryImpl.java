@@ -85,7 +85,6 @@ public class PostRepositoryImpl implements PostRepository {
       Log.d(TAG, "post = " + post.get("author").toString());
 
     }
-
   }
 
 

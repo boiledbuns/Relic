@@ -32,8 +32,7 @@ public class Authenticator {
   private String preference;
   private String tokenKey;
   private String refreshTokenKey;
-
-  private String authCode;
+  private String redirectCode;
 
   private String responseType = "code";
   private String state = "random0101"; // any random value
@@ -50,6 +49,7 @@ public class Authenticator {
     preference = context.getResources().getString(R.string.AUTH_PREF);
     tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
     refreshTokenKey = context.getResources().getString(R.string.REFRESH_TOKEN_KEY);
+    redirectCode = context.getString(R.string.REDIRECT_CODE);
   }
 
   public String getUrl() {
@@ -70,13 +70,16 @@ public class Authenticator {
     String queryStrings = redirectUrl.substring(REDIRECT_URI.length() + 1);
     String[] queryPairs = queryStrings.split("&");
 
+    // parses the redirect to get the access token needed to retrieve the access token
     final Map<String, String> queryMap = new HashMap<>();
     for (String queryPair : queryPairs) {
       String[] mapping = queryPair.split("=");
       queryMap.put(mapping[0], mapping[1]);
     }
-    Log.d(TAG, queryMap.keySet().toString() + " " + queryMap.get("code"));
-    authCode = queryMap.get("code");
+    // stores the redirect "code" in shared preferences for easy access
+    Log.d(TAG, queryMap.keySet().toString() + " " + queryMap.get(redirectCode));
+    appContext.getSharedPreferences(preference, Context.MODE_PRIVATE).edit()
+        .putString(redirectCode, queryMap.get(redirectCode)).apply();
 
     // get the access and refresh token
     requestQueue.add(new RedditGetTokenRequest(Request.Method.POST, ACCESS_TOKEN_URI,
@@ -161,12 +164,14 @@ public class Authenticator {
 
 
   class RedditGetTokenRequest extends StringRequest {
-    private String redirectCode;
+    private String code;
 
     private RedditGetTokenRequest(int method, String url, Response.Listener<String> listener,
                                  Response.ErrorListener errorListener) {
       super(method, url, listener, errorListener);
-      redirectCode = authCode;
+
+      code = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
+          .getString(redirectCode, "DEFAULT");
     }
 
     // override headers to add custom credentials in client_secret:redirect_code format
@@ -176,7 +181,7 @@ public class Authenticator {
       Map<String, String> headers = new HashMap<>();
 
       // generate encoded credential string with client id and code from redirect
-      String credentials = appContext.getString(R.string.client_id) + ":" + redirectCode;
+      String credentials = appContext.getString(R.string.client_id) + ":" + code;
       String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
       headers.put("Authorization", auth);
 
@@ -188,7 +193,7 @@ public class Authenticator {
       Map<String, String> params = new HashMap<>();
 
       params.put("grant_type", "authorization_code");
-      params.put("code", redirectCode);
+      params.put("code", code);
       params.put("redirect_uri", REDIRECT_URI);
       return params;
     }
@@ -207,8 +212,10 @@ public class Authenticator {
       // create a new header map and add the right headers to it
       Map<String, String> headers = new HashMap<>();
 
+      String code = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
+          .getString(redirectCode, "DEFAULT");
       // generate encoded credential string with client id and code from redirect
-      String credentials = appContext.getString(R.string.client_id) + ":" + authCode;
+      String credentials = appContext.getString(R.string.client_id) + ":" + code;
       String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
       headers.put("Authorization", auth);
 
