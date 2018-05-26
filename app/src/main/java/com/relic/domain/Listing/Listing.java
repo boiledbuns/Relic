@@ -1,4 +1,6 @@
-package com.relic.domain;
+package com.relic.domain.Listing;
+
+import com.relic.domain.Thing;
 
 import java.util.List;
 

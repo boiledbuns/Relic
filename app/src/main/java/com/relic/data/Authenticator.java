@@ -22,6 +22,9 @@ import org.json.simple.parser.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Singleton instance of the authenticator because we should be able to
+ */
 public class Authenticator {
   private final String TAG = "AUTHENTICATOR";
   private final String BASE = "https://www.reddit.com/api/v1/authorize.compact?";
@@ -42,6 +45,12 @@ public class Authenticator {
   Context appContext;
   RequestQueue requestQueue;
 
+  private static Authenticator INSTANCE;
+
+  /**
+   * Private constructor to initialize the single instance of the Authenticator
+   * @param context
+   */
   public Authenticator(Context context) {
     appContext = context;
     requestQueue = Volley.newRequestQueue(context);
@@ -50,6 +59,15 @@ public class Authenticator {
     tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
     refreshTokenKey = context.getResources().getString(R.string.REFRESH_TOKEN_KEY);
     redirectCode = context.getString(R.string.REDIRECT_CODE);
+  }
+
+
+  public static Authenticator getAuthenticator(Context context) {
+    if (INSTANCE == null) {
+      // initialize the instance of the authenticator if it's null
+      INSTANCE = new Authenticator(context);
+    }
+    return INSTANCE;
   }
 
   public String getUrl() {
@@ -66,6 +84,11 @@ public class Authenticator {
   }
 
 
+  /**
+   * Callback used to parse the url after the user has authenticated through the reddit auth page.
+   * Retrieves the code value and uses it to obtain the real auth token
+   * @param redirectUrl url with params to parse
+   */
   public void retrieveAccessToken(String redirectUrl) {
     String queryStrings = redirectUrl.substring(REDIRECT_URI.length() + 1);
     String[] queryPairs = queryStrings.split("&");
@@ -88,7 +111,6 @@ public class Authenticator {
           public void onResponse(String response) {
             Log.d(TAG, response);
             saveReturn(response);
-            refreshToken();
           }
         },
         new Response.ErrorListener() {

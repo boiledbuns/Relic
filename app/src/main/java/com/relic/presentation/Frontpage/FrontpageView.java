@@ -30,7 +30,7 @@ public class FrontpageView extends Fragment {
 
     // initializes the instance of the post repo and injects it into the VM
     PostRepository postRepo = new PostRepositoryImpl(getContext());
-    Authenticator auth = new Authenticator(getContext());
+    Authenticator auth = Authenticator.getAuthenticator(getContext());
     viewModel = ViewModelProviders.of(this).get(FrontpageVM.class);
     viewModel.init(postRepo, auth);
   }

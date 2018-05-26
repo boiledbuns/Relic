@@ -6,7 +6,7 @@ import com.relic.data.Authenticator;
 import com.relic.data.PostRepository;
 
 public class FrontpageVM extends ViewModel implements FrontpageContract.VM {
-  private String defaultSub = "/r/frontpage/hot.json";
+  private String defaultSub = "/";
   PostRepository postRepo;
   Authenticator authenticator;
 
@@ -15,6 +15,7 @@ public class FrontpageVM extends ViewModel implements FrontpageContract.VM {
     this.authenticator = auth;
 
     // get the posts for the frontpage as default
+    auth.refreshToken();
     postRepo.getPosts(defaultSub);
   }
 

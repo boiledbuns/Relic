@@ -13,14 +13,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
+import com.relic.domain.Post.Post;
+import com.relic.domain.Post.PostImpl;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class PostRepositoryImpl implements PostRepository {
@@ -74,22 +78,36 @@ public class PostRepositoryImpl implements PostRepository {
     ));
   }
 
+
+  /**
+   * Parses the response from the api and stores the data in the persistence layer
+   * @param response the json response from the server with the listing object
+   * @throws ParseException
+   */
   private void parsePosts(String response) throws ParseException {
     JSONArray listingChildren = (JSONArray) ((JSONObject) ((JSONObject) JSONParser.parse(response))
         .get("data")).get("children");
 
     Iterator postIterator = listingChildren.iterator();
+    List <Post> children = new ArrayList<>();
+    Log.d(TAG, "dank = " + response);
 
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
-      Log.d(TAG, "post = " + post.get("author").toString());
 
+      children.add(new PostImpl(
+          (String) post.get("id"),
+          (String) post.get("subreddit_name_prefixed"),
+          (String) post.get("author")
+      ));
     }
+
+    Log.d(TAG, "post = " + children.toString());
   }
 
 
   class RedditOauthRequest extends StringRequest {
-    public RedditOauthRequest(int method, String url, Response.Listener<String> listener,
+    private RedditOauthRequest(int method, String url, Response.Listener<String> listener,
                               Response.ErrorListener errorListener) {
       super(method, url, listener, errorListener);
     }
@@ -99,14 +117,11 @@ public class PostRepositoryImpl implements PostRepository {
 
       // generate the credential string for oauth
       String credentials = "bearer " + authToken;
-      Log.d(TAG, credentials);
-      // String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-
       headers.put("Authorization", credentials);
       headers.put("User-Agent", userAgent);
 
       return headers;
     }
-
   }
+
 }
