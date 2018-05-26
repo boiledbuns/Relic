@@ -1,6 +1,6 @@
 package com.relic.domain.Post;
 
-public class PostImpl implements Post {
+public class PostImpl extends Post {
   private String id;
   private String subreddit;
   private String author;

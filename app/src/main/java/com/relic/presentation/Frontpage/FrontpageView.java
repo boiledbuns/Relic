@@ -15,6 +15,8 @@ import com.relic.data.Authenticator;
 import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
 
+import java.util.ArrayList;
+
 public class FrontpageView extends Fragment {
   FrontpageContract.VM viewModel;
   View rootView;
@@ -40,7 +42,6 @@ public class FrontpageView extends Fragment {
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
     rootView = inflater.inflate(R.layout.frontpage, container, false);
-
     return rootView;
   }
 

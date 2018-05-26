@@ -13,6 +13,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
+import com.relic.data.Listing.Listing;
+import com.relic.data.Listing.PostListing;
 import com.relic.domain.Post.Post;
 import com.relic.domain.Post.PostImpl;
 
@@ -84,23 +86,29 @@ public class PostRepositoryImpl implements PostRepository {
    * @throws ParseException
    */
   private void parsePosts(String response) throws ParseException {
-    JSONArray listingChildren = (JSONArray) ((JSONObject) ((JSONObject) JSONParser.parse(response))
-        .get("data")).get("children");
+    JSONObject listingData = (JSONObject) ((JSONObject) JSONParser.parse(response)).get("data");
+    JSONArray listingPosts = (JSONArray) (listingData).get("children");
 
-    Iterator postIterator = listingChildren.iterator();
-    List <Post> children = new ArrayList<>();
+    Iterator postIterator = listingPosts.iterator();
+    List <Post> posts = new ArrayList<>();
     Log.d(TAG, "dank = " + response);
 
+    // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
-
-      children.add(new PostImpl(
+      posts.add(new PostImpl(
           (String) post.get("id"),
           (String) post.get("subreddit_name_prefixed"),
           (String) post.get("author")
       ));
     }
-    Log.d(TAG, children.toString());
+
+    // Create a new listing object and add the posts, before, and after ids to it
+    PostListing listing = new PostListing((String) listingData.get("before"),
+        (String) listingData.get("after"), posts);
+
+    Log.d(TAG, listingData.keySet().toString());
+    Log.d(TAG, listingData.get("after").toString());
   }
 
 
