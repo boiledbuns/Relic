@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PostRepositoryImpl implements PostRepository {
-  private final String ENDPOINT = "https://oauth.reddit.com";
-  private final String ENDPOINT2 = "https://www.reddit.com";
+  private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "POST_REPO";
 
@@ -101,8 +100,7 @@ public class PostRepositoryImpl implements PostRepository {
           (String) post.get("author")
       ));
     }
-
-    Log.d(TAG, "post = " + children.toString());
+    Log.d(TAG, children.toString());
   }
 
 

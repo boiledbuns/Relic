@@ -6,7 +6,7 @@ import com.relic.data.Authenticator;
 import com.relic.data.PostRepository;
 
 public class FrontpageVM extends ViewModel implements FrontpageContract.VM {
-  private String defaultSub = "/";
+  private String defaultSub = "";
   PostRepository postRepo;
   Authenticator authenticator;
 
