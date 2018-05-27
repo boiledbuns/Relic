@@ -4,7 +4,10 @@ package com.relic;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.relic.data.AccountRepository;
+import com.relic.data.AccountRepositoryImpl;
 import com.relic.data.Authenticator;
+import com.relic.data.VolleyQueue;
 import com.relic.presentation.Frontpage.FrontpageView;
 
 public class MainActivity extends AppCompatActivity {
@@ -14,6 +17,9 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    // initialize the request queue
+    VolleyQueue.init(getApplicationContext());
 
     Authenticator auth = new Authenticator(this);
 
@@ -28,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         .replace(R.id.main_content_frame, loginFragment).commit();
     }
 
-
+    AccountRepository accountRepo = new AccountRepositoryImpl(this);
   }
 
 }

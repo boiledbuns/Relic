@@ -39,7 +39,7 @@ public class Authenticator {
 
   private String responseType = "code";
   private String state = "random0101"; // any random value
-  private String scope = "edit flair history modconfig modflair modlog modposts modwiki" +
+  private String scope = "identity account mysubreddits edit flair history modconfig modflair modlog modposts modwiki" +
       " mysubreddits privatemessages read report save submit subscribe vote wikiedit wikiread";
 
   Context appContext;
@@ -165,7 +165,7 @@ public class Authenticator {
     JSONParser parser = new JSONParser();
     try {
       JSONObject data = (JSONObject) parser.parse(response);
-
+      Log.d(TAG, data.get("scope").toString());
 
       // stores the token in shared preferences
       SharedPreferences.Editor prefEditor = appContext.
