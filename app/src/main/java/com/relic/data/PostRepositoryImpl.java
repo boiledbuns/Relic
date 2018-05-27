@@ -101,13 +101,15 @@ public class PostRepositoryImpl implements PostRepository {
           (String) post.get("subreddit_name_prefixed"),
           (String) post.get("author")
       ));
+
+      Log.d(TAG, "post keys " + post.keySet().toString());
+
     }
 
     // Create a new listing object and add the posts, before, and after ids to it
     PostListing listing = new PostListing((String) listingData.get("before"),
         (String) listingData.get("after"), posts);
 
-    Log.d(TAG, listingData.keySet().toString());
     Log.d(TAG, listingData.get("after").toString());
   }
 

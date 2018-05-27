@@ -53,7 +53,7 @@ public class Authenticator {
    */
   public Authenticator(Context context) {
     appContext = context;
-    requestQueue = Volley.newRequestQueue(context);
+    requestQueue = VolleyQueue.getQueue();
     // retrieve the strings from res
     preference = context.getResources().getString(R.string.AUTH_PREF);
     tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
@@ -70,6 +70,7 @@ public class Authenticator {
     return INSTANCE;
   }
 
+
   public String getUrl() {
     return BASE + "client_id=" + appContext.getString(R.string.client_id)
         + "&response_type=" + responseType
@@ -78,6 +79,7 @@ public class Authenticator {
         + "&duration=" + DURATION
         + "&scope=" + scope;
   }
+
 
   public String getRedirect() {
     return this.REDIRECT_URI;
@@ -132,14 +134,14 @@ public class Authenticator {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            Log.d(TAG, "REFRESH = " + response);
+            Log.d(TAG, "Token refreshed" + response);
             saveReturn(response);
           }
         },
         new Response.ErrorListener() {
           @Override
           public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "REFRESH = " + error.toString());
+            Log.d(TAG, "Token failed to refresh = " + error.toString());
           }
         })
     );

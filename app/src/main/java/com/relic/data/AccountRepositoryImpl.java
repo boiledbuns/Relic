@@ -12,7 +12,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class AccountRepositoryImpl implements AccountRepository {
@@ -24,7 +30,6 @@ public class AccountRepositoryImpl implements AccountRepository {
 
   public AccountRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
-    auth.refreshToken();
 
     this.context = context;
     getMe();
@@ -46,8 +51,8 @@ public class AccountRepositoryImpl implements AccountRepository {
               public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, "Error : " + error.networkResponse.headers.toString());
               }
-            }
-    ) {
+            })
+        {
         public Map<String, String> getHeaders() {
           Map <String, String> headers = new HashMap<>();
 
@@ -69,6 +74,24 @@ public class AccountRepositoryImpl implements AccountRepository {
 
   private void parseUser(String response) {
     Log.d(TAG, response);
+    JSONObject data = null;
+
+    try {
+      data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
+    } catch (ParseException e) {
+      Log.d(TAG, "Error parsing the response: " + e.toString());
+    }
+
+    JSONArray subs = (JSONArray) data.get("children");
+    Iterator subIterator = subs.iterator();
+
+    while (subIterator.hasNext()) {
+      JSONObject currentSub = (JSONObject) ((JSONObject) subIterator.next()).get("data");
+
+      Log.d(TAG, "keys = " + currentSub.keySet());
+
+    }
+
   }
 
 
