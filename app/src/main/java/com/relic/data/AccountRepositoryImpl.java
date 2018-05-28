@@ -11,6 +11,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
+import com.relic.data.Subreddit.SubredditDB;
+import com.relic.data.Subreddit.SubredditDecorator;
 import com.relic.domain.Subreddit;
 import com.relic.domain.SubredditImpl;
 
@@ -30,14 +32,17 @@ public class AccountRepositoryImpl implements AccountRepository {
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "ACCOUNT_REPO";
 
+  private SubredditDB subDB;
   private Context context;
 
   public AccountRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
-
     this.context = context;
-    getMe();
 
+    subDB = SubredditDB.getDatabase(context);
+    subDB.getSubredditDao().getAll();
+
+    getMe();
   }
 
   private void getMe() {
@@ -85,7 +90,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     JSONObject data;
 
     data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
-    List <Subreddit> subscribed = new ArrayList<>();
+    List <SubredditDecorator> subscribed = new ArrayList<>();
 
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
@@ -98,15 +103,16 @@ public class AccountRepositoryImpl implements AccountRepository {
         nsfw = false;
       }
       // Log.d(TAG, "keys = " + currentSub.keySet());
-      subscribed.add(new SubredditImpl(
+      subscribed.add(new SubredditDecorator(
           (String) currentSub.get("id"),
           (String) currentSub.get("display_name"),
           (String) currentSub.get("icon_img"),
           nsfw
       ));
     }
-    Log.d(TAG, subscribed.toString());
 
+    //subDB.getSubredditDao().insertAll(subscribed);
+    Log.d(TAG, subscribed.toString());
   }
 
 

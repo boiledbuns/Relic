@@ -23,6 +23,8 @@ android {
 
 dependencies {
     def lifecycle_ver = "1.1.1"
+    def room_ver = "1.1.0"
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
@@ -42,7 +44,9 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
 
     // Room (use 1.1.0-beta1 for latest beta)
-    implementation 'android.arch.persistence.room:runtime:1.1.0'
+    implementation "android.arch.persistence.room:runtime:$room_ver"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_ver"
+
 
     // Viewmodel and LiveData
     implementation "android.arch.lifecycle:extensions:$lifecycle_ver"
