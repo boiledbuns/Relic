@@ -11,14 +11,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
+import com.relic.domain.Subreddit;
+import com.relic.domain.SubredditImpl;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class AccountRepositoryImpl implements AccountRepository {
@@ -43,7 +47,11 @@ public class AccountRepositoryImpl implements AccountRepository {
             new Response.Listener<String>() {
               @Override
               public void onResponse(String response) {
-                parseUser(response);
+                try {
+                  parseUser(response);
+                } catch (ParseException e) {
+                  Log.e(TAG, "Error parsing the response: " + e.toString());
+                }
               }
             },
             new Response.ErrorListener() {
@@ -72,25 +80,32 @@ public class AccountRepositoryImpl implements AccountRepository {
     });
   }
 
-  private void parseUser(String response) {
+  private void parseUser(String response) throws ParseException{
     Log.d(TAG, response);
-    JSONObject data = null;
+    JSONObject data;
 
-    try {
-      data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
-    } catch (ParseException e) {
-      Log.d(TAG, "Error parsing the response: " + e.toString());
-    }
+    data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
+    List <Subreddit> subscribed = new ArrayList<>();
 
+    // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
     Iterator subIterator = subs.iterator();
 
     while (subIterator.hasNext()) {
       JSONObject currentSub = (JSONObject) ((JSONObject) subIterator.next()).get("data");
-
-      Log.d(TAG, "keys = " + currentSub.keySet());
-
+      boolean nsfw = true;
+      if (currentSub.get("nsfw") == null) {
+        nsfw = false;
+      }
+      // Log.d(TAG, "keys = " + currentSub.keySet());
+      subscribed.add(new SubredditImpl(
+          (String) currentSub.get("id"),
+          (String) currentSub.get("display_name"),
+          (String) currentSub.get("icon_img"),
+          nsfw
+      ));
     }
+    Log.d(TAG, subscribed.toString());
 
   }
 
