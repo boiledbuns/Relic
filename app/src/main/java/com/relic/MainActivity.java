@@ -4,11 +4,9 @@ package com.relic;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.relic.data.AccountRepository;
-import com.relic.data.AccountRepositoryImpl;
 import com.relic.data.Authenticator;
 import com.relic.data.VolleyQueue;
-import com.relic.presentation.Frontpage.FrontpageView;
+import com.relic.presentation.DisplaySubs.DisplaySubsView;
 
 public class MainActivity extends AppCompatActivity {
   Authenticator auth;
@@ -24,8 +22,10 @@ public class MainActivity extends AppCompatActivity {
     Authenticator auth = new Authenticator(this);
 
     // take the user to the frontpage
+//    getSupportFragmentManager().beginTrans  action()
+//        .replace(R.id.main_content_frame, new FrontpageView()).commit();
     getSupportFragmentManager().beginTransaction()
-        .replace(R.id.main_content_frame, new FrontpageView()).commit();
+        .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
 
     if (!auth.isAuthenticated()) {
       // create the login fragment for the user if not authenticated
@@ -33,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
       getSupportFragmentManager().beginTransaction().addToBackStack("AUTH")
         .replace(R.id.main_content_frame, loginFragment).commit();
     }
-
-    AccountRepository accountRepo = new AccountRepositoryImpl(this);
   }
 
 }

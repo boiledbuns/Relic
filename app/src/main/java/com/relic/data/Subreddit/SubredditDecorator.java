@@ -4,14 +4,15 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.relic.domain.Subreddit;
 import com.relic.domain.SubredditImpl;
 
 /**
- * Mapper class with public var to reduce boilerplater and and allow the SubredditImpl class to be
+ * Mapper class with public var to reduce boilerplate and and allow the SubredditImpl class to be
  * used with room without violating clean architecture (ie. keeping it framework independent)
  */
 @Entity
-public class SubredditDecorator {
+public class SubredditDecorator extends Subreddit{
   @NonNull
   @PrimaryKey
   public String id;
@@ -26,9 +27,12 @@ public class SubredditDecorator {
     this.nsfw = nsfw;
   }
 
-  public SubredditImpl mapToDomain() {
-    return new SubredditImpl(id, iconLink, name, nsfw);
+  @Override
+  public String toString() {
+    return name + " " + id + " " + iconLink + " " + nsfw;
   }
 
-
+//  public SubredditImpl mapToDomain() {
+//    return new SubredditImpl(id, iconLink, name, nsfw);
+//  }
 }

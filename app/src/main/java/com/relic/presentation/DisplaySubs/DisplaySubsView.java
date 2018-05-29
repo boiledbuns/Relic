@@ -1,5 +1,6 @@
 package com.relic.presentation.DisplaySubs;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,14 +9,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class DisplaySubsFrag extends Fragment{
+import com.relic.data.SubRepository;
+import com.relic.data.SubRepositoryImpl;
+
+public class DisplaySubsView extends Fragment {
   DisplaySubsContract.VM viewModel;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    viewModel = new DisplaySubsVM();
+    viewModel = ViewModelProviders.of(this).get(DisplaySubsVM.class);
+
+    // initialize the repository and inject it into the viewmodel
+    SubRepository accountRepo = new SubRepositoryImpl(this.getContext());
+    viewModel.init(accountRepo);
   }
 
   @Nullable
