@@ -1,4 +1,4 @@
-package com.relic.domain.Post;
+package com.relic.domain.post;
 
 import com.relic.domain.Thing;
 

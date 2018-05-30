@@ -2,7 +2,6 @@ package com.relic.data;
 
 
 import android.content.Context;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,10 +12,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
-import com.relic.data.Listing.Listing;
-import com.relic.data.Listing.PostListing;
-import com.relic.domain.Post.Post;
-import com.relic.domain.Post.PostImpl;
+import com.relic.data.listing.PostListing;
+import com.relic.domain.post.Post;
+import com.relic.domain.post.PostImpl;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

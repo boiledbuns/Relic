@@ -1,4 +1,4 @@
-package com.relic.presentation.Frontpage;
+package com.relic.presentation.frontpage;
 
 import android.arch.lifecycle.ViewModel;
 

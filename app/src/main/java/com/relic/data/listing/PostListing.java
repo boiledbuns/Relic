@@ -1,6 +1,6 @@
-package com.relic.data.Listing;
+package com.relic.data.listing;
 
-import com.relic.domain.Post.Post;
+import com.relic.domain.post.Post;
 import com.relic.domain.Thing;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.relic.domain.Post;
+package com.relic.domain.post;
 
 public class PostImpl extends Post {
   private String id;

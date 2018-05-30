@@ -1,18 +1,20 @@
-package com.relic.data.Subreddit;
+package com.relic.data.subreddit;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.relic.domain.Subreddit;
-import com.relic.domain.SubredditImpl;
+import com.relic.domain.behaviours.SubscribedCallback;
+
+import java.util.List;
 
 /**
  * Mapper class with public var to reduce boilerplate and and allow the SubredditImpl class to be
  * used with room without violating clean architecture (ie. keeping it framework independent)
  */
 @Entity
-public class SubredditDecorator extends Subreddit{
+public class SubredditDecorator extends Subreddit {
   @NonNull
   @PrimaryKey
   public String id;

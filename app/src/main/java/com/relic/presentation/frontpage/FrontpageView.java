@@ -1,6 +1,5 @@
-package com.relic.presentation.Frontpage;
+package com.relic.presentation.frontpage;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,8 +13,6 @@ import com.relic.R;
 import com.relic.data.Authenticator;
 import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
-
-import java.util.ArrayList;
 
 public class FrontpageView extends Fragment {
   FrontpageContract.VM viewModel;

@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.relic.data.Authenticator;
 import com.relic.data.VolleyQueue;
-import com.relic.presentation.DisplaySubs.DisplaySubsView;
+import com.relic.presentation.displaysubs.DisplaySubsView;
 
 public class MainActivity extends AppCompatActivity {
   Authenticator auth;

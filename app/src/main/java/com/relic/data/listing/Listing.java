@@ -1,4 +1,4 @@
-package com.relic.data.Listing;
+package com.relic.data.listing;
 
 import com.relic.domain.Thing;
 
