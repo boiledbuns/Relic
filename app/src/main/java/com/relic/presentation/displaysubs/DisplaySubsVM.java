@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.relic.data.Authenticator;
 import com.relic.data.SubRepository;
 import com.relic.domain.Subreddit;
 
@@ -15,7 +16,10 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
 
   final String TAG = "DISPLAY_SUBS_VM";
 
-  public void init(SubRepository subRepository) {
+  public void init(SubRepository subRepository, Authenticator auth) {
+    // refresh token before performing any requests
+    auth.refreshToken();
+
     this.subRepo = subRepository;
     subRepository.getSubscribed();
 

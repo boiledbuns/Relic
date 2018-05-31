@@ -59,7 +59,7 @@ public class SubRepositoryImpl implements SubRepository {
             new Response.ErrorListener() {
               @Override
               public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Error : " + error.networkResponse.headers.toString());
+                Log.d(TAG, "Error : " + error.toString());
               }
             })
         {

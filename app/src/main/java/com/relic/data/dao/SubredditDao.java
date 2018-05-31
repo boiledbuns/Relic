@@ -15,7 +15,7 @@ public abstract class SubredditDao {
   @Query("SELECT * FROM SubredditModel")
   public abstract List<SubredditModel> getAll();
 
-  @Query("SELECT * FROM SubredditModel")
+  @Query("SELECT * FROM SubredditModel ORDER BY name DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)

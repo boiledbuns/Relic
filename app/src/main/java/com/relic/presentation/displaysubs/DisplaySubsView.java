@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.relic.R;
+import com.relic.data.Authenticator;
 import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.databinding.DisplaySubsBinding;
@@ -39,7 +41,7 @@ public class DisplaySubsView extends Fragment {
 
     // initialize the repository and inject it into the viewmodel
     SubRepository accountRepo = new SubRepositoryImpl(this.getContext());
-    viewModel.init(accountRepo);
+    viewModel.init(accountRepo, Authenticator.getAuthenticator(this.getContext()));
   }
 
   @Nullable
@@ -53,6 +55,11 @@ public class DisplaySubsView extends Fragment {
     // initialize the adapter for the subs and attach it to the recyclerview
     subAdapter = new SubItemAdapter();
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
+
+    // displays the items in 3 columns
+    ((GridLayoutManager) displaySubsBinding.displaySubsRecyclerview.getLayoutManager())
+        .setSpanCount(3);
+
 
     // calls method to subscribe the adapter to the livedata list
     subscribeToList(viewModel);

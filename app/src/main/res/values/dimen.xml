@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="sub_item_height">30dp</dimen>
+    <dimen name="sub_item_margin">3dp</dimen>
 </resources>

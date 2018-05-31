@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
     </data>
@@ -8,6 +9,10 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/display_subs_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
+        android:clipToPadding="false"
+        android:paddingEnd="@dimen/sub_item_margin"
+        android:paddingBottom="@dimen/sub_item_margin"/>
 
 </layout>

@@ -12,11 +12,12 @@ import com.relic.R;
 import com.relic.databinding.SubItemBinding;
 import com.relic.domain.Subreddit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private final String TAG = "SUB_ITEM_ADAPTER";
-  private List<Subreddit> subList;
+  private List<Subreddit> subList = new ArrayList<>();
 
   /**
    * Viewholder to cache data
@@ -55,7 +56,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
   public void setList(List<Subreddit> subs) {
     // set the entire list if the current list is null
-    if (this.subList == null) {
+    if (this.subList.size() == 0) {
       this.subList = subs;
       notifyItemChanged(0, subs.size());
       Log.d(TAG, subs.size() + " ");

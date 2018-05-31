@@ -21,11 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     Authenticator auth = new Authenticator(this);
 
-    // take the user to the frontpage
-//    getSupportFragmentManager().beginTrans  action()
-//        .replace(R.id.main_content_frame, new FrontpageView()).commit();
-    getSupportFragmentManager().beginTransaction()
-        .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
+    initializeDefaultView();
 
     if (!auth.isAuthenticated()) {
       // create the login fragment for the user if not authenticated
@@ -33,6 +29,14 @@ public class MainActivity extends AppCompatActivity {
       getSupportFragmentManager().beginTransaction().addToBackStack("AUTH")
         .replace(R.id.main_content_frame, loginFragment).commit();
     }
+  }
+
+
+  public void initializeDefaultView() {
+    auth.refreshToken();
+
+    getSupportFragmentManager().beginTransaction()
+        .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
   }
 
 }
