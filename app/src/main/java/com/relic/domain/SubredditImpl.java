@@ -28,4 +28,9 @@ public class SubredditImpl implements Subreddit {
   public String getSubName() {
     return null;
   }
+
+  @Override
+  public String getBannerUrl() {
+    return null;
+  }
 }

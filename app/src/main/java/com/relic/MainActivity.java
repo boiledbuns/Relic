@@ -19,8 +19,8 @@ public class MainActivity extends AppCompatActivity {
     // initialize the request queue
     VolleyQueue.init(getApplicationContext());
 
-    Authenticator auth = new Authenticator(this);
 
+    auth = Authenticator.getAuthenticator(this);
     initializeDefaultView();
 
     if (!auth.isAuthenticated()) {

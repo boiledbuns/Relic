@@ -8,7 +8,7 @@ import android.content.Context;
 import com.relic.data.dao.SubredditDao;
 import com.relic.data.models.SubredditModel;
 
-@Database(entities = {SubredditModel.class}, version = 1, exportSchema = false)
+@Database(entities = {SubredditModel.class}, version = 2, exportSchema = false)
 public abstract class ApplicationDB extends RoomDatabase{
   private static ApplicationDB INSTANCE;
 

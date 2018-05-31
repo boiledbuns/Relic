@@ -17,19 +17,19 @@ public class SubredditModel implements Subreddit {
   @PrimaryKey
   public String id;
   public String name;
-  public String iconLink;
+  public String bannerUrl;
   public boolean nsfw;
 
-  public SubredditModel(String id, String name, String iconLink, boolean nsfw) {
+  public SubredditModel(String id, String name, String bannerUrl, boolean nsfw) {
     this.id = id;
-    this.iconLink = iconLink;
+    this.bannerUrl = bannerUrl;
     this.name = name;
     this.nsfw = nsfw;
   }
 
   @Override
   public String toString() {
-    return name + " " + id + " " + iconLink + " " + nsfw;
+    return name + " " + id + " " + bannerUrl + " " + nsfw;
   }
 
   @Override
@@ -42,7 +42,12 @@ public class SubredditModel implements Subreddit {
     return name;
   }
 
+  @Override
+  public String getBannerUrl() {
+    return bannerUrl;
+  }
+
 //  public SubredditImpl mapToDomain() {
-//    return new SubredditImpl(id, iconLink, name, nsfw);
+//    return new SubredditImpl(id, bannerUrl, name, nsfw);
 //  }
 }

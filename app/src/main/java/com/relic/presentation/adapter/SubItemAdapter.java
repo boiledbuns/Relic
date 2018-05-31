@@ -1,16 +1,19 @@
 package com.relic.presentation.adapter;
 
 import android.arch.lifecycle.LiveData;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.relic.R;
 import com.relic.databinding.SubItemBinding;
 import com.relic.domain.Subreddit;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,5 +64,16 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
       notifyItemChanged(0, subs.size());
       Log.d(TAG, subs.size() + " ");
     }
+  }
+
+  @BindingAdapter({"bind:bannerUrl"})
+  public static void loadImage(ImageView imgView, String bannerUrl) {
+    // loads default image in case the sub has no banner
+    String url = "https://i.imgur.com/FDMAWSA.jpg";
+//    if (bannerUrl != null || bannerUrl.length() == 0) {
+//      url = bannerUrl;
+//    }
+    Log.d("SUB_ITEM_ADAPTER", "URL = " + url);
+    Picasso.get().load(url).into(imgView);
   }
 }
