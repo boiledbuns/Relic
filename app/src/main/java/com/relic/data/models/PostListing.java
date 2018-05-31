@@ -1,12 +1,13 @@
-package com.relic.data.listing;
+package com.relic.data.models;
 
+import com.relic.domain.Listing;
 import com.relic.domain.post.Post;
 import com.relic.domain.Thing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostListing extends Listing {
+public class PostListing implements Listing {
   private String before;
   private String after;
   private List <Post> children;

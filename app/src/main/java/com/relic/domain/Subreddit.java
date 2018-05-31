@@ -1,5 +1,5 @@
 package com.relic.domain;
 
-public abstract class Subreddit {
+public interface Subreddit {
   
 }

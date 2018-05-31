@@ -12,7 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
-import com.relic.data.listing.PostListing;
+import com.relic.data.models.PostListing;
 import com.relic.domain.post.Post;
 import com.relic.domain.post.PostImpl;
 

@@ -1,20 +1,18 @@
-package com.relic.data.subreddit;
+package com.relic.data.models;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.relic.domain.Subreddit;
-import com.relic.domain.behaviours.SubscribedCallback;
 
-import java.util.List;
 
 /**
  * Mapper class with public var to reduce boilerplate and and allow the SubredditImpl class to be
  * used with room without violating clean architecture (ie. keeping it framework independent)
  */
 @Entity
-public class SubredditDecorator extends Subreddit {
+public class SubredditModel implements Subreddit {
   @NonNull
   @PrimaryKey
   public String id;
@@ -22,7 +20,7 @@ public class SubredditDecorator extends Subreddit {
   public String iconLink;
   public boolean nsfw;
 
-  public SubredditDecorator(String id, String name, String iconLink, boolean nsfw) {
+  public SubredditModel(String id, String name, String iconLink, boolean nsfw) {
     this.id = id;
     this.iconLink = iconLink;
     this.name = name;

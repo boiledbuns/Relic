@@ -1,6 +1,6 @@
 package com.relic.domain;
 
-public class SubredditImpl extends Subreddit {
+public class SubredditImpl implements Subreddit {
   private String id;
   private String iconLink;
   private String name;

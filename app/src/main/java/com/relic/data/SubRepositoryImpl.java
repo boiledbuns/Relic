@@ -1,5 +1,6 @@
 package com.relic.data;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -9,11 +10,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.relic.R;
-import com.relic.data.subreddit.SubredditDB;
-import com.relic.data.subreddit.SubredditDecorator;
+import com.relic.data.models.SubredditModel;
 import com.relic.domain.Subreddit;
-import com.relic.domain.behaviours.SubscribedCallback;
-import com.relic.presentation.displaysubs.DisplaySubsContract;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -31,18 +29,23 @@ public class SubRepositoryImpl implements SubRepository {
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "ACCOUNT_REPO";
 
-  private SubredditDB subDB;
+  private ApplicationDB subDB;
   private Context context;
 
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;
 
-    subDB = SubredditDB.getDatabase(context);
+    subDB = ApplicationDB.getDatabase(context);
   }
 
 
-  public void getSubscribed(final SubscribedCallback subCallback) {
+  public void getSubscribed() {
+  }
+
+
+  @Override
+  public void retrieveSubscribed() {
     // create the new request to reddit servers and store the data in persistence layer
     VolleyQueue.getQueue().add(
         new StringRequest(
@@ -51,7 +54,7 @@ public class SubRepositoryImpl implements SubRepository {
               @Override
               public void onResponse(String response) {
                 try {
-                  parseUser(response, subCallback);
+                  parseUser(response);
                 } catch (ParseException e) {
                   Log.e(TAG, "Error parsing the response: " + e.toString());
                 }
@@ -64,31 +67,37 @@ public class SubRepositoryImpl implements SubRepository {
               }
             })
         {
-        public Map<String, String> getHeaders() {
-          Map <String, String> headers = new HashMap<>();
+          public Map<String, String> getHeaders() {
+            Map <String, String> headers = new HashMap<>();
 
-          String auth = context.getSharedPreferences(
-              context.getResources().getString(R.string.AUTH_PREF),
-              Context.MODE_PRIVATE)
-              .getString(context.getResources().getString(R.string.TOKEN_KEY), "DEFAULT");
+            String auth = context.getSharedPreferences(
+                context.getResources().getString(R.string.AUTH_PREF),
+                Context.MODE_PRIVATE)
+                .getString(context.getResources().getString(R.string.TOKEN_KEY), "DEFAULT");
 
-          // generate the credential string for oauth
-          String credentials = "bearer " + auth;
-          headers.put("Authorization", credentials);
-          headers.put("User-Agent", userAgent);
+            // generate the credential string for oauth
+            String credentials = "bearer " + auth;
+            headers.put("Authorization", credentials);
+            headers.put("User-Agent", userAgent);
 
-          return headers;
-        }
-    });
+            return headers;
+          }
+        });
   }
 
 
-  private void parseUser(String response, SubscribedCallback subCallback) throws ParseException {
+  @Override
+  public LiveData<List<SubredditModel>> getSubscribedList() {
+    return subDB.getSubredditDao().getAllSubscribed();
+  }
+
+
+  private void parseUser(String response) throws ParseException {
     Log.d(TAG, response);
     JSONObject data;
 
     data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
-    List <SubredditDecorator> subscribed = new ArrayList<>();
+    List <SubredditModel> subscribed = new ArrayList<>();
 
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
@@ -101,7 +110,7 @@ public class SubRepositoryImpl implements SubRepository {
         nsfw = false;
       }
       // Log.d(TAG, "keys = " + currentSub.keySet());
-      subscribed.add(new SubredditDecorator(
+      subscribed.add(new SubredditModel(
           (String) currentSub.get("id"),
           (String) currentSub.get("display_name"),
           (String) currentSub.get("icon_img"),
@@ -110,21 +119,19 @@ public class SubRepositoryImpl implements SubRepository {
     }
     Log.d(TAG, subscribed.toString());
     // insert the subs in the room instance
-    new InsertSubsTask (subDB, subCallback).execute(subscribed);
+    new InsertSubsTask (subDB).execute(subscribed);
   }
 
 
-  static class InsertSubsTask extends AsyncTask <List<SubredditDecorator>, Integer, Integer> {
-    private SubredditDB subDB;
-    private SubscribedCallback subCallback;
+  static class InsertSubsTask extends AsyncTask <List<SubredditModel>, Integer, Integer> {
+    private ApplicationDB subDB;
 
-    InsertSubsTask(SubredditDB subDB, SubscribedCallback subCallback) {
+    InsertSubsTask(ApplicationDB subDB) {
       this.subDB = subDB;
-      this.subCallback = subCallback;
     }
 
     @Override
-    protected Integer doInBackground(List<SubredditDecorator>... lists) {
+    protected Integer doInBackground(List<SubredditModel>... lists) {
       subDB.getSubredditDao().insertAll(lists[0]);
       return lists[0].size();
     }
@@ -133,8 +140,11 @@ public class SubRepositoryImpl implements SubRepository {
     protected void onPostExecute(Integer integer) {
       //super.onPostExecute(integer);
       // sends the VM the list of newly inserted subs
-      subCallback.recieveSubs(new ArrayList<Subreddit>(subDB.getSubredditDao().getAll()));
+      //recieveSubs(new ArrayList<Subreddit>(subDB.getSubredditDao().getAll()));
     }
   }
+
+
+
 
 }
