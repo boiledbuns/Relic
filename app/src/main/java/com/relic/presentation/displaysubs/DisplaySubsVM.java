@@ -17,6 +17,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
 
   public void init(SubRepository subRepository) {
     this.subRepo = subRepository;
+    subRepository.getSubscribed();
 
     // initialize the mediator with null value until we get db values
     obvSubsMediator = new MediatorLiveData<>();
@@ -31,9 +32,8 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
    * @return the livedata list of subscribed subs
    */
   @Override
-  public LiveData<List<Subreddit>> getSubscribed() {
-    // LiveData<List<Subreddit>> list = obvSubsMediator;
-    return null;
+  public LiveData<List<? extends Subreddit>> getSubscribed() {
+    return obvSubsMediator;
   }
 
 

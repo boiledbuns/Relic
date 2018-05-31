@@ -2,19 +2,20 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="subredditItem" type="com.relic.data.models.SubredditModel"/>
+        <variable name="subredditItem" type="com.relic.domain.Subreddit"/>
     </data>
 
-    <RelativeLayout
+    <android.support.v7.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/sub_item_height">
+        <RelativeLayout
+            android:layout_height="@dimen/sub_item_height"
+            android:layout_width="wrap_content">
 
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{subredditItem.id}"/>
-
-
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{subredditItem.getId}"/>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
 </layout>

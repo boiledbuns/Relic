@@ -32,6 +32,16 @@ public class SubredditModel implements Subreddit {
     return name + " " + id + " " + iconLink + " " + nsfw;
   }
 
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public String getSubName() {
+    return name;
+  }
+
 //  public SubredditImpl mapToDomain() {
 //    return new SubredditImpl(id, iconLink, name, nsfw);
 //  }

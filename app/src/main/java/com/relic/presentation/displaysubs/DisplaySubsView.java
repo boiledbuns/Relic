@@ -1,13 +1,13 @@
 package com.relic.presentation.displaysubs;
 
-import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +19,16 @@ import com.relic.databinding.DisplaySubsBinding;
 import com.relic.domain.Subreddit;
 import com.relic.presentation.adapter.SubItemAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DisplaySubsView extends Fragment {
+  private final String TAG = "DISPLAY_SUBS_VIEW";
   DisplaySubsContract.VM viewModel;
   public View rootView;
 
   private DisplaySubsBinding displaySubsBinding;
-  private RecyclerView recyclerView;
+  SubItemAdapter subAdapter;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,10 +51,29 @@ public class DisplaySubsView extends Fragment {
         .inflate(inflater, R.layout.display_subs, container, false);
 
     // initialize the adapter for the subs and attach it to the recyclerview
-    SubItemAdapter subAdapter = new SubItemAdapter();
+    subAdapter = new SubItemAdapter();
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
+
+    // calls method to subscribe the adapter to the livedata list
+    subscribeToList(viewModel);
 
     rootView = displaySubsBinding.getRoot();
     return displaySubsBinding.getRoot();
+  }
+
+  private void subscribeToList(DisplaySubsContract.VM viewModel) {
+    // allows the list to be updated as data is updated
+    viewModel.getSubscribed().observe(this, new Observer<List<? extends Subreddit>>() {
+      @Override
+      public void onChanged(@Nullable List<? extends Subreddit> subredditsList) {
+        // updates the view once the list is loaded
+        if (subredditsList != null) {
+          subAdapter.setList(new ArrayList<>(subredditsList));
+          Log.d(TAG, "Changes to subreddit list received");
+        }
+        // execute changes and sync
+        displaySubsBinding.executePendingBindings();
+      }
+    });
   }
 }

@@ -11,5 +11,4 @@ public interface SubRepository {
 
   LiveData<List<SubredditModel>> getSubscribedList();
 
-  void retrieveSubscribed();
 }

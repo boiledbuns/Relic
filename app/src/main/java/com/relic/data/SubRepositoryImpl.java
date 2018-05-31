@@ -27,7 +27,7 @@ import java.util.Map;
 public class SubRepositoryImpl implements SubRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
-  private final String TAG = "ACCOUNT_REPO";
+  private final String TAG = "SUB_REPO";
 
   private ApplicationDB subDB;
   private Context context;
@@ -40,12 +40,8 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
-  public void getSubscribed() {
-  }
-
-
   @Override
-  public void retrieveSubscribed() {
+  public void getSubscribed() {
     // create the new request to reddit servers and store the data in persistence layer
     VolleyQueue.getQueue().add(
         new StringRequest(
@@ -134,13 +130,6 @@ public class SubRepositoryImpl implements SubRepository {
     protected Integer doInBackground(List<SubredditModel>... lists) {
       subDB.getSubredditDao().insertAll(lists[0]);
       return lists[0].size();
-    }
-
-    @Override
-    protected void onPostExecute(Integer integer) {
-      //super.onPostExecute(integer);
-      // sends the VM the list of newly inserted subs
-      //recieveSubs(new ArrayList<Subreddit>(subDB.getSubredditDao().getAll()));
     }
   }
 

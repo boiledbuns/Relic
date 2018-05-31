@@ -11,7 +11,7 @@ import java.util.List;
 public interface DisplaySubsContract {
   interface VM {
     void init(SubRepository accountRepo);
-    LiveData<List<Subreddit>> getSubscribed();
+    LiveData<List<? extends Subreddit>> getSubscribed();
   }
 
 }

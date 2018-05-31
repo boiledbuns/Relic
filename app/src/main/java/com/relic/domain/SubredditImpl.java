@@ -19,4 +19,13 @@ public class SubredditImpl implements Subreddit {
   }
 
 
+  @Override
+  public String getId() {
+    return null;
+  }
+
+  @Override
+  public String getSubName() {
+    return null;
+  }
 }
