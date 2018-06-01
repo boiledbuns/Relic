@@ -18,6 +18,6 @@ public abstract class SubredditDao {
   @Query("SELECT * FROM SubredditModel ORDER BY name DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertAll(List<SubredditModel> subredditList);
 }

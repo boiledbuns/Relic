@@ -11,7 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.relic.R;
 import com.relic.data.models.SubredditModel;
-import com.relic.domain.Subreddit;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -50,7 +49,7 @@ public class SubRepositoryImpl implements SubRepository {
               @Override
               public void onResponse(String response) {
                 try {
-                  parseUser(response);
+                  parseSubreddits(response);
                 } catch (ParseException e) {
                   Log.e(TAG, "Error parsing the response: " + e.toString());
                 }
@@ -88,7 +87,7 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
-  private void parseUser(String response) throws ParseException {
+  private void parseSubreddits(String response) throws ParseException {
     Log.d(TAG, response);
     JSONObject data;
 
@@ -105,15 +104,15 @@ public class SubRepositoryImpl implements SubRepository {
       if (currentSub.get("nsfw") == null) {
         nsfw = false;
       }
-      // Log.d(TAG, "keys = " + currentSub.keySet());
+      Log.d(TAG, "keys = " + currentSub.keySet());
       subscribed.add(new SubredditModel(
           (String) currentSub.get("id"),
           (String) currentSub.get("display_name"),
-          (String) currentSub.get("icon_img"),
+          (String) currentSub.get("banner_img"),
           nsfw
       ));
     }
-    Log.d(TAG, subscribed.toString());
+    //Log.d(TAG, subscribed.toString());
     // insert the subs in the room instance
     new InsertSubsTask (subDB).execute(subscribed);
   }
@@ -132,8 +131,6 @@ public class SubRepositoryImpl implements SubRepository {
       return lists[0].size();
     }
   }
-
-
 
 
 }

@@ -68,12 +68,16 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
   @BindingAdapter({"bind:bannerUrl"})
   public static void loadImage(ImageView imgView, String bannerUrl) {
-    // loads default image in case the sub has no banner
-    String url = "https://i.imgur.com/FDMAWSA.jpg";
-//    if (bannerUrl != null || bannerUrl.length() == 0) {
-//      url = bannerUrl;
-//    }
-    Log.d("SUB_ITEM_ADAPTER", "URL = " + url);
-    Picasso.get().load(url).into(imgView);
+    // does not load image if the banner img string is empty
+    if (bannerUrl.length() > 0) {
+      try {
+        Log.d("SUB_ITEM_ADAPTER", "URL = " + bannerUrl);
+        Picasso.get().load(bannerUrl).into(imgView);
+      }
+      catch (Error e) {
+        Log.d("SUB_ITEM_ADAPTER", "Issue loading image " + e.toString());
+      }
+    }
+
   }
 }
