@@ -3,6 +3,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="subredditItem" type="com.relic.domain.Subreddit"/>
+        <variable name="itemOnClick"
+                  type="com.relic.presentation.adapter.SubItemAdapter.SubItemOnClick"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -10,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_marginStart="@dimen/subitem_margin"
         android:layout_marginTop="@dimen/subitem_margin"
-        android:background="@color/pastel">
+        android:background="@color/pastel"
+        android:onClick="@{() -> itemOnClick.onClick(subredditItem)}">
 
         <RelativeLayout
             android:layout_height="0dp"

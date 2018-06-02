@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.relic.R;
 import com.relic.databinding.SubItemBinding;
@@ -31,8 +32,12 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     SubItemVH(SubItemBinding subBinding) {
       super(subBinding.getRoot());
       this.binding = subBinding;
+
+      // attach the onclick to this item
+      this.binding.setItemOnClick(new SubItemOnClick());
     }
   }
+
 
   @NonNull
   @Override
@@ -48,6 +53,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
   public void onBindViewHolder(@NonNull SubItemVH holder, int position) {
     // binds sets the item in the binding
     holder.binding.setSubredditItem(subList.get(position));
+
     // pushes changes
     holder.binding.executePendingBindings();
   }
@@ -80,5 +86,14 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     }
   }
 
+
+  /**
+   * onclick method for the xml file to hook to
+   */
+  public class SubItemOnClick {
+    public void onClick(Subreddit subItem) {
+      Log.d(TAG, subItem.getSubName());
+    }
+  }
 
 }

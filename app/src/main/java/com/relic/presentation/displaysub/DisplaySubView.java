@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.relic.presentation.displaysubs.DisplaySubsContract;
 
 public class DisplaySubView extends Fragment {
   DisplaySubContract.ViewModel displaySubVM;
@@ -27,6 +26,5 @@ public class DisplaySubView extends Fragment {
     // provide the viewmodel after the view has been initialized
     displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
   }
-
 
 }
