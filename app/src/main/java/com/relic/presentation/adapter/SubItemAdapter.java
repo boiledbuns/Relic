@@ -78,6 +78,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
         Log.d("SUB_ITEM_ADAPTER", "Issue loading image " + e.toString());
       }
     }
-
   }
+
+
 }

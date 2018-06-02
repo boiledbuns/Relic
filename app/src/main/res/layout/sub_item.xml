@@ -8,19 +8,23 @@
     <android.support.constraint.ConstraintLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_marginStart="@dimen/sub_item_margin"
-        android:layout_marginTop="@dimen/sub_item_margin"
+        android:layout_marginStart="@dimen/subitem_margin"
+        android:layout_marginTop="@dimen/subitem_margin"
         android:background="@color/pastel">
 
         <RelativeLayout
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            app:layout_constraintDimensionRatio="W, 1:1">
+            app:layout_constraintDimensionRatio="W, 1:1"
+            android:paddingTop="@dimen/subitem_padding_top"
+            android:paddingStart="@dimen/subitem_padding_hor"
+            android:paddingEnd="@dimen/subitem_padding_hor">
 
-            <TextView
+        <TextView
                 android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAllCaps="true"
                 android:text="@{subredditItem.getSubName}"/>
 
             <ImageView

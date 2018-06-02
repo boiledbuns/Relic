@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         app:layoutManager="android.support.v7.widget.GridLayoutManager"
         android:clipToPadding="false"
-        android:paddingEnd="@dimen/sub_item_margin"
-        android:paddingBottom="@dimen/sub_item_margin"/>
+        android:paddingEnd="@dimen/subitem_margin"
+        android:paddingBottom="@dimen/subitem_margin"/>
 
 </layout>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="sub_item_height">30dp</dimen>
-    <dimen name="sub_item_margin">3dp</dimen>
+    <dimen name="subitem_height">30dp</dimen>
+    <dimen name="subitem_margin">3dp</dimen>
+    <dimen name="subitem_padding_top">12dp</dimen>
+    <dimen name="subitem_padding_hor">12dp</dimen>
+
 </resources>

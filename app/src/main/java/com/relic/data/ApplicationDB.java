@@ -19,7 +19,6 @@ public abstract class ApplicationDB extends RoomDatabase{
       INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
           ApplicationDB.class, "SUBREDDIT").build();
     }
-
     return INSTANCE;
   }
 

@@ -18,7 +18,6 @@ public class SubredditImpl implements Subreddit {
     return name + " " + id + " " + iconLink + " " + nsfw;
   }
 
-
   @Override
   public String getId() {
     return null;
