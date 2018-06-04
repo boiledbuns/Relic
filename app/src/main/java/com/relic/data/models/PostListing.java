@@ -1,7 +1,7 @@
 package com.relic.data.models;
 
 import com.relic.domain.Listing;
-import com.relic.domain.post.Post;
+import com.relic.domain.Post;
 import com.relic.domain.Thing;
 
 import java.util.ArrayList;
@@ -30,6 +30,6 @@ public class PostListing implements Listing {
 
   @Override
   public List<Thing> getChildren() {
-    return new ArrayList<Thing>(children);
+    return new ArrayList<Thing>();
   }
 }

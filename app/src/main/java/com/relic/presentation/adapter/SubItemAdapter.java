@@ -105,6 +105,9 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
       // replace the current screen with sub item
       ((FragmentActivity) fragmentContext).getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, new DisplaySubView()).addToBackStack(TAG).commit();
+
+      // add the sub object to the repo
+
     }
   }
 

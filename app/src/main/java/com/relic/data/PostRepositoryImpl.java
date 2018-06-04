@@ -13,7 +13,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
 import com.relic.data.models.PostListing;
-import com.relic.domain.post.Post;
+import com.relic.domain.Post;
 import com.relic.domain.post.PostImpl;
 
 import org.json.simple.JSONArray;

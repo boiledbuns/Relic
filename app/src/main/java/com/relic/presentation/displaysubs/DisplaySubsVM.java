@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
   private SubRepository subRepo;
-  public MediatorLiveData <List<? extends Subreddit>> obvSubsMediator;
+  private MediatorLiveData <List<? extends Subreddit>> obvSubsMediator;
 
   final String TAG = "DISPLAY_SUBS_VM";
 
