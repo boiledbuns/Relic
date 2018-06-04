@@ -1,19 +1,20 @@
 package com.relic.presentation.adapter;
 
-import android.arch.lifecycle.LiveData;
+import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.relic.R;
 import com.relic.databinding.SubItemBinding;
 import com.relic.domain.Subreddit;
+import com.relic.presentation.displaysub.DisplaySubView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,6 +23,14 @@ import java.util.List;
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private final String TAG = "SUB_ITEM_ADAPTER";
   private List<Subreddit> subList = new ArrayList<>();
+
+  private Context fragmentContext;
+
+  public SubItemAdapter(Context context) {
+    super();
+    // initialize the context for this app to be used by the inner class
+    fragmentContext = context;
+  }
 
   /**
    * Viewholder to cache data
@@ -88,11 +97,14 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
 
   /**
-   * onclick method for the xml file to hook to
+   * onclick class for the xml file to hook to
    */
   public class SubItemOnClick {
     public void onClick(Subreddit subItem) {
       Log.d(TAG, subItem.getSubName());
+      // replace the current screen with sub item
+      ((FragmentActivity) fragmentContext).getSupportFragmentManager().beginTransaction()
+          .replace(R.id.main_content_frame, new DisplaySubView()).addToBackStack(TAG).commit();
     }
   }
 

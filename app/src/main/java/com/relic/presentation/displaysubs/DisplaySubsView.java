@@ -53,13 +53,12 @@ public class DisplaySubsView extends Fragment {
         .inflate(inflater, R.layout.display_subs, container, false);
 
     // initialize the adapter for the subs and attach it to the recyclerview
-    subAdapter = new SubItemAdapter();
+    subAdapter = new SubItemAdapter(this.getContext());
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
 
     // displays the items in 3 columns
     ((GridLayoutManager) displaySubsBinding.displaySubsRecyclerview.getLayoutManager())
         .setSpanCount(3);
-
 
     // calls method to subscribe the adapter to the livedata list
     subscribeToList(viewModel);

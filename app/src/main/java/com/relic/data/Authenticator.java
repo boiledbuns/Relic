@@ -42,8 +42,8 @@ public class Authenticator {
   private String scope = "identity account mysubreddits edit flair history modconfig modflair modlog modposts modwiki" +
       " mysubreddits privatemessages read report save submit subscribe vote wikiedit wikiread";
 
-  Context appContext;
-  RequestQueue requestQueue;
+  private Context appContext;
+  private RequestQueue requestQueue;
 
   private static Authenticator INSTANCE;
 
