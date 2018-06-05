@@ -12,7 +12,7 @@ import java.util.List;
 public interface DisplaySubsContract {
   interface VM {
     void init(SubRepository accountRepo, Authenticator auth);
-    LiveData<List<? extends Subreddit>> getSubscribed();
+    LiveData<List<SubredditModel>> getSubscribed();
   }
 
 }

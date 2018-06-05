@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="subredditItem" type="com.relic.domain.Subreddit"/>
+        <variable name="subredditItem" type="com.relic.data.models.SubredditModel"/>
         <variable name="itemOnClick"
                   type="com.relic.presentation.adapter.SubItemAdapter.SubItemOnClick"/>
     </data>
@@ -24,16 +24,17 @@
             android:paddingEnd="@dimen/subitem_padding_hor">
 
         <TextView
-                android:layout_centerHorizontal="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAllCaps="true"
-                android:text="@{subredditItem.getSubName}"/>
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:text="@{subredditItem.subName}"
+            android:textStyle="bold"/>
 
-            <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                app:bannerUrl="@{subredditItem.getBannerUrl}"/>
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:bannerUrl="@{subredditItem.getBannerUrl}"/>
         </RelativeLayout>
     </android.support.constraint.ConstraintLayout>
 </layout>

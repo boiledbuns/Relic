@@ -3,6 +3,7 @@ package com.relic.presentation.adapter;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
@@ -12,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.relic.R;
+import com.relic.data.models.SubredditModel;
 import com.relic.databinding.SubItemBinding;
-import com.relic.domain.Subreddit;
 import com.relic.presentation.displaysub.DisplaySubView;
 import com.squareup.picasso.Picasso;
 
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private final String TAG = "SUB_ITEM_ADAPTER";
-  private List<Subreddit> subList = new ArrayList<>();
+  private List<SubredditModel> subList = new ArrayList<>();
 
   private Context fragmentContext;
 
@@ -72,7 +73,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     return subList.size();
   }
 
-  public void setList(List<Subreddit> subs) {
+  public void setList(List<SubredditModel> subs) {
     // set the entire list if the current list is null
     if (this.subList.size() == 0) {
       this.subList = subs;
@@ -100,14 +101,19 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
    * onclick class for the xml file to hook to
    */
   public class SubItemOnClick {
-    public void onClick(Subreddit subItem) {
+    public void onClick(SubredditModel subItem) {
       Log.d(TAG, subItem.getSubName());
-      // replace the current screen with sub item
+
+      // add the sub reddit object to the bundle
+      Bundle bundle = new Bundle();
+      bundle.putParcelable("SubredditModel", subItem);
+
+      DisplaySubView subFrag = new DisplaySubView();
+      subFrag.setArguments(bundle);
+
+      // replace the current screen with the newly created fragment
       ((FragmentActivity) fragmentContext).getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, new DisplaySubView()).addToBackStack(TAG).commit();
-
-      // add the sub object to the repo
-
+          .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
     }
   }
 

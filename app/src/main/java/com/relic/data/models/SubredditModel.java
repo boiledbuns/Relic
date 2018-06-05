@@ -50,8 +50,6 @@ public class SubredditModel implements Subreddit, Parcelable {
   }
 
 
-
-
   @Override
   public int describeContents() {
     return 0;

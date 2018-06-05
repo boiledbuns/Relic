@@ -1,6 +1,7 @@
 package com.relic.data;
 
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -75,6 +76,16 @@ public class PostRepositoryImpl implements PostRepository {
           }
         }
     ));
+  }
+
+  @Override
+  public LiveData<PostListing> getPostListing(String subredditName) {
+    return null;
+  }
+
+  @Override
+  public void retrieveNextPostListing(String listingAfter) {
+
   }
 
 

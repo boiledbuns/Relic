@@ -17,6 +17,7 @@ import com.relic.R;
 import com.relic.data.Authenticator;
 import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
+import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
 import com.relic.domain.Subreddit;
 import com.relic.presentation.adapter.SubItemAdapter;
@@ -69,9 +70,9 @@ public class DisplaySubsView extends Fragment {
 
   private void subscribeToList(DisplaySubsContract.VM viewModel) {
     // allows the list to be updated as data is updated
-    viewModel.getSubscribed().observe(this, new Observer<List<? extends Subreddit>>() {
+    viewModel.getSubscribed().observe(this, new Observer<List<SubredditModel>>() {
       @Override
-      public void onChanged(@Nullable List<? extends Subreddit> subredditsList) {
+      public void onChanged(@Nullable List<SubredditModel> subredditsList) {
         // updates the view once the list is loaded
         if (subredditsList != null) {
           subAdapter.setList(new ArrayList<>(subredditsList));

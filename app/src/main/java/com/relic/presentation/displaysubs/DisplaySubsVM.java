@@ -6,13 +6,14 @@ import android.arch.lifecycle.ViewModel;
 
 import com.relic.data.Authenticator;
 import com.relic.data.SubRepository;
+import com.relic.data.models.SubredditModel;
 import com.relic.domain.Subreddit;
 
 import java.util.List;
 
 public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
   private SubRepository subRepo;
-  private MediatorLiveData <List<? extends Subreddit>> obvSubsMediator;
+  private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
 
   final String TAG = "DISPLAY_SUBS_VM";
 
@@ -36,7 +37,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
    * @return the livedata list of subscribed subs
    */
   @Override
-  public LiveData<List<? extends Subreddit>> getSubscribed() {
+  public LiveData<List<SubredditModel>> getSubscribed() {
     return obvSubsMediator;
   }
 
