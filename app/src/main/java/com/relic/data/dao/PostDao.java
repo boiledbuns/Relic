@@ -7,13 +7,14 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.relic.data.entities.PostEntity;
+import com.relic.data.models.PostModel;
 
 import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  @Query("SELECT  * FROM PostEntity where postListingId = :postId")
-  public abstract LiveData<List<PostEntity>> getSubredditPosts(String postId);
+  @Query("SELECT id, title, commentCount  FROM PostEntity where postListingId != :postListingId")
+  public abstract LiveData<List<PostModel>> getSubredditPosts(String postListingId);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertPosts(List<PostEntity> posts);

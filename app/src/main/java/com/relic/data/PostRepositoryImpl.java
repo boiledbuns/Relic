@@ -14,8 +14,10 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
+import com.relic.data.dao.PostDao;
 import com.relic.data.entities.PostEntity;
 import com.relic.data.models.PostListingModel;
+import com.relic.data.models.PostModel;
 import com.relic.domain.Post;
 import com.relic.domain.post.PostImpl;
 
@@ -38,6 +40,7 @@ public class PostRepositoryImpl implements PostRepository {
   private Context context;
   private String authToken;
   private JSONParser JSONParser;
+  private ApplicationDB appDB;
 
   RequestQueue requestQueue;
 
@@ -52,10 +55,13 @@ public class PostRepositoryImpl implements PostRepository {
     String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
     authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
+
+    // initialize reference to the database
+    appDB = ApplicationDB.getDatabase(context);
   }
 
 
-  public LiveData<PostListingModel> getPostListing(String subreddit) {
+  public LiveData<List<PostModel>> getPostListing(String subreddit) {
     // create the new request and submit it
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + subreddit,
         new Response.Listener<String>() {
@@ -77,7 +83,7 @@ public class PostRepositoryImpl implements PostRepository {
         }
     ));
 
-    return null;
+    return appDB.getPostDao().getSubredditPosts("1");
   }
 
 
@@ -97,35 +103,22 @@ public class PostRepositoryImpl implements PostRepository {
     JSONArray listingPosts = (JSONArray) (listingData).get("children");
 
     Iterator postIterator = listingPosts.iterator();
-    List <Post> posts = new ArrayList<>();
     List <PostEntity> postEntities = new ArrayList<>();
 
     // GSON reader to unmarshall the json response
     Gson gson = new GsonBuilder().create();
-
     Log.d(TAG, "dank = " + response);
 
-    PostEntity newPostEntity;
     // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
-      posts.add(new PostImpl(
-          (String) post.get("id"),
-          (String) post.get("subreddit_name_prefixed"),
-          (String) post.get("author")
-      ));
-
-      // demarshall the object using the json return
-      newPostEntity = gson.fromJson(response, PostEntity.class);
-      postEntities.add(newPostEntity);
-
-      Log.d(TAG, "post keys " + post.keySet().toString());
+      // demarshall the object and add it into a list
+      postEntities.add(gson.fromJson(response, PostEntity.class));
+      // Log.d(TAG, "post keys " + post.keySet().toString());
     }
-    
-    // Create a new listing object and add the posts, before, and after ids to it
-    PostListingModel listing = new PostListingModel((String) listingData.get("before"),
-        (String) listingData.get("after"), posts);
 
+    // insert all the post entities into the db
+    appDB.getPostDao().insertPosts(postEntities);
     Log.d(TAG, listingData.get("after").toString());
   }
 
