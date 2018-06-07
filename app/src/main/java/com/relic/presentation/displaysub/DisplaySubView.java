@@ -63,7 +63,7 @@ public class DisplaySubView extends Fragment {
       displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
     }
 
-    Toast.makeText(this.getContext(), "Orientation changed", Toast.LENGTH_SHORT).show();
+    //Toast.makeText(this.getContext(), "Orientation changed", Toast.LENGTH_SHORT).show();
   }
 
 }

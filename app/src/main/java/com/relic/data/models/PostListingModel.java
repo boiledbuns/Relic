@@ -1,5 +1,8 @@
 package com.relic.data.models;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.relic.domain.Listing;
 import com.relic.domain.Post;
 import com.relic.domain.Thing;
@@ -7,12 +10,15 @@ import com.relic.domain.Thing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostListing implements Listing {
+@Entity
+public class PostListingModel implements Listing {
+  @PrimaryKey
+  private int listingID;
   private String before;
   private String after;
   private List <Post> children;
 
-  public PostListing(String before, String after, List <Post> listings) {
+  public PostListingModel(String before, String after, List <Post> listings) {
     this.before = before;
     this.after = after;
     this.children = listings;

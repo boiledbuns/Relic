@@ -2,11 +2,10 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 
-import com.relic.data.models.PostListing;
+import com.relic.data.models.PostListingModel;
 
 public interface PostRepository {
-  void getPosts(String subredditName);
+  LiveData<PostListingModel> getPostListing(String subredditName);
 
-  LiveData<PostListing> getPostListing(String subredditName);
   void retrieveNextPostListing(String listingAfter);
 }

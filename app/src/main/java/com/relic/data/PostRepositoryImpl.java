@@ -4,7 +4,6 @@ package com.relic.data;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -12,8 +11,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.relic.R;
-import com.relic.data.models.PostListing;
+import com.relic.data.entities.PostEntity;
+import com.relic.data.models.PostListingModel;
 import com.relic.domain.Post;
 import com.relic.domain.post.PostImpl;
 
@@ -39,6 +41,7 @@ public class PostRepositoryImpl implements PostRepository {
 
   RequestQueue requestQueue;
 
+
   public PostRepositoryImpl(Context context) {
     this.context = context;
     requestQueue = Volley.newRequestQueue(context);
@@ -49,12 +52,10 @@ public class PostRepositoryImpl implements PostRepository {
     String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
     authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
-
-    Toast.makeText(context, "AUTH TOKEN = " + authToken, Toast.LENGTH_SHORT).show();
   }
 
 
-  public void getPosts(String subreddit) {
+  public LiveData<PostListingModel> getPostListing(String subreddit) {
     // create the new request and submit it
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + subreddit,
         new Response.Listener<String>() {
@@ -68,20 +69,17 @@ public class PostRepositoryImpl implements PostRepository {
               Log.d(TAG, "Error: " + error.getMessage());
             }
           }
-        },
-        new Response.ErrorListener() {
+        }, new Response.ErrorListener() {
           @Override
           public void onErrorResponse(VolleyError error) {
             Log.d(TAG, "Error: " + error.networkResponse.headers.toString());
           }
         }
     ));
-  }
 
-  @Override
-  public LiveData<PostListing> getPostListing(String subredditName) {
     return null;
   }
+
 
   @Override
   public void retrieveNextPostListing(String listingAfter) {
@@ -100,8 +98,14 @@ public class PostRepositoryImpl implements PostRepository {
 
     Iterator postIterator = listingPosts.iterator();
     List <Post> posts = new ArrayList<>();
+    List <PostEntity> postEntities = new ArrayList<>();
+
+    // GSON reader to unmarshall the json response
+    Gson gson = new GsonBuilder().create();
+
     Log.d(TAG, "dank = " + response);
 
+    PostEntity newPostEntity;
     // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
@@ -111,12 +115,15 @@ public class PostRepositoryImpl implements PostRepository {
           (String) post.get("author")
       ));
 
+      // demarshall the object using the json return
+      newPostEntity = gson.fromJson(response, PostEntity.class);
+      postEntities.add(newPostEntity);
+
       Log.d(TAG, "post keys " + post.keySet().toString());
-
     }
-
+    
     // Create a new listing object and add the posts, before, and after ids to it
-    PostListing listing = new PostListing((String) listingData.get("before"),
+    PostListingModel listing = new PostListingModel((String) listingData.get("before"),
         (String) listingData.get("after"), posts);
 
     Log.d(TAG, listingData.get("after").toString());

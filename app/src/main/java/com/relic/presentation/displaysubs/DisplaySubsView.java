@@ -19,7 +19,6 @@ import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
-import com.relic.domain.Subreddit;
 import com.relic.presentation.adapter.SubItemAdapter;
 
 import java.util.ArrayList;
