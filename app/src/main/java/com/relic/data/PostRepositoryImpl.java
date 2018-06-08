@@ -3,6 +3,7 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PostRepositoryImpl implements PostRepository {
-  private final String ENDPOINT = "https://oauth.reddit.com/";
+  private final String ENDPOINT = "https://oauth.reddit.com/r/";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "POST_REPO";
 
@@ -112,14 +113,21 @@ public class PostRepositoryImpl implements PostRepository {
     // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
+
       // demarshall the object and add it into a list
-      postEntities.add(gson.fromJson(response, PostEntity.class));
-      // Log.d(TAG, "post keys " + post.keySet().toString());
+      Log.d(TAG, "post : " + post.toJSONString().length());
+      for (int i = 0; i < Math.ceil(post.toJSONString().length()/900); i ++) {
+        Log.d(TAG + " " + i, post.toJSONString().substring(0 + i*900, 900 + i*900));
+      }
+
+      postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
+
+      //Log.d(TAG, "post keys " + post.keySet().toString());
     }
+    //Log.d(TAG, postEntities.size() + " posts retrieved");
 
     // insert all the post entities into the db
-    appDB.getPostDao().insertPosts(postEntities);
-    Log.d(TAG, listingData.get("after").toString());
+    new InsertPostsTask().execute(postEntities);
   }
 
 
@@ -138,6 +146,14 @@ public class PostRepositoryImpl implements PostRepository {
       headers.put("User-Agent", userAgent);
 
       return headers;
+    }
+  }
+
+  class InsertPostsTask extends AsyncTask<List<PostEntity>, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(List<PostEntity>... lists) {
+      appDB.getPostDao().insertPosts(lists[0]);
+      return null;
     }
   }
 

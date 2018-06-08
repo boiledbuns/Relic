@@ -1,5 +1,6 @@
 package com.relic.presentation.displaysub;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
@@ -31,5 +32,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     postsMediator.addSource(postRepo.getPostListing(currentSub.getSubName()), postsMediator::setValue);
   }
 
-
+  public LiveData<List<PostModel>> getPosts() {
+    return postsMediator;
+  }
 }

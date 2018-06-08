@@ -1,5 +1,6 @@
 package com.relic.presentation.displaysub;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -14,12 +15,17 @@ import android.widget.Toast;
 
 import com.relic.R;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubBinding;
-import com.relic.domain.Subreddit;
+
+import java.util.List;
+
 
 public class DisplaySubView extends Fragment {
+  private final String TAG = "DISPLAYSUB_VIEW";
   DisplaySubContract.ViewModel displaySubVM;
+
 
   private DisplaySubBinding displaySubBinding;
 
@@ -50,6 +56,8 @@ public class DisplaySubView extends Fragment {
     // initialize the databinding for the layout
     displaySubBinding = DataBindingUtil.inflate(inflater, R.layout.display_sub, container, false);
 
+    subscribeToPosts();
+
     return displaySubBinding.getRoot();
   }
 
@@ -62,8 +70,20 @@ public class DisplaySubView extends Fragment {
       // fetch the viewmodel if the fragment survives a reconfiguration change
       displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
     }
-
     //Toast.makeText(this.getContext(), "Orientation changed", Toast.LENGTH_SHORT).show();
+  }
+
+  private void subscribeToPosts() {
+    // observe the livedata list contained in the viewmodel
+    displaySubVM.getPosts().observe(this, new Observer<List<PostModel>>() {
+      @Override
+      public void onChanged(@Nullable List<PostModel> postModels) {
+        if (postModels != null) {
+          // update the view whenever the livedata changes
+          Log.d(TAG, "SIZE " + postModels.size());
+        }
+      }
+    });
   }
 
 }

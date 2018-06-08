@@ -23,7 +23,6 @@ public class PostModel implements Post {
     this.commentCount = commentCount;
   }
 
-
   public String getId() {
     return id;
   }
@@ -47,6 +46,6 @@ public class PostModel implements Post {
 //                   String subId, String stringDate) {
 //  }
 
-  public PostModel(){}
+  public PostModel() {}
 
 }
