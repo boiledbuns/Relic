@@ -3,15 +3,17 @@ package com.relic.presentation.displaysubs;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.util.Log;
 
 import com.relic.data.Authenticator;
 import com.relic.data.SubRepository;
+import com.relic.data.callbacks.AuthenticationCallback;
 import com.relic.data.models.SubredditModel;
 import com.relic.domain.Subreddit;
 
 import java.util.List;
 
-public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
+public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback {
   private SubRepository subRepo;
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
 
@@ -19,10 +21,9 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
 
   public void init(SubRepository subRepository, Authenticator auth) {
     // refresh token before performing any requests
-    auth.refreshToken();
+    auth.refreshToken(this);
 
     this.subRepo = subRepository;
-    subRepository.getSubscribed();
 
     // initialize the mediator with null value until we get db values
     obvSubsMediator = new MediatorLiveData<>();
@@ -37,9 +38,12 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM {
    * @return the livedata list of subscribed subs
    */
   @Override
-  public LiveData<List<SubredditModel>> getSubscribed() {
+  public LiveData<List<SubredditModel>> getSubscribedList() {
     return obvSubsMediator;
   }
 
-
+  @Override
+  public void onAuthenticated() {
+    subRepo.getSubscribed();
+  }
 }

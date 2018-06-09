@@ -69,7 +69,7 @@ public class DisplaySubsView extends Fragment {
 
   private void subscribeToList(DisplaySubsContract.VM viewModel) {
     // allows the list to be updated as data is updated
-    viewModel.getSubscribed().observe(this, new Observer<List<SubredditModel>>() {
+    viewModel.getSubscribedList().observe(this, new Observer<List<SubredditModel>>() {
       @Override
       public void onChanged(@Nullable List<SubredditModel> subredditsList) {
         // updates the view once the list is loaded

@@ -14,6 +14,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.relic.R;
+import com.relic.data.callbacks.AuthenticationCallback;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -91,7 +92,7 @@ public class Authenticator {
    * Retrieves the code value and uses it to obtain the real auth token
    * @param redirectUrl url with params to parse
    */
-  public void retrieveAccessToken(String redirectUrl) {
+  public void retrieveAccessToken(String redirectUrl, AuthenticationCallback callback) {
     String queryStrings = redirectUrl.substring(REDIRECT_URI.length() + 1);
     String[] queryPairs = queryStrings.split("&");
 
@@ -112,7 +113,7 @@ public class Authenticator {
           @Override
           public void onResponse(String response) {
             Log.d(TAG, response);
-            saveReturn(response);
+            saveReturn(response, callback);
           }
         },
         new Response.ErrorListener() {
@@ -126,16 +127,15 @@ public class Authenticator {
 
 
   /**
-   * Refreshes the current access token using the refresh token to get a permanent
-   * auth token that can be used forever
+   * Refreshes the current access token using the refresh token by getting a new one
    */
-  public void refreshToken() {
+  public void refreshToken(AuthenticationCallback callback) {
     requestQueue.add(new RedditGetRefreshRequest(Request.Method.POST, ACCESS_TOKEN_URI,
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
             Log.d(TAG, "Token refreshed" + response);
-            saveReturn(response);
+            saveReturn(response, callback);
           }
         },
         new Response.ErrorListener() {
@@ -163,7 +163,7 @@ public class Authenticator {
    * preferences. Then refreshes the token to get the permanent token
    * @param response
    */
-  private void saveReturn(String response) {
+  private void saveReturn(String response, AuthenticationCallback callback) {
     JSONParser parser = new JSONParser();
     try {
       JSONObject data = (JSONObject) parser.parse(response);
@@ -179,8 +179,10 @@ public class Authenticator {
       }
 
       prefEditor.putString(tokenKey, (String) data.get(tokenKey)).apply();
-
       Log.d(TAG, "token saved! " + (String) data.get(tokenKey));
+
+      callback.onAuthenticated();
+
     } catch (ParseException e) {
       Toast.makeText(appContext, "yikes", Toast.LENGTH_SHORT).show();
     }

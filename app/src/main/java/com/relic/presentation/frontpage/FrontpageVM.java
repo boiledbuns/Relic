@@ -15,7 +15,7 @@ public class FrontpageVM extends ViewModel implements FrontpageContract.VM {
     this.authenticator = auth;
 
     // get the posts for the frontpage as default
-    auth.refreshToken();
+//    auth.refreshToken(this);
     postRepo.getPostListing(defaultSub);
   }
 

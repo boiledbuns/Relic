@@ -2,6 +2,7 @@ package com.relic.data.entities;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -37,7 +38,10 @@ public class PostEntity {
   // post metadata
   public int view_count;
   public boolean visited;
-  //public boolean edited;
+
+  @Ignore
+  private boolean isEdited;
+
   public boolean over_18;
   public boolean locked;
   public boolean archived;
@@ -49,5 +53,6 @@ public class PostEntity {
   public PostEntity(){
 
   }
+
 
 }

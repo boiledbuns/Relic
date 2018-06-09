@@ -13,6 +13,8 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.relic.data.Authenticator;
+import com.relic.data.callbacks.AuthenticationCallback;
+import com.relic.presentation.displaysubs.DisplaySubsView;
 
 
 public class LoginFragment extends Fragment {
@@ -41,22 +43,30 @@ public class LoginFragment extends Fragment {
     return rootView;
   }
 
-  class LoginClient extends WebViewClient {
+
+  class LoginClient extends WebViewClient implements AuthenticationCallback{
+    FragmentActivity parentActivity;
+
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
       String checkUrl = auth.getRedirect();
       // closes the login fragment once the user has successfully been authenticated
       if (url.substring(0, checkUrl.length()).equals(checkUrl)) {
-        FragmentActivity parentActivity = getActivity();
+        parentActivity = getActivity();
 
         Toast.makeText(parentActivity, "You've been authenticated!", Toast.LENGTH_SHORT).show();
-        parentActivity.onBackPressed();
-
         // retrieves the access token using the redirect url
         Log.d(TAG, url);
-        auth.retrieveAccessToken(url);
+        auth.retrieveAccessToken(url, this);
       }
       return false;
+    }
+
+    @Override
+    public void onAuthenticated() {
+      // sends user to default view of subreddits
+      parentActivity.getSupportFragmentManager().beginTransaction()
+          .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
   }
 

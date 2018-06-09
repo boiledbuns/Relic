@@ -114,20 +114,20 @@ public class PostRepositoryImpl implements PostRepository {
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
 
-      // demarshall the object and add it into a list
-      Log.d(TAG, "post : " + post.toJSONString().length());
-      for (int i = 0; i < Math.ceil(post.toJSONString().length()/900); i ++) {
-        Log.d(TAG + " " + i, post.toJSONString().substring(0 + i*900, 900 + i*900));
-      }
+//      for (int i = 0; i < Math.ceil(post.toJSONString().length()/900); i ++) {
+//        Log.d(TAG + " " + i, post.toJSONString().substring(0 + i*900, 900 + i*900));
+//      }
 
-      postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
+      // demarshall the object and add it into a list
+      Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
+      //postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
 
       //Log.d(TAG, "post keys " + post.keySet().toString());
     }
-    //Log.d(TAG, postEntities.size() + " posts retrieved");
 
     // insert all the post entities into the db
     new InsertPostsTask().execute(postEntities);
+    //Log.d(TAG, postEntities.size() + " posts retrieved");
   }
 
 
