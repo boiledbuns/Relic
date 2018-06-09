@@ -41,7 +41,7 @@ public class SubRepositoryImpl implements SubRepository {
 
 
   @Override
-  public void getSubscribed() {
+  public void retieveMoreSubscribedSubs() {
     // create the new request to reddit servers and store the data in persistence layer
     VolleyQueue.getQueue().add(
         new StringRequest(
@@ -83,7 +83,7 @@ public class SubRepositoryImpl implements SubRepository {
 
 
   @Override
-  public LiveData<List<SubredditModel>> getSubscribedList() {
+  public LiveData<List<SubredditModel>> getSubscribedSubs() {
     return subDB.getSubredditDao().getAllSubscribed();
   }
 

@@ -62,7 +62,14 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
 
-  public LiveData<List<PostModel>> getPostListing(String subreddit) {
+  public LiveData<List<PostModel>> getPosts(String subreddit) {
+    retrieveMorePosts(subreddit);
+    return appDB.getPostDao().getSubredditPosts("1");
+  }
+
+
+  @Override
+  public void retrieveMorePosts(String subreddit) {
     // create the new request and submit it
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + subreddit,
         new Response.Listener<String>() {
@@ -77,20 +84,12 @@ public class PostRepositoryImpl implements PostRepository {
             }
           }
         }, new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "Error: " + error.networkResponse.headers.toString());
-          }
-        }
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        Log.d(TAG, "Error: " + error.networkResponse.headers.toString());
+      }
+    }
     ));
-
-    return appDB.getPostDao().getSubredditPosts("1");
-  }
-
-
-  @Override
-  public void retrieveNextPostListing(String listingAfter) {
-
   }
 
 
@@ -119,15 +118,15 @@ public class PostRepositoryImpl implements PostRepository {
 //      }
 
       // demarshall the object and add it into a list
-      Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
-      //postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
+      //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
+      postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
 
       //Log.d(TAG, "post keys " + post.keySet().toString());
     }
 
     // insert all the post entities into the db
-    new InsertPostsTask().execute(postEntities);
     //Log.d(TAG, postEntities.size() + " posts retrieved");
+    new InsertPostsTask(appDB, postEntities).execute();
   }
 
 
@@ -149,10 +148,19 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
-  class InsertPostsTask extends AsyncTask<List<PostEntity>, Integer, Integer> {
+  static class InsertPostsTask extends AsyncTask<String, Integer, Integer> {
+    ApplicationDB appDB;
+    List<PostEntity> postList;
+
+    InsertPostsTask(ApplicationDB db, List<PostEntity> posts) {
+      super();
+      appDB = db;
+      postList = posts;
+    }
+
     @Override
-    protected Integer doInBackground(List<PostEntity>... lists) {
-      appDB.getPostDao().insertPosts(lists[0]);
+    protected Integer doInBackground(String... strings) {
+      appDB.getPostDao().insertPosts(postList);
       return null;
     }
   }

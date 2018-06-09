@@ -24,7 +24,6 @@ import java.util.List;
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private final String TAG = "SUB_ITEM_ADAPTER";
   private List<SubredditModel> subList = new ArrayList<>();
-
   private Context fragmentContext;
 
   public SubItemAdapter(Context context) {
@@ -61,10 +60,8 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
   @Override
   public void onBindViewHolder(@NonNull SubItemVH holder, int position) {
-    // binds sets the item in the binding
+    // attachs the sub item to the viewholder post binding
     holder.binding.setSubredditItem(subList.get(position));
-
-    // pushes changes
     holder.binding.executePendingBindings();
   }
 
@@ -73,6 +70,11 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     return subList.size();
   }
 
+
+  /**
+   *
+   * @param subs list of all posts
+   */
   public void setList(List<SubredditModel> subs) {
     // set the entire list if the current list is null
     if (this.subList.size() == 0) {

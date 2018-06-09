@@ -40,7 +40,7 @@ public class PostEntity {
   public boolean visited;
 
   @Ignore
-  private boolean isEdited;
+  //private boolean isEdited;
 
   public boolean over_18;
   public boolean locked;

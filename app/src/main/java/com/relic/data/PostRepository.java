@@ -8,7 +8,6 @@ import com.relic.data.models.PostModel;
 import java.util.List;
 
 public interface PostRepository {
-  LiveData<List<PostModel>> getPostListing(String subredditName);
-
-  void retrieveNextPostListing(String listingAfter);
+  LiveData<List<PostModel>> getPosts(String subredditName);
+  void retrieveMorePosts(String listingAfter);
 }

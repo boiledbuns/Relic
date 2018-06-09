@@ -60,14 +60,22 @@ public class DisplaySubsView extends Fragment {
     ((GridLayoutManager) displaySubsBinding.displaySubsRecyclerview.getLayoutManager())
         .setSpanCount(3);
 
-    // calls method to subscribe the adapter to the livedata list
-    subscribeToList(viewModel);
-
     rootView = displaySubsBinding.getRoot();
     return displaySubsBinding.getRoot();
   }
 
-  private void subscribeToList(DisplaySubsContract.VM viewModel) {
+  @Override
+  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+
+    // calls method to subscribe the adapter to the livedata list
+    subscribeToList();
+  }
+
+  /**
+   * Gets livedata list of subscribed subs from the VM and attach a listener to it
+   */
+  private void subscribeToList() {
     // allows the list to be updated as data is updated
     viewModel.getSubscribedList().observe(this, new Observer<List<SubredditModel>>() {
       @Override

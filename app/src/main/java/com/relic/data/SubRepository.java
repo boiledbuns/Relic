@@ -7,8 +7,8 @@ import com.relic.data.models.SubredditModel;
 import java.util.List;
 
 public interface SubRepository {
-  void getSubscribed();
 
-  LiveData<List<SubredditModel>> getSubscribedList();
+  LiveData<List<SubredditModel>> getSubscribedSubs();
+  void retieveMoreSubscribedSubs();
 
 }

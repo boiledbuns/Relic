@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import com.relic.data.PostRepository;
-import com.relic.data.models.PostListingModel;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 
@@ -29,7 +28,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     postsMediator = new MediatorLiveData<>();
     postsMediator.setValue(null);
 
-    postsMediator.addSource(postRepo.getPostListing(currentSub.getSubName()), postsMediator::setValue);
+    postsMediator.addSource(postRepo.getPosts(currentSub.getSubName()), postsMediator::setValue);
   }
 
   public LiveData<List<PostModel>> getPosts() {
