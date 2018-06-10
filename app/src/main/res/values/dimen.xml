@@ -5,4 +5,10 @@
     <dimen name="subitem_padding_top">12dp</dimen>
     <dimen name="subitem_padding_hor">12dp</dimen>
 
+    <dimen name="postitem_height">100dp</dimen>
+    <dimen name="postitem_margin">4dp</dimen>
+    <dimen name="postitem_padding_top">12dp</dimen>
+    <dimen name="postitem_padding_hor">12dp</dimen>
+
+
 </resources>

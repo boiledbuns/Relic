@@ -13,7 +13,7 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  @Query("SELECT id, title, commentCount  FROM PostEntity where id != :postListingId")
+  @Query("SELECT id, title, selftext, score, commentCount, created  FROM PostEntity where id != :postListingId")
   public abstract LiveData<List<PostModel>> getSubredditPosts(String postListingId);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)

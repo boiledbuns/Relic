@@ -7,13 +7,16 @@ import com.relic.domain.Post;
 
 public class PostModel implements Post {
   private String id;
+  private String selfText;
+  private String created;
+  private int score;
   public String title;
   private int commentCount;
 
-  @Ignore
-  private int karma;
+  public PostModel() {}
 
-//  public String subName;
+
+  //  public String subName;
 //  public String stringDate;
   public int getCommentCount() {
     return commentCount;
@@ -39,6 +42,21 @@ public class PostModel implements Post {
     this.title = title;
   }
 
+  public String getSelfText() {
+    return selfText;
+  }
+
+  public void setSelfText(String selfText) {
+    this.selfText = selfText;
+  }
+
+  public int getScore() {
+    return score;
+  }
+
+  public void setScore(int score) {
+    this.score = score;
+  }
 
 
   // Only constructor should be used by room
@@ -46,6 +64,11 @@ public class PostModel implements Post {
 //                   String subId, String stringDate) {
 //  }
 
-  public PostModel() {}
+  public String getCreated() {
+    return created;
+  }
 
+  public void setCreated(String created) {
+    this.created = created;
+  }
 }
