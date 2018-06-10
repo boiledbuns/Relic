@@ -16,6 +16,6 @@ public class DisplaySubContract {
 
     String getSubName();
 
-    void retrieveMorePosts();
+    void retrieveMorePosts(boolean resetPosts);
   }
 }

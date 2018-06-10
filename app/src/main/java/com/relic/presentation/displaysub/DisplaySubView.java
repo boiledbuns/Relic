@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +66,7 @@ public class DisplaySubView extends Fragment {
     postAdapter = new PostItemAdapter();
     displaySubBinding.displayPostsRecyclerview.setAdapter(postAdapter);
 
+    attachScrollListeners();
     return displaySubBinding.getRoot();
   }
 
@@ -88,18 +90,36 @@ public class DisplaySubView extends Fragment {
       @Override
       public void onChanged(@Nullable List<PostModel> postModels) {
         if (postModels != null) {
+
+          // tells VM to retrieve more posts if there are no posts currently stored for this sub
+          if (postModels.size() == 0) {
+            displaySubVM.retrieveMorePosts(true);
+            Log.d(TAG, "Requesting more posts from vm");
+          }
+
           // update the view whenever the livedata changes
           Log.d(TAG, "SIZE " + postModels.size());
           postAdapter.setPostList(postModels);
-        }
-        else if (postModels.size() == 0) {
-          // tells VM to retrieve more posts
-          displaySubVM.getPosts();
-          Log.d(TAG, "Requesting more posts from vm");
         }
         displaySubBinding.executePendingBindings();
       }
     });
   }
 
+
+  public void attachScrollListeners() {
+    displaySubBinding.displayPostsRecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+
+        // checks if the recyclerview can no longer scroll downwards
+        if (!recyclerView.canScrollVertically(1)) {
+          // fetch the next post listing
+          displaySubVM.retrieveMorePosts(false);
+          Log.d(TAG, "Bottom reached, more posts retrieved");
+        }
+      }
+    });
+  }
 }

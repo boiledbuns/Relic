@@ -15,6 +15,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
+import com.relic.data.callbacks.RetrieveNextListingCallback;
 import com.relic.data.dao.PostDao;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -69,15 +70,23 @@ public class PostRepositoryImpl implements PostRepository {
 
 
   @Override
-  public void retrieveMorePosts(String subreddit) {
+  public void retrieveMorePosts(String subredditName, String after) {
+    String ending = subredditName;
+    // check if we want to start from a new page listing for this subreddit
+    if (after != null) {
+      ending += "/" + after;
+      ending = after;
+
+    }
+
     // create the new request and submit it
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + subreddit,
+    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
             Log.d(TAG, response);
             try {
-              parsePosts(response, subreddit);
+              parsePosts(response, subredditName);
             }
             catch (ParseException error) {
               Log.d(TAG, "Error: " + error.getMessage());
@@ -167,7 +176,29 @@ public class PostRepositoryImpl implements PostRepository {
     protected Integer doInBackground(ListingEntity... listing) {
       appDB.getPostDao().insertPosts(postList);
       appDB.getListingDAO().insertListing(listing[0]);
-      appDB.getListingDAO().getNext(listing[0].subredditName);
+      return null;
+    }
+  }
+
+
+  public void getNextPostingVal(RetrieveNextListingCallback callback, String subName) {
+    new RetrieveListingAfterTask(appDB, callback).execute(subName);
+  }
+
+
+  static class RetrieveListingAfterTask extends AsyncTask<String, Integer, Integer> {
+    ApplicationDB appDB;
+    RetrieveNextListingCallback callback;
+
+    RetrieveListingAfterTask(ApplicationDB appDB, RetrieveNextListingCallback callback) {
+      this.appDB = appDB;
+      this.callback = callback;
+    }
+    @Override
+    protected Integer doInBackground(String... strings) {
+      // get the "after" value for the most current sub listing
+      String subAfter = appDB.getListingDAO().getNext(strings[0]);
+      callback.onNextListing(subAfter);
       return null;
     }
   }

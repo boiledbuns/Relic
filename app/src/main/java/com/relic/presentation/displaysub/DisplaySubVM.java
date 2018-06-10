@@ -6,13 +6,14 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import com.relic.data.PostRepository;
+import com.relic.data.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 
 import java.util.List;
 
 
-public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel {
+public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
   private final String TAG = "DISPLAYSUB_VM";
   private SubredditModel currentSub;
   private PostRepository postRepo;
@@ -40,11 +41,26 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     return currentSub.getSubName();
   }
 
+
   /**
    * Method that allows views aware of the VM to request the VM retrieve more posts
    */
   @Override
-  public void retrieveMorePosts() {
-    postRepo.retrieveMorePosts("test");
+  public void retrieveMorePosts(boolean resetPosts) {
+    if (resetPosts) {
+      // we pass null for the value of next to tell repo that we're refreshing
+      onNextListing(null);
+    }
+    else {
+      // retrieve the "after" value for the next posting
+      postRepo.getNextPostingVal(this, currentSub.getSubName());
+    }
   }
+
+  @Override
+  public void onNextListing(String nextVal) {
+    // retrieve the "after" value for the next posting
+    postRepo.retrieveMorePosts(currentSub.getSubName(), nextVal);
+  }
+
 }
