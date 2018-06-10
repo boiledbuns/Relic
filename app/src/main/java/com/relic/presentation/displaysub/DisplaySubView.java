@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ public class DisplaySubView extends Fragment {
 
   private DisplaySubBinding displaySubBinding;
   private PostItemAdapter postAdapter;
+  private SwipeRefreshLayout swipeRefresh;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,6 +68,8 @@ public class DisplaySubView extends Fragment {
     postAdapter = new PostItemAdapter();
     displaySubBinding.displayPostsRecyclerview.setAdapter(postAdapter);
 
+    swipeRefresh = displaySubBinding.getRoot().findViewById(R.id.display_posts_swipeRefreshLayout);
+
     attachScrollListeners();
     return displaySubBinding.getRoot();
   }
@@ -96,12 +100,14 @@ public class DisplaySubView extends Fragment {
             displaySubVM.retrieveMorePosts(true);
             Log.d(TAG, "Requesting more posts from vm");
           }
-
-          // update the view whenever the livedata changes
-          Log.d(TAG, "SIZE " + postModels.size());
-          postAdapter.setPostList(postModels);
+          else {
+            swipeRefresh.setRefreshing(false);
+            // update the view whenever the livedata changes
+            Log.d(TAG, "SIZE " + postModels.size());
+            postAdapter.setPostList(postModels);
+          }
+          displaySubBinding.executePendingBindings();
         }
-        displaySubBinding.executePendingBindings();
       }
     });
   }
@@ -121,5 +127,15 @@ public class DisplaySubView extends Fragment {
         }
       }
     });
+
+    swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        // refresh the listing for this sub
+        displaySubVM.retrieveMorePosts(true);
+        Log.d(TAG, "Top pulled, posts refreshed");
+      }
+    });
+
   }
 }

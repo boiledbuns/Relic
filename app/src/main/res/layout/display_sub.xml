@@ -6,11 +6,19 @@
     <data>
     </data>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/display_posts_recyclerview"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/display_posts_swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:scrollbarStyle="outsideOverlay"/>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/display_posts_recyclerview"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 </layout>

@@ -69,14 +69,19 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
 
+  /**
+   * Retrieves posts for a subreddit
+   * @param subredditName name of the subreddit
+   * @param after the full name of the page to retrieve the posts from
+   */
   @Override
   public void retrieveMorePosts(String subredditName, String after) {
     String ending = subredditName;
     // check if we want to start from a new page listing for this subreddit
     if (after != null) {
-      ending += "/" + after;
       ending = after;
-
+      // delete all the current items for the db
+      new DeleteSubPostsTask(appDB).execute(subredditName);
     }
 
     // create the new request and submit it
@@ -103,7 +108,7 @@ public class PostRepositoryImpl implements PostRepository {
 
 
   /**
-   * Parses the response from the api and stores the data in the persistence layer
+   * Parses the response from the api and stores the posts in the persistence layer
    * @param response the json response from the server with the listing object
    * @throws ParseException
    */
@@ -130,7 +135,6 @@ public class PostRepositoryImpl implements PostRepository {
       // demarshall the object and add it into a list
       //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
       postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
-
       //Log.d(TAG, "post keys " + post.keySet().toString());
     }
 
@@ -180,25 +184,47 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
-
+  /**
+   * Retrieves the "after" values to be used for the next post listing
+   * @param callback callback to send the name to
+   * @param subName name of the sub to retrieve the "after" value for
+   */
   public void getNextPostingVal(RetrieveNextListingCallback callback, String subName) {
     new RetrieveListingAfterTask(appDB, callback).execute(subName);
   }
-
 
   static class RetrieveListingAfterTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB appDB;
     RetrieveNextListingCallback callback;
 
     RetrieveListingAfterTask(ApplicationDB appDB, RetrieveNextListingCallback callback) {
+      super();
       this.appDB = appDB;
       this.callback = callback;
     }
+
     @Override
     protected Integer doInBackground(String... strings) {
       // get the "after" value for the most current sub listing
       String subAfter = appDB.getListingDAO().getNext(strings[0]);
       callback.onNextListing(subAfter);
+      return null;
+    }
+  }
+
+  static class DeleteSubPostsTask extends AsyncTask<String, Integer, Integer> {
+    ApplicationDB appDB;
+    RetrieveNextListingCallback callback;
+
+    DeleteSubPostsTask(ApplicationDB appDB) {
+      super();
+      this.appDB = appDB;
+    }
+
+    @Override
+    protected Integer doInBackground(String... strings) {
+      // delete the posts associated with the current sub
+      appDB.getPostDao().deleteAllFromSub(strings[0]);
       return null;
     }
   }

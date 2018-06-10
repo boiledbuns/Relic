@@ -32,9 +32,15 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     postsMediator.addSource(postRepo.getPosts(currentSub.getSubName()), postsMediator::setValue);
   }
 
+
+  /**
+   * Exposes the livedata list of posts to the view
+   * @return the lists of posts
+   */
   public LiveData<List<PostModel>> getPosts() {
     return postsMediator;
   }
+
 
   @Override
   public String getSubName() {
@@ -56,6 +62,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       postRepo.getNextPostingVal(this, currentSub.getSubName());
     }
   }
+
 
   @Override
   public void onNextListing(String nextVal) {
