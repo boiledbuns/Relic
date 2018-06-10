@@ -8,7 +8,7 @@
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/postitem_height"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/postitem_margin"
         android:layout_marginEnd="@dimen/postitem_margin"
         android:layout_marginTop="@dimen/postitem_margin">
@@ -18,28 +18,46 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/postitem_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:letterSpacing="@dimen/title_spacing"
                 android:text="@{PostModel.title}"/>
 
             <TextView
+                android:id="@+id/postitem_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_title"
+                android:text="Author Placeholder"/>
+
+            <TextView
+                android:id="@+id/postitem_created"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_title"
+                android:layout_toRightOf="@id/postitem_author"
+                android:text="@{PostModel.created}"/>
+
+            <TextView
+                android:id="@+id/postitem_selftext"
+                android:layout_width="@dimen/postitem_selftext_height"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_author"
                 android:text="@{PostModel.selfText}"/>
 
             <TextView
+                android:id="@+id/postitem_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_selftext"
                 android:text="@{Integer.toString(PostModel.score)}"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{PostModel.created}"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_selftext"
+                android:layout_toRightOf="@id/postitem_score"
                 android:text="@{Integer.toString(PostModel.commentCount)}"/>
 
         </RelativeLayout>

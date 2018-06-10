@@ -34,4 +34,9 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public LiveData<List<PostModel>> getPosts() {
     return postsMediator;
   }
+
+  @Override
+  public String getSubName() {
+    return currentSub.getSubName();
+  }
 }

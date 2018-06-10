@@ -61,6 +61,7 @@ public class DisplaySubsView extends Fragment {
         .setSpanCount(3);
 
     rootView = displaySubsBinding.getRoot();
+    getActivity().setTitle(R.string.app_name);
     return displaySubsBinding.getRoot();
   }
 
