@@ -50,9 +50,4 @@ public class PostEntity {
   public boolean spoiler;
   public String subreddit;
 
-  public PostEntity(){
-
-  }
-
-
 }

@@ -11,7 +11,11 @@ import java.util.List;
 public class DisplaySubContract {
   interface ViewModel {
     void init(SubredditModel subredditModel, PostRepository postRepo);
+
     LiveData<List<PostModel>> getPosts();
+
     String getSubName();
+
+    void retrieveMorePosts();
   }
 }

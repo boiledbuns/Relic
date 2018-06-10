@@ -92,6 +92,11 @@ public class DisplaySubView extends Fragment {
           Log.d(TAG, "SIZE " + postModels.size());
           postAdapter.setPostList(postModels);
         }
+        else if (postModels.size() == 0) {
+          // tells VM to retrieve more posts
+          displaySubVM.getPosts();
+          Log.d(TAG, "Requesting more posts from vm");
+        }
         displaySubBinding.executePendingBindings();
       }
     });

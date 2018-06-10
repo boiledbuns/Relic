@@ -39,4 +39,12 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public String getSubName() {
     return currentSub.getSubName();
   }
+
+  /**
+   * Method that allows views aware of the VM to request the VM retrieve more posts
+   */
+  @Override
+  public void retrieveMorePosts() {
+    postRepo.retrieveMorePosts("test");
+  }
 }

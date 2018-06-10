@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.dao.PostDao;
+import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
 import com.relic.data.models.PostListingModel;
 import com.relic.data.models.PostModel;
@@ -63,8 +64,7 @@ public class PostRepositoryImpl implements PostRepository {
 
 
   public LiveData<List<PostModel>> getPosts(String subreddit) {
-    retrieveMorePosts(subreddit);
-    return appDB.getPostDao().getSubredditPosts("1");
+    return appDB.getPostDao().getSubredditPosts(subreddit);
   }
 
 
@@ -75,9 +75,9 @@ public class PostRepositoryImpl implements PostRepository {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            //Log.d(TAG, response);
+            Log.d(TAG, response);
             try {
-              parsePosts(response);
+              parsePosts(response, subreddit);
             }
             catch (ParseException error) {
               Log.d(TAG, "Error: " + error.getMessage());
@@ -98,21 +98,22 @@ public class PostRepositoryImpl implements PostRepository {
    * @param response the json response from the server with the listing object
    * @throws ParseException
    */
-  private void parsePosts(String response) throws ParseException {
+  private void parsePosts(String response, String subreddit) throws ParseException {
     JSONObject listingData = (JSONObject) ((JSONObject) JSONParser.parse(response)).get("data");
     JSONArray listingPosts = (JSONArray) (listingData).get("children");
 
-    Iterator postIterator = listingPosts.iterator();
-    List <PostEntity> postEntities = new ArrayList<>();
+    // create the new listing entity
+    ListingEntity listing = new ListingEntity(subreddit, (String) listingData.get("after"));
 
     // GSON reader to unmarshall the json response
     Gson gson = new GsonBuilder().create();
     Log.d(TAG, "dank = " + response);
 
+    Iterator postIterator = listingPosts.iterator();
+    List <PostEntity> postEntities = new ArrayList<>();
     // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
-
 //      for (int i = 0; i < Math.ceil(post.toJSONString().length()/900); i ++) {
 //        Log.d(TAG + " " + i, post.toJSONString().substring(0 + i*900, 900 + i*900));
 //      }
@@ -125,8 +126,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     // insert all the post entities into the db
-    //Log.d(TAG, postEntities.size() + " posts retrieved");
-    new InsertPostsTask(appDB, postEntities).execute();
+    new InsertPostsTask(appDB, postEntities).execute(listing);
   }
 
 
@@ -148,7 +148,12 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
-  static class InsertPostsTask extends AsyncTask<String, Integer, Integer> {
+
+  /**
+   * Async task to insert posts and create/update the listing data for the current subreddit to
+   * point to the next listing
+   */
+  static class InsertPostsTask extends AsyncTask<ListingEntity, Integer, Integer> {
     ApplicationDB appDB;
     List<PostEntity> postList;
 
@@ -159,8 +164,10 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    protected Integer doInBackground(String... strings) {
+    protected Integer doInBackground(ListingEntity... listing) {
       appDB.getPostDao().insertPosts(postList);
+      appDB.getListingDAO().insertListing(listing[0]);
+      appDB.getListingDAO().getNext(listing[0].subredditName);
       return null;
     }
   }

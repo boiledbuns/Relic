@@ -29,7 +29,6 @@ dependencies {
     def lifecycle_ver = "1.1.1"
     def room_ver = "1.1.0"
 
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
@@ -47,6 +46,8 @@ dependencies {
 
     implementation 'com.android.support:design:27.1.1'
 
+    annotationProcessor 'com.android.databinding:compiler:3.0.1'
+
     // Room (use 1.1.0-beta1 for latest beta)
     implementation "android.arch.persistence.room:runtime:$room_ver"
     annotationProcessor "android.arch.persistence.room:compiler:$room_ver"
@@ -60,4 +61,13 @@ dependencies {
     // GSON for deserializing objects
     implementation 'com.google.code.gson:gson:2.8.4'
 
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "4000"
+            options.compilerArgs << "-Xmaxwarns" << "4000"
+        }
+    }
 }

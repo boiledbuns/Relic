@@ -1,20 +1,17 @@
 package com.relic.data.models;
 
-import android.arch.persistence.room.Ignore;
-
 import com.relic.domain.Post;
 
 
 public class PostModel implements Post {
   private String id;
-  private String selfText;
+  private String selftext;
   private String created;
   private int score;
   public String title;
   private int commentCount;
 
   public PostModel() {}
-
 
   //  public String subName;
 //  public String stringDate;
@@ -42,12 +39,12 @@ public class PostModel implements Post {
     this.title = title;
   }
 
-  public String getSelfText() {
-    return selfText;
+  public String getSelftext() {
+    return selftext;
   }
 
-  public void setSelfText(String selfText) {
-    this.selfText = selfText;
+  public void setSelftext(String selftext) {
+    this.selftext = selftext;
   }
 
   public int getScore() {
