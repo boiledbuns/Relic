@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PostRepositoryImpl implements PostRepository {
-  private final String ENDPOINT = "https://oauth.reddit.com/r/";
+  private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "POST_REPO";
 
@@ -64,6 +64,11 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
 
+  /**
+   * Exposes the livedata list of posts
+   * @param subreddit subreddit to get the list for
+   * @return livedata list of posts
+   */
   public LiveData<List<PostModel>> getPosts(String subreddit) {
     return appDB.getPostDao().getSubredditPosts(subreddit);
   }
@@ -76,12 +81,15 @@ public class PostRepositoryImpl implements PostRepository {
    */
   @Override
   public void retrieveMorePosts(String subredditName, String after) {
-    String ending = subredditName;
-    // check if we want to start from a new page listing for this subreddit
-    if (after != null) {
-      ending = after;
+    String ending = "r/" + subredditName;
+    // if we dont pass in an after value (ie. we want to reset)
+    if (after == null) {
       // delete all the current items for the db
       new DeleteSubPostsTask(appDB).execute(subredditName);
+    }
+    else {
+      // change the api endpoint to access to get the next post listing
+      ending += "?after=" + after;
     }
 
     // create the new request and submit it
@@ -89,7 +97,7 @@ public class PostRepositoryImpl implements PostRepository {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            Log.d(TAG, response);
+            Log.d(TAG, "Loaded reponse");
             try {
               parsePosts(response, subredditName);
             }
@@ -118,6 +126,8 @@ public class PostRepositoryImpl implements PostRepository {
 
     // create the new listing entity
     ListingEntity listing = new ListingEntity(subreddit, (String) listingData.get("after"));
+    Log.d(TAG, "Listing after val : " + listing.afterPosting);
+    Log.d(TAG, "Listing after val : " + listingData.toString());
 
     // GSON reader to unmarshall the json response
     Gson gson = new GsonBuilder().create();
@@ -125,6 +135,7 @@ public class PostRepositoryImpl implements PostRepository {
 
     Iterator postIterator = listingPosts.iterator();
     List <PostEntity> postEntities = new ArrayList<>();
+
     // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
@@ -133,7 +144,7 @@ public class PostRepositoryImpl implements PostRepository {
 //      }
 
       // demarshall the object and add it into a list
-      //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
+      Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
       postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
       //Log.d(TAG, "post keys " + post.keySet().toString());
     }
@@ -193,6 +204,7 @@ public class PostRepositoryImpl implements PostRepository {
     new RetrieveListingAfterTask(appDB, callback).execute(subName);
   }
 
+
   static class RetrieveListingAfterTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB appDB;
     RetrieveNextListingCallback callback;
@@ -211,6 +223,7 @@ public class PostRepositoryImpl implements PostRepository {
       return null;
     }
   }
+
 
   static class DeleteSubPostsTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB appDB;

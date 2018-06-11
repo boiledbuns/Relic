@@ -77,7 +77,10 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
    */
   public void setList(List<SubredditModel> subs) {
     // set the entire list if the current list is null
-    if (this.subList.size() == 0) {
+    if (subs == null) {
+      this.subList = new ArrayList<>();
+    }
+    else if (this.subList.size() == 0) {
       this.subList = subs;
       notifyItemChanged(0, subs.size());
       Log.d(TAG, subs.size() + " ");

@@ -2,6 +2,7 @@ package com.relic.presentation.adapter;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,11 +12,12 @@ import com.relic.R;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.PostItemBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostItemVH>{
   private final String TAG = "POST_ADAPTER";
-  List<PostModel> postList;
+  private List<PostModel> postList;
 
 
   /**
@@ -30,6 +32,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
       this.postBinding = postBinding;
     }
   }
+
 
   @NonNull
   @Override
@@ -54,16 +57,43 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
   }
 
 
-  public void setPostList(List<PostModel> posts) {
-    int start = posts.size();
+  public void setPostList(List<PostModel> newPostList) {
     if (postList == null) {
-      postList = posts;
+      postList = newPostList;
+      notifyItemRangeRemoved(0, newPostList.size());
+    } else {
+      // used to tell list what has changed
+      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+        @Override
+        public int getOldListSize() {
+          return postList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+          return newPostList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+          return postList.get(oldItemPosition).getId().equals(newPostList.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+          return postList.get(oldItemPosition).getId().equals(newPostList.get(newItemPosition).getId());
+        }
+      });
+      // sets the new list as the current one
+      postList = newPostList;
+      diffResult.dispatchUpdatesTo(this);
     }
-    else {
-      postList.addAll(posts);
-      Log.d(TAG, "Post amount = " + postList.size());
-    }
-    notifyItemRangeChanged(start, postList.size());
+
+  }
+
+  public void resetPostList() {
+    postList.clear();
+    notifyDataSetChanged();
   }
 
 }

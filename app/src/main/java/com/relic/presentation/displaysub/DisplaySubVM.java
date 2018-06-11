@@ -55,7 +55,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public void retrieveMorePosts(boolean resetPosts) {
     if (resetPosts) {
       // we pass null for the value of next to tell repo that we're refreshing
-      onNextListing(null);
+      postRepo.retrieveMorePosts(currentSub.getSubName(), null);
     }
     else {
       // retrieve the "after" value for the next posting
@@ -66,6 +66,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
   @Override
   public void onNextListing(String nextVal) {
+    Log.d(TAG, "Retrieving next posts with " + nextVal);
     // retrieve the "after" value for the next posting
     postRepo.retrieveMorePosts(currentSub.getSubName(), nextVal);
   }
