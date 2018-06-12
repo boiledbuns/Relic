@@ -12,6 +12,8 @@
     <dimen name="postitem_padding_hor">12dp</dimen>
 
     <dimen name="title_max_lines">2</dimen>
+    <dimen name="title_margin">6dp</dimen>
+
     <dimen name="selftext_max_lines">4</dimen>
     <dimen name="title_spacing">0.05</dimen>
 

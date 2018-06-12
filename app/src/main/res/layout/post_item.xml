@@ -31,6 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_title"
+                android:layout_marginEnd="@dimen/title_margin"
                 android:text="Author Placeholder"/>
 
             <TextView
@@ -46,6 +47,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_author"
+                android:paddingTop="@dimen/title_margin"
+                android:paddingBottom="@dimen/title_margin"
                 android:maxLines="3"
                 android:text="@{PostModel.selftext}"/>
 
