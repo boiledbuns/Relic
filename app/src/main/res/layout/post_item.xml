@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_title"
                 android:layout_marginEnd="@dimen/title_margin"
-                android:text="Author Placeholder"/>
+                android:text="@{PostModel.author}"/>
 
             <TextView
                 android:id="@+id/postitem_created"

@@ -5,6 +5,7 @@ import com.relic.domain.Post;
 
 public class PostModel implements Post {
   private String id;
+  private String author;
   private String selftext;
   private String created;
   private int score;
@@ -55,6 +56,13 @@ public class PostModel implements Post {
     this.score = score;
   }
 
+  public String getAuthor() {
+    return author;
+  }
+
+  public void setAuthor(String author) {
+    this.author = author;
+  }
 
   // Only constructor should be used by room
 //  public PostModel(String id, String author, int commentCount, int karma, String title,

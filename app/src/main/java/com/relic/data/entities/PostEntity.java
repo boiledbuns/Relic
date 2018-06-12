@@ -13,12 +13,14 @@ public class PostEntity {
   // every post is associated with a listing (many posts to one listing)
   @NonNull
   @PrimaryKey
-  public String id;
+  @ColumnInfo(name = "id")
+  public String name;
 //  public String getSubreddit_id;
 //  public String postListingId;
 
   // content columns
   public String title;
+  public String author;
   public String permalink;
   public String selftext;
   //public String media_embed;

@@ -9,8 +9,10 @@ import com.relic.data.entities.ListingEntity;
 
 @Dao
 public abstract class ListingDAO {
-  @Query("SELECT afterPosting from ListingEntity WHERE subredditName = :subName")
+  @Query("SELECT afterPosting FROM ListingEntity WHERE subredditName = :subName")
   public abstract String getNext(String subName);
+
+  //@Query("SELECT * FROM ListingEntity WHERE ")
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertListing(ListingEntity listing);

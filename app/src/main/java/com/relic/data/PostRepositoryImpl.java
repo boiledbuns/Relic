@@ -97,7 +97,7 @@ public class PostRepositoryImpl implements PostRepository {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            Log.d(TAG, "Loaded reponse");
+            //Log.d(TAG, "Loaded reponse ");
             try {
               parsePosts(response, subredditName);
             }
@@ -131,7 +131,6 @@ public class PostRepositoryImpl implements PostRepository {
 
     // GSON reader to unmarshall the json response
     Gson gson = new GsonBuilder().create();
-    Log.d(TAG, "dank = " + response);
 
     Iterator postIterator = listingPosts.iterator();
     List <PostEntity> postEntities = new ArrayList<>();
@@ -143,10 +142,10 @@ public class PostRepositoryImpl implements PostRepository {
 //        Log.d(TAG + " " + i, post.toJSONString().substring(0 + i*900, 900 + i*900));
 //      }
 
-      // demarshall the object and add it into a list
-      Log.d(TAG, "post : " + post.get("title") + " "+ post.get("edited"));
-      postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
+      // unmarshall the object and add it into a list
+      Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
       //Log.d(TAG, "post keys " + post.keySet().toString());
+      postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
     }
 
     // insert all the post entities into the db
