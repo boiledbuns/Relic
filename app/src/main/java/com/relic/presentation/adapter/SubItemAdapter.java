@@ -122,4 +122,9 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     }
   }
 
+  public void resetSubList() {
+    subList.clear();
+    notifyDataSetChanged();
+  }
+
 }

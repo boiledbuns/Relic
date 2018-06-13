@@ -40,6 +40,17 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     return obvSubsMediator;
   }
 
+
+  /**
+   * Retrieves more posts either from the start or leading off the current "after" page
+   * @param resetPosts whether the post list should be restarted
+   */
+  @Override
+  public void retrieveMoreSubs(boolean resetPosts) {
+    subRepo.retieveMoreSubscribedSubs();
+  }
+
+
   @Override
   public void onAuthenticated() {
     subRepo.retieveMoreSubscribedSubs();

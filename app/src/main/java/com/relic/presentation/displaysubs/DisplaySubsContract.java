@@ -12,7 +12,10 @@ import java.util.List;
 public interface DisplaySubsContract {
   interface VM {
     void init(SubRepository accountRepo, Authenticator auth);
+
     LiveData<List<SubredditModel>> getSubscribedList();
+
+    void retrieveMoreSubs(boolean resetPosts);
   }
 
 }

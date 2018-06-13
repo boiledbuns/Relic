@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ public class DisplaySubsView extends Fragment {
   public View rootView;
 
   private DisplaySubsBinding displaySubsBinding;
+  private SwipeRefreshLayout swipeRefreshLayout;
   SubItemAdapter subAdapter;
 
   @Override
@@ -43,6 +45,7 @@ public class DisplaySubsView extends Fragment {
     SubRepository accountRepo = new SubRepositoryImpl(this.getContext());
     viewModel.init(accountRepo, Authenticator.getAuthenticator(this.getContext()));
   }
+
 
   @Nullable
   @Override
@@ -62,6 +65,10 @@ public class DisplaySubsView extends Fragment {
 
     rootView = displaySubsBinding.getRoot();
     getActivity().setTitle(R.string.app_name);
+
+    // attach the actions associated with loading the posts
+    attachScrollListeners();
+
     return displaySubsBinding.getRoot();
   }
 
@@ -85,9 +92,25 @@ public class DisplaySubsView extends Fragment {
         if (subredditsList != null) {
           subAdapter.setList(new ArrayList<>(subredditsList));
           Log.d(TAG, "Changes to subreddit list received");
+
+          // stops the loading animation
+          swipeRefreshLayout.setRefreshing(false);
         }
         // execute changes and sync
         displaySubsBinding.executePendingBindings();
+      }
+    });
+  }
+
+
+  public void attachScrollListeners() {
+    swipeRefreshLayout = displaySubsBinding.getRoot().findViewById(R.id.display_subs_swiperefreshlayout);
+    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        // refresh the current list and retrieve more posts
+        subAdapter.resetSubList();
+        viewModel.retrieveMoreSubs(true);
       }
     });
   }
