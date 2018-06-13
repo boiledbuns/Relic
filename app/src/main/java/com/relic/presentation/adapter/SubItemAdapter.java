@@ -109,7 +109,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     public void onClick(SubredditModel subItem) {
       Log.d(TAG, subItem.getSubName());
 
-      // add the sub reddit object to the bundle
+      // add the subreddit object to the bundle
       Bundle bundle = new Bundle();
       bundle.putParcelable("SubredditModel", subItem);
 
