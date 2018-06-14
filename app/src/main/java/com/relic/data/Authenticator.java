@@ -12,9 +12,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.relic.R;
-import com.relic.data.callbacks.AuthenticationCallback;
+import com.relic.presentation.callbacks.AuthenticationCallback;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

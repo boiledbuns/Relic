@@ -1,27 +1,22 @@
 package com.relic.presentation.adapter;
 
 import android.databinding.DataBindingUtil;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.relic.R;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.PostItemBinding;
-import com.relic.presentation.displaypost.DisplayPostView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostItemVH>{
   private final String TAG = "POST_ADAPTER";
   private List<PostModel> postList;
-  private PostItemOnclick onclick;
+  private PostItemOnclick onClick;
 
 
   /**
@@ -37,8 +32,9 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
     }
   }
 
-  public PostItemAdapter(PostItemOnclick onclick) {
-    this.onclick = onclick;
+  public PostItemAdapter(PostItemOnclick onClick) {
+    super();
+    this.onClick = onClick;
   }
 
   @NonNull
@@ -48,8 +44,8 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
     PostItemBinding postBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
         R.layout.post_item, parent, false);
 
-    // attach the onclick object to the binding
-    postBinding.setOnclick(this.onclick);
+    // attach the onClick object to the binding
+    postBinding.setPostOnClick(this.onClick);
     return new PostItemVH(postBinding);
   }
 

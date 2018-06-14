@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.relic.data.Authenticator;
 import com.relic.data.VolleyQueue;
-import com.relic.data.callbacks.AuthenticationCallback;
+import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.presentation.displaysubs.DisplaySubsView;
 
 public class MainActivity extends AppCompatActivity implements AuthenticationCallback {

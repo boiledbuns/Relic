@@ -1,5 +1,5 @@
 package com.relic.presentation.adapter;
 
 public interface PostItemOnclick {
-  void click(String fullName);
+  void onClick(String fullName);
 }

@@ -2,8 +2,7 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 
-import com.relic.data.callbacks.RetrieveNextListingCallback;
-import com.relic.data.models.PostListingModel;
+import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 
 import java.util.List;

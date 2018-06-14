@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import com.relic.data.PostRepository;
-import com.relic.data.callbacks.RetrieveNextListingCallback;
+import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 

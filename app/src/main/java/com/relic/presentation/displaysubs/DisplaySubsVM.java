@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel;
 
 import com.relic.data.Authenticator;
 import com.relic.data.SubRepository;
-import com.relic.data.callbacks.AuthenticationCallback;
+import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.data.models.SubredditModel;
 
 import java.util.List;

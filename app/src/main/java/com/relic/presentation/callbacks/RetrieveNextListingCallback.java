@@ -1,4 +1,4 @@
-package com.relic.data.callbacks;
+package com.relic.presentation.callbacks;
 
 public interface RetrieveNextListingCallback {
   void onNextListing(String nextVal);

@@ -1,11 +1,8 @@
 package com.relic.presentation.adapter;
 
-import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +12,6 @@ import android.widget.ImageView;
 import com.relic.R;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.SubItemBinding;
-import com.relic.presentation.displaysub.DisplaySubView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,12 +20,11 @@ import java.util.List;
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private final String TAG = "SUB_ITEM_ADAPTER";
   private List<SubredditModel> subList = new ArrayList<>();
-  private Context fragmentContext;
+  private SubItemOnClick onClick;
 
-  public SubItemAdapter(Context context) {
+  public SubItemAdapter(SubItemOnClick onClick) {
     super();
-    // initialize the context for this app to be used by the inner class
-    fragmentContext = context;
+    this.onClick = onClick;
   }
 
   /**
@@ -41,9 +36,6 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     SubItemVH(SubItemBinding subBinding) {
       super(subBinding.getRoot());
       this.binding = subBinding;
-
-      // attach the onclick to this item
-      this.binding.setItemOnClick(new SubItemOnClick());
     }
   }
 
@@ -55,6 +47,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     SubItemBinding subBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
         R.layout.sub_item, parent, false);
 
+    subBinding.setSubOnClick(onClick);
     return new SubItemVH(subBinding);
   }
 
@@ -101,26 +94,6 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     }
   }
 
-
-  /**
-   * onclick class for the xml file to hook to
-   */
-  public class SubItemOnClick {
-    public void onClick(SubredditModel subItem) {
-      Log.d(TAG, subItem.getSubName());
-
-      // add the subreddit object to the bundle
-      Bundle bundle = new Bundle();
-      bundle.putParcelable("SubredditModel", subItem);
-
-      DisplaySubView subFrag = new DisplaySubView();
-      subFrag.setArguments(bundle);
-
-      // replace the current screen with the newly created fragment
-      ((FragmentActivity) fragmentContext).getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
-    }
-  }
 
   public void resetSubList() {
     subList.clear();

@@ -15,14 +15,10 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
-import com.relic.data.callbacks.RetrieveNextListingCallback;
-import com.relic.data.dao.PostDao;
+import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
-import com.relic.data.models.PostListingModel;
 import com.relic.data.models.PostModel;
-import com.relic.domain.Post;
-import com.relic.domain.post.PostImpl;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

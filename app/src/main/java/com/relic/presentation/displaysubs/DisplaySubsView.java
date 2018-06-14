@@ -21,6 +21,8 @@ import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
 import com.relic.presentation.adapter.SubItemAdapter;
+import com.relic.presentation.adapter.SubItemOnClick;
+import com.relic.presentation.displaysub.DisplaySubView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +58,7 @@ public class DisplaySubsView extends Fragment {
         .inflate(inflater, R.layout.display_subs, container, false);
 
     // initialize the adapter for the subs and attach it to the recyclerview
-    subAdapter = new SubItemAdapter(this.getContext());
+    subAdapter = new SubItemAdapter(new OnClick());
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
 
     // displays the items in 3 columns
@@ -113,5 +115,25 @@ public class DisplaySubsView extends Fragment {
         viewModel.retrieveMoreSubs(true);
       }
     });
+  }
+
+  /**
+   * onClick class for the xml file to hook to
+   */
+  public class OnClick implements SubItemOnClick {
+    public void onClick(SubredditModel subItem) {
+      Log.d(TAG, subItem.getSubName());
+
+      // add the subreddit object to the bundle
+      Bundle bundle = new Bundle();
+      bundle.putParcelable("SubredditModel", subItem);
+
+      DisplaySubView subFrag = new DisplaySubView();
+      subFrag.setArguments(bundle);
+
+      // replace the current screen with the newly created fragment
+      getActivity().getSupportFragmentManager().beginTransaction()
+          .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+    }
   }
 }

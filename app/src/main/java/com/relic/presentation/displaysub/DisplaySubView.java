@@ -145,7 +145,7 @@ public class DisplaySubView extends Fragment {
    * Onclick class with method for the view to hook onto
    */
   class OnClick implements PostItemOnclick {
-    public void click(String postId) {
+    public void onClick(String postId) {
       // create a new bundle for the post id
       Bundle bundle = new Bundle();
       bundle.putString("full_name", postId);
