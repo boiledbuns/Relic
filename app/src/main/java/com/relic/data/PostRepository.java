@@ -13,4 +13,7 @@ public interface PostRepository {
   void retrieveMorePosts(String subredditName, String postingAfter);
 
   void getNextPostingVal(RetrieveNextListingCallback callback, String subName);
+
+  LiveData<PostModel> getPost(String postFullName);
+
 }

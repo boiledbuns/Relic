@@ -237,4 +237,9 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
+  
+  public LiveData<PostModel> getPost(String postFullName) {
+    return appDB.getPostDao().getSinglePost(postFullName);
+  }
+
 }

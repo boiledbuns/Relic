@@ -112,6 +112,9 @@ public class DisplaySubView extends Fragment {
   }
 
 
+  /**
+   * Attach the event listeners for scrolling within the recyclerview and swiperefreshlayout
+   */
   public void attachScrollListeners() {
     displaySubBinding.displayPostsRecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
