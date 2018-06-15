@@ -97,8 +97,10 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
 
   public void resetPostList() {
-    postList.clear();
-    notifyDataSetChanged();
+    if (postList != null) {
+      postList.clear();
+      notifyDataSetChanged();
+    }
   }
 
 }
