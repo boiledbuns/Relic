@@ -2,6 +2,7 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -10,7 +11,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.relic.R;
+import com.relic.data.entities.CommentEntity;
 import com.relic.data.models.CommentModel;
 
 import org.json.simple.JSONArray;
@@ -18,6 +22,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +33,7 @@ public class CommentRepositoryImpl implements CommentRepository {
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "COMMENT_REPO";
 
+  private ApplicationDB appDB;
   private Context viewContext;
   private RequestQueue queue;
   private JSONParser JSONParser;
@@ -36,6 +42,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 
   public CommentRepositoryImpl (Context context) {
     //TODO convert VolleyQueue into a singleton
+    appDB = ApplicationDB.getDatabase(context);
     queue = Volley.newRequestQueue(context);
     JSONParser = new JSONParser();
 
@@ -111,26 +118,49 @@ public class CommentRepositoryImpl implements CommentRepository {
 
 
   private void parseComments(String response) throws ParseException {
+    Gson gson = new GsonBuilder().create();
+
     JSONArray array = (JSONArray) JSONParser.parse(response);
     JSONObject comments = (JSONObject) array.get(1);
     Log.d(TAG, comments.keySet().toString());
 
+    // get the data from the listing object
     comments = (JSONObject) comments.get("data");
-    Log.d(TAG, comments.keySet().toString());
+    // get the list of children (comments) associated with the post
+    JSONArray commentChildren = ((JSONArray) comments.get("children"));
+    Iterator commentIterator = commentChildren.iterator();
 
-    array = ((JSONArray) comments.get("children"));
-    Iterator arrayIterator = array.iterator();
 
-    while (arrayIterator.hasNext()) {
-      comments = (JSONObject) arrayIterator.next();
-      comments = (JSONObject) comments.get("data");
+    List<CommentEntity> commentEntities = new ArrayList<>();
 
-      Log.d(TAG, comments.get("body_html").toString());
+    JSONObject commentPOJO;
+    while (commentIterator.hasNext()) {
+      commentPOJO = (JSONObject) ((JSONObject) commentIterator.next()).get("data");
 
+      Log.d(TAG, commentPOJO.keySet().toString());
+
+      // unmarshall the comment pojo and add it to list
+      commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity.class));
     }
-    Log.d(TAG, "END");
   }
 
+
+  private class InsertCommentsTask extends AsyncTask<String, Integer, Integer> {
+    ApplicationDB db;
+    List<CommentEntity> comments;
+
+    InsertCommentsTask(ApplicationDB appDB, List<CommentEntity> commentEntities) {
+      this.db = appDB;
+      this.comments = commentEntities;
+    }
+
+    @Override
+    protected Integer doInBackground(String... strings) {
+      db.getCommentDAO();
+
+      return null;
+    }
+  }
 
 
 }
