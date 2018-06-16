@@ -66,7 +66,7 @@ public class CommentRepositoryImpl implements CommentRepository {
   public LiveData<List<CommentModel>> getComments(String postFullname) {
 
 
-    return null;
+    return appDB.getCommentDAO().getComments(postFullname);
   }
 
 
@@ -117,6 +117,11 @@ public class CommentRepositoryImpl implements CommentRepository {
   }
 
 
+  /**
+   * Parse the response from the api and store the comments in the room db
+   * @param response json string response
+   * @throws ParseException potential issue with parsing of json structure
+   */
   private void parseComments(String response) throws ParseException {
     Gson gson = new GsonBuilder().create();
 
@@ -137,15 +142,17 @@ public class CommentRepositoryImpl implements CommentRepository {
     while (commentIterator.hasNext()) {
       commentPOJO = (JSONObject) ((JSONObject) commentIterator.next()).get("data");
 
-      Log.d(TAG, commentPOJO.keySet().toString());
-
       // unmarshall the comment pojo and add it to list
       commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity.class));
+      Log.d(TAG, commentPOJO.get("parent_id").toString());
     }
+
+    // insert comments
+    new InsertCommentsTask(appDB, commentEntities).execute();
   }
 
 
-  private class InsertCommentsTask extends AsyncTask<String, Integer, Integer> {
+  private static class InsertCommentsTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB db;
     List<CommentEntity> comments;
 
@@ -156,8 +163,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     protected Integer doInBackground(String... strings) {
-      db.getCommentDAO();
-
+      db.getCommentDAO().insertComments(comments);
       return null;
     }
   }

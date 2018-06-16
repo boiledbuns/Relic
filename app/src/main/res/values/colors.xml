@@ -5,4 +5,9 @@
     <color name="colorAccent">#FF4081</color>
     <color name="mainFont">#E5E5E5</color>
     <color name="pastel">#C1E0F7</color>
+
+    <color name="primaryText">#b4bbc6</color>
+    <color name="background">#35373a</color>
+    <color name="backgroundSecondary">#384559</color>
+
 </resources>

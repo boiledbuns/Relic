@@ -11,22 +11,25 @@ public class CommentEntity {
   @PrimaryKey
   public String id;
 
-  public String replies;
+  //public String replies;
   public String created;
   public String author;
   public String subreddit;
 
+  @ColumnInfo(name ="parentId")
+  public String parent_id;
   @ColumnInfo(name = "body")
   public String body_html;
 
   public int score;
+  @ColumnInfo(name = "gilded")
+  public int gilded;
 
   @ColumnInfo(name = "isSubmitter")
   public boolean is_submitter;
   @ColumnInfo(name = "scoreHidden")
   public boolean score_hidden;
-  @ColumnInfo(name = "isGilded")
-  public boolean gilded;
+
 
   //boolean edited;
 

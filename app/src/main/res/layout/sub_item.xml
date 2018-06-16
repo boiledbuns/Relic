@@ -8,12 +8,13 @@
                   type="com.relic.presentation.adapter.SubItemOnClick"/>
     </data>
 
+    <!-- need constraint layout to keep the square shape -->
     <android.support.constraint.ConstraintLayout
+        android:background="@color/backgroundSecondary"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginStart="@dimen/subitem_margin"
         android:layout_marginTop="@dimen/subitem_margin"
-        android:background="@color/pastel"
         android:onClick="@{() -> subOnClick.onClick(subredditItem)}">
 
         <RelativeLayout
@@ -24,18 +25,18 @@
             android:paddingStart="@dimen/subitem_padding_hor"
             android:paddingEnd="@dimen/subitem_padding_hor">
 
-        <TextView
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAllCaps="true"
-            android:text="@{subredditItem.subName}"
-            android:textStyle="bold"/>
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="@dimen/title_spacing"
+                android:text="@{subredditItem.subName}"
+                android:textStyle="normal"/>
 
-        <ImageView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            app:bannerUrl="@{subredditItem.getBannerUrl}"/>
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                app:bannerUrl="@{subredditItem.getBannerUrl}"/>
         </RelativeLayout>
     </android.support.constraint.ConstraintLayout>
 </layout>
