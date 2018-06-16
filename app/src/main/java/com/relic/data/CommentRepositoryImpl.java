@@ -19,6 +19,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -111,11 +112,23 @@ public class CommentRepositoryImpl implements CommentRepository {
 
   private void parseComments(String response) throws ParseException {
     JSONArray array = (JSONArray) JSONParser.parse(response);
-    JSONObject comments = ((JSONObject) ((JSONArray) ((JSONObject) ((JSONObject) array.get(0)).get("data")).get("children")).get(0));
-    comments.get("data");
+    JSONObject comments = (JSONObject) array.get(1);
+    Log.d(TAG, comments.keySet().toString());
 
+    comments = (JSONObject) comments.get("data");
+    Log.d(TAG, comments.keySet().toString());
 
-    Log.d(TAG, comments.get("data").toString());
+    array = ((JSONArray) comments.get("children"));
+    Iterator arrayIterator = array.iterator();
+
+    while (arrayIterator.hasNext()) {
+      comments = (JSONObject) arrayIterator.next();
+      comments = (JSONObject) comments.get("data");
+
+      Log.d(TAG, comments.get("body_html").toString());
+
+    }
+    Log.d(TAG, "END");
   }
 
 
