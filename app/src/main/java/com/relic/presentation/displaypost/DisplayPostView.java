@@ -24,8 +24,9 @@ public class DisplayPostView extends Fragment {
   private final String TAG = "DISPLAYPOST_VIEW";
   private DisplayPostContract.ViewModel displayPostVM;
   private DisplayPostBinding postBinding;
-  private String postFullname;
 
+  private String postFullname;
+  private String subreddit;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class DisplayPostView extends Fragment {
     try {
       // parse the full name of the post to be displayed
       postFullname = getArguments().getString("full_name");
+      subreddit = getArguments().getString("subreddit");
       Log.d(TAG, "Post fullname : " + postFullname);
     }
     catch (Exception e) {
@@ -59,7 +61,7 @@ public class DisplayPostView extends Fragment {
     // create the VM and initialize it with injected dependencies
     displayPostVM = ViewModelProviders.of(this).get(DisplayPostVM.class);
     displayPostVM.init(new PostRepositoryImpl(getContext()),
-        new CommentRepositoryImpl(getContext()), postFullname);
+        new CommentRepositoryImpl(getContext()), subreddit, postFullname);
 
     subscribeToVM();
   }

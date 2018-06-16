@@ -5,6 +5,7 @@ import com.relic.domain.Post;
 
 public class PostModel implements Post {
   private String id;
+  private String subreddit;
   private String author;
   private String selftext;
   private String created;
@@ -75,5 +76,13 @@ public class PostModel implements Post {
 
   public void setCreated(String created) {
     this.created = created;
+  }
+
+  public String getSubreddit() {
+    return subreddit;
+  }
+
+  public void setSubreddit(String subreddit) {
+    this.subreddit = subreddit;
   }
 }

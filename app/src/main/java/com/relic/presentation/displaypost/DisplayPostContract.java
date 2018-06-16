@@ -14,7 +14,7 @@ public interface DisplayPostContract {
      * @param commentRepo repository for retrieving comments
      * @param fullName the fullname of the post to be displayed
      */
-    void init(PostRepository postRepo, CommentRepository commentRepo, String fullName);
+    void init(PostRepository postRepo, CommentRepository commentRepo, String subreddit, String fullName);
 
 
     /**

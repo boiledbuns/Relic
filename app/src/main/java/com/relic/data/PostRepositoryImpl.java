@@ -123,7 +123,6 @@ public class PostRepositoryImpl implements PostRepository {
     // create the new listing entity
     ListingEntity listing = new ListingEntity(subreddit, (String) listingData.get("after"));
     Log.d(TAG, "Listing after val : " + listing.afterPosting);
-    Log.d(TAG, "Listing after val : " + listingData.toString());
 
     // GSON reader to unmarshall the json response
     Gson gson = new GsonBuilder().create();

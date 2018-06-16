@@ -13,14 +13,23 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
 
   private LiveData<PostModel> currentPost;
 
+  private String postFullname;
+  private String subName;
 
-  public void init(PostRepository postRepo, CommentRepository commentRepo, String fullname) {
+
+  public void init(PostRepository postRepo, CommentRepository commentRepo, String subreddit, String fullname) {
     // initialize reference to repos for this VM
     this.postRepo = postRepo;
     this.commentRepo = commentRepo;
 
     // retrieves the livedata post to be exposed to the view
     currentPost = postRepo.getPost(fullname);
+    subName = subreddit;
+
+    postFullname = fullname;
+
+    // TESTING:
+    commentRepo.retrieveComments(subName, postFullname, null);
   }
 
   public LiveData<PostModel> getPost() {

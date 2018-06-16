@@ -148,10 +148,11 @@ public class DisplaySubView extends Fragment {
    * Onclick class with method for the view to hook onto
    */
   class OnClick implements PostItemOnclick {
-    public void onClick(String postId) {
+    public void onClick(String postId, String subreddit) {
       // create a new bundle for the post id
       Bundle bundle = new Bundle();
       bundle.putString("full_name", postId);
+      bundle.putString("subreddit", subreddit);
 
       DisplayPostView postFrag = new DisplayPostView();
       postFrag.setArguments(bundle);
