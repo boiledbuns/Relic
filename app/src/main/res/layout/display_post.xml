@@ -13,20 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/display_post_margin">
-        <!-- recyclerview for the comments -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/display_comments_recyclerview"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/title_textsize"
             android:text="test"/>
+
             <RelativeLayout
+                android:id="@+id/display_post_postitem"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:visibility="gone"
+                android:layout_height="wrap_content"
                 android:paddingTop="@dimen/display_post_paddingtop"
                 android:paddingStart="@dimen/display_post_paddingside"
                 android:paddingEnd="@dimen/display_post_paddingside">
@@ -61,17 +66,16 @@
                     android:text="@{postItem.selftext}"/>
             </RelativeLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="test2"/>
+            <!-- recyclerview for the comments -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/display_comments_recyclerview"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/display_post_postitem"/>
 
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="test"/>
-
+        </RelativeLayout>
+        </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 
