@@ -14,7 +14,7 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  @Query("SELECT id, title, author, selftext, score, commentCount, created, subreddit FROM PostEntity WHERE subreddit = :subName")
+  @Query("SELECT id, title, author, selftext, score, commentCount, created, subreddit, domain, url FROM PostEntity WHERE subreddit = :subName")
   public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)

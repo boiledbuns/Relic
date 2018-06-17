@@ -35,6 +35,7 @@ public class PostEntity {
   //public String media;
   //public String preview;
   public String thumbnail;
+  public String domain;
   public String url;
 
   // post metadata

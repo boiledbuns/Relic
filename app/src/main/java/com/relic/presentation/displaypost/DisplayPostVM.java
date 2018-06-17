@@ -5,13 +5,17 @@ import android.arch.lifecycle.ViewModel;
 
 import com.relic.data.CommentRepository;
 import com.relic.data.PostRepository;
+import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
+
+import java.util.List;
 
 public class DisplayPostVM extends ViewModel implements DisplayPostContract.ViewModel {
   private PostRepository postRepo;
   private CommentRepository commentRepo;
 
   private LiveData<PostModel> currentPost;
+  private LiveData<List<CommentModel>> commentList;
 
   private String postFullname;
   private String subName;
@@ -28,12 +32,26 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
 
     postFullname = fullname;
 
-    // TESTING:
-    commentRepo.retrieveComments(subName, postFullname, null);
+    commentList = commentRepo.getComments(fullname);
+    //commentRepo.retrieveComments(subName, postFullname, null);
   }
 
+
+  /**
+   * Exposes the post to the view
+   * @return post as livedata
+   */
   public LiveData<PostModel> getPost() {
     return currentPost;
+  }
+
+
+  /**
+   * Exposes the list of comments to the view
+   * @return comment list as livedata
+   */
+  public LiveData<List<CommentModel>> getCommentList() {
+    return commentList;
   }
 
 }

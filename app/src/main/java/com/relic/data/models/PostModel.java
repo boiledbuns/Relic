@@ -13,6 +13,9 @@ public class PostModel implements Post {
   public String title;
   private int commentCount;
 
+  public String domain;
+  public String url;
+
   public PostModel() {}
 
   //  public String subName;

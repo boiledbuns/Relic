@@ -2,6 +2,7 @@ package com.relic.data.models;
 
 public class CommentModel {
   private String id;
+  public String body;
 
   public CommentModel() {}
 

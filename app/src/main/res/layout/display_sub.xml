@@ -17,7 +17,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
-            android:scrollbarStyle="outsideOverlay"/>
+            android:scrollbarStyle="outsideOverlay"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/postitem_margin"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

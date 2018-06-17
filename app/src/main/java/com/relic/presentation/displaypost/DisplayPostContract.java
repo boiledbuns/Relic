@@ -4,7 +4,10 @@ import android.arch.lifecycle.LiveData;
 
 import com.relic.data.CommentRepository;
 import com.relic.data.PostRepository;
+import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
+
+import java.util.List;
 
 public interface DisplayPostContract {
   interface ViewModel {
@@ -18,10 +21,16 @@ public interface DisplayPostContract {
 
 
     /**
-     * Exposes the postmodel as livedata to the view
+     * Exposes the postm to the view
      * @return postmodel as livedata
      */
     LiveData<PostModel> getPost();
 
+
+    /**
+     * Exposes the postm to the view
+     * @return postmodel as livedata
+     */
+    LiveData<List<CommentModel>> getCommentList();
   }
 }

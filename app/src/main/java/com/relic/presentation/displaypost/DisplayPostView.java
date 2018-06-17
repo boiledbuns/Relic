@@ -16,14 +16,19 @@ import android.widget.Toast;
 import com.relic.R;
 import com.relic.data.CommentRepositoryImpl;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.DisplayPostBinding;
+import com.relic.presentation.adapter.CommentAdapter;
 import com.relic.presentation.callbacks.PostLoadCallback;
+
+import java.util.List;
 
 public class DisplayPostView extends Fragment {
   private final String TAG = "DISPLAYPOST_VIEW";
   private DisplayPostContract.ViewModel displayPostVM;
-  private DisplayPostBinding postBinding;
+  private DisplayPostBinding displayPostBinding;
+  private CommentAdapter commentAdapter;
 
   private String postFullname;
   private String subreddit;
@@ -37,7 +42,7 @@ public class DisplayPostView extends Fragment {
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    postBinding = DataBindingUtil
+    displayPostBinding = DataBindingUtil
         .inflate(inflater, R.layout.display_post, container, false);
 
     try {
@@ -50,7 +55,10 @@ public class DisplayPostView extends Fragment {
       Toast.makeText(getContext(), "Fragment not loaded properly!", Toast.LENGTH_SHORT).show();
     }
 
-    return postBinding.getRoot();
+    commentAdapter = new CommentAdapter();
+    displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
+
+    return displayPostBinding.getRoot();
   }
 
 
@@ -76,12 +84,22 @@ public class DisplayPostView extends Fragment {
       @Override
       public void onChanged(@Nullable PostModel postModel) {
         if (postModel != null) {
-          postBinding.setPostItem(postModel);
+          displayPostBinding.setPostItem(postModel);
         }
       }
     });
 
-    // TODO : Observe the comments exposed by the VM
+    // Observe the list of comments exposed by the VM
+    displayPostVM.getCommentList().observe(this, new Observer<List<CommentModel>>() {
+      @Override
+      public void onChanged(@Nullable List<CommentModel> commentModels) {
+        // notify the adapter and set the new list
+        if (commentModels != null) {
+          commentAdapter.setComments(commentModels);
+          Log.d(TAG, "Comments " + commentModels.size());
+        }
+      }
+    });
   }
 
 

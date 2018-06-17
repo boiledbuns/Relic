@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_title"
                 android:layout_marginEnd="@dimen/title_margin"
-                android:text="@{postModel.author}"/>
+                android:text="@{postModel.domain +  ` ` + postModel.author}"/>
 
             <TextView
                 android:id="@+id/postitem_created"
@@ -52,11 +52,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_author"
-                android:paddingTop="@dimen/title_margin"
-                android:paddingBottom="@dimen/title_margin"
+                android:layout_marginTop="@dimen/postitem_text_spacing"
+                android:layout_marginBottom="@dimen/postitem_text_spacing"
                 android:maxLines="3"
+                android:ellipsize="end"
                 android:text="@{postModel.selftext}"/>
-
 
             <TextView
                 android:id="@+id/postitem_score"
@@ -77,7 +77,6 @@
 
                 android:drawablePadding="@dimen/postitem_ic_spacing"
                 android:drawableStart="@drawable/ic_comment"/>
-
 
         </RelativeLayout>
         
