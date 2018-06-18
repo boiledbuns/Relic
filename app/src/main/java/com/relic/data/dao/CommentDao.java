@@ -16,6 +16,6 @@ public abstract class CommentDao {
   @Insert (onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertComments(List<CommentEntity> commentEntities);
 
-  @Query("SELECT id, body FROM CommentEntity WHERE parentId = :postId")
+  @Query("SELECT id, author, body, created, score, isSubmitter, gilded FROM CommentEntity WHERE parentId = :postId")
   public abstract LiveData<List<CommentModel>> getComments(String postId);
 }

@@ -33,7 +33,8 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     postFullname = fullname;
 
     commentList = commentRepo.getComments(fullname);
-    //commentRepo.retrieveComments(subName, postFullname, null);
+    // retrieve the first set of comments
+    commentRepo.retrieveComments(subName, postFullname, null);
   }
 
 

@@ -57,6 +57,7 @@ public class DisplayPostView extends Fragment {
 
     commentAdapter = new CommentAdapter();
     displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
+    displayPostBinding.displayCommentsRecyclerview.setNestedScrollingEnabled(false);
 
     return displayPostBinding.getRoot();
   }
