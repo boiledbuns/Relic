@@ -1,5 +1,7 @@
 package com.relic.data.models;
 
+import android.text.Html;
+
 import com.relic.domain.Post;
 
 
@@ -15,6 +17,7 @@ public class PostModel implements Post {
 
   public String domain;
   public String url;
+  public String thumbnail;
 
   public PostModel() {}
 
@@ -87,5 +90,9 @@ public class PostModel implements Post {
 
   public void setSubreddit(String subreddit) {
     this.subreddit = subreddit;
+  }
+
+  public String getHtmlSelfText() {
+    return selftext == null ? "" : Html.fromHtml(Html.fromHtml(selftext).toString()).toString();
   }
 }

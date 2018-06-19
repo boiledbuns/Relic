@@ -40,6 +40,8 @@ public class PostEntity {
 
   // post metadata
   public int view_count;
+  public int gilded;
+
   public boolean visited;
 
   @Ignore
@@ -51,6 +53,9 @@ public class PostEntity {
   public boolean is_video;
   public boolean is_self;
   public boolean spoiler;
+  public boolean stickied;
+
+
   public String subreddit;
 
 }

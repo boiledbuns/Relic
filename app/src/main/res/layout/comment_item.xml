@@ -36,7 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/commentitem_author"
-            android:text="@{Html.fromHtml(commentModel.body)}"/>
+
+            android:text="@{Html.fromHtml(Html.fromHtml(commentModel.body).toString()).toString()}"/>
 
     </RelativeLayout>
 

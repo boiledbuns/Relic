@@ -1,15 +1,19 @@
 package com.relic.presentation.adapter;
 
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.relic.R;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.PostItemBinding;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -96,10 +100,28 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
   }
 
 
+  /**
+   * Clears all the data from the current list and tells list to show as empty
+   */
   public void resetPostList() {
     if (postList != null) {
       postList.clear();
       notifyDataSetChanged();
+    }
+  }
+
+
+  @BindingAdapter({"bind:thumbnail"})
+  public static void loadThumbnail(ImageView imgView, String thumbnailUrl) {
+    // does not load image Wif the banner img string is empty
+    if (thumbnailUrl.length() > 0) {
+      try {
+        Log.d("SUB_ITEM_ADAPTER", "URL = " + thumbnailUrl);
+        Picasso.get().load(thumbnailUrl).into(imgView);
+      }
+      catch (Error e) {
+        Log.d("SUB_ITEM_ADAPTER", "Issue loading image " + e.toString());
+      }
     }
   }
 

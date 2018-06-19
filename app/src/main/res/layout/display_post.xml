@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.text.Html"/>
         <variable
             name="postItem"
             type="com.relic.data.models.PostModel"/>
@@ -29,9 +30,7 @@
                 android:id="@+id/display_post_postitem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/display_post_paddingtop"
-                android:paddingStart="@dimen/display_post_paddingside"
-                android:paddingEnd="@dimen/display_post_paddingside"
+                android:padding="@dimen/display_post_paddingtop"
                 android:layout_marginBottom="@dimen/display_post_bottommargin">
 
                 <TextView
@@ -61,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/display_post_author"
-                    android:text="@{postItem.selftext}"/>
+                    android:text="@{postItem.htmlSelfText}"/>
             </RelativeLayout>
 
             <!-- recyclerview for the comments -->

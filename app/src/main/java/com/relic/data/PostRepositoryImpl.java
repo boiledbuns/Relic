@@ -140,8 +140,11 @@ public class PostRepositoryImpl implements PostRepository {
       // unmarshall the object and add it into a list
       Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
       Log.d(TAG, "post : " + post.get("domain") + " "+ post.get("url"));
+      Log.d(TAG, "post : " + post.get("secure_media_embed") + " "+ post.get("thumbnail"));
+//      Log.d(TAG, "post : " + post.get("domain") + " "+ post.get("url"));
 
-      //Log.d(TAG, "post keys " + post.keySet().toString());
+
+      Log.d(TAG, "post keys " + post.keySet().toString());
       postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
     }
 

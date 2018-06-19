@@ -4,7 +4,7 @@ public class CommentModel {
   private String id;
 
   public String author;
-  public String body;
+  private String body;
   public String created;
   public int score;
 
@@ -19,5 +19,13 @@ public class CommentModel {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public String getBody() {
+    return body == null ? "" : body;
+  }
+
+  public void setBody(String body) {
+    this.body = body;
   }
 }

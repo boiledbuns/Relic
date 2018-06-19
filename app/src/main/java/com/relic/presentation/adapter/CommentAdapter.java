@@ -44,7 +44,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
   public void onBindViewHolder(@NonNull CommentItemVH holder, int position) {
     // attach the current binding to the viewholder
     holder.commentItemBinding.setCommentModel(commentList.get(position));
-    Log.d(TAG, "Comment " + commentList.get(position).body);
+    Log.d(TAG, "Comment " + commentList.get(position).getBody());
     holder.commentItemBinding.executePendingBindings();
   }
 

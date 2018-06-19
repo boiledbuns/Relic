@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
             name="postModel"
@@ -31,13 +34,19 @@
                 android:textSize="@dimen/title_textsize"
                 android:text="@{postModel.title}"/>
 
+            <ImageView
+                android:layout_width="@dimen/postitem_image_width"
+                android:layout_height="@dimen/postitem_image_width"
+                android:layout_toRightOf="@+id/postitem_title"
+                app:thumbnail="@{postModel.thumbnail}"/>
+
             <TextView
                 android:id="@+id/postitem_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_title"
                 android:layout_marginEnd="@dimen/title_margin"
-                android:text="@{postModel.domain +  ` ` + postModel.author}"/>
+                android:text="@{postModel.domain + ` ` + postModel.author}"/>
 
             <TextView
                 android:id="@+id/postitem_created"
