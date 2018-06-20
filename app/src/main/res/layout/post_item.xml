@@ -65,6 +65,8 @@
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:paddingStart="@dimen/postitem_selftext_margin"
+                    android:paddingTop="@dimen/postitem_selftext_margin"
+
                     app:thumbnail="@{postModel.thumbnail}"/>
             </LinearLayout>
 

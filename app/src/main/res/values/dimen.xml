@@ -8,14 +8,14 @@
     <!-- post item -->
     <dimen name="postitem_height">100dp</dimen>
     <dimen name="postitem_selftext_height">50dp</dimen>
-    <dimen name="postitem_selftext_margin">10dp</dimen>
+    <dimen name="postitem_selftext_margin">14dp</dimen>
     <dimen name="postitem_margin">6dp</dimen>
     <dimen name="postitem_padding_top">12dp</dimen>
     <dimen name="postitem_padding_hor">12dp</dimen>
     <dimen name="postitem_ic_spacing">8dp</dimen>
     <dimen name="postitem_attr1_margin">90dp</dimen>
     <dimen name="postitem_text_spacing">16dp</dimen>
-    <dimen name="postitem_image_width">60dp</dimen>
+    <dimen name="postitem_image_width">55dp</dimen>
 
 
 

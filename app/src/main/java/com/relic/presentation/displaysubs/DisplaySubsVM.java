@@ -47,12 +47,15 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
    */
   @Override
   public void retrieveMoreSubs(boolean resetPosts) {
-    subRepo.retieveMoreSubscribedSubs();
+    if (resetPosts) {
+      subRepo.retrieveMoreSubscribedSubs(null);
+    }
   }
 
 
   @Override
   public void onAuthenticated() {
-    subRepo.retieveMoreSubscribedSubs();
+    // retrieve posts from beginning because user has just been authenticated
+    subRepo.retrieveMoreSubscribedSubs(null);
   }
 }

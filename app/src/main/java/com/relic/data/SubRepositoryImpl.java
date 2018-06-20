@@ -25,6 +25,7 @@ import java.util.Map;
 
 public class SubRepositoryImpl implements SubRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
+  private final String KEY = "SUBSCRIBED";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "SUB_REPO";
 
@@ -40,12 +41,28 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
+  /**
+   * Returns the list of subscribed subs from the database
+   * @return list of subscribed subs in the database as livedata
+   */
   @Override
-  public void retieveMoreSubscribedSubs() {
+  public LiveData<List<SubredditModel>> getSubscribedSubs() {
+    return subDB.getSubredditDao().getAllSubscribed();
+  }
+
+
+  @Override
+  public void retrieveMoreSubscribedSubs(String after) {
+    String ending = "";
+    // change the string if not refreshing the entire list of subscribed subreddits
+    if (after != null) {
+      ending = "?after=" + after + "&limit=50";
+    }
+
     // create the new request to reddit servers and store the data in persistence layer
     VolleyQueue.getQueue().add(
         new StringRequest(
-            Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber",
+            Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
             new Response.Listener<String>() {
               @Override
               public void onResponse(String response) {
@@ -59,7 +76,7 @@ public class SubRepositoryImpl implements SubRepository {
             new Response.ErrorListener() {
               @Override
               public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Error : " + error.networkResponse.headers);
+                Log.d(TAG, "Error : " + error.getMessage());
               }
             })
         {
@@ -82,18 +99,12 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
-  @Override
-  public LiveData<List<SubredditModel>> getSubscribedSubs() {
-    return subDB.getSubredditDao().getAllSubscribed();
-  }
-
 
   private void parseSubreddits(String response) throws ParseException {
-    Log.d(TAG, response);
-    JSONObject data;
-
-    data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
+    //Log.d(TAG, response);
+    JSONObject data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
     List <SubredditModel> subscribed = new ArrayList<>();
+    String after = (String) data.get("after");
 
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
@@ -105,7 +116,7 @@ public class SubRepositoryImpl implements SubRepository {
       if (currentSub.get("nsfw") == null) {
         nsfw = false;
       }
-      Log.d(TAG, "keys = " + currentSub.keySet());
+      //Log.d(TAG, "keys = " + currentSub.keySet());
       subscribed.add(new SubredditModel(
           (String) currentSub.get("id"),
           (String) currentSub.get("display_name"),
@@ -113,23 +124,41 @@ public class SubRepositoryImpl implements SubRepository {
           nsfw
       ));
     }
+
+    Log.d(TAG, "retrieved = " + subscribed.size() + " " + after);
     //Log.d(TAG, subscribed.toString());
-    // insert the subs in the room instance
-    new InsertSubsTask (subDB).execute(subscribed);
+    // insert the subs and listing into the room instance
+    new InsertSubsTask(this, subDB, subscribed).execute(after);
   }
 
 
-  static class InsertSubsTask extends AsyncTask <List<SubredditModel>, Integer, Integer> {
+  static class InsertSubsTask extends AsyncTask <String, Integer, Integer> {
     private ApplicationDB subDB;
+    private SubRepository subRepo;
+    private List<SubredditModel> subs;
+    private String after;
 
-    InsertSubsTask(ApplicationDB subDB) {
+    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, List<SubredditModel> subs) {
       this.subDB = subDB;
+      this.subRepo = subRepo;
+      this.subs = subs;
     }
 
     @Override
-    protected Integer doInBackground(List<SubredditModel>... lists) {
-      subDB.getSubredditDao().insertAll(lists[0]);
-      return lists[0].size();
+    protected Integer doInBackground(String... Strings) {
+      subDB.getSubredditDao().insertAll(subs);
+      // stores the after value to be used to retrieve the next listing
+      after = Strings[0];
+      return subs.size();
+    }
+
+    @Override
+    protected void onPostExecute(Integer integer) {
+      super.onPostExecute(integer);
+      if (after != null) {
+        // retrieve more subs without refreshing if the string is null
+        subRepo.retrieveMoreSubscribedSubs(after);
+      }
     }
   }
 
