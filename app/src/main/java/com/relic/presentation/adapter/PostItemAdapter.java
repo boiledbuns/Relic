@@ -7,6 +7,7 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -113,11 +114,11 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
   @BindingAdapter({"bind:thumbnail"})
   public static void loadThumbnail(ImageView imgView, String thumbnailUrl) {
-    // does not load image Wif the banner img string is empty
-    if (thumbnailUrl.length() > 0) {
+    if (thumbnailUrl != null) {
+      // does not load image if the banner img string is empty
       try {
         Log.d("SUB_ITEM_ADAPTER", "URL = " + thumbnailUrl);
-        Picasso.get().load(thumbnailUrl).into(imgView);
+        Picasso.get().load(thumbnailUrl).resizeDimen(R.dimen.postitem_image_width, R.dimen.postitem_image_width).centerCrop().into(imgView);
       }
       catch (Error e) {
         Log.d("SUB_ITEM_ADAPTER", "Issue loading image " + e.toString());

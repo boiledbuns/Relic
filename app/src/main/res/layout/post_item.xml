@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -26,45 +27,55 @@
             android:layout_height="match_parent"
             android:padding="@dimen/postitem_padding_top">
 
-            <TextView
-                android:id="@+id/postitem_title"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/postitem_titlegroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/postitem_padding_top"
-                android:textSize="@dimen/title_textsize"
-                android:text="@{postModel.title}"/>
+                android:layout_marginBottom="@dimen/postitem_selftext_margin">
 
-            <ImageView
-                android:layout_width="@dimen/postitem_image_width"
-                android:layout_height="@dimen/postitem_image_width"
-                android:layout_toRightOf="@+id/postitem_title"
-                app:thumbnail="@{postModel.thumbnail}"/>
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/postitem_author"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_title"
-                android:layout_marginEnd="@dimen/title_margin"
-                android:text="@{postModel.domain + ` ` + postModel.author}"/>
+                    <TextView
+                        android:id="@+id/postitem_author"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/title_margin"
+                        android:text="@{postModel.author + ` ` + postModel.created}"/>
 
-            <TextView
-                android:id="@+id/postitem_created"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_title"
-                android:layout_toRightOf="@id/postitem_author"
-                android:text="@{postModel.created}"/>
+                    <TextView
+                        android:id="@+id/postitem_title"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:textSize="@dimen/title_textsize"
+                        android:layout_below="@id/postitem_author"
+                        android:text="@{postModel.title}"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/postitem_title"
+                        android:text="@{postModel.domain}"/>
+                </RelativeLayout>
+
+
+                <ImageView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:paddingStart="@dimen/postitem_selftext_margin"
+                    app:thumbnail="@{postModel.thumbnail}"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/postitem_selftext"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_author"
-                android:layout_marginTop="@dimen/postitem_text_spacing"
-                android:layout_marginBottom="@dimen/postitem_text_spacing"
-                android:maxLines="3"
+                android:layout_below="@+id/postitem_titlegroup"
+                android:layout_marginBottom="@dimen/postitem_selftext_margin"
                 android:ellipsize="end"
+                android:maxLines="3"
                 android:text="@{postModel.selftext}"/>
 
             <TextView
@@ -72,20 +83,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_selftext"
-                android:text="@{Integer.toString(postModel.score)}"
-
+                android:drawableLeft="@drawable/ic_upvote"
                 android:drawablePadding="@dimen/postitem_ic_spacing"
-                android:drawableLeft="@drawable/ic_upvote"/>
+                android:text="@{Integer.toString(postModel.score)}"/>
 
             <TextView
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postitem_selftext"
                 android:layout_marginStart="@dimen/postitem_attr1_margin"
-                android:text="@{Integer.toString(postModel.commentCount)}"
-
                 android:drawablePadding="@dimen/postitem_ic_spacing"
-                android:drawableStart="@drawable/ic_comment"/>
+                android:drawableStart="@drawable/ic_comment"
+                android:text="@{Integer.toString(postModel.commentCount)}"/>
+
 
         </RelativeLayout>
         
