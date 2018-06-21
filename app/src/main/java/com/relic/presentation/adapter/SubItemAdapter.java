@@ -3,6 +3,7 @@ package com.relic.presentation.adapter;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -73,10 +74,31 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     if (subs == null) {
       this.subList = new ArrayList<>();
     }
-    else if (this.subList.size() == 0) {
-      this.subList = subs;
-      notifyItemChanged(0, subs.size());
-      Log.d(TAG, subs.size() + " ");
+    else {
+      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+        @Override
+        public int getOldListSize() {
+          return subList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+          return subs.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+          return (subList.get(oldItemPosition).id == subs.get(newItemPosition).id);
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+          return true;
+        }
+      });
+      // sets the old list as the new one and use diff util to update this adapter
+      subList = subs;
+      diffResult.dispatchUpdatesTo(this);
     }
   }
 
@@ -93,7 +115,6 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 //      }
 //    }
   }
-
 
   public void resetSubList() {
     subList.clear();

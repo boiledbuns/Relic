@@ -32,7 +32,6 @@ public class SubRepositoryImpl implements SubRepository {
   private ApplicationDB subDB;
   private Context context;
 
-
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;

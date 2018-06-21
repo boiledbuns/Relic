@@ -14,14 +14,13 @@ import java.util.List;
 public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback {
   private SubRepository subRepo;
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
+  private Authenticator auth;
 
   final String TAG = "DISPLAY_SUBS_VM";
 
   public void init(SubRepository subRepository, Authenticator auth) {
-    // refresh token before performing any requests
-    auth.refreshToken(this);
-
     this.subRepo = subRepository;
+    this.auth = auth;
 
     // initialize the mediator with null value until we get db values
     obvSubsMediator = new MediatorLiveData<>();
@@ -30,6 +29,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     // add the live data from the repo as a source
     obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
   }
+
 
   /**
    * Exposes subscribed subs to the ui for binding
@@ -48,6 +48,8 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   @Override
   public void retrieveMoreSubs(boolean resetPosts) {
     if (resetPosts) {
+      // refresh token before performing any requests
+      auth.refreshToken(this);
       subRepo.retrieveMoreSubscribedSubs(null);
     }
   }

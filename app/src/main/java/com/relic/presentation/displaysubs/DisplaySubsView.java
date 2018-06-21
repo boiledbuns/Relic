@@ -22,12 +22,13 @@ import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
 import com.relic.presentation.adapter.SubItemAdapter;
 import com.relic.presentation.adapter.SubItemOnClick;
+import com.relic.presentation.callbacks.AllSubsLoadedCallback;
 import com.relic.presentation.displaysub.DisplaySubView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisplaySubsView extends Fragment {
+public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   private final String TAG = "DISPLAY_SUBS_VIEW";
   DisplaySubsContract.VM viewModel;
   public View rootView;
@@ -82,6 +83,7 @@ public class DisplaySubsView extends Fragment {
     subscribeToList();
   }
 
+
   /**
    * Gets livedata list of subscribed subs from the VM and attach a listener to it
    */
@@ -94,10 +96,9 @@ public class DisplaySubsView extends Fragment {
         if (subredditsList != null) {
           subAdapter.setList(new ArrayList<>(subredditsList));
           Log.d(TAG, "Changes to subreddit list received");
-
-          // stops the loading animation
           swipeRefreshLayout.setRefreshing(false);
         }
+        // execute bindings only once everything is loaded (on callback)
         // execute changes and sync
         displaySubsBinding.executePendingBindings();
       }
@@ -113,9 +114,17 @@ public class DisplaySubsView extends Fragment {
         // refresh the current list and retrieve more posts
         subAdapter.resetSubList();
         viewModel.retrieveMoreSubs(true);
+        // TODO start the loading animation for the screen
       }
     });
   }
+
+
+  @Override
+  public void onAllSubsLoaded() {
+    // TODO: stop the loading animation
+  }
+
 
   /**
    * onClick class for the xml file to hook to
