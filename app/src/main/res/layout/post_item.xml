@@ -14,7 +14,7 @@
     </data>
 
     <android.support.v7.widget.CardView
-        android:theme="@style/ItemTheme"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{() -> postOnClick.onClick(postModel.id, postModel.subreddit)}"
@@ -58,6 +58,9 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/postitem_title"
                         android:text="@{postModel.domain}"/>
+
+
+
                 </RelativeLayout>
 
 
@@ -80,11 +83,25 @@
                 android:maxLines="3"
                 android:text="@{postModel.selftext}"/>
 
+            <android.support.design.chip.ChipGroup
+                android:id="@+id/postitem_extra_info"
+                android:layout_below="@id/postitem_selftext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{postModel.subreddit}"/>
+
+
+            </android.support.design.chip.ChipGroup>
+
             <TextView
                 android:id="@+id/postitem_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_selftext"
+                android:layout_below="@id/postitem_extra_info"
                 android:drawableLeft="@drawable/ic_upvote"
                 android:drawablePadding="@dimen/postitem_ic_spacing"
                 android:text="@{Integer.toString(postModel.score)}"/>
@@ -93,7 +110,7 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_selftext"
+                android:layout_below="@id/postitem_extra_info"
                 android:layout_marginStart="@dimen/postitem_attr1_margin"
                 android:drawablePadding="@dimen/postitem_ic_spacing"
                 android:drawableStart="@drawable/ic_comment"
