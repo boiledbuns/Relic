@@ -2,6 +2,7 @@ package com.relic.presentation.adapter;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,8 +62,33 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
       Log.d(TAG, "No comments " + getItemCount());
     } else {
       // use diff util to check the difference
-      commentList.addAll(newComments);
+      commentList = newComments;
       Log.d(TAG, "Comments " + commentList.size());
+
+      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+        @Override
+        public int getOldListSize() {
+          return commentList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+          return newComments.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int i, int i1) {
+          return (commentList.get(i).getId().equals(newComments.get(i1).getId()));
+        }
+
+        @Override
+        public boolean areContentsTheSame(int i, int i1) {
+          return (commentList.get(i).getId().equals(newComments.get(i1).getId()));
+        }
+      });
+
+      commentList = newComments;
+      diffResult.dispatchUpdatesTo(this);
     }
     notifyItemChanged(0, commentList.size());
   }

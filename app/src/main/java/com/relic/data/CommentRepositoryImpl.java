@@ -15,7 +15,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.entities.CommentEntity;
+import com.relic.data.entities.ListingEntity;
 import com.relic.data.models.CommentModel;
+import com.relic.domain.Listing;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -64,8 +66,6 @@ public class CommentRepositoryImpl implements CommentRepository {
    */
   @Override
   public LiveData<List<CommentModel>> getComments(String postFullname) {
-
-
     return appDB.getCommentDAO().getComments(postFullname);
   }
 
@@ -76,7 +76,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     String ending = "r/" + subName + "/comments/" + postFullName.substring(3);
     Log.d(TAG, ENDPOINT + ending);
     if (after != null) {
-      //ending += after;
+      ending += "?after=" + after;
     }
     queue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
         new Response.Listener<String>() {
@@ -84,7 +84,7 @@ public class CommentRepositoryImpl implements CommentRepository {
           public void onResponse(String response) {
             Log.d(TAG, response);
             try {
-              parseComments(response);
+              parseComments(postFullName, response);
             } catch (Exception e) {
               Log.d(TAG, "Error parsing JSON return " + e.getMessage());
             }
@@ -120,9 +120,10 @@ public class CommentRepositoryImpl implements CommentRepository {
   /**
    * Parse the response from the api and store the comments in the room db
    * @param response json string response
+   * @param postFullName fullname of post used as a key for the "after" value
    * @throws ParseException potential issue with parsing of json structure
    */
-  private void parseComments(String response) throws ParseException {
+  private void parseComments(String postFullName, String response) throws ParseException {
     Gson gson = new GsonBuilder().create();
 
     JSONArray array = (JSONArray) JSONParser.parse(response);
@@ -131,10 +132,11 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     // get the data from the listing object
     comments = (JSONObject) comments.get("data");
+    ListingEntity listing = new ListingEntity(postFullName, (String) comments.get("after"));
+
     // get the list of children (comments) associated with the post
     JSONArray commentChildren = ((JSONArray) comments.get("children"));
     Iterator commentIterator = commentChildren.iterator();
-
 
     List<CommentEntity> commentEntities = new ArrayList<>();
 
@@ -144,26 +146,29 @@ public class CommentRepositoryImpl implements CommentRepository {
 
       // unmarshall the comment pojo and add it to list
       commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity.class));
-      Log.d(TAG, commentPOJO.get("parent_id").toString());
+      Log.d(TAG, commentPOJO.get("id").toString());
     }
 
     // insert comments
-    new InsertCommentsTask(appDB, commentEntities).execute();
+    new InsertCommentsTask(appDB, commentEntities, listing).execute();
   }
 
 
   private static class InsertCommentsTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB db;
     List<CommentEntity> comments;
+    ListingEntity listing;
 
-    InsertCommentsTask(ApplicationDB appDB, List<CommentEntity> commentEntities) {
+    InsertCommentsTask(ApplicationDB appDB, List<CommentEntity> commentEntities, ListingEntity listing) {
       this.db = appDB;
       this.comments = commentEntities;
+      this.listing = listing;
     }
 
     @Override
     protected Integer doInBackground(String... strings) {
       db.getCommentDAO().insertComments(comments);
+      db.getListingDAO().insertListing(listing);
       return null;
     }
   }

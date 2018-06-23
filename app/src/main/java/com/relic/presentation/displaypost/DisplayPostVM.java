@@ -7,10 +7,11 @@ import com.relic.data.CommentRepository;
 import com.relic.data.PostRepository;
 import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
+import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 
 import java.util.List;
 
-public class DisplayPostVM extends ViewModel implements DisplayPostContract.ViewModel {
+public class DisplayPostVM extends ViewModel implements DisplayPostContract.ViewModel, RetrieveNextListingCallback {
   private PostRepository postRepo;
   private CommentRepository commentRepo;
 
@@ -29,12 +30,10 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     // retrieves the livedata post to be exposed to the view
     currentPost = postRepo.getPost(fullname);
     subName = subreddit;
-
     postFullname = fullname;
 
+    // retrieve the comment list as livedata so that we can expose it to the view first
     commentList = commentRepo.getComments(fullname);
-    // retrieve the first set of comments
-    commentRepo.retrieveComments(subName, postFullname, null);
   }
 
 
@@ -54,5 +53,14 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
   public LiveData<List<CommentModel>> getCommentList() {
     return commentList;
   }
+
+
+
+  @Override
+  public void onNextListing(String nextVal) {
+    // retrieve the first set of comments
+    commentRepo.retrieveComments(subName, postFullname, nextVal);
+  }
+
 
 }

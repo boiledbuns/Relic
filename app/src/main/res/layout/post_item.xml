@@ -92,29 +92,26 @@
                 <android.support.design.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{postModel.subreddit}"/>
+                    app:chipText="@{postModel.subreddit}"/>
 
+                <android.support.design.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    app:chipIcon="@drawable/ic_upvote"
+                    app:iconStartPadding="2dp"
+                    app:chipText="@{Integer.toString(postModel.score)}"/>
 
+                <android.support.design.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    app:chipIcon="@drawable/ic_comment"
+                    app:iconStartPadding="8dp"
+                    app:chipText="@{Integer.toString(postModel.commentCount)}"/>
             </android.support.design.chip.ChipGroup>
 
-            <TextView
-                android:id="@+id/postitem_score"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_extra_info"
-                android:drawableLeft="@drawable/ic_upvote"
-                android:drawablePadding="@dimen/postitem_ic_spacing"
-                android:text="@{Integer.toString(postModel.score)}"/>
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_extra_info"
-                android:layout_marginStart="@dimen/postitem_attr1_margin"
-                android:drawablePadding="@dimen/postitem_ic_spacing"
-                android:drawableStart="@drawable/ic_comment"
-                android:text="@{Integer.toString(postModel.commentCount)}"/>
 
 
         </RelativeLayout>
