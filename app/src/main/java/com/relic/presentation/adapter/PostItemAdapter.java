@@ -114,7 +114,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
   @BindingAdapter({"bind:thumbnail"})
   public static void loadThumbnail(ImageView imgView, String thumbnailUrl) {
-    if (thumbnailUrl != null) {
+    if (thumbnailUrl != null && thumbnailUrl.length() != 0) {
       // does not load image if the banner img string is empty
       try {
         Log.d("SUB_ITEM_ADAPTER", "URL = " + thumbnailUrl);

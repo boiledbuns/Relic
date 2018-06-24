@@ -2,8 +2,10 @@ package com.relic.presentation.displaypost;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
+import android.util.Log;
 
 import com.relic.data.CommentRepository;
+import com.relic.data.ListingRepository;
 import com.relic.data.PostRepository;
 import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
@@ -12,6 +14,9 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import java.util.List;
 
 public class DisplayPostVM extends ViewModel implements DisplayPostContract.ViewModel, RetrieveNextListingCallback {
+  private String TAG = "DISPLAYPOST_VM";
+
+  private ListingRepository listingRepo;
   private PostRepository postRepo;
   private CommentRepository commentRepo;
 
@@ -22,8 +27,9 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
   private String subName;
 
 
-  public void init(PostRepository postRepo, CommentRepository commentRepo, String subreddit, String fullname) {
+  public void init(ListingRepository listingRepo, PostRepository postRepo, CommentRepository commentRepo, String subreddit, String fullname) {
     // initialize reference to repos for this VM
+    this.listingRepo = listingRepo;
     this.postRepo = postRepo;
     this.commentRepo = commentRepo;
 
@@ -34,6 +40,7 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
 
     // retrieve the comment list as livedata so that we can expose it to the view first
     commentList = commentRepo.getComments(fullname);
+    retrieveMoreComments(false);
   }
 
 
@@ -55,12 +62,24 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
   }
 
 
-
   @Override
-  public void onNextListing(String nextVal) {
-    // retrieve the first set of comments
-    commentRepo.retrieveComments(subName, postFullname, nextVal);
+  public void retrieveMoreComments(boolean refresh) {
+    if (refresh) {
+      // TODO: delete the first set of comments
+      // retrieve the first set of comments
+      commentRepo.retrieveComments(subName, postFullname, null);
+    }
+    else {
+      // retrieve the next listing for the comments on this post
+      listingRepo.getKey(postFullname, this);
+    }
   }
 
 
+  @Override
+  public void onNextListing(String nextVal) {
+    Log.d(TAG, "Next Value " + nextVal);
+    // retrieve the first set of comments
+    commentRepo.retrieveComments(subName, postFullname, nextVal);
+  }
 }

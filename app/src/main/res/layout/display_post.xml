@@ -11,10 +11,11 @@
     </data>
 
     <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/postitem_swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none">
@@ -72,7 +73,7 @@
                 android:layout_below="@id/display_post_postitem"/>
 
         </RelativeLayout>
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 

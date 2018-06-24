@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 import com.relic.R;
 import com.relic.data.CommentRepositoryImpl;
+import com.relic.data.ListingRepositoryImpl;
 import com.relic.data.PostRepositoryImpl;
 import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
@@ -26,9 +29,11 @@ import java.util.List;
 
 public class DisplayPostView extends Fragment {
   private final String TAG = "DISPLAYPOST_VIEW";
+
   private DisplayPostContract.ViewModel displayPostVM;
   private DisplayPostBinding displayPostBinding;
   private CommentAdapter commentAdapter;
+  private SwipeRefreshLayout swipeRefreshLayout;
 
   private String postFullname;
   private String subreddit;
@@ -59,6 +64,10 @@ public class DisplayPostView extends Fragment {
     displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
     displayPostBinding.displayCommentsRecyclerview.setNestedScrollingEnabled(false);
 
+    // get a reference to the swipe refresh layout and attach the scroll listeners
+    swipeRefreshLayout = displayPostBinding.getRoot().findViewById(R.id.postitem_swiperefresh);
+    attachScrollListenters();
+
     return displayPostBinding.getRoot();
   }
 
@@ -69,7 +78,7 @@ public class DisplayPostView extends Fragment {
 
     // create the VM and initialize it with injected dependencies
     displayPostVM = ViewModelProviders.of(this).get(DisplayPostVM.class);
-    displayPostVM.init(new PostRepositoryImpl(getContext()),
+    displayPostVM.init(new ListingRepositoryImpl(getContext()), new PostRepositoryImpl(getContext()),
         new CommentRepositoryImpl(getContext()), subreddit, postFullname);
 
     subscribeToVM();
@@ -103,6 +112,28 @@ public class DisplayPostView extends Fragment {
     });
   }
 
+
+  private void attachScrollListenters() {
+    displayPostBinding.displayCommentsRecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+
+        // if recyclerview reaches bottom
+        if (!recyclerView.canScrollVertically(1)) {
+          Log.d(TAG, "Bottom reached");
+          displayPostVM.retrieveMoreComments(false);
+        }
+      }
+    });
+
+    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        displayPostVM.retrieveMoreComments(true);
+      }
+    });
+  }
 
 
 
