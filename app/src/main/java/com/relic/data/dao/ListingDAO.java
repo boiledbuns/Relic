@@ -9,7 +9,7 @@ import com.relic.data.entities.ListingEntity;
 
 @Dao
 public abstract class ListingDAO {
-  @Query("SELECT afterPosting FROM ListingEntity WHERE subredditName = :subName")
+  @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :subName")
   public abstract String getNext(String subName);
 
   //@Query("SELECT * FROM ListingEntity WHERE ")

@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 
 import com.relic.R;
 import com.relic.data.Authenticator;
+import com.relic.data.ListingRepository;
+import com.relic.data.ListingRepositoryImpl;
 import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
@@ -45,8 +47,8 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     viewModel = ViewModelProviders.of(this).get(DisplaySubsVM.class);
 
     // initialize the repository and inject it into the viewmodel
-    SubRepository accountRepo = new SubRepositoryImpl(this.getContext());
-    viewModel.init(accountRepo, Authenticator.getAuthenticator(this.getContext()));
+    viewModel.init(new SubRepositoryImpl(getContext()), new ListingRepositoryImpl(getContext()),
+        Authenticator.getAuthenticator(this.getContext()));
   }
 
 

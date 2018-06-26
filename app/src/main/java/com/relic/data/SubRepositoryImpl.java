@@ -10,7 +10,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.relic.R;
+import com.relic.data.entities.ListingEntity;
 import com.relic.data.models.SubredditModel;
+import com.relic.domain.Listing;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -55,7 +57,7 @@ public class SubRepositoryImpl implements SubRepository {
     String ending = "";
     // change the string if not refreshing the entire list of subscribed subreddits
     if (after != null) {
-      ending = "?after=" + after + "&limit=50";
+      ending = "?limit=50&after=" + after;
     }
 
     // create the new request to reddit servers and store the data in persistence layer
@@ -105,6 +107,10 @@ public class SubRepositoryImpl implements SubRepository {
     List <SubredditModel> subscribed = new ArrayList<>();
     String after = (String) data.get("after");
 
+    // create a new listing to ensure that the db has an "after" value for checking if we need to
+    // fetch more values or not
+    ListingEntity listing = new ListingEntity(TAG, after);
+
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
     Iterator subIterator = subs.iterator();
@@ -127,7 +133,7 @@ public class SubRepositoryImpl implements SubRepository {
     Log.d(TAG, "retrieved = " + subscribed.size() + " " + after);
     //Log.d(TAG, subscribed.toString());
     // insert the subs and listing into the room instance
-    new InsertSubsTask(this, subDB, subscribed).execute(after);
+    new InsertSubsTask(this, subDB, listing, subscribed).execute(after);
   }
 
 
@@ -136,11 +142,13 @@ public class SubRepositoryImpl implements SubRepository {
     private SubRepository subRepo;
     private List<SubredditModel> subs;
     private String after;
+    private ListingEntity listing;
 
-    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, List<SubredditModel> subs) {
+    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditModel> subs) {
       this.subDB = subDB;
       this.subRepo = subRepo;
       this.subs = subs;
+      this.listing = listing;
     }
 
     @Override
@@ -148,6 +156,11 @@ public class SubRepositoryImpl implements SubRepository {
       subDB.getSubredditDao().insertAll(subs);
       // stores the after value to be used to retrieve the next listing
       after = Strings[0];
+
+      // update the listing value if it isn't null
+      if (after != null) {
+        subDB.getListingDAO().insertListing(listing);
+      }
       return subs.size();
     }
 

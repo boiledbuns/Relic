@@ -5,22 +5,28 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.relic.data.Authenticator;
+import com.relic.data.ListingRepository;
 import com.relic.data.SubRepository;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.data.models.SubredditModel;
+import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 
 import java.util.List;
 
-public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback {
+public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback, RetrieveNextListingCallback{
+  final String TAG = "DISPLAY_SUBS_VM";
+
   private SubRepository subRepo;
+  private ListingRepository listingRepo;
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
   private Authenticator auth;
 
-  final String TAG = "DISPLAY_SUBS_VM";
 
-  public void init(SubRepository subRepository, Authenticator auth) {
-    this.subRepo = subRepository;
+  public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
+    subRepo = subRepository;
+    listingRepo = ListingRepository;
     this.auth = auth;
+    auth.refreshToken(this);
 
     // initialize the mediator with null value until we get db values
     obvSubsMediator = new MediatorLiveData<>();
@@ -57,7 +63,15 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   @Override
   public void onAuthenticated() {
-    // retrieve posts from beginning because user has just been authenticated
-    subRepo.retrieveMoreSubscribedSubs(null);
+    listingRepo.getKey("SUB_REPO", this);
+  }
+
+
+  @Override
+  public void onNextListing(String nextVal) {
+    // retrieve posts only if the "after" value is empty
+    if (nextVal == null) {
+      subRepo.retrieveMoreSubscribedSubs(null);
+    }
   }
 }

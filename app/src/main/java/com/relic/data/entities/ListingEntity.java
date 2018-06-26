@@ -13,11 +13,11 @@ import android.support.annotation.NonNull;
 public class ListingEntity {
   @NonNull
   @PrimaryKey
-  public String subredditName;
+  public String listingKey;
   public String afterPosting;
 
-  public ListingEntity(String subredditName, String after) {
-    this.subredditName = subredditName;
+  public ListingEntity(String listingKey, String after) {
+    this.listingKey = listingKey;
     this.afterPosting = after;
   }
 
