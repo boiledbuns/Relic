@@ -73,10 +73,10 @@ public class CommentRepositoryImpl implements CommentRepository {
 
   @Override
   public void retrieveComments(String subName, String postFullName, String after) {
-    String ending = "r/" + subName + "/comments/" + postFullName.substring(3);
+    String ending = "r/" + subName + "/comments/" + postFullName.substring(3) + "?count=20";
     Log.d(TAG, ENDPOINT + ending);
     if (after != null) {
-      ending += "?after=" + after;
+      ending += "&after=" + after;
     }
     queue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
         new Response.Listener<String>() {
@@ -133,11 +133,12 @@ public class CommentRepositoryImpl implements CommentRepository {
     // get the data from the listing object
     comments = (JSONObject) comments.get("data");
     ListingEntity listing = new ListingEntity(postFullName, (String) comments.get("after"));
+    Log.d(TAG, "after " + (String) comments.keySet().toString() + " " + (String) comments.get("after"));
 
     // get the list of children (comments) associated with the post
     JSONArray commentChildren = ((JSONArray) comments.get("children"));
-    Iterator commentIterator = commentChildren.iterator();
 
+    Iterator commentIterator = commentChildren.iterator();
     List<CommentEntity> commentEntities = new ArrayList<>();
 
     JSONObject commentPOJO;

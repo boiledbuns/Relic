@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import java.util.List;
 
 public class DisplaySubView extends Fragment {
   private final String TAG = "DISPLAYSUB_VIEW";
+  private final String SCROLL_POSITION = "POSITION";
   DisplaySubContract.ViewModel displaySubVM;
 
   private DisplaySubBinding displaySubBinding;
@@ -41,9 +43,9 @@ public class DisplaySubView extends Fragment {
 
     // parse the SubredditModel from the Bundle
     SubredditModel subModel = this.getArguments().getParcelable("SubredditModel");
-    getActivity().setTitle(subModel.getSubName());
 
     if (subModel != null) {
+      getActivity().setTitle(subModel.getSubName());
       // get the viewmodel and inject the dependencies into it
       displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
 
@@ -83,8 +85,18 @@ public class DisplaySubView extends Fragment {
       // fetch the viewmodel if the fragment survives a reconfiguration change
       displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
     }
+
     subscribeToPosts();
     //Toast.makeText(this.getContext(), "Orientation changed", Toast.LENGTH_SHORT).show();
+
+    // recreate saved instance
+    if (savedInstanceState != null) {
+      Integer position = savedInstanceState.getInt(SCROLL_POSITION);
+
+      Log.d(TAG, position + " = previous position");
+      // scroll to the previous position before reconfiguration change
+      displaySubBinding.displayPostsRecyclerview.smoothScrollToPosition(position);
+    }
   }
 
 
@@ -161,4 +173,18 @@ public class DisplaySubView extends Fragment {
           .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
     }
   }
+
+
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+
+    LinearLayoutManager manager =  (LinearLayoutManager) displaySubBinding.displayPostsRecyclerview.getLayoutManager();
+    // put the first visible item position into the bundle to allow us to get back to it
+    outState.putInt(SCROLL_POSITION, manager.findFirstCompletelyVisibleItemPosition());
+    Log.d(TAG, "First position = " + manager.findFirstCompletelyVisibleItemPosition());
+  }
+
+
 }

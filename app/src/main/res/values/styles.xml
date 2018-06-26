@@ -18,5 +18,12 @@
     </style>
 
 
+    <style name="CardTheme">
+        <item name="android:background">@color/backgroundSecondary</item>
+    </style>
+
+    <style name="Chip">
+    </style>
+
 
 </resources>
