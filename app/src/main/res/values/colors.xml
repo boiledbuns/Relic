@@ -10,4 +10,14 @@
     <color name="background">#35373a</color>
     <color name="backgroundSecondary">#384559</color>
 
+
+    <color name="darkGray">#384559</color>
+
+
+    <color name="paleGray">#afafaf</color>
+    <color name="paleBlueGray">#717375</color>
+    <color name="paleDarkGray">#313947</color>
+
+    <color name="lightGray">#6c7584</color>
+
 </resources>

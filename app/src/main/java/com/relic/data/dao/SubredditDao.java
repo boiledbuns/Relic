@@ -20,4 +20,7 @@ public abstract class SubredditDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertAll(List<SubredditModel> subredditList);
+
+  @Query("DELETE FROM SubredditModel")
+  public abstract void deleteAll();
 }

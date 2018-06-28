@@ -19,7 +19,8 @@
         android:onClick="@{() -> postOnClick.onClick(postModel.id, postModel.subreddit)}"
         android:layout_marginStart="@dimen/postitem_margin"
         android:layout_marginEnd="@dimen/postitem_margin"
-        android:layout_marginTop="@dimen/postitem_margin">
+        android:layout_marginTop="@dimen/postitem_margin"
+        app:cardBackgroundColor="?attr/colorPrimary">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -65,7 +66,6 @@
                     android:layout_width="wrap_content"
                     android:paddingStart="@dimen/postitem_selftext_margin"
                     android:paddingTop="@dimen/postitem_selftext_margin"
-
                     app:thumbnail="@{postModel.thumbnail}"/>
             </LinearLayout>
 
@@ -80,15 +80,19 @@
                 android:text="@{postModel.selftext}"/>
 
             <android.support.design.chip.ChipGroup
+                style="@style/Widget.MaterialComponents.ChipGroup"
                 android:id="@+id/postitem_extra_info"
                 android:layout_below="@id/postitem_selftext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <android.support.design.chip.Chip
+                    style="@style/RelicChip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:chipText="@{postModel.subreddit}"/>
+                    app:chipText="@{postModel.subreddit}"
+                    app:chipBackgroundColor="?attr/colorAccent"
+                    android:textColor="@color/mainFont"/>
 
                 <android.support.design.chip.Chip
                     android:layout_width="wrap_content"
@@ -96,7 +100,8 @@
                     android:layout_marginStart="12dp"
                     app:chipIcon="@drawable/ic_upvote"
                     app:iconStartPadding="2dp"
-                    app:chipText="@{Integer.toString(postModel.score)}"/>
+                    app:chipText="@{Integer.toString(postModel.score)}"
+                    app:chipBackgroundColor="?attr/colorAccent"/>
 
                 <android.support.design.chip.Chip
                     android:layout_width="wrap_content"
@@ -104,10 +109,9 @@
                     android:layout_marginStart="12dp"
                     app:chipIcon="@drawable/ic_comment"
                     app:iconStartPadding="8dp"
-                    app:chipText="@{Integer.toString(postModel.commentCount)}"/>
+                    app:chipText="@{Integer.toString(postModel.commentCount)}"
+                    app:chipBackgroundColor="?attr/colorAccent"/>
             </android.support.design.chip.ChipGroup>
-
-
 
 
         </RelativeLayout>

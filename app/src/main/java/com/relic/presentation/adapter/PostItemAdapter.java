@@ -61,6 +61,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
     holder.postBinding.executePendingBindings();
   }
 
+
   @Override
   public int getItemCount() {
     return postList == null ? 0 : postList.size();

@@ -68,7 +68,7 @@ public class SubRepositoryImpl implements SubRepository {
               @Override
               public void onResponse(String response) {
                 try {
-                  parseSubreddits(response);
+                  parseSubreddits(response, after == null);
                 } catch (ParseException e) {
                   Log.e(TAG, "Error parsing the response: " + e.toString());
                 }
@@ -101,7 +101,7 @@ public class SubRepositoryImpl implements SubRepository {
 
 
 
-  private void parseSubreddits(String response) throws ParseException {
+  private void parseSubreddits(String response, boolean delete) throws ParseException {
     //Log.d(TAG, response);
     JSONObject data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
     List <SubredditModel> subscribed = new ArrayList<>();
@@ -133,7 +133,7 @@ public class SubRepositoryImpl implements SubRepository {
     Log.d(TAG, "retrieved = " + subscribed.size() + " " + after);
     //Log.d(TAG, subscribed.toString());
     // insert the subs and listing into the room instance
-    new InsertSubsTask(this, subDB, listing, subscribed).execute(after);
+    new InsertSubsTask(this, subDB, listing, subscribed, delete).execute(after);
   }
 
 
@@ -143,20 +143,24 @@ public class SubRepositoryImpl implements SubRepository {
     private List<SubredditModel> subs;
     private String after;
     private ListingEntity listing;
+    public boolean delete;
 
-    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditModel> subs) {
+    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditModel> subs, boolean delete) {
       this.subDB = subDB;
       this.subRepo = subRepo;
       this.subs = subs;
       this.listing = listing;
+      this.delete = delete;
     }
 
     @Override
     protected Integer doInBackground(String... Strings) {
+      if (delete) {
+        subDB.getSubredditDao().deleteAll();
+      }
       subDB.getSubredditDao().insertAll(subs);
       // stores the after value to be used to retrieve the next listing
       after = Strings[0];
-
       // update the listing value if it isn't null
       if (after != null) {
         subDB.getListingDAO().insertListing(listing);

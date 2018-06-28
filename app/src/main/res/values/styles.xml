@@ -1,29 +1,43 @@
 <resources>
-
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/backgroundSecondary</item>
         <item name="colorPrimaryDark">@color/backgroundSecondary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="background">@color/background</item>
+        <item name="colorAccent">@color/paleDarkGray</item>
+    </style>
+
+    <style name="RelicCard" parent="CardView.Dark">
+        <!--<item name="cardBackgroundColor">@color/darkGray</item>
+        <item name="android:colorAccent">@color/paleDarkGray</item>-->
+        <item name="cardBackgroundColor">@color/paleBlueGray</item>
+        <item name="android:colorAccent">@color/paleGray</item>
     </style>
 
 
     <style name="ItemTheme">
         <!-- Customize your theme here. -->
-        <item name="android:color">#b4bbc6</item>
-        <item name="android:textColor">#b4bbc6</item>
-        <item name="android:background">@color/backgroundSecondary</item>
+        <item name="colorAccent">@color/paleDarkGray</item>
+        <item name="android:textColorPrimary">@color/mainFont</item>
+        <item name="android:textColorSecondary">@color/lightGray</item>
+    </style>
+
+    <style name="RelicChip" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="android:textColor">@color/paleGray</item>
+        <item name="android:textColorPrimary">@color/paleGray</item>
+
     </style>
 
 
-    <style name="CardTheme">
-        <item name="android:background">@color/backgroundSecondary</item>
+    <style name="PrimaryText">
+        <item name="android:colorPrimary">@color/mainFont</item>
     </style>
 
-    <style name="Chip">
+    <style name="SecondaryText" parent="TextAppearance.AppCompat.Title">
+        <item name="android:colorPrimary">@color/lightGray</item>
     </style>
+
+
 
 
 </resources>
