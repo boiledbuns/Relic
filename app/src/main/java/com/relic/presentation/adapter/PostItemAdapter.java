@@ -118,11 +118,11 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
     if (thumbnailUrl != null && thumbnailUrl.length() != 0) {
       // does not load image if the banner img string is empty
       try {
-        Log.d("SUB_ITEM_ADAPTER", "URL = " + thumbnailUrl);
+        Log.d("POSTITEM_ADAPTER", "URL = " + thumbnailUrl);
         Picasso.get().load(thumbnailUrl).resizeDimen(R.dimen.postitem_image_width, R.dimen.postitem_image_width).centerCrop().into(imgView);
       }
       catch (Error e) {
-        Log.d("SUB_ITEM_ADAPTER", "Issue loading image " + e.toString());
+        Log.d("POSTITEM_ADAPTER", "Issue loading image " + e.toString());
       }
     }
   }

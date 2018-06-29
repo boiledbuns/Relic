@@ -23,6 +23,6 @@ public abstract class PostDao {
   @Query("DELETE FROM PostEntity WHERE subreddit = :subName")
   public abstract void deleteAllFromSub(String subName);
 
-  @Query("SELECT id, title, author, selftext, score, commentCount, created FROM PostEntity WHERE id = :postName")
+  @Query("SELECT id, title, author, selftext, score, commentCount, created, thumbnail, url FROM PostEntity WHERE id = :postName")
   public abstract LiveData<PostModel> getSinglePost(String postName);
 }

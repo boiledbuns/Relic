@@ -133,18 +133,13 @@ public class PostRepositoryImpl implements PostRepository {
     // generate the list of posts using the json array
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
-//      for (int i = 0; i < Math.ceil(post.toJSONString().length()/900); i ++) {
-//        Log.d(TAG + " " + i, post.toJSONString().substring(0 + i*900, 900 + i*900));
-//      }
+      //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
+      Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
+      Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
+      Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
+      //Log.d(TAG, "post keys " + post.keySet().toString());
 
       // unmarshall the object and add it into a list
-      Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
-      Log.d(TAG, "post : " + post.get("domain") + " "+ post.get("url"));
-      Log.d(TAG, "post : " + post.get("secure_media_embed") + " "+ post.get("thumbnail"));
-//      Log.d(TAG, "post : " + post.get("domain") + " "+ post.get("url"));
-
-
-      Log.d(TAG, "post keys " + post.keySet().toString());
       postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
     }
 

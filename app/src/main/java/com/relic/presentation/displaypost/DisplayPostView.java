@@ -2,6 +2,7 @@ package com.relic.presentation.displaypost;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.relic.R;
@@ -24,6 +26,7 @@ import com.relic.data.models.PostModel;
 import com.relic.databinding.DisplayPostBinding;
 import com.relic.presentation.adapter.CommentAdapter;
 import com.relic.presentation.callbacks.PostLoadCallback;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -135,5 +138,27 @@ public class DisplayPostView extends Fragment {
   }
 
 
+  /**
+   * Bind this method to the preview image to automatically load the image into it
+   * @param imgView imageview to hold the preview image
+   * @param previewUrl url of the preview image
+   */
+  @BindingAdapter({"bind:previewImage"})
+  public static void LoadPreviewImage(ImageView imgView, String previewUrl) {
+    Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewUrl);
 
+//    if (fullImage != null && fullImage.substring(fullImage.length() - 3) == ("jpg" || "png")) {
+//
+//    }
+    if (previewUrl != null && previewUrl.length() != 0) {
+      // does not load image if the banner img string is empty
+      try {
+        Log.d("DISPLAYPOST_VIEW", "URL = " + previewUrl);
+        Picasso.get().load(previewUrl).resize(imgView.getWidth(), 0).into(imgView);
+      }
+      catch (Error e) {
+        Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
+      }
+    }
+  }
 }

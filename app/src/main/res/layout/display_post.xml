@@ -26,12 +26,19 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <ImageView
+                android:id="@+id/displaypost_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:previewImage="@{postItem.thumbnail}"/>
+
             <!-- groups post data together -->
             <RelativeLayout
                 android:theme="@style/ItemTheme"
                 android:id="@+id/display_post_postitem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/displaypost_preview"
                 android:padding="@dimen/display_post_paddingtop"
                 android:layout_marginBottom="@dimen/display_post_bottommargin">
 
