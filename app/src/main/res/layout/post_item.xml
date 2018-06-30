@@ -11,6 +11,9 @@
         <variable
             name="postOnClick"
             type="com.relic.presentation.adapter.PostItemOnclick"/>
+        <variable
+            name="postOnClickImage"
+            type="com.relic.presentation.adapter.ImageOnClick"/>
     </data>
 
     <android.support.v7.widget.CardView
@@ -60,12 +63,12 @@
                         android:text="@{postModel.domain}"/>
                 </RelativeLayout>
 
-
                 <ImageView
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:paddingStart="@dimen/postitem_selftext_margin"
                     android:paddingTop="@dimen/postitem_selftext_margin"
+                    android:onClick="@{() -> postOnClickImage.onClick(postModel.url)}"
                     app:thumbnail="@{postModel.thumbnail}"/>
             </LinearLayout>
 
@@ -75,8 +78,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/postitem_titlegroup"
                 android:layout_marginBottom="@dimen/postitem_selftext_margin"
-                android:ellipsize="end"
                 android:maxLines="3"
+                android:ellipsize="marquee"
                 android:text="@{postModel.selftext}"/>
 
             <android.support.design.chip.ChipGroup

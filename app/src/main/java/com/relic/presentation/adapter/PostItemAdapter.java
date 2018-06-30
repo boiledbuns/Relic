@@ -22,6 +22,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
   private final String TAG = "POST_ADAPTER";
   private List<PostModel> postList;
   private PostItemOnclick onClick;
+  private ImageOnClick onClickImage;
 
 
   /**
@@ -37,9 +38,10 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
     }
   }
 
-  public PostItemAdapter(PostItemOnclick onClick) {
+  public PostItemAdapter(PostItemOnclick onClick, ImageOnClick onClickImage) {
     super();
     this.onClick = onClick;
+    this.onClickImage = onClickImage;
   }
 
   @NonNull
@@ -49,8 +51,9 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
     PostItemBinding postBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
         R.layout.post_item, parent, false);
 
-    // attach the onClick object to the binding
+    // attach the onClick s to the binding
     postBinding.setPostOnClick(this.onClick);
+    postBinding.setPostOnClickImage(this.onClickImage);
     return new PostItemVH(postBinding);
   }
 

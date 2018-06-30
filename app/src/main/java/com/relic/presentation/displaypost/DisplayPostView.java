@@ -25,7 +25,6 @@ import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.DisplayPostBinding;
 import com.relic.presentation.adapter.CommentAdapter;
-import com.relic.presentation.callbacks.PostLoadCallback;
 import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
@@ -149,30 +148,21 @@ public class DisplayPostView extends Fragment {
   @BindingAdapter({"bind:previewThumbnail", "bind:previewFullImage"})
   public static void LoadPreviewImage(ImageView imgView, String previewThumbnail, String previewFullImage) {
     Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewFullImage);
+    String useUrl = previewFullImage;
 
-    // tries to load full image if the url links to an image type
-    if (previewFullImage != null && picEndings.contains(previewFullImage.substring(previewFullImage.length() - 3))) {
-      Log.d("DISPLAYPOST_VIEW", "Full image loaded");
-      // does not load image if the banner img string is empty
-      try {
-        Picasso.get().load(previewFullImage).resize(imgView.getWidth(), 0)
-            .onlyScaleDown().into(imgView);
-      }
-      catch (Error e) {
-        Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
-      }
-    }
-    else if (previewThumbnail != null && previewThumbnail.length() != 0) {
-      // does not load image if the banner img string is empty
-      try {
-        Log.d("DISPLAYPOST_VIEW", "THUMBNAIL LOADED");
-        Picasso.get().load(previewThumbnail).resize(imgView.getWidth(), 0)
-            .centerCrop().into(imgView);
-      }
-      catch (Error e) {
-        Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
-      }
+    // use the thumbnail image url if the full url is not an image
+    if (previewFullImage == null || !picEndings.contains(previewFullImage.substring(previewFullImage.length() - 3))) {
+      useUrl = previewThumbnail;
     }
 
+    try {
+      // does not load image if the banner img string is empty
+      imgView.setVisibility(ImageView.VISIBLE);
+      Picasso.get().load(useUrl).fit().centerCrop().into(imgView);
+    }
+    catch (Error e) {
+      Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
+    }
   }
+
 }

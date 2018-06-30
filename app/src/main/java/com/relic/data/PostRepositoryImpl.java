@@ -70,6 +70,17 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
 
+//  public void retrieveMorePosts2(String subredditName, String after) {
+//
+//  }
+//
+//
+//  public void reset(){
+//
+//  }
+
+
+
   /**
    * Retrieves posts for a subreddit
    * @param subredditName name of the subreddit
@@ -78,7 +89,7 @@ public class PostRepositoryImpl implements PostRepository {
   @Override
   public void retrieveMorePosts(String subredditName, String after) {
     String ending = "r/" + subredditName;
-    // if we dont pass in an after value (ie. we want to reset)
+    // reset posts for this subreddit if the after values have been set to null
     if (after == null) {
       // delete all the current items for the db
       new DeleteSubPostsTask(appDB).execute(subredditName);

@@ -48,7 +48,7 @@ public class PostModel implements Post {
   }
 
   public String getSelftext() {
-    return selftext;
+    return selftext == null ? "" : selftext;
   }
 
   public void setSelftext(String selftext) {

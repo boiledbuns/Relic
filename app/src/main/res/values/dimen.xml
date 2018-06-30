@@ -28,11 +28,10 @@
     <dimen name="title_textsize">16sp</dimen>
 
     <!-- display post -->
-    <dimen name="display_post_bottommargin">12dp</dimen>
-    <dimen name="display_post_paddingtop">6dp</dimen>
-    <dimen name="display_post_paddingside">6dp</dimen>
-    <dimen name="display_post_title_size">18sp</dimen>
-    <dimen name="display_post_title_margin">6dp</dimen>
-
-
+    <dimen name="displaypost_bottommargin">12dp</dimen>
+    <dimen name="displaypost_paddingtop">6dp</dimen>
+    <dimen name="displaypost_paddingside">6dp</dimen>
+    <dimen name="displaypost_title_size">18sp</dimen>
+    <dimen name="displaypost_title_margin">6dp</dimen>
+    <dimen name="displaypost_image_height">180dp</dimen>
 </resources>
