@@ -28,6 +28,7 @@ import com.relic.presentation.adapter.CommentAdapter;
 import com.relic.presentation.callbacks.PostLoadCallback;
 import com.squareup.picasso.Picasso;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class DisplayPostView extends Fragment {
@@ -40,6 +41,7 @@ public class DisplayPostView extends Fragment {
 
   private String postFullname;
   private String subreddit;
+  private static List picEndings = Arrays.asList("jpg", "png");
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,24 +143,36 @@ public class DisplayPostView extends Fragment {
   /**
    * Bind this method to the preview image to automatically load the image into it
    * @param imgView imageview to hold the preview image
-   * @param previewUrl url of the preview image
+   * @param previewThumbnail url of the thumbnail image
+   * @param previewFullImage url of the full image
    */
-  @BindingAdapter({"bind:previewImage"})
-  public static void LoadPreviewImage(ImageView imgView, String previewUrl) {
-    Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewUrl);
+  @BindingAdapter({"bind:previewThumbnail", "bind:previewFullImage"})
+  public static void LoadPreviewImage(ImageView imgView, String previewThumbnail, String previewFullImage) {
+    Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewFullImage);
 
-//    if (fullImage != null && fullImage.substring(fullImage.length() - 3) == ("jpg" || "png")) {
-//
-//    }
-    if (previewUrl != null && previewUrl.length() != 0) {
+    // tries to load full image if the url links to an image type
+    if (previewFullImage != null && picEndings.contains(previewFullImage.substring(previewFullImage.length() - 3))) {
+      Log.d("DISPLAYPOST_VIEW", "Full image loaded");
       // does not load image if the banner img string is empty
       try {
-        Log.d("DISPLAYPOST_VIEW", "URL = " + previewUrl);
-        Picasso.get().load(previewUrl).resize(imgView.getWidth(), 0).into(imgView);
+        Picasso.get().load(previewFullImage).resize(imgView.getWidth(), 0)
+            .onlyScaleDown().into(imgView);
       }
       catch (Error e) {
         Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
       }
     }
+    else if (previewThumbnail != null && previewThumbnail.length() != 0) {
+      // does not load image if the banner img string is empty
+      try {
+        Log.d("DISPLAYPOST_VIEW", "THUMBNAIL LOADED");
+        Picasso.get().load(previewThumbnail).resize(imgView.getWidth(), 0)
+            .centerCrop().into(imgView);
+      }
+      catch (Error e) {
+        Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
+      }
+    }
+
   }
 }

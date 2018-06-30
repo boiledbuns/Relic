@@ -30,7 +30,8 @@
                 android:id="@+id/displaypost_preview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:previewImage="@{postItem.thumbnail}"/>
+                app:previewThumbnail="@{postItem.thumbnail}"
+                app:previewFullImage="@{postItem.url}"/>
 
             <!-- groups post data together -->
             <RelativeLayout
