@@ -46,7 +46,7 @@ public class PostRepositoryImpl implements PostRepository {
 
   public PostRepositoryImpl(Context context) {
     this.context = context;
-    requestQueue = Volley.newRequestQueue(context);
+    requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
     JSONParser = new JSONParser();
 
     // get the oauth token from the app's shared preferences

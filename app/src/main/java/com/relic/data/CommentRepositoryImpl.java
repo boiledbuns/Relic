@@ -45,7 +45,7 @@ public class CommentRepositoryImpl implements CommentRepository {
   public CommentRepositoryImpl (Context context) {
     //TODO convert VolleyQueue into a singleton
     appDB = ApplicationDB.getDatabase(context);
-    queue = Volley.newRequestQueue(context);
+    queue = VolleyAccessor.getInstance(context).getRequestQueue();
     JSONParser = new JSONParser();
 
     // TODO convert this to a authenticator method

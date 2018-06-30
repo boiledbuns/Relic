@@ -13,13 +13,11 @@ public class ListingRepositoryImpl implements ListingRepository {
   private final String TAG = "COMMENT_REPO";
 
   private ApplicationDB appDB;
-  private RequestQueue queue;
 
 
   public ListingRepositoryImpl (Context context) {
     //TODO convert VolleyQueue into a singleton
     appDB = ApplicationDB.getDatabase(context);
-    queue = Volley.newRequestQueue(context);
   }
 
   @Override

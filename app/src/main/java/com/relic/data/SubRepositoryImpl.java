@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -33,10 +34,12 @@ public class SubRepositoryImpl implements SubRepository {
 
   private ApplicationDB subDB;
   private Context context;
+  private RequestQueue volleyQueue;
 
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;
+    volleyQueue = VolleyAccessor.getInstance(context).getRequestQueue();
 
     subDB = ApplicationDB.getDatabase(context);
   }
@@ -61,7 +64,7 @@ public class SubRepositoryImpl implements SubRepository {
     }
 
     // create the new request to reddit servers and store the data in persistence layer
-    VolleyQueue.getQueue().add(
+    volleyQueue.add(
         new StringRequest(
             Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
             new Response.Listener<String>() {
