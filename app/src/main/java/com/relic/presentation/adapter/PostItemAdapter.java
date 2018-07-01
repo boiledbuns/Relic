@@ -122,7 +122,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
       // does not load image if the banner img string is empty
       try {
         Log.d("POSTITEM_ADAPTER", "URL = " + thumbnailUrl);
-        Picasso.get().load(thumbnailUrl).resizeDimen(R.dimen.postitem_image_width, R.dimen.postitem_image_width).centerCrop().into(imgView);
+        Picasso.get().load(thumbnailUrl).fit().centerCrop().into(imgView);
       }
       catch (Error e) {
         Log.d("POSTITEM_ADAPTER", "Issue loading image " + e.toString());

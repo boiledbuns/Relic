@@ -17,7 +17,7 @@ public class PostModel implements Post {
 
   public String domain;
   public String url;
-  public String thumbnail;
+  private String thumbnail;
 
   public PostModel() {}
 
@@ -93,6 +93,14 @@ public class PostModel implements Post {
   }
 
   public String getHtmlSelfText() {
-    return selftext == null ? "" : Html.fromHtml(Html.fromHtml(selftext).toString()).toString();
+    return selftext == null ? null: Html.fromHtml(Html.fromHtml(selftext).toString()).toString();
+  }
+
+  public String getThumbnail() {
+    return thumbnail;
+  }
+
+  public void setThumbnail(String thumbnail) {
+    this.thumbnail = thumbnail.equals("self") ? null : thumbnail;
   }
 }

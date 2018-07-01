@@ -157,7 +157,6 @@ public class DisplayPostView extends Fragment {
 
     try {
       // does not load image if the banner img string is empty
-      imgView.setVisibility(ImageView.VISIBLE);
       Picasso.get().load(useUrl).fit().centerCrop().into(imgView);
     }
     catch (Error e) {

@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="postModel"
             type="com.relic.data.models.PostModel"/>
@@ -64,8 +65,9 @@
                 </RelativeLayout>
 
                 <ImageView
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/postitem_image_width"
+                    android:layout_height="@dimen/postitem_image_width"
+                    android:visibility="@{postModel.thumbnail == null? View.GONE : View.VISIBLE}"
                     android:paddingStart="@dimen/postitem_selftext_margin"
                     android:paddingTop="@dimen/postitem_selftext_margin"
                     android:onClick="@{() -> postOnClickImage.onClick(postModel.url)}"
@@ -80,6 +82,7 @@
                 android:layout_marginBottom="@dimen/postitem_selftext_margin"
                 android:maxLines="3"
                 android:ellipsize="marquee"
+                android:visibility="@{postModel.selftext == null ? View.GONE : View.VISIBLE}"
                 android:text="@{postModel.selftext}"/>
 
             <android.support.design.chip.ChipGroup
