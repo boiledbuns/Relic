@@ -2,7 +2,9 @@ package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -183,17 +185,28 @@ public class DisplaySubView extends Fragment {
    */
   class OnClickImage implements ImageOnClick {
     @Override
-    public void onClick(String imageURL) {
-      // create a new bundle for to pass the image url along
-      Bundle bundle = new Bundle();
-      bundle.putString("image_url", imageURL);
+    public void onClick(String url) {
+      // Parses the url type and routes it appropriately
+      String urlEnding = url.substring(url.length() - 3);
+      if (urlEnding.equals("jpg") || urlEnding.equals("png") || urlEnding.equals("gif")) {
+        // create a new bundle for to pass the image url along
+        Bundle bundle = new Bundle();
+        bundle.putString("image_url", url);
 
-      DisplayImageFragment displayImageFragment = new DisplayImageFragment();
-      displayImageFragment.setArguments(bundle);
+        DisplayImageFragment displayImageFragment = new DisplayImageFragment();
+        displayImageFragment.setArguments(bundle);
 
-      // replace the current fragment with the new display image frag and add it to the frag stack
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG).commit();
+        // replace the current fragment with the new display image frag and add it to the frag stack
+        getActivity().getSupportFragmentManager().beginTransaction()
+            .add(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG).commit();
+      }
+      else {
+        // open the url in the browser
+        Intent openInBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(openInBrowser);
+      }
+
+
     }
   }
 

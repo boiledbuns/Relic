@@ -2,6 +2,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android">
     <RelativeLayout
+        android:theme="@style/AlertDialog.AppCompat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent">
@@ -9,6 +10,8 @@
         <ImageView
             android:id="@+id/displayimage_imageview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/displayimage_margin"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
 </layout>

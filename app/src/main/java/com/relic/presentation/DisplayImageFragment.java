@@ -1,6 +1,5 @@
 package com.relic.presentation;
 
-import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.relic.R;
 import com.relic.databinding.DisplayImageBinding;
@@ -35,6 +33,13 @@ public class DisplayImageFragment extends Fragment {
 
     // retrieve the reference to the binding
     displayImageBinding = DataBindingUtil.inflate(inflater, R.layout.display_image, container, false);
+    displayImageBinding.getRoot().setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        getActivity().onBackPressed();
+      }
+    });
+
     loadImage(container.getWidth());
     return displayImageBinding.getRoot();
   }
