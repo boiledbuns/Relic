@@ -1,9 +1,17 @@
 package com.relic;
 
 
+import android.content.Context;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.relic.data.Authenticator;
 import com.relic.data.VolleyQueue;
@@ -30,7 +38,20 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
       getSupportFragmentManager().beginTransaction()
         .replace(R.id.main_content_frame, loginFragment).commit();
     }
+
+    setSupportActionBar(findViewById(R.id.my_toolbar));
+    // set Title of app using custom title textview instead of the default
+    getSupportActionBar().setTitle(" ");
+    ((TextView) findViewById(R.id.my_toolbar_title)).setText(getText(R.string.app_name));
+
+    findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Toast.makeText(getApplicationContext(), "NAVBAR", Toast.LENGTH_SHORT).show();
+      }
+    });
   }
+
 
   @Override
   public void onAuthenticated() {

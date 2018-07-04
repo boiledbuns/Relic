@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- actionbar -->
+    <dimen name="toolbar_height">48dp</dimen>
+    <dimen name="toolbar_elevation">4dp</dimen>
+
+
     <dimen name="subitem_height">30dp</dimen>
     <dimen name="subitem_margin">3dp</dimen>
     <dimen name="subitem_padding_top">12dp</dimen>
