@@ -13,9 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
         android:background="?attr/colorPrimary"
-        android:elevation="@dimen/toolbar_height"
-        android:textAlignment="center">
-
+        android:elevation="@dimen/toolbar_height">
+        
         <TextView
             android:id="@+id/my_toolbar_title"
             android:layout_width="wrap_content"
