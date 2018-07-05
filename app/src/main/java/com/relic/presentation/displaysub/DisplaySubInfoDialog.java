@@ -28,7 +28,7 @@ public class DisplaySubInfoDialog extends DialogFragment{
             // TODO set no
           }
         });
-    return super.onCreateDialog(savedInstanceState);
+    return builder.create();
   }
 
 

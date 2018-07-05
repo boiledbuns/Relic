@@ -185,8 +185,7 @@ public class DisplaySubView extends Fragment {
         @Override
         public void onClick(View view) {
           Toast.makeText(getContext(), "Title Clicked", Toast.LENGTH_SHORT).show();
-          DisplaySubInfoDialog dialog = new DisplaySubInfoDialog();
-          dialog.show(getFragmentManager(), TAG);
+          new DisplaySubInfoDialog().showNow(getFragmentManager(), TAG);
         }
       });
     }
@@ -256,6 +255,8 @@ public class DisplaySubView extends Fragment {
     super.onDestroy();
     // set title back to app name
     ((TextView) getActivity().findViewById(R.id.my_toolbar_title)).setText(R.string.app_name);
+    ((TextView) getActivity().findViewById(R.id.my_toolbar_subtitle)).setText("");
+
   }
 
 }

@@ -16,13 +16,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.widget.NestedScrollView
+        <com.relic.presentation.displaypost.DisplayPostNestedScrollView
             android:id="@+id/displaypost_nestedscroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="none">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -41,7 +41,6 @@
                 android:id="@+id/display_post_postitem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/displaypost_preview"
                 android:padding="@dimen/displaypost_paddingtop"
                 android:layout_marginBottom="@dimen/displaypost_bottommargin"
                 android:background="?attr/colorPrimary">
@@ -79,13 +78,13 @@
             <!-- recyclerview for the comments -->
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/display_comments_recyclerview"
+                android:nestedScrollingEnabled="false"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/display_post_postitem"/>
+                android:layout_height="wrap_content"/>
 
-        </RelativeLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </LinearLayout>
+        </com.relic.presentation.displaypost.DisplayPostNestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 
