@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- actionbar -->
-    <dimen name="toolbar_height">48dp</dimen>
+    <dimen name="toolbar_height">52dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="toolbar_h1">18dp</dimen>
+    <dimen name="toolbar_h2">12dp</dimen>
 
 
     <dimen name="subitem_height">30dp</dimen>
