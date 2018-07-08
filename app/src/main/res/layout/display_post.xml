@@ -49,6 +49,7 @@
                     android:id="@+id/display_post_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/displaypost_title_marginbottom"
                     android:textSize="@dimen/title_textsize"
                     android:text="@{postItem.title}"/>
 
@@ -64,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/display_post_title"
-                    android:layout_toRightOf="@id/display_post_author"
+                    android:layout_toEndOf="@id/display_post_author"
                     android:text="@{postItem.created}"/>
 
                 <TextView
@@ -72,6 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/display_post_author"
+                    android:layout_marginTop="@dimen/displaypost_body_margintop"
                     android:text="@{postItem.htmlSelfText}"/>
             </RelativeLayout>
 

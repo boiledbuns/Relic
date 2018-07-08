@@ -44,6 +44,11 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
   }
 
 
+  public void refresh() {
+
+  }
+
+
   /**
    * Exposes the post to the view
    * @return post as livedata

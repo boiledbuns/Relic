@@ -14,6 +14,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
+import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.entities.CommentEntity;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.models.CommentModel;
@@ -94,27 +95,8 @@ public class CommentRepositoryImpl implements CommentRepository {
           public void onErrorResponse(VolleyError error) {
             Log.d(TAG, "Error with request : " +  error.getMessage());
           }
-        }));
+        }, authToken));
     }
-
-
-  class RedditOauthRequest extends StringRequest {
-    private RedditOauthRequest(int method, String url, Response.Listener<String> listener,
-                               Response.ErrorListener errorListener) {
-      super(method, url, listener, errorListener);
-    }
-
-    public Map<String, String> getHeaders() {
-      Map <String, String> headers = new HashMap<>();
-
-      // generate the credential string for oauth
-      String credentials = "bearer " + authToken;
-      headers.put("Authorization", credentials);
-      headers.put("User-Agent", userAgent);
-
-      return headers;
-    }
-  }
 
 
   /**

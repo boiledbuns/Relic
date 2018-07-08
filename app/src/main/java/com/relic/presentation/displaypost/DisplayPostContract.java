@@ -41,5 +41,7 @@ public interface DisplayPostContract {
      */
     void retrieveMoreComments(boolean refresh);
 
+
+    void refresh();
   }
 }

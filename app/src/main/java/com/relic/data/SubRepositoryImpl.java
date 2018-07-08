@@ -11,6 +11,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.relic.R;
+import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.models.SubredditModel;
 import com.relic.domain.Listing;
@@ -35,11 +36,19 @@ public class SubRepositoryImpl implements SubRepository {
   private ApplicationDB subDB;
   private Context context;
   private RequestQueue volleyQueue;
+  private String authToken;
 
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;
     volleyQueue = VolleyAccessor.getInstance(context).getRequestQueue();
+
+
+    // retrieve the auth token shared preferences
+    String authKey = context.getResources().getString(R.string.AUTH_PREF);
+    String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
+    authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+        .getString(tokenKey, "DEFAULT");
 
     subDB = ApplicationDB.getDatabase(context);
   }
@@ -64,42 +73,24 @@ public class SubRepositoryImpl implements SubRepository {
     }
 
     // create the new request to reddit servers and store the data in persistence layer
-    volleyQueue.add(
-        new StringRequest(
-            Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
-            new Response.Listener<String>() {
-              @Override
-              public void onResponse(String response) {
-                try {
-                  parseSubreddits(response, after == null);
-                } catch (ParseException e) {
-                  Log.e(TAG, "Error parsing the response: " + e.toString());
-                }
-              }
-            },
-            new Response.ErrorListener() {
-              @Override
-              public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "Error : " + error.getMessage());
-              }
-            })
-        {
-          public Map<String, String> getHeaders() {
-            Map <String, String> headers = new HashMap<>();
-
-            String auth = context.getSharedPreferences(
-                context.getResources().getString(R.string.AUTH_PREF),
-                Context.MODE_PRIVATE)
-                .getString(context.getResources().getString(R.string.TOKEN_KEY), "DEFAULT");
-
-            // generate the credential string for oauth
-            String credentials = "bearer " + auth;
-            headers.put("Authorization", credentials);
-            headers.put("User-Agent", userAgent);
-
-            return headers;
+    volleyQueue.add(new RedditOauthRequest(
+        Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
+        new Response.Listener<String>() {
+          @Override
+          public void onResponse(String response) {
+            try {
+              parseSubreddits(response, after == null);
+            } catch (ParseException e) {
+              Log.e(TAG, "Error parsing the response: " + e.toString());
+            }
           }
-        });
+        },
+        new Response.ErrorListener() {
+          @Override
+          public void onErrorResponse(VolleyError error) {
+            Log.d(TAG, "Error : " + error.getMessage());
+          }
+        }, authToken));
   }
 
 

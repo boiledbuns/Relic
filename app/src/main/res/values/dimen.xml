@@ -37,7 +37,10 @@
     <dimen name="displaypost_paddingtop">6dp</dimen>
     <dimen name="displaypost_paddingside">6dp</dimen>
     <dimen name="displaypost_title_size">18sp</dimen>
-    <dimen name="displaypost_title_margin">6dp</dimen>
+    <dimen name="displaypost_title_margin">8dp</dimen>
+    <dimen name="displaypost_title_marginbottom">6dp</dimen>
+    <dimen name="displaypost_body_margintop">20dp</dimen>
+
     <dimen name="displaypost_image_height">180dp</dimen>
 
     <!-- display image -->

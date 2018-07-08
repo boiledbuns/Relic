@@ -15,6 +15,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
+import com.relic.data.Request.RedditOauthRequest;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -41,7 +42,7 @@ public class PostRepositoryImpl implements PostRepository {
   private JSONParser JSONParser;
   private ApplicationDB appDB;
 
-  RequestQueue requestQueue;
+  private RequestQueue requestQueue;
 
 
   public PostRepositoryImpl(Context context) {
@@ -117,8 +118,8 @@ public class PostRepositoryImpl implements PostRepository {
       public void onErrorResponse(VolleyError error) {
         Log.d(TAG, "Error: " + error.getMessage());
       }
-    }
-    ));
+    }, authToken)
+    );
   }
 
 
@@ -156,25 +157,6 @@ public class PostRepositoryImpl implements PostRepository {
 
     // insert all the post entities into the db
     new InsertPostsTask(appDB, postEntities).execute(listing);
-  }
-
-
-  class RedditOauthRequest extends StringRequest {
-    private RedditOauthRequest(int method, String url, Response.Listener<String> listener,
-                              Response.ErrorListener errorListener) {
-      super(method, url, listener, errorListener);
-    }
-
-    public Map<String, String> getHeaders() {
-      Map <String, String> headers = new HashMap<>();
-
-      // generate the credential string for oauth
-      String credentials = "bearer " + authToken;
-      headers.put("Authorization", credentials);
-      headers.put("User-Agent", userAgent);
-
-      return headers;
-    }
   }
 
 
@@ -250,6 +232,11 @@ public class PostRepositoryImpl implements PostRepository {
   
   public LiveData<PostModel> getPost(String postFullName) {
     return appDB.getPostDao().getSinglePost(postFullName);
+  }
+
+
+  public void retrieveSinglePost(String postFullName) {
+
   }
 
 }
