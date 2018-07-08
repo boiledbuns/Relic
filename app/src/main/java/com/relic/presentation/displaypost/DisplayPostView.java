@@ -21,6 +21,8 @@ import com.relic.R;
 import com.relic.data.CommentRepositoryImpl;
 import com.relic.data.ListingRepositoryImpl;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.data.gateway.UserGateway;
+import com.relic.data.gateway.UserGatewayImpl;
 import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.DisplayPostBinding;
@@ -85,6 +87,10 @@ public class DisplayPostView extends Fragment {
         new CommentRepositoryImpl(getContext()), subreddit, postFullname);
 
     subscribeToVM();
+
+    // Testing user gateway using user "reddit"
+    UserGateway userGateway = new UserGatewayImpl(getContext());
+    userGateway.getUser("reddit");
   }
 
 

@@ -41,7 +41,7 @@ public class CommentRepositoryImpl implements CommentRepository {
   private RequestQueue queue;
   private JSONParser JSONParser;
 
-  String authToken;
+  private String authToken;
 
   public CommentRepositoryImpl (Context context) {
     //TODO convert VolleyQueue into a singleton
@@ -126,13 +126,12 @@ public class CommentRepositoryImpl implements CommentRepository {
     JSONObject commentPOJO;
     while (commentIterator.hasNext()) {
       commentPOJO = (JSONObject) ((JSONObject) commentIterator.next()).get("data");
-
       // unmarshall the comment pojo and add it to list
       commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity.class));
       Log.d(TAG, commentPOJO.get("id").toString());
     }
 
-    // insert comments
+    // insert the comments
     new InsertCommentsTask(appDB, commentEntities, listing).execute();
   }
 
