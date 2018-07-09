@@ -16,4 +16,7 @@ public interface SubRepository {
    *              are paged), refreshes if it is null
    */
   void retrieveMoreSubscribedSubs(String after);
+
+
+  LiveData<SubredditModel> findSub(String name);
 }

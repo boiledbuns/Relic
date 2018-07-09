@@ -10,6 +10,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.entities.ListingEntity;
@@ -75,24 +76,15 @@ public class SubRepositoryImpl implements SubRepository {
     // create the new request to reddit servers and store the data in persistence layer
     volleyQueue.add(new RedditOauthRequest(
         Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
-        new Response.Listener<String>() {
-          @Override
-          public void onResponse(String response) {
-            try {
-              parseSubreddits(response, after == null);
-            } catch (ParseException e) {
-              Log.e(TAG, "Error parsing the response: " + e.toString());
-            }
+        response -> {
+          try {
+            parseSubreddits(response, after == null);
+          } catch (ParseException e) {
+            Log.e(TAG, "Error parsing the response: " + e.toString());
           }
         },
-        new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "Error : " + error.getMessage());
-          }
-        }, authToken));
+        error -> Log.d(TAG, "Error : " + error.getMessage()), authToken));
   }
-
 
 
   private void parseSubreddits(String response, boolean delete) throws ParseException {
@@ -137,7 +129,7 @@ public class SubRepositoryImpl implements SubRepository {
     private List<SubredditModel> subs;
     private String after;
     private ListingEntity listing;
-    public boolean delete;
+    private boolean delete;
 
     InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditModel> subs, boolean delete) {
       this.subDB = subDB;
@@ -173,4 +165,36 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
+  @Override
+  public LiveData<SubredditModel> findSub(String name) {
+    String end = ENDPOINT + "";
+      volleyQueue.add(new RedditOauthRequest(Request.Method.GET, end,
+          response -> {
+            try {
+              parseSearchedSubs(response);
+            }
+            catch (ParseException e) {
+              Log.d(TAG, "Error parsing the response");
+            }},
+          error -> Log.d(TAG, "error retrieving this class"), authToken));
+
+    // TODO method to dao interface for retrieving a livedata instance of this class
+    return null;
+  }
+
+  private void parseSearchedSubs(String response) throws ParseException{
+    //
+    JSONParser parser = new JSONParser();
+    JSONObject full = (JSONObject) parser.parse(response);
+
+    Log.d(TAG, response);
+
+  }
+
+
+  //TODO split retrieve sub into multiple single, single responsibility subs
+  //TODO include method to retrieve single subreddit, switch get all to use that instead
+  private void getAdditionalSubInfo() {
+
+  }
 }

@@ -4,6 +4,7 @@ package com.relic;
 import android.content.Context;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.design.chip.Chip;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     setSupportActionBar(findViewById(R.id.my_toolbar));
     // set Title of app using custom title textview instead of the default
     getSupportActionBar().setTitle(" ");
-    ((TextView) findViewById(R.id.my_toolbar_title)).setText(getText(R.string.app_name));
+    ((Chip) findViewById(R.id.my_toolbar_title)).setChipText(getText(R.string.app_name));
 
     findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
       @Override

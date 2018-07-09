@@ -13,6 +13,10 @@ import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.VolleyAccessor;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 public class UserGatewayImpl implements UserGateway{
   private final String ENDPOINT = "https://oauth.reddit.com/";
   public static String TAG = "USER_GATEWAY";
@@ -37,7 +41,7 @@ public class UserGatewayImpl implements UserGateway{
   }
 
   public void getUser(String username) {
-    String endpoint = ENDPOINT + "/user/" + username + "/overview";
+    String endpoint = ENDPOINT + "/user/" + username + "/about";
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, endpoint,
         new Response.Listener<String>() {
           @Override
@@ -55,7 +59,16 @@ public class UserGatewayImpl implements UserGateway{
 
   private void parseUser(String response) {
     Log.d(TAG, response);
+    JSONParser parser = new JSONParser();
 
+    try {
+      JSONObject full = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+
+      Log.d(TAG, full.keySet().toString());
+    }
+    catch (ParseException e) {
+       Log.d(TAG, "Error parsing the response");
+    }
   }
 
 

@@ -21,13 +21,13 @@
 
         <TextView
             android:id="@+id/commentitem_author"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/commentitem_score"
             android:text="@{commentModel.author}"/>
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{commentModel.created}"
             android:layout_toEndOf="@+id/commentitem_author"/>
@@ -36,7 +36,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/commentitem_author"
-            android:text="@{Html.fromHtml(Html.fromHtml(commentModel.body).toString()).toString()}"/>
+            android:text="@{Html.fromHtml(Html.fromHtml(commentModel.body).toString()).toString()}"
+            android:paddingBottom="0dp"
+            android:layout_marginBottom="0dp"/>
 
     </RelativeLayout>
 

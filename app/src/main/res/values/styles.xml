@@ -37,6 +37,9 @@
         <item name="android:colorPrimary">@color/lightGray</item>
     </style>
 
+    <style name="titleChip" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:labelTextSize">@dimen/toolbar_h1</item>
+    </style>
 
 
 

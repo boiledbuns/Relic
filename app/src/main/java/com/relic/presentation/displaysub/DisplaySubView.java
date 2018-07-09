@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.chip.Chip;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -175,10 +176,10 @@ public class DisplaySubView extends Fragment {
     AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
     if (appCompatActivity != null) {
       // sets title and tells user default sorting
-      TextView title = getActivity().findViewById(R.id.my_toolbar_title);
+      Chip title = getActivity().findViewById(R.id.my_toolbar_title);
       TextView subTitle = getActivity().findViewById(R.id.my_toolbar_subtitle);
 
-      title.setText(subName);
+      title.setChipText(subName);
       subTitle.setText("Popular");
 
       title.setOnClickListener(new View.OnClickListener() {
@@ -254,7 +255,7 @@ public class DisplaySubView extends Fragment {
   public void onDestroy() {
     super.onDestroy();
     // set title back to app name
-    ((TextView) getActivity().findViewById(R.id.my_toolbar_title)).setText(R.string.app_name);
+    ((Chip) getActivity().findViewById(R.id.my_toolbar_title)).setChipTextResource(R.string.app_name);
     ((TextView) getActivity().findViewById(R.id.my_toolbar_subtitle)).setText("");
 
   }
