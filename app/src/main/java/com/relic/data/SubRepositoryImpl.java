@@ -1,6 +1,7 @@
 package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -38,12 +39,13 @@ public class SubRepositoryImpl implements SubRepository {
   private Context context;
   private RequestQueue volleyQueue;
   private String authToken;
+  private JSONParser parser;
 
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;
     volleyQueue = VolleyAccessor.getInstance(context).getRequestQueue();
-
+    parser = new JSONParser();
 
     // retrieve the auth token shared preferences
     String authKey = context.getResources().getString(R.string.AUTH_PREF);
@@ -78,7 +80,10 @@ public class SubRepositoryImpl implements SubRepository {
         Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
         response -> {
           try {
-            parseSubreddits(response, after == null);
+            // insert the subs and listing into the room instance
+            new InsertSubsTask(this, subDB, parseAfterValue(response),
+                parseSubreddits(response), after == null).execute(after);
+
           } catch (ParseException e) {
             Log.e(TAG, "Error parsing the response: " + e.toString());
           }
@@ -87,15 +92,19 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
-  private void parseSubreddits(String response, boolean delete) throws ParseException {
-    //Log.d(TAG, response);
-    JSONObject data = (JSONObject) ((JSONObject) new JSONParser().parse(response)).get("data");
-    List <SubredditModel> subscribed = new ArrayList<>();
-    String after = (String) data.get("after");
-
+  private ListingEntity parseAfterValue(String response) throws ParseException {
+    JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
     // create a new listing to ensure that the db has an "after" value for checking if we need to
     // fetch more values or not
-    ListingEntity listing = new ListingEntity(TAG, after);
+    return new ListingEntity(TAG, (String) data.get("after"););
+  }
+
+
+  private List<SubredditModel> parseSubreddits(String response) throws ParseException {
+    //Log.d(TAG, response);
+    JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+    List <SubredditModel> subscribed = new ArrayList<>();
+    String after = (String) data.get("after");
 
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
@@ -118,8 +127,7 @@ public class SubRepositoryImpl implements SubRepository {
 
     Log.d(TAG, "retrieved = " + subscribed.size() + " " + after);
     //Log.d(TAG, subscribed.toString());
-    // insert the subs and listing into the room instance
-    new InsertSubsTask(this, subDB, listing, subscribed, delete).execute(after);
+    return subscribed;
   }
 
 
@@ -166,12 +174,15 @@ public class SubRepositoryImpl implements SubRepository {
 
 
   @Override
-  public LiveData<SubredditModel> findSub(String name) {
+  public LiveData<List<SubredditModel>> findSub(String name) {
+    MutableLiveData<List<SubredditModel>> searchResults = new MutableLiveData<>();
+
     String end = ENDPOINT + "";
       volleyQueue.add(new RedditOauthRequest(Request.Method.GET, end,
           response -> {
             try {
-              parseSearchedSubs(response);
+              parseAfterValue(response);
+              parseSubreddits(response);
             }
             catch (ParseException e) {
               Log.d(TAG, "Error parsing the response");
@@ -179,8 +190,9 @@ public class SubRepositoryImpl implements SubRepository {
           error -> Log.d(TAG, "error retrieving this class"), authToken));
 
     // TODO method to dao interface for retrieving a livedata instance of this class
-    return null;
+    return searchResults;
   }
+
 
   private void parseSearchedSubs(String response) throws ParseException{
     //

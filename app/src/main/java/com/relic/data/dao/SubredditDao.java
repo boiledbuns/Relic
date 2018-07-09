@@ -23,4 +23,8 @@ public abstract class SubredditDao {
 
   @Query("DELETE FROM SubredditModel")
   public abstract void deleteAll();
+
+  @Query("SELECT * FROM SubredditModel WHERE name LIKE :search")
+  public abstract LiveData<List<SubredditModel>> findSubreddit(String search);
+
 }

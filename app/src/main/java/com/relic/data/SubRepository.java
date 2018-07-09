@@ -18,5 +18,5 @@ public interface SubRepository {
   void retrieveMoreSubscribedSubs(String after);
 
 
-  LiveData<SubredditModel> findSub(String name);
+  LiveData<List<SubredditModel>> findSub(String name);
 }
