@@ -13,12 +13,12 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
         android:background="?attr/colorPrimary"
-        android:elevation="@dimen/toolbar_height"
-        android:padding="@dimen/toolbar_paddingtop">
+        android:elevation="@dimen/toolbar_height">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/toolbar_paddingtop">
 
             <android.support.design.chip.Chip
                 android:id="@+id/my_toolbar_title"

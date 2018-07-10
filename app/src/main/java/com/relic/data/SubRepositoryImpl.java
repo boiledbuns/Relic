@@ -96,7 +96,7 @@ public class SubRepositoryImpl implements SubRepository {
     JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
     // create a new listing to ensure that the db has an "after" value for checking if we need to
     // fetch more values or not
-    return new ListingEntity(TAG, (String) data.get("after"););
+    return new ListingEntity(TAG, (String) data.get("after"));
   }
 
 
@@ -181,8 +181,7 @@ public class SubRepositoryImpl implements SubRepository {
       volleyQueue.add(new RedditOauthRequest(Request.Method.GET, end,
           response -> {
             try {
-              parseAfterValue(response);
-              parseSubreddits(response);
+              searchResults.setValue(parseSubreddits(response));
             }
             catch (ParseException e) {
               Log.d(TAG, "Error parsing the response");

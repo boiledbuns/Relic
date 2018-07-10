@@ -7,5 +7,9 @@
     <string name="REDIRECT_CODE">code</string>
 
 
+    <!-- search strings-->
+    <string name="searchmenu_title">Search</string>
+    <string name="search_subreddit_hint">subreddit name</string>
+
 
 </resources>
