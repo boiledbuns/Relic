@@ -25,5 +25,20 @@ public class SubGatewayImpl implements SubGateway {
     requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
   }
 
+  //TODO include method to retrieve single subreddit, switch get all to use that instead
+  public void getAdditionalSubInfo(String subredditName) {
+    // get sub info and sidebar info
+    
+
+  }
+
+
+  /**
+   * Routes the api request through this single method based on request
+   * @param action
+   */
+  private void router(int action, String subredditName, String subredditFullname) {
+
+  }
 
 }

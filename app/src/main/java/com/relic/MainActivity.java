@@ -7,9 +7,12 @@ import android.support.annotation.Nullable;
 import android.support.design.chip.Chip;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +24,10 @@ import com.relic.presentation.displaysubs.DisplaySubsView;
 
 public class MainActivity extends AppCompatActivity implements AuthenticationCallback {
   final String TAG = "MAIN_ACTIVITY";
-  Authenticator auth;
+  private Authenticator auth;
+
+  private MenuItem searchMenuItem;
+  private SearchView searchView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,16 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 
 
   @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+//    getMenuInflater().inflate(R.menu.search_menu, menu);
+//
+//    searchMenuItem = menu.findItem(R.id.search_item);
+//    searchView = (SearchView) searchMenuItem.getActionView();
+     return super.onCreateOptionsMenu(menu);
+  }
+
+
+  @Override
   public void onAuthenticated() {
     // sends user to default view of subreddits
     initializeDefaultView();
@@ -69,6 +85,20 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     if (fragCount < 1) {
       getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
+    }
+  }
+
+  @Override
+  public void onBackPressed() {
+    searchView = findViewById(R.id.search_view);
+    // checks if the search view is open
+    if (!searchView.isIconified()) {
+      //searchView.clearFocus();
+      searchMenuItem.collapseActionView();
+      searchView.setIconified(true);
+    }
+    else {
+      super.onBackPressed();
     }
   }
 

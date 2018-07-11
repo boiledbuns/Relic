@@ -80,6 +80,8 @@ public class SubRepositoryImpl implements SubRepository {
         Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
         response -> {
           try {
+            List<SubredditModel> subreddts = parseSubreddits(response);
+
             // insert the subs and listing into the room instance
             new InsertSubsTask(this, subDB, parseAfterValue(response),
                 parseSubreddits(response), after == null).execute(after);
@@ -193,19 +195,14 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
-  private void parseSearchedSubs(String response) throws ParseException{
-    //
-    JSONParser parser = new JSONParser();
-    JSONObject full = (JSONObject) parser.parse(response);
+//  private void parseSearchedSubs(Subreddit response) throws ParseException{
+//    //
+//    JSONParser parser = new JSONParser();
+//    JSONObject full = (JSONObject) parser.parse(response);
+//
+//    Log.d(TAG, response);
+//
+//  }
 
-    Log.d(TAG, response);
 
-  }
-
-
-  //TODO split retrieve sub into multiple single, single responsibility subs
-  //TODO include method to retrieve single subreddit, switch get all to use that instead
-  private void getAdditionalSubInfo() {
-
-  }
 }
