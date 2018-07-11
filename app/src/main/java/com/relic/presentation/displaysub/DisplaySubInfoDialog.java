@@ -44,6 +44,4 @@ public class DisplaySubInfoDialog extends DialogFragment{
         });
     return builder.create();
   }
-
-
 }

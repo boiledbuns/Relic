@@ -15,6 +15,8 @@ import com.android.volley.toolbox.Volley;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.entities.ListingEntity;
+import com.relic.data.gateway.SubGateway;
+import com.relic.data.gateway.SubGatewayImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.domain.Listing;
 
@@ -118,7 +120,7 @@ public class SubRepositoryImpl implements SubRepository {
       if (currentSub.get("nsfw") == null) {
         nsfw = false;
       }
-      //Log.d(TAG, "keys = " + currentSub.keySet());
+      Log.d(TAG, "keys = " + currentSub.keySet());
       subscribed.add(new SubredditModel(
           (String) currentSub.get("id"),
           (String) currentSub.get("display_name"),
@@ -205,4 +207,8 @@ public class SubRepositoryImpl implements SubRepository {
 //  }
 
 
+  @Override
+  public SubGateway getSubGateway() {
+    return new SubGatewayImpl(context);
+  }
 }

@@ -2,6 +2,7 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 
+import com.relic.data.gateway.SubGateway;
 import com.relic.data.models.SubredditModel;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface SubRepository {
 
 
   LiveData<List<SubredditModel>> findSub(String name);
+
+  SubGateway getSubGateway();
 }
