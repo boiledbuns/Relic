@@ -13,7 +13,7 @@ import com.relic.data.VolleyAccessor;
 
 public class SubGatewayImpl implements SubGateway {
   private final String ENDPOINT = "https://oauth.reddit.com/";
-  public static String TAG = "USER_GATEWAY";
+  public static String TAG = "SUB_GATEWAY";
   private String authToken;
 
   public final int GET_SUBINFO = 1;
@@ -75,7 +75,28 @@ public class SubGatewayImpl implements SubGateway {
           Log.d(TAG, "Error retrieving the response from the server");
         }, authToken));
   }
+  
+
+  public void subscribe(String name) {
+    String end = ENDPOINT + "api/subscribe?action=sub&sr_name=" + name;
+    requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
+        (response -> {
+          Log.d(TAG, response);
+        }),
+        (error -> {
+          Log.d(TAG, "Error subscribing to subreddit");
+        }), authToken));
+  }
 
 
-
+  public void unsubscribe(String name) {
+    String end = ENDPOINT + "api/subscribe?action=unsub&sr_name=" + name;
+    requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
+        (response -> {
+          Log.d(TAG, response);
+        }),
+        (error -> {
+          Log.d(TAG, "Error unsubscribing to subreddit");
+        }), authToken));
+  }
 }

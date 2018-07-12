@@ -18,6 +18,8 @@ public class SubredditModel implements Subreddit, Parcelable {
   public String name;
   public String bannerUrl;
   public boolean nsfw;
+  private boolean subscribed;
+  private int subscriberCount;
 
   public SubredditModel(String id, String name, String bannerUrl, boolean nsfw) {
     this.id = id;
@@ -86,4 +88,19 @@ public class SubredditModel implements Subreddit, Parcelable {
       }
   };
 
+  public boolean isSubscribed() {
+    return subscribed;
+  }
+
+  public void setSubscribed(boolean subscribed) {
+    this.subscribed = subscribed;
+  }
+
+  public int getSubscriberCount() {
+    return subscriberCount;
+  }
+
+  public void setSubscriberCount(int subscriberCount) {
+    this.subscriberCount = subscriberCount;
+  }
 }

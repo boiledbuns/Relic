@@ -16,7 +16,8 @@ public class SubredditEntity {
   public String public_description;
   @ColumnInfo(name = "descriptionHtml")
   public String public_description_html;
-  public String user_is_subscriber;
+  @ColumnInfo(name = "subscribed")
+  public boolean user_is_subscriber;
   //public String name;
 
   @ColumnInfo(name = "name")
@@ -27,6 +28,7 @@ public class SubredditEntity {
   @ColumnInfo(name = "iconUrl")
   public String icon_img;
 
+  @ColumnInfo(name = "subscriberCount")
   public int subscribers;
 
   @ColumnInfo(name = "nsfw")

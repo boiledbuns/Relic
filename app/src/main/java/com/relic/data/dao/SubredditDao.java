@@ -13,10 +13,10 @@ import java.util.List;
 
 @Dao
 public abstract class SubredditDao {
-  @Query("SELECT id, name, bannerUrl, nsfw FROM SubredditEntity")
+  @Query("SELECT id, name, bannerUrl, nsfw, subscribed, subscriberCount FROM SubredditEntity")
   public abstract List<SubredditModel> getAll();
 
-  @Query("SELECT id, name, bannerUrl, nsfw FROM SubredditEntity ORDER BY name DESC")
+  @Query("SELECT id, name, bannerUrl, nsfw, subscribed, subscriberCount FROM SubredditEntity ORDER BY name DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)

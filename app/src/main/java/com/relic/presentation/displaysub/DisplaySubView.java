@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import com.relic.R;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.data.SubRepository;
+import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubBinding;
