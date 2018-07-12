@@ -6,25 +6,25 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
+import com.relic.data.entities.SubredditEntity;
 import com.relic.data.models.SubredditModel;
 
 import java.util.List;
 
 @Dao
 public abstract class SubredditDao {
-  @Query("SELECT * FROM SubredditModel")
+  @Query("SELECT id, name, bannerUrl, nsfw FROM SubredditEntity")
   public abstract List<SubredditModel> getAll();
 
-  @Query("SELECT * FROM SubredditModel ORDER BY name DESC")
+  @Query("SELECT id, name, bannerUrl, nsfw FROM SubredditEntity ORDER BY name DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  public abstract void insertAll(List<SubredditModel> subredditList);
+  public abstract void insertAll(List<SubredditEntity> subredditList);
 
-  @Query("DELETE FROM SubredditModel")
+  @Query("DELETE FROM SubredditEntity")
   public abstract void deleteAll();
 
-  @Query("SELECT * FROM SubredditModel WHERE name LIKE :search")
+  @Query("SELECT * FROM SubredditEntity WHERE name LIKE :search")
   public abstract LiveData<List<SubredditModel>> findSubreddit(String search);
-
 }

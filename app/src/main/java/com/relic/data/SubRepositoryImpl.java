@@ -12,9 +12,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.entities.ListingEntity;
+import com.relic.data.entities.SubredditEntity;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
 import com.relic.data.models.SubredditModel;
@@ -82,11 +85,10 @@ public class SubRepositoryImpl implements SubRepository {
         Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
         response -> {
           try {
-            List<SubredditModel> subreddts = parseSubreddits(response);
-
+            List<SubredditEntity> subreddts = parseSubreddits(response);
             // insert the subs and listing into the room instance
             new InsertSubsTask(this, subDB, parseAfterValue(response),
-                parseSubreddits(response), after == null).execute(after);
+                parseSubreddits(response), after == null).execute(parseAfterValue(response).afterPosting);
 
           } catch (ParseException e) {
             Log.e(TAG, "Error parsing the response: " + e.toString());
@@ -104,11 +106,13 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
-  private List<SubredditModel> parseSubreddits(String response) throws ParseException {
+  private List<SubredditEntity> parseSubreddits(String response) throws ParseException {
     //Log.d(TAG, response);
+    // GSON reader used to unmarshall json objects
+    Gson gson = new GsonBuilder().create();
+
     JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
-    List <SubredditModel> subscribed = new ArrayList<>();
-    String after = (String) data.get("after");
+    List <SubredditEntity> subscribed = new ArrayList<>();
 
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
@@ -116,20 +120,20 @@ public class SubRepositoryImpl implements SubRepository {
 
     while (subIterator.hasNext()) {
       JSONObject currentSub = (JSONObject) ((JSONObject) subIterator.next()).get("data");
-      boolean nsfw = true;
-      if (currentSub.get("nsfw") == null) {
-        nsfw = false;
-      }
+//      boolean nsfw = true;
+//      if (currentSub.get("nsfw") == null) {
+//        nsfw = false;
+//      }
       Log.d(TAG, "keys = " + currentSub.keySet());
-      subscribed.add(new SubredditModel(
-          (String) currentSub.get("id"),
-          (String) currentSub.get("display_name"),
-          (String) currentSub.get("banner_img"),
-          nsfw
-      ));
+//      subscribed.add(new SubredditModel(
+//          (String) currentSub.get("id"),
+//          (String) currentSub.get("display_name"),
+//          (String) currentSub.get("banner_img"),
+//          nsfw
+//      );
+      subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity.class));
     }
 
-    Log.d(TAG, "retrieved = " + subscribed.size() + " " + after);
     //Log.d(TAG, subscribed.toString());
     return subscribed;
   }
@@ -138,12 +142,12 @@ public class SubRepositoryImpl implements SubRepository {
   static class InsertSubsTask extends AsyncTask <String, Integer, Integer> {
     private ApplicationDB subDB;
     private SubRepository subRepo;
-    private List<SubredditModel> subs;
+    private List<SubredditEntity> subs;
     private String after;
     private ListingEntity listing;
     private boolean delete;
 
-    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditModel> subs, boolean delete) {
+    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditEntity> subs, boolean delete) {
       this.subDB = subDB;
       this.subRepo = subRepo;
       this.subs = subs;
@@ -159,7 +163,7 @@ public class SubRepositoryImpl implements SubRepository {
       subDB.getSubredditDao().insertAll(subs);
       // stores the after value to be used to retrieve the next listing
       after = Strings[0];
-      // update the listing value if it isn't null
+      // update the listing value if it isn't null (not refresh)
       if (after != null) {
         subDB.getListingDAO().insertListing(listing);
       }
@@ -184,12 +188,13 @@ public class SubRepositoryImpl implements SubRepository {
     String end = ENDPOINT + "";
       volleyQueue.add(new RedditOauthRequest(Request.Method.GET, end,
           response -> {
-            try {
-              searchResults.setValue(parseSubreddits(response));
-            }
-            catch (ParseException e) {
-              Log.d(TAG, "Error parsing the response");
-            }},
+//            try {
+//              searchResults.setValue(parseSubreddits(response));
+//            }
+//            catch (ParseException e) {
+//              Log.d(TAG, "Error parsing the response");
+//            }
+            },
           error -> Log.d(TAG, "error retrieving this class"), authToken));
 
     // TODO method to dao interface for retrieving a livedata instance of this class

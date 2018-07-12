@@ -13,10 +13,7 @@ import com.relic.domain.Subreddit;
  * Mapper class with public var to reduce boilerplate and and allow the SubredditImpl class to be
  * used with room without violating clean architecture (ie. keeping it framework independent)
  */
-@Entity
 public class SubredditModel implements Subreddit, Parcelable {
-  @NonNull
-  @PrimaryKey
   public String id;
   public String name;
   public String bannerUrl;
@@ -48,7 +45,6 @@ public class SubredditModel implements Subreddit, Parcelable {
   public String getBannerUrl() {
     return bannerUrl;
   }
-
 
   @Override
   public int describeContents() {
