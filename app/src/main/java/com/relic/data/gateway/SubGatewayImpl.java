@@ -35,7 +35,6 @@ public class SubGatewayImpl implements SubGateway {
   }
 
 
-
   public LiveData<String> getAdditionalSubInfo(String subredditName) {
     MutableLiveData<String> subinfo = new MutableLiveData<>();
     // get sub info and sidebar info

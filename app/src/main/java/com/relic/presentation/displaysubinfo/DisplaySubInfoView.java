@@ -1,6 +1,7 @@
 package com.relic.presentation.displaysubinfo;
 
 import android.app.Dialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,18 +13,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.relic.R;
+import com.relic.data.SubRepositoryImpl;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
 
 public class DisplaySubInfoView extends DialogFragment{
-  private SubGateway subGateway;
+  private DisplaySubInfoContract.ViewModel viewModel;
+
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    // retrieve the name of the subreddit form the args
+    String subName = getArguments().getString("name");
+
+    super.onCreate(savedInstanceState);
+    viewModel = ViewModelProviders.of(this).get(DisplaySubInfoVM.class);
+    viewModel.initialize(subName, new SubRepositoryImpl(getContext()));
+  }
+
 
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
     // inflate custom layout for our dialog
     View view = inflater.inflate(R.layout.display_subinfo, container, false);
-    subGateway = new SubGatewayImpl(getContext());
     return view;
   }
 
