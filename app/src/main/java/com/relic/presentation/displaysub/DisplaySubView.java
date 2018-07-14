@@ -1,9 +1,7 @@
 package com.relic.presentation.displaysub;
 
-import android.app.Dialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -11,11 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.chip.Chip;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,8 +23,6 @@ import android.widget.Toast;
 
 import com.relic.R;
 import com.relic.data.PostRepositoryImpl;
-import com.relic.data.SubRepository;
-import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubBinding;
@@ -38,6 +31,7 @@ import com.relic.presentation.adapter.ImageOnClick;
 import com.relic.presentation.adapter.PostItemAdapter;
 import com.relic.presentation.adapter.PostItemOnclick;
 import com.relic.presentation.displaypost.DisplayPostView;
+import com.relic.presentation.displaysubinfo.DisplaySubInfoView;
 
 import java.util.List;
 
@@ -45,7 +39,7 @@ import java.util.List;
 public class DisplaySubView extends Fragment {
   private final String TAG = "DISPLAYSUB_VIEW";
   private final String SCROLL_POSITION = "POSITION";
-  DisplaySubContract.ViewModel displaySubVM;
+  protected DisplaySubContract.ViewModel displaySubVM;
 
   private DisplaySubBinding displaySubBinding;
   private PostItemAdapter postAdapter;
@@ -188,7 +182,7 @@ public class DisplaySubView extends Fragment {
         @Override
         public void onClick(View view) {
           Toast.makeText(getContext(), "Title Clicked", Toast.LENGTH_SHORT).show();
-          new DisplaySubInfoDialog().showNow(getFragmentManager(), TAG);
+          new DisplaySubInfoView().showNow(getFragmentManager(), TAG);
         }
       });
     }
@@ -210,7 +204,7 @@ public class DisplaySubView extends Fragment {
 
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
-    }
+      }
   }
 
 
@@ -259,7 +253,8 @@ public class DisplaySubView extends Fragment {
     // set title back to app name
     ((Chip) getActivity().findViewById(R.id.my_toolbar_title)).setChipTextResource(R.string.app_name);
     ((TextView) getActivity().findViewById(R.id.my_toolbar_subtitle)).setText("");
-
   }
+
+
 
 }

@@ -20,8 +20,6 @@ public class SubGatewayImpl implements SubGateway {
   public final int SUBSCRIBE = 2;
   public final int UNSUBSCRIBE = 3;
 
-
-
   RequestQueue requestQueue;
 
   public SubGatewayImpl(Context context) {
@@ -59,7 +57,6 @@ public class SubGatewayImpl implements SubGateway {
 
       }
     }
-
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
         (name) -> {
           // determine the appropriate parsing method to be used
@@ -75,7 +72,7 @@ public class SubGatewayImpl implements SubGateway {
           Log.d(TAG, "Error retrieving the response from the server");
         }, authToken));
   }
-  
+
 
   public void subscribe(String name) {
     String end = ENDPOINT + "api/subscribe?action=sub&sr_name=" + name;
