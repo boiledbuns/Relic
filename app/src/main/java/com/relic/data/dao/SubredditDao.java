@@ -27,4 +27,7 @@ public abstract class SubredditDao {
 
   @Query("SELECT * FROM SubredditEntity WHERE name LIKE :search")
   public abstract LiveData<List<SubredditModel>> findSubreddit(String search);
+
+  @Query("SELECT name FROM SubredditEntity WHERE name = :subName")
+  public abstract LiveData<List<String>> getSubscribed(String subName);
 }

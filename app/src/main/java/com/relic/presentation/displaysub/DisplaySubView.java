@@ -182,7 +182,14 @@ public class DisplaySubView extends Fragment {
         @Override
         public void onClick(View view) {
           Toast.makeText(getContext(), "Title Clicked", Toast.LENGTH_SHORT).show();
-          new DisplaySubInfoView().showNow(getFragmentManager(), TAG);
+
+
+          DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
+          Bundle bundle = new Bundle();
+          bundle.putString("name", subName);
+
+          displaySubInfoView.setArguments(bundle);
+          displaySubInfoView.showNow(getFragmentManager(), TAG);
         }
       });
     }

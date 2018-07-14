@@ -1,8 +1,10 @@
 package com.relic.presentation.displaysubinfo;
 
 import android.app.Dialog;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,9 +18,11 @@ import com.relic.R;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
+import com.relic.databinding.DisplaySubinfoBinding;
 
 public class DisplaySubInfoView extends DialogFragment{
   private DisplaySubInfoContract.ViewModel viewModel;
+  private DisplaySubinfoBinding displaySubinfoBinding;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,16 +38,17 @@ public class DisplaySubInfoView extends DialogFragment{
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    // inflate custom layout for our dialog
-    View view = inflater.inflate(R.layout.display_subinfo, container, false);
-    return view;
+    // initialize the databinding with the inflater
+    displaySubinfoBinding = DataBindingUtil.bind(inflater.inflate(R.layout.display_subinfo, container, false));
+    subscribeToVM();
+    return displaySubinfoBinding.getRoot();
   }
 
 
   @NonNull
   @Override
   public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-    // display additionla data for the subreddit (ie. sidebar)
+    // display additional data for the subreddit (ie. sidebar)
 
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder.setMessage("TEST")
@@ -61,5 +66,22 @@ public class DisplaySubInfoView extends DialogFragment{
           }
         });
     return builder.create();
+  }
+
+
+  private void subscribeToVM() {
+    // observe the subreddit description
+    viewModel.getDescription().observe(this, new Observer<String>() {
+      @Override
+      public void onChanged(@Nullable String description) {
+        if (description != null) {
+          displaySubinfoBinding.setSubDescription(description);
+        }
+      }
+    });
+
+    viewModel.getSubscribed().observe(this,
+        (Boolean isSubscribed) -> displaySubinfoBinding.setSubscribed(isSubscribed)
+    );
   }
 }

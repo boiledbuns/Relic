@@ -1,7 +1,6 @@
 package com.relic.presentation.displaysubinfo;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.relic.data.SubRepository;
@@ -13,7 +12,7 @@ public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContrac
 
   private String subredditName;
   private LiveData<String> subDescription;
-  private LiveData<Boolean> subscribed;
+  private LiveData<Boolean> isSubbed;
 
   @Override
   public void initialize(String subName, SubRepository subrepo) {
@@ -28,6 +27,7 @@ public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContrac
 
   private void fetchValues () {
     subDescription = subGateway.getAdditionalSubInfo(subredditName);
+    isSubbed = subGateway.getIsSubscribed(subredditName);
   }
 
 
@@ -36,7 +36,7 @@ public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContrac
   }
 
   public LiveData<Boolean> getSubscribed() {
-    return subscribed;
+    return isSubbed;
   }
 
   public void subscribeToSubreddit() {

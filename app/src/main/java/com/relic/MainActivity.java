@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     // checks if the search view is open
     if (!searchView.isIconified()) {
       //searchView.clearFocus();
-      searchMenuItem.collapseActionView();
+      //searchMenuItem.collapseActionView();
       searchView.setIconified(true);
     }
     else {
