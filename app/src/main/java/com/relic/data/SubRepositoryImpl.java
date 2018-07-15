@@ -8,10 +8,7 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
@@ -21,7 +18,6 @@ import com.relic.data.entities.SubredditEntity;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
 import com.relic.data.models.SubredditModel;
-import com.relic.domain.Listing;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -29,10 +25,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class SubRepositoryImpl implements SubRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -40,17 +34,19 @@ public class SubRepositoryImpl implements SubRepository {
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "SUB_REPO";
 
-  private ApplicationDB subDB;
+  private ApplicationDB appDb;
   private Context context;
   private RequestQueue volleyQueue;
   private String authToken;
   private JSONParser parser;
+  private Gson gson;
 
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;
     volleyQueue = VolleyAccessor.getInstance(context).getRequestQueue();
     parser = new JSONParser();
+    gson = new GsonBuilder().create();
 
     // retrieve the auth token shared preferences
     String authKey = context.getResources().getString(R.string.AUTH_PREF);
@@ -58,7 +54,7 @@ public class SubRepositoryImpl implements SubRepository {
     authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
 
-    subDB = ApplicationDB.getDatabase(context);
+    appDb = ApplicationDB.getDatabase(context);
   }
 
 
@@ -68,7 +64,7 @@ public class SubRepositoryImpl implements SubRepository {
    */
   @Override
   public LiveData<List<SubredditModel>> getSubscribedSubs() {
-    return subDB.getSubredditDao().getAllSubscribed();
+    return appDb.getSubredditDao().getAllSubscribed();
   }
 
 
@@ -87,7 +83,7 @@ public class SubRepositoryImpl implements SubRepository {
           try {
             List<SubredditEntity> subreddts = parseSubreddits(response);
             // insert the subs and listing into the room instance
-            new InsertSubsTask(this, subDB, parseAfterValue(response),
+            new InsertSubsTask(this, appDb, parseAfterValue(response),
                 parseSubreddits(response), after == null).execute(parseAfterValue(response).afterPosting);
 
           } catch (ParseException e) {
@@ -109,7 +105,6 @@ public class SubRepositoryImpl implements SubRepository {
   private List<SubredditEntity> parseSubreddits(String response) throws ParseException {
     //Log.d(TAG, response);
     // GSON reader used to unmarshall json objects
-    Gson gson = new GsonBuilder().create();
 
     JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
     List <SubredditEntity> subscribed = new ArrayList<>();
@@ -120,22 +115,40 @@ public class SubRepositoryImpl implements SubRepository {
 
     while (subIterator.hasNext()) {
       JSONObject currentSub = (JSONObject) ((JSONObject) subIterator.next()).get("data");
-//      boolean nsfw = true;
-//      if (currentSub.get("nsfw") == null) {
-//        nsfw = false;
-//      }
       Log.d(TAG, "keys = " + currentSub.keySet());
-//      subscribed.add(new SubredditModel(
-//          (String) currentSub.get("id"),
-//          (String) currentSub.get("display_name"),
-//          (String) currentSub.get("banner_img"),
-//          nsfw
-//      );
       subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity.class));
     }
 
     //Log.d(TAG, subscribed.toString());
     return subscribed;
+  }
+
+
+  public LiveData<SubredditModel> getSingleSub(String subName) {
+    return appDb.getSubredditDao().getSub(subName);
+  }
+
+  @Override
+  public void retrieveSingleSub(String subName) {
+    volleyQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + "r/" + subName  +"/about",
+        (String response) -> {
+          Log.d(TAG, response);
+
+          try {
+            // parse the response and add it to an arraylist to be inserted in the db
+            JSONObject subredditObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+            SubredditEntity subreddit = gson.fromJson(subredditObject.toJSONString(), SubredditEntity.class);
+
+            // create a new task to insert the subreddits on parse success
+            new InsertSubTask().execute(appDb, subreddit);
+
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+
+        }, (VolleyError e) -> {
+      Log.d(TAG, "There was an error retrieving the respone from the server " + e.getMessage());
+    }, authToken));
   }
 
 
@@ -201,7 +214,6 @@ public class SubRepositoryImpl implements SubRepository {
     return searchResults;
   }
 
-
 //  private void parseSearchedSubs(Subreddit response) throws ParseException{
 //    //
 //    JSONParser parser = new JSONParser();
@@ -216,4 +228,15 @@ public class SubRepositoryImpl implements SubRepository {
   public SubGateway getSubGateway() {
     return new SubGatewayImpl(context);
   }
+
+
+  static class InsertSubTask extends AsyncTask <Object, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB applicationDB = (ApplicationDB) objects[0];
+      applicationDB.getSubredditDao().insert((SubredditEntity) objects[1]);
+      return null;
+    }
+  }
+
 }

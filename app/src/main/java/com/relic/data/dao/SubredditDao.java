@@ -13,17 +13,23 @@ import java.util.List;
 
 @Dao
 public abstract class SubredditDao {
-  @Query("SELECT id, name, bannerUrl, nsfw, subscribed, subscriberCount FROM SubredditEntity")
+  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description FROM SubredditEntity")
   public abstract List<SubredditModel> getAll();
 
-  @Query("SELECT id, name, bannerUrl, nsfw, subscribed, subscriberCount FROM SubredditEntity ORDER BY name DESC")
+  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description FROM SubredditEntity ORDER BY name DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertAll(List<SubredditEntity> subredditList);
 
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  public abstract void insert(SubredditEntity subreddit);
+
   @Query("DELETE FROM SubredditEntity")
   public abstract void deleteAll();
+
+  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description FROM SubredditEntity WHERE name = :subName")
+  public abstract LiveData<SubredditModel> getSub(String subName);
 
   @Query("SELECT * FROM SubredditEntity WHERE name LIKE :search")
   public abstract LiveData<List<SubredditModel>> findSubreddit(String search);

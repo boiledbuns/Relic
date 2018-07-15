@@ -18,6 +18,8 @@ public interface SubRepository {
    */
   void retrieveMoreSubscribedSubs(String after);
 
+  LiveData<SubredditModel> getSingleSub(String subName);
+  void retrieveSingleSub(String subName);
 
   LiveData<List<SubredditModel>> findSub(String name);
 

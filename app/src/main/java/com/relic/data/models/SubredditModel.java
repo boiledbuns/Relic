@@ -1,10 +1,7 @@
 package com.relic.data.models;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import com.relic.domain.Subreddit;
 
@@ -18,8 +15,11 @@ public class SubredditModel implements Subreddit, Parcelable {
   public String name;
   public String bannerUrl;
   public boolean nsfw;
-  private boolean subscribed;
+  private boolean isSubscribed;
   private int subscriberCount;
+  private String description;
+
+  public SubredditModel () { }
 
   public SubredditModel(String id, String name, String bannerUrl, boolean nsfw) {
     this.id = id;
@@ -88,12 +88,12 @@ public class SubredditModel implements Subreddit, Parcelable {
       }
   };
 
-  public boolean isSubscribed() {
-    return subscribed;
+  public boolean getIsSubscribed() {
+    return isSubscribed;
   }
 
-  public void setSubscribed(boolean subscribed) {
-    this.subscribed = subscribed;
+  public void setIsSubscribed(boolean subscribed) {
+    this.isSubscribed = subscribed;
   }
 
   public int getSubscriberCount() {
@@ -102,5 +102,14 @@ public class SubredditModel implements Subreddit, Parcelable {
 
   public void setSubscriberCount(int subscriberCount) {
     this.subscriberCount = subscriberCount;
+  }
+
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }

@@ -3,6 +3,7 @@ package com.relic.data.gateway;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -11,6 +12,10 @@ import com.relic.R;
 import com.relic.data.ApplicationDB;
 import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.VolleyAccessor;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class SubGatewayImpl implements SubGateway {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -45,12 +50,8 @@ public class SubGatewayImpl implements SubGateway {
     Log.d(TAG, "from " + end);
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
         (response) -> {
-          // determine the appropriate parsing method to be used
-          subinfo.setValue("yeet");
-          subinfo.setValue(response);
-          Log.d(TAG, "Response : " + response);
-        },
-        (error) -> {
+          subinfo.setValue(parseSubredditInfo(response));
+        }, (error) -> {
           Log.d(TAG, "Error retrieving the response from the server");
         }, authToken));
 
@@ -130,5 +131,28 @@ public class SubGatewayImpl implements SubGateway {
         }), authToken));
 
     return success;
+  }
+
+
+  private String parseSubredditInfo(String response) {
+    String info = response;
+    JSONParser parser = new JSONParser();
+
+    try {
+      Log.d(TAG, response);
+      JSONObject subInfoObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+      Log.d(TAG, subInfoObject.keySet().toString());
+
+      info = subInfoObject.get("public_description") +
+          subInfoObject.get("accounts_active").toString() +
+          Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()) +
+          (String) subInfoObject.get("description_html");
+
+    } catch (ParseException e) {
+      Log.d(TAG, "Error parsing the response");
+      info = "Error parsing the response";
+    }
+
+    return info;
   }
 }
