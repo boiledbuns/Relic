@@ -39,11 +39,11 @@ public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContrac
     return isSubbed;
   }
 
-  public void subscribeToSubreddit() {
-
+  public LiveData<Boolean> subscribe() {
+    return subGateway.subscribe(subredditName);
   }
 
-  public void unsubscribeToSubreddit() {
-
+  public LiveData<Boolean> unsubscribe() {
+    return subGateway.unsubscribe(subredditName);
   }
 }

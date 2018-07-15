@@ -8,8 +8,12 @@ public interface DisplaySubInfoContract {
   interface ViewModel {
     void initialize(String subName, SubRepository subrepo);
 
-    public LiveData<String> getDescription();
+    LiveData<String> getDescription();
 
-    public LiveData<Boolean> getSubscribed();
+    LiveData<Boolean> getSubscribed();
+
+    LiveData<Boolean> subscribe();
+    LiveData<Boolean> unsubscribe();
+
   }
 }

@@ -41,19 +41,20 @@ public class SubGatewayImpl implements SubGateway {
   public LiveData<String> getAdditionalSubInfo(String subredditName) {
     MutableLiveData<String> subinfo = new MutableLiveData<>();
     // get sub info and sidebar info
-    //route(GET_SUBINFO, subredditName,null, subinfo);
-
-    String end = ENDPOINT + "r/" + subredditName + "/about/rules";
+    String end = ENDPOINT + "r/" + subredditName + "/about";
     Log.d(TAG, "from " + end);
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
         (response) -> {
-          // determine the appropriate parsing method to be use
+          // determine the appropriate parsing method to be used
+          subinfo.setValue("yeet");
           subinfo.setValue(response);
-          Log.d(TAG, "Response : " +response);
+          Log.d(TAG, "Response : " + response);
         },
         (error) -> {
           Log.d(TAG, "Error retrieving the response from the server");
         }, authToken));
+
+    subinfo.setValue("yeet");
     return subinfo;
   }
 
@@ -84,7 +85,7 @@ public class SubGatewayImpl implements SubGateway {
           // determine the appropriate parsing method to be used
           switch (action) {
             case(GET_SUBINFO): {
-              livedata.setValue(response);
+              livedata.postValue(response);
             }
             case(SUBSCRIBE): {
             }
@@ -96,7 +97,10 @@ public class SubGatewayImpl implements SubGateway {
   }
 
 
-  public void subscribe(String name) {
+  public LiveData<Boolean> subscribe(String name) {
+    MutableLiveData<Boolean> success = new MutableLiveData<>();
+    success.setValue(true);
+
     String end = ENDPOINT + "api/subscribe?action=sub&sr_name=" + name;
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
         (response -> {
@@ -104,11 +108,17 @@ public class SubGatewayImpl implements SubGateway {
         }),
         (error -> {
           Log.d(TAG, "Error subscribing to subreddit");
+          success.setValue(false);
         }), authToken));
+
+    return success;
   }
 
 
-  public void unsubscribe(String name) {
+  public LiveData<Boolean> unsubscribe(String name) {
+    MutableLiveData<Boolean> success = new MutableLiveData<>();
+    success.setValue(true);
+
     String end = ENDPOINT + "api/subscribe?action=unsub&sr_name=" + name;
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
         (response -> {
@@ -116,6 +126,9 @@ public class SubGatewayImpl implements SubGateway {
         }),
         (error -> {
           Log.d(TAG, "Error unsubscribing to subreddit");
+          success.setValue(false);
         }), authToken));
+
+    return success;
   }
 }

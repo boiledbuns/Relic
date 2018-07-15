@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import com.relic.data.gateway.SubGatewayImpl;
 import com.relic.databinding.DisplaySubinfoBinding;
 
 public class DisplaySubInfoView extends DialogFragment{
+  private String TAG = "DISPLAYSUBINFO_VIEW";
+
   private DisplaySubInfoContract.ViewModel viewModel;
   private DisplaySubinfoBinding displaySubinfoBinding;
 
@@ -35,36 +38,28 @@ public class DisplaySubInfoView extends DialogFragment{
   }
 
 
-  @Nullable
-  @Override
-  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    // initialize the databinding with the inflater
-    displaySubinfoBinding = DataBindingUtil.bind(inflater.inflate(R.layout.display_subinfo, container, false));
-    subscribeToVM();
-    return displaySubinfoBinding.getRoot();
-  }
-
-
   @NonNull
   @Override
   public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-    // display additional data for the subreddit (ie. sidebar)
+    displaySubinfoBinding = DataBindingUtil.bind(LayoutInflater.from(getActivity()).inflate(R.layout.display_subinfo, null, false));
 
+    // override dialog creation to add custom buttons
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    builder.setMessage("TEST")
-        .setPositiveButton("SUBSCRIBE", new DialogInterface.OnClickListener() {
+    builder.setView(displaySubinfoBinding.getRoot())
+        .setPositiveButton("UNSUBSCRIBE", new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialogInterface, int i) {
             // display the button to subscribe if the user is not subscribed (and vice versa)
-
-            //subGateway.subscribe();
+            viewModel.subscribe();
           }
         }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialogInterface, int i) {
-            // TODO set no
           }
         });
+
+    subscribeToVM();
+
     return builder.create();
   }
 
@@ -75,7 +70,9 @@ public class DisplaySubInfoView extends DialogFragment{
       @Override
       public void onChanged(@Nullable String description) {
         if (description != null) {
+          Log.d(TAG, "Change observed " + description);
           displaySubinfoBinding.setSubDescription(description);
+          displaySubinfoBinding.executePendingBindings();
         }
       }
     });

@@ -6,6 +6,6 @@ public interface SubGateway {
   LiveData<String> getAdditionalSubInfo(String subredditName);
   LiveData<Boolean> getIsSubscribed(String subredditName);
 
-  void subscribe(String subreddit);
-  void unsubscribe(String subreddit);
+  LiveData<Boolean> subscribe(String subreddit);
+  LiveData<Boolean> unsubscribe(String subreddit);
 }
