@@ -47,9 +47,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     }
 
     setSupportActionBar(findViewById(R.id.my_toolbar));
-    // set Title of app using custom title textview instead of the default
-    getSupportActionBar().setTitle(" ");
-    ((Chip) findViewById(R.id.my_toolbar_title)).setChipText(getText(R.string.app_name));
 
     findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
       @Override
@@ -77,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
   }
 
   public void initializeDefaultView() {
+    // set sizes for title and subtitle
+
     // get the number of additional (non default) fragments in the stack
     int fragCount = getSupportFragmentManager().getBackStackEntryCount();
     Log.d(TAG, "Number of fragments " +  fragCount);
@@ -90,16 +89,40 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 
   @Override
   public void onBackPressed() {
-    searchView = findViewById(R.id.search_view);
-    // checks if the search view is open
-    if (!searchView.isIconified()) {
-      //searchView.clearFocus();
-      //searchMenuItem.collapseActionView();
-      searchView.setIconified(true);
+//    searchView = findViewById(R.id.search_view);
+//    // checks if the search view is open
+//    if (!searchView.isIconified()) {
+//      //searchView.clearFocus();
+//      //searchMenuItem.collapseActionView();
+//      searchView.setIconified(true);
+//    }
+//    else {
+//      super.onBackPressed();
+//    }
+    super.onBackPressed();
+  }
+
+
+  public void customSetTitle (String title, String subtitle) {
+    ((TextView) findViewById(R.id.my_toolbar_title)).setText(title);
+    if (subtitle != null) {
+      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText(subtitle);
+    } else {
+      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText("");
     }
-    else {
-      super.onBackPressed();
+  }
+
+  public void customSetTitle (int resId, String subtitle) {
+    ((TextView) findViewById(R.id.my_toolbar_title)).setText(resId);
+    if (subtitle != null) {
+      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText(subtitle);
+    } else {
+      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText("");
     }
+  }
+
+  public View customGetActionbar() {
+    return findViewById(R.id.my_toolbar);
   }
 
 }

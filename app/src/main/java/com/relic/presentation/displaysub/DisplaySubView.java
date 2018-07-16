@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.relic.MainActivity;
 import com.relic.R;
 import com.relic.data.PostRepositoryImpl;
 import com.relic.data.models.PostModel;
@@ -172,17 +173,12 @@ public class DisplaySubView extends Fragment {
     AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
     if (appCompatActivity != null) {
       // sets title and tells user default sorting
-      Chip title = getActivity().findViewById(R.id.my_toolbar_title);
-      TextView subTitle = getActivity().findViewById(R.id.my_toolbar_subtitle);
+      ((MainActivity) getActivity()).customSetTitle(subName, "popular");
 
-      title.setChipText(subName);
-      subTitle.setText("Popular");
-
-      title.setOnClickListener(new View.OnClickListener() {
+      ((MainActivity) getActivity()).customGetActionbar().setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
           Toast.makeText(getContext(), "Title Clicked", Toast.LENGTH_SHORT).show();
-
 
           DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
           Bundle bundle = new Bundle();
@@ -258,8 +254,7 @@ public class DisplaySubView extends Fragment {
   public void onDestroy() {
     super.onDestroy();
     // set title back to app name
-    ((Chip) getActivity().findViewById(R.id.my_toolbar_title)).setChipTextResource(R.string.app_name);
-    ((TextView) getActivity().findViewById(R.id.my_toolbar_subtitle)).setText("");
+    ((MainActivity) getActivity()).customSetTitle(R.string.app_name, null);
   }
 
 

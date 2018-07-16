@@ -15,33 +15,18 @@
         android:background="?attr/colorPrimary"
         android:elevation="@dimen/toolbar_height">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/my_toolbar_title"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/toolbar_h1"
+            android:textStyle="bold"/>
 
-            <android.support.design.chip.Chip
-                android:id="@+id/my_toolbar_title"
-                style="@style/titleChip"
-                android:textSize="@dimen/toolbar_h1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/toolbar_paddingtop"/>
-
-            <TextView
-                android:id="@+id/my_toolbar_subtitle"
-                android:textSize="@dimen/toolbar_h2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <android.support.v7.widget.SearchView
-                android:id="@+id/search_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:searchIcon="@drawable/ic_search"
-                app:queryHint="@string/search_subreddit_hint"
-                android:paddingBottom="8dp"/>
-        </RelativeLayout>
-
+        <TextView
+            android:id="@+id/my_toolbar_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/toolbar_h2"/>
 
     </android.support.v7.widget.Toolbar>
 

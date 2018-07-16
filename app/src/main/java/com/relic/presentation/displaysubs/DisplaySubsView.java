@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.relic.MainActivity;
 import com.relic.R;
 import com.relic.data.Authenticator;
 import com.relic.data.ListingRepositoryImpl;
@@ -75,7 +76,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         .setSpanCount(3);
 
     rootView = displaySubsBinding.getRoot();
-    getActivity().setTitle(R.string.app_name);
+    ((MainActivity) getActivity()).customSetTitle(R.string.app_name, null);
 
     // attach the actions associated with loading the posts
     attachScrollListeners();
@@ -98,20 +99,20 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // associate menu with search subreddit configuration defined in xml subreddit searchable
 //    SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 //    SearchView searchView = (SearchView) menu.findItem(R.id.search_item).getActionView();
-
-    SearchView searchView = getActivity().findViewById(R.id.search_view);
-    // add custom listener to handle results of search
-    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-      @Override
-      public boolean onQueryTextSubmit(String s) {
-        return false;
-      }
-
-      @Override
-      public boolean onQueryTextChange(String s) {
-        return false;
-      }
-    });
+//
+//    SearchView searchView = getActivity().findViewById(R.id.search_view);
+//    // add custom listener to handle results of search
+//    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//      @Override
+//      public boolean onQueryTextSubmit(String s) {
+//        return false;
+//      }
+//
+//      @Override
+//      public boolean onQueryTextChange(String s) {
+//        return false;
+//      }
+//    });
 
   }
 

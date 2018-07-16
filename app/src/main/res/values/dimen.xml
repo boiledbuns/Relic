@@ -6,7 +6,7 @@
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="toolbar_chipheight">40dp</dimen>
 
-    <dimen name="toolbar_h1">18dp</dimen>
+    <dimen name="toolbar_h1">20dp</dimen>
     <dimen name="toolbar_h2">12dp</dimen>
 
 
