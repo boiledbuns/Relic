@@ -15,18 +15,29 @@
         android:background="?attr/colorPrimary"
         android:elevation="@dimen/toolbar_height">
 
-        <TextView
-            android:id="@+id/my_toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/toolbar_h1"
-            android:textStyle="bold"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/my_toolbar_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/toolbar_h2"/>
+            <TextView
+                android:id="@+id/my_toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/toolbar_h1"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/my_toolbar_subtitle"
+                android:layout_below="@id/my_toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/toolbar_h2"/>
+
+            <com.relic.presentation.customview.RelicSearchView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </RelativeLayout>
 
     </android.support.v7.widget.Toolbar>
 

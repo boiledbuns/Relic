@@ -76,7 +76,7 @@ public class DisplaySubInfoView extends DialogFragment{
       displaySubinfoBinding.executePendingBindings();
     });
 
-//    // observe the subreddit description
+    // observe the subreddit description
 //    displaySubInfoVM.getDescription().observe(this, new Observer<String>() {
 //      @Override
 //      public void onChanged(@Nullable String description) {

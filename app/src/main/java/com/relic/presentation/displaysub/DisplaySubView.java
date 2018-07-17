@@ -174,11 +174,10 @@ public class DisplaySubView extends Fragment {
     if (appCompatActivity != null) {
       // sets title and tells user default sorting
       ((MainActivity) getActivity()).customSetTitle(subName, "popular");
-
-      ((MainActivity) getActivity()).customGetActionbar().setOnClickListener(new View.OnClickListener() {
+      ((MainActivity) getActivity()).customGetTitle().setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-          Toast.makeText(getContext(), "Title Clicked", Toast.LENGTH_SHORT).show();
+          Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
 
           DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
           Bundle bundle = new Bundle();
@@ -248,15 +247,6 @@ public class DisplaySubView extends Fragment {
     outState.putInt(SCROLL_POSITION, manager.findFirstCompletelyVisibleItemPosition());
     Log.d(TAG, "First position = " + manager.findFirstCompletelyVisibleItemPosition());
   }
-
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    // set title back to app name
-    ((MainActivity) getActivity()).customSetTitle(R.string.app_name, null);
-  }
-
 
 
 }

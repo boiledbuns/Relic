@@ -58,6 +58,13 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 
 
   @Override
+  public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+    super.onCreate(savedInstanceState, persistentState);
+    // removes custom title
+    getSupportActionBar().setTitle("");
+  }
+
+  @Override
   public boolean onCreateOptionsMenu(Menu menu) {
 //    getMenuInflater().inflate(R.menu.search_menu, menu);
 //
@@ -74,8 +81,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
   }
 
   public void initializeDefaultView() {
-    // set sizes for title and subtitle
-
     // get the number of additional (non default) fragments in the stack
     int fragCount = getSupportFragmentManager().getBackStackEntryCount();
     Log.d(TAG, "Number of fragments " +  fragCount);
@@ -121,10 +126,14 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     }
   }
 
+
+  public TextView customGetTitle() {
+    return findViewById(R.id.my_toolbar_title);
+  }
+
   public View customGetActionbar() {
     return findViewById(R.id.my_toolbar);
   }
-
 }
 
 
