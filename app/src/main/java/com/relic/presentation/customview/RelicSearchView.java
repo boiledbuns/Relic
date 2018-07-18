@@ -2,42 +2,81 @@ package com.relic.presentation.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.relic.R;
 
-public class RelicSearchView extends ViewGroup{
-  RelicSearchView relicSearchView;
+public class RelicSearchView extends RelativeLayout {
+  private final String TAG = "RELIC_SEARCHVIEW";
   boolean searchExpanded = false;
+
+  private RelicSearchView relicSearchView;
+  private EditText searchInput;
+
 
   public RelicSearchView(Context context) {
     super(context);
-    relicSearchView = (RelicSearchView) inflate(context, R.layout.relic_searchview, this);
+    relicSearchView = (RelicSearchView) inflate(getContext(), R.layout.relic_searchview, this);
+  }
+
+
+  public RelicSearchView(Context context, AttributeSet attributeSet) {
+    super(context, attributeSet);
+    relicSearchView = (RelicSearchView) inflate(getContext(), R.layout.relic_searchview, this);
+  }
+
+
+  @Override
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+
+    searchInput = relicSearchView.findViewById(R.id.searchbox_edittext);
 
     // add onclick to show edit text
     findViewById(R.id.search_icon).setOnClickListener((View onClickView) -> {
       expandSearch(!searchExpanded);
       searchExpanded = !searchExpanded;
     });
+
+    searchInput.setOnKeyListener(new OnKeyListener() {
+      @Override
+      public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+        Toast.makeText(getContext().getApplicationContext(), "Button pressed " + keyCode, Toast.LENGTH_SHORT).show();
+        if (keyCode == KeyEvent.ACTION_DOWN || keyCode == keyEvent.KEYCODE_BACK) {
+          expandSearch(!searchExpanded);
+          searchExpanded = !searchExpanded;
+        }
+        return false;
+      }
+    });
   }
 
-  public RelicSearchView(Context context, AttributeSet attributeSet) {
-    this(context);
-  }
 
   @Override
   protected void onLayout(boolean b, int i, int i1, int i2, int i3) {
-
+    super.onLayout(b, i, i1, i2, i3);
   }
 
-  public void expandSearch (boolean expand) {
-    int searchBox =  View.VISIBLE;
-    int searchIcon = View.INVISIBLE;
 
-    if (!expand) {
-      searchBox = View.GONE;
-      searchIcon = View.VISIBLE;
+  public void expandSearch (boolean expand) {
+    int searchBox =  View.GONE;
+    int searchIcon = View.VISIBLE;
+
+    if (expand) {
+      searchBox = View.VISIBLE;
+      searchIcon = View.INVISIBLE;
+
+      // retrieve reference to the search input and focus it
+      searchInput.setFocusable(true);
+      searchInput.requestFocus();
+      InputMethodManager imm = (InputMethodManager) relicSearchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT);
     }
 
     relicSearchView.findViewById(R.id.search_icon).setVisibility(searchIcon);

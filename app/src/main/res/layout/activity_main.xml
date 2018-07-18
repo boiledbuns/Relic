@@ -34,11 +34,12 @@
                 android:textSize="@dimen/toolbar_h2"/>
 
             <com.relic.presentation.customview.RelicSearchView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
+                android:id="@+id/test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
         </RelativeLayout>
-
     </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
