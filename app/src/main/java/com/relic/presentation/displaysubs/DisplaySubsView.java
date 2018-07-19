@@ -98,6 +98,18 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
     // calls method to subscribe the adapter to the livedata list
     subscribeToList();
+
+    //TESTing
+    // Search TODO: add additional live data to be observed for recent results
+    (new SubRepositoryImpl(getContext())).findSub("hearth")
+        .observe(this, new Observer<List<String>>() {
+      @Override
+      public void onChanged(@Nullable List<String> searchResults) {
+        if (searchResults != null && searchResults.size() > 0) {
+          Toast.makeText(getContext(), "RESULTS = " + searchResults.toString(), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
   }
 
 

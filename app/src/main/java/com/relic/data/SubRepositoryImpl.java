@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -195,33 +196,43 @@ public class SubRepositoryImpl implements SubRepository {
 
 
   @Override
-  public LiveData<List<SubredditModel>> findSub(String name) {
-    MutableLiveData<List<SubredditModel>> searchResults = new MutableLiveData<>();
+  public LiveData<List<String>> findSub(String name) {
+    MutableLiveData<List<String>> searchResults = new MutableLiveData<>();
 
-    String end = ENDPOINT + "";
-      volleyQueue.add(new RedditOauthRequest(Request.Method.GET, end,
+    String end = ENDPOINT + "api/search_subreddits?query=" + name;
+      volleyQueue.add(new RedditOauthRequest(Request.Method.POST, end,
           response -> {
-//            try {
-//              searchResults.setValue(parseSubreddits(response));
-//            }
-//            catch (ParseException e) {
-//              Log.d(TAG, "Error parsing the response");
-//            }
-            },
-          error -> Log.d(TAG, "error retrieving this class"), authToken));
+            Log.d(TAG, response);
+            parseSearchedSubs(response, searchResults);
+          },
+          error -> {
+            Log.d(TAG, "error retrieving this search results");
+          }, authToken));
 
     // TODO method to dao interface for retrieving a livedata instance of this class
     return searchResults;
   }
 
-//  private void parseSearchedSubs(Subreddit response) throws ParseException{
-//    //
-//    JSONParser parser = new JSONParser();
-//    JSONObject full = (JSONObject) parser.parse(response);
-//
-//    Log.d(TAG, response);
-//
-//  }
+  private void parseSearchedSubs(String response, MutableLiveData<List<String>> matches) {
+    List <String> parsedMatches = new ArrayList<>();
+
+    try {
+      JSONObject full = (JSONObject) parser.parse(response);
+      JSONArray subreddits = (JSONArray) full.get("subreddits");
+
+      Iterator subIterator = subreddits.iterator();
+      while (subIterator.hasNext()) {
+        parsedMatches.add((String) ((JSONObject) subIterator.next()).get("name"));
+      }
+      // replace the livedata list with the names parsed from the api
+      matches.setValue(parsedMatches);
+      Log.d(TAG, "MATCHES = " + parsedMatches.toString());
+
+
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+  }
 
 
   @Override

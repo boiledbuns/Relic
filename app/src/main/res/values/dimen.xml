@@ -8,7 +8,7 @@
 
     <dimen name="toolbar_h1">18dp</dimen>
     <dimen name="toolbar_h2">12dp</dimen>
-    <dimen name="search_padding">6dp</dimen>
+    <dimen name="search_padding">4dp</dimen>
 
 
     <dimen name="subitem_height">30dp</dimen>

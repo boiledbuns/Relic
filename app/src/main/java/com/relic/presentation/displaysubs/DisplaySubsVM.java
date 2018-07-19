@@ -2,7 +2,9 @@ package com.relic.presentation.displaysubs;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.Nullable;
 
 import com.relic.data.Authenticator;
 import com.relic.data.ListingRepository;
@@ -34,6 +36,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
     // add the live data from the repo as a source
     obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
+
   }
 
 

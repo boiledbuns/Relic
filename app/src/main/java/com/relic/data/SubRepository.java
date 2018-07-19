@@ -21,7 +21,7 @@ public interface SubRepository {
   LiveData<SubredditModel> getSingleSub(String subName);
   void retrieveSingleSub(String subName);
 
-  LiveData<List<SubredditModel>> findSub(String name);
+  LiveData<List<String>> findSub(String name);
 
   SubGateway getSubGateway();
 }
