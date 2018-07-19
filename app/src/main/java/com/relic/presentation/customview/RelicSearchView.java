@@ -1,6 +1,11 @@
 package com.relic.presentation.customview;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.method.KeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,14 +52,54 @@ public class RelicSearchView extends RelativeLayout {
     searchInput.setOnKeyListener(new OnKeyListener() {
       @Override
       public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-        Toast.makeText(getContext().getApplicationContext(), "Button pressed " + keyCode, Toast.LENGTH_SHORT).show();
-        if (keyCode == KeyEvent.ACTION_DOWN || keyCode == keyEvent.KEYCODE_BACK) {
+//        /Toast.makeText(getContext().getApplicationContext(), "Button pressed " + keyCode + " " + keyEvent.getAction(), Toast.LENGTH_SHORT).show();
+        if (keyEvent.getAction() == keyEvent.ACTION_UP && (keyCode == KeyEvent.ACTION_DOWN || keyCode == keyEvent.KEYCODE_BACK)) {
           expandSearch(!searchExpanded);
           searchExpanded = !searchExpanded;
         }
         return false;
       }
     });
+
+    searchInput.setKeyListener(new KeyListener() {
+      @Override
+      public int getInputType() {
+        Toast.makeText(getContext().getApplicationContext(), "Button pressed ", Toast.LENGTH_SHORT).show();
+        return 0;
+      }
+
+      @Override
+      public boolean onKeyDown(View view, Editable editable, int i, KeyEvent keyEvent) {
+        Toast.makeText(getContext().getApplicationContext(), "Button down ", Toast.LENGTH_SHORT).show();
+        return false;
+      }
+
+      @Override
+      public boolean onKeyUp(View view, Editable editable, int i, KeyEvent keyEvent) {
+        Toast.makeText(getContext().getApplicationContext(), "Button up ", Toast.LENGTH_SHORT).show();
+        return false;
+      }
+
+      @Override
+      public boolean onKeyOther(View view, Editable editable, KeyEvent keyEvent) {
+        Toast.makeText(getContext().getApplicationContext(), "Button other ", Toast.LENGTH_SHORT).show();
+        return false;
+      }
+
+      @Override
+      public void clearMetaKeyState(View view, Editable editable, int i) {
+        Toast.makeText(getContext().getApplicationContext(), "Button meta ", Toast.LENGTH_SHORT).show();
+      }
+    });
+
+
+    searchInput.setOnFocusChangeListener(new OnFocusChangeListener() {
+      @Override
+      public void onFocusChange(View view, boolean b) {
+        Toast.makeText(getContext(), "Button pressed " + b, Toast.LENGTH_SHORT).show();
+      }
+    });
+
   }
 
 

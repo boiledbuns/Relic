@@ -40,6 +40,9 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   DisplaySubsContract.VM viewModel;
   public View rootView;
 
+  private SearchView searchView;
+  private MenuItem searchMenuItem;
+
   private DisplaySubsBinding displaySubsBinding;
   private SwipeRefreshLayout swipeRefreshLayout;
   SubItemAdapter subAdapter;
@@ -115,8 +118,15 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 //        return false;
 //      }
 //    });
-  }
+    super.onCreateOptionsMenu(menu, inflater);
+    inflater.inflate(R.menu.search_menu, menu);
 
+    searchMenuItem = menu.findItem(R.id.search_item);
+    searchView = (SearchView) searchMenuItem.getActionView();
+
+    int padding = (int) getResources().getDimension(R.dimen.search_padding);
+    searchView.setPadding(0, 0, padding, padding);
+  }
 
   /**
    * Gets livedata list of subscribed subs from the VM and attach a listener to it

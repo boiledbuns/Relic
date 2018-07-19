@@ -1,15 +1,10 @@
 package com.relic;
 
-
-import android.content.Context;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
-import android.support.design.chip.Chip;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +21,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
   final String TAG = "MAIN_ACTIVITY";
   private Authenticator auth;
 
-  private MenuItem searchMenuItem;
   private SearchView searchView;
 
   @Override
@@ -64,15 +58,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     getSupportActionBar().setTitle("");
   }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-//    getMenuInflater().inflate(R.menu.search_menu, menu);
-//
-//    searchMenuItem = menu.findItem(R.id.search_item);
-//    searchView = (SearchView) searchMenuItem.getActionView();
-     return super.onCreateOptionsMenu(menu);
-  }
-
 
   @Override
   public void onAuthenticated() {
@@ -91,22 +76,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
   }
-
-  @Override
-  public void onBackPressed() {
-//    searchView = findViewById(R.id.search_view);
-//    // checks if the search view is open
-//    if (!searchView.isIconified()) {
-//      //searchView.clearFocus();
-//      //searchMenuItem.collapseActionView();
-//      searchView.setIconified(true);
-//    }
-//    else {
-//      super.onBackPressed();
-//    }
-    super.onBackPressed();
-  }
-
 
   public void customSetTitle (String title, String subtitle) {
     ((TextView) findViewById(R.id.my_toolbar_title)).setText(title);
@@ -134,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
   public View customGetActionbar() {
     return findViewById(R.id.my_toolbar);
   }
+
 }
 
 
