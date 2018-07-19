@@ -6,8 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +19,8 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
   final String TAG = "MAIN_ACTIVITY";
   private Authenticator auth;
 
-  private SearchView searchView;
+  private TextView titleTW;
+  private TextView subtitleTW;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     initializeDefaultView();
   }
 
+
   public void initializeDefaultView() {
     // get the number of additional (non default) fragments in the stack
     int fragCount = getSupportFragmentManager().getBackStackEntryCount();
@@ -75,23 +75,31 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
       getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
+
+    // initialize references to the title
+    titleTW = findViewById(R.id.my_toolbar_title);
+    subtitleTW= findViewById(R.id.my_toolbar_subtitle);
   }
 
   public void customSetTitle (String title, String subtitle) {
-    ((TextView) findViewById(R.id.my_toolbar_title)).setText(title);
-    if (subtitle != null) {
-      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText(subtitle);
+    if (titleTW != null) {
+      titleTW.setText(title);
+    }
+    if (subtitleTW != null) {
+      subtitleTW.setText(subtitle);
     } else {
-      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText("");
+      subtitleTW.setText("");
     }
   }
 
   public void customSetTitle (int resId, String subtitle) {
-    ((TextView) findViewById(R.id.my_toolbar_title)).setText(resId);
-    if (subtitle != null) {
-      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText(subtitle);
+    if (titleTW != null) {
+      titleTW.setText(resId);
+    }
+    if (subtitleTW != null) {
+      subtitleTW.setText(subtitle);
     } else {
-      ((TextView) findViewById(R.id.my_toolbar_subtitle)).setText("");
+      subtitleTW.setText("");
     }
   }
 

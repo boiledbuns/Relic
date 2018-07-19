@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.relic.MainActivity;
 import com.relic.R;
@@ -126,6 +127,21 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
+
+    // Add query listeners to the searchview
+    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String s) {
+        Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
+        return false;
+      }
+
+      @Override
+      public boolean onQueryTextChange(String s) {
+        Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
+        return false;
+      }
+    });
   }
 
   /**

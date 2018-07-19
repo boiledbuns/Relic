@@ -14,8 +14,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -41,6 +45,9 @@ public class DisplaySubView extends Fragment {
   private final String TAG = "DISPLAYSUB_VIEW";
   private final String SCROLL_POSITION = "POSITION";
   protected DisplaySubContract.ViewModel displaySubVM;
+
+  private SearchView searchView;
+  private MenuItem searchMenuItem;
 
   private DisplaySubBinding displaySubBinding;
   private PostItemAdapter postAdapter;
@@ -83,6 +90,7 @@ public class DisplaySubView extends Fragment {
 
     attachScrollListeners();
     initializeActionbar();
+    setHasOptionsMenu(true);
     return displaySubBinding.getRoot();
   }
 
@@ -105,6 +113,34 @@ public class DisplaySubView extends Fragment {
       // scroll to the previous position before reconfiguration change
       displaySubBinding.displayPostsRecyclerview.smoothScrollToPosition(position);
     }
+  }
+
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    super.onCreateOptionsMenu(menu, inflater);
+    inflater.inflate(R.menu.search_menu, menu);
+
+    searchMenuItem = menu.findItem(R.id.search_item);
+
+    searchView = (SearchView) searchMenuItem.getActionView();
+    int padding = (int) getResources().getDimension(R.dimen.search_padding);
+    searchView.setPadding(0, 0, padding, padding);
+
+    // Add query listeners to the searchview
+    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String s) {
+        Toast.makeText(getContext(), "Display sub view " + s, Toast.LENGTH_SHORT).show();
+        return false;
+      }
+
+      @Override
+      public boolean onQueryTextChange(String s) {
+        Toast.makeText(getContext(), "Display sub view " + s, Toast.LENGTH_SHORT).show();
+        return false;
+      }
+    });
   }
 
 
@@ -174,19 +210,22 @@ public class DisplaySubView extends Fragment {
     if (appCompatActivity != null) {
       // sets title and tells user default sorting
       ((MainActivity) getActivity()).customSetTitle(subName, "popular");
-      ((MainActivity) getActivity()).customGetTitle().setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
+      View title = ((MainActivity) getActivity()).customGetTitle();
+      if (title != null) {
+        title.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
 
-          DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
-          Bundle bundle = new Bundle();
-          bundle.putString("name", subName);
+            DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
+            Bundle bundle = new Bundle();
+            bundle.putString("name", subName);
 
-          displaySubInfoView.setArguments(bundle);
-          displaySubInfoView.showNow(getFragmentManager(), TAG);
-        }
-      });
+            displaySubInfoView.setArguments(bundle);
+            displaySubInfoView.showNow(getFragmentManager(), TAG);
+          }
+        });
+      }
     }
   }
 
