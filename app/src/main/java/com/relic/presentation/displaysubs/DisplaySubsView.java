@@ -101,7 +101,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
     //TESTing
     // Search TODO: add additional live data to be observed for recent results
-    (new SubRepositoryImpl(getContext())).findSub("hearth")
+    (new SubRepositoryImpl(getContext())).searchSubreddits("hearth")
         .observe(this, new Observer<List<String>>() {
       @Override
       public void onChanged(@Nullable List<String> searchResults) {
@@ -115,22 +115,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    // associate menu with search subreddit configuration defined in xml subreddit searchable
-//    SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-//    SearchView searchView = (SearchView) menu.findItem(R.id.search_item).getActionView();
-
-    // add custom listener to handle results of search
-//    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//      @Override
-//      public boolean onQueryTextSubmit(String s) {
-//        return false;
-//      }
-//
-//      @Override
-//      public boolean onQueryTextChange(String s) {
-//        return false;
-//      }
-//    });
     super.onCreateOptionsMenu(menu, inflater);
     inflater.inflate(R.menu.search_menu, menu);
 
@@ -145,6 +129,8 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       @Override
       public boolean onQueryTextSubmit(String s) {
         Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
+        //
+
         return false;
       }
 
@@ -155,6 +141,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       }
     });
   }
+
 
   /**
    * Gets livedata list of subscribed subs from the VM and attach a listener to it

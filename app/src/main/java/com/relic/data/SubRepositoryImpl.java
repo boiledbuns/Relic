@@ -196,42 +196,49 @@ public class SubRepositoryImpl implements SubRepository {
 
 
   @Override
-  public LiveData<List<String>> findSub(String name) {
+  public LiveData<List<SubredditModel>> findSubreddit(String subredditName) {
+    return null;
+  }
+
+
+  @Override
+  public LiveData<List<String>> searchSubreddits(String searchValue) {
     MutableLiveData<List<String>> searchResults = new MutableLiveData<>();
 
-    String end = ENDPOINT + "api/search_subreddits?query=" + name;
+    String end = ENDPOINT + "api/search_subreddits?query=" + searchValue;
       volleyQueue.add(new RedditOauthRequest(Request.Method.POST, end,
           response -> {
             Log.d(TAG, response);
-            parseSearchedSubs(response, searchResults);
+            // parse the reponse as a list of sub names and update the livedata accordingly
+            searchResults.setValue(parseSearchedSubs(response));
           },
           error -> {
             Log.d(TAG, "error retrieving this search results");
           }, authToken));
 
-    // TODO method to dao interface for retrieving a livedata instance of this class
     return searchResults;
   }
 
-  private void parseSearchedSubs(String response, MutableLiveData<List<String>> matches) {
+
+  /**
+   * Parses the api response to obtain the list of subreddit names
+   * @param response search_subreddits api response
+   */
+  private List<String> parseSearchedSubs(String response) {
     List <String> parsedMatches = new ArrayList<>();
 
     try {
-      JSONObject full = (JSONObject) parser.parse(response);
-      JSONArray subreddits = (JSONArray) full.get("subreddits");
-
+      JSONArray subreddits = (JSONArray) ((JSONObject) parser.parse(response)).get("subreddits");
       Iterator subIterator = subreddits.iterator();
+
       while (subIterator.hasNext()) {
         parsedMatches.add((String) ((JSONObject) subIterator.next()).get("name"));
       }
-      // replace the livedata list with the names parsed from the api
-      matches.setValue(parsedMatches);
-      Log.d(TAG, "MATCHES = " + parsedMatches.toString());
-
-
     } catch (ParseException e) {
       e.printStackTrace();
     }
+
+    return  parsedMatches;
   }
 
 

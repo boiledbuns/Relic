@@ -17,6 +17,10 @@ public interface DisplaySubsContract {
     LiveData<List<SubredditModel>> getSubscribedList();
 
     void retrieveMoreSubs(boolean resetPosts);
+
+    LiveData<List<String>> getSearchList();
+
+    void retrieveSearchResults(String search);
   }
 
 }

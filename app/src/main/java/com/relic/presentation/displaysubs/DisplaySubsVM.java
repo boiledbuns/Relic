@@ -20,8 +20,10 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   private SubRepository subRepo;
   private ListingRepository listingRepo;
-  private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
   private Authenticator auth;
+
+  private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
+  private LiveData<List<String>> searchResults;
 
 
   public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
@@ -36,7 +38,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
     // add the live data from the repo as a source
     obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
-
   }
 
 
@@ -49,6 +50,11 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     return obvSubsMediator;
   }
 
+
+  @Override
+  public LiveData<List<String>> getSearchList() {
+    return searchResults;
+  }
 
   /**
    * Retrieves more posts either from the start or leading off the current "after" page

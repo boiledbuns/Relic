@@ -21,7 +21,15 @@ public interface SubRepository {
   LiveData<SubredditModel> getSingleSub(String subName);
   void retrieveSingleSub(String subName);
 
-  LiveData<List<String>> findSub(String name);
+
+  LiveData<List<SubredditModel>> findSubreddit(String name);
+
+  /**
+   * Returns a list of subreddit names matching the search value
+   * @param searchValue
+   * @return
+   */
+  LiveData<List<String>> searchSubreddits(String searchValue);
 
   SubGateway getSubGateway();
 }
