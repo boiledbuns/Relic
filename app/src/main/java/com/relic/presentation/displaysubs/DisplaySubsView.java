@@ -1,9 +1,7 @@
 package com.relic.presentation.displaysubs;
 
-import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,6 +26,7 @@ import com.relic.data.ListingRepositoryImpl;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
+import com.relic.presentation.adapter.SearchItemAdapter;
 import com.relic.presentation.adapter.SubItemAdapter;
 import com.relic.presentation.adapter.SubItemOnClick;
 import com.relic.presentation.callbacks.AllSubsLoadedCallback;
@@ -47,10 +46,12 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   private DisplaySubsBinding displaySubsBinding;
   private SwipeRefreshLayout swipeRefreshLayout;
   SubItemAdapter subAdapter;
+  SearchItemAdapter searchItemAdapter;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
 
     // retrieve the instance of the viewmodel and attach a reference to it in this view
     viewModel = ViewModelProviders.of(this).get(DisplaySubsVM.class);
@@ -58,8 +59,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // initialize the repository and inject it into the viewmodel
     viewModel.init(new SubRepositoryImpl(getContext()), new ListingRepositoryImpl(getContext()),
         Authenticator.getAuthenticator(this.getContext()));
-
-    setHasOptionsMenu(true);
   }
 
 
@@ -71,9 +70,11 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     displaySubsBinding = DataBindingUtil
         .inflate(inflater, R.layout.display_subs, container, false);
 
-    // initialize the adapter for the subs and attach it to the recyclerview
+    // initialize the adapters for the subs and attach it to the recyclerview
     subAdapter = new SubItemAdapter(new OnClick());
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
+
+    searchItemAdapter = new SearchItemAdapter();
 
     // displays the items in 3 columns
     ((GridLayoutManager) displaySubsBinding.displaySubsRecyclerview.getLayoutManager())
@@ -97,7 +98,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     super.onActivityCreated(savedInstanceState);
 
     // calls method to subscribe the adapter to the livedata list
-    subscribeToList();
+    subscribeToLiveData();
 
     //TESTing
     // Search TODO: add additional live data to be observed for recent results
@@ -127,16 +128,18 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
       @Override
-      public boolean onQueryTextSubmit(String s) {
-        Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
-        //
-
+      public boolean onQueryTextSubmit(String query) {
+        //Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
+        // sends search query to viewmodel
+        viewModel.retrieveSearchResults(query);
         return false;
       }
 
       @Override
-      public boolean onQueryTextChange(String s) {
-        Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
+      public boolean onQueryTextChange(String query) {
+        //Toast.makeText(getContext(), "Display subs view " + query, Toast.LENGTH_SHORT).show();
+        // sends search query to viewmodel
+        viewModel.retrieveSearchResults(query);
         return false;
       }
     });
@@ -146,7 +149,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   /**
    * Gets livedata list of subscribed subs from the VM and attach a listener to it
    */
-  private void subscribeToList() {
+  private void subscribeToLiveData() {
     // allows the list to be updated as data is updated
     viewModel.getSubscribedList().observe(this, new Observer<List<SubredditModel>>() {
       @Override
@@ -162,6 +165,23 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         displaySubsBinding.executePendingBindings();
       }
     });
+
+    // allows the search result adapter to be updated when search queries are entered
+    viewModel.getSearchList().observe(this, new Observer<List<String>>() {
+      @Override
+      public void onChanged(@Nullable List<String> searchResults) {
+        if (searchResults != null) {
+          if (searchResults.isEmpty()) {
+            // TODO show the empty card or picture thing
+          } else {
+            // Sends the search results to the adapter to be displayed
+            searchItemAdapter.setSearchResults(searchResults);
+            Log.d(TAG, "Results sent to adapter, size = " + searchResults.size());
+          }
+        }
+      }
+    });
+
   }
 
 

@@ -42,6 +42,8 @@ public class SubRepositoryImpl implements SubRepository {
   private JSONParser parser;
   private Gson gson;
 
+  MutableLiveData<List<String>> searchResults;
+
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
     this.context = context;
@@ -203,7 +205,9 @@ public class SubRepositoryImpl implements SubRepository {
 
   @Override
   public LiveData<List<String>> searchSubreddits(String searchValue) {
-    MutableLiveData<List<String>> searchResults = new MutableLiveData<>();
+    if (searchResults == null) {
+      searchResults= new MutableLiveData<>();
+    }
 
     String end = ENDPOINT + "api/search_subreddits?query=" + searchValue;
       volleyQueue.add(new RedditOauthRequest(Request.Method.POST, end,

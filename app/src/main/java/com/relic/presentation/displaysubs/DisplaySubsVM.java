@@ -2,9 +2,11 @@ package com.relic.presentation.displaysubs;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.relic.data.Authenticator;
 import com.relic.data.ListingRepository;
@@ -23,7 +25,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   private Authenticator auth;
 
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
-  private LiveData<List<String>> searchResults;
+  private LiveData <List<String>> searchResults;
 
 
   public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
@@ -32,7 +34,8 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     this.auth = auth;
     auth.refreshToken(this);
 
-    // initialize the mediator with null value until we get db values
+    // initialize the livedata with null value until we get db values
+    searchResults = new MediatorLiveData<>();
     obvSubsMediator = new MediatorLiveData<>();
     obvSubsMediator.setValue(null);
 
@@ -53,7 +56,13 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   @Override
   public LiveData<List<String>> getSearchList() {
-    return searchResults;
+    return subRepo.searchSubreddits(null);
+  }
+
+  @Override
+  public void retrieveSearchResults(String search) {
+    Log.d(TAG, "Retrieving search results for " + search);
+    searchResults = subRepo.searchSubreddits(search);
   }
 
   /**
