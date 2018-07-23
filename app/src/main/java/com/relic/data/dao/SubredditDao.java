@@ -5,6 +5,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.database.Cursor;
 
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.models.SubredditModel;
@@ -36,4 +37,7 @@ public abstract class SubredditDao {
 
   @Query("SELECT name FROM SubredditEntity WHERE name = :subName")
   public abstract LiveData<List<String>> getSubscribed(String subName);
+
+  @Query("SELECT id as _id FROM SubredditEntity WHERE name = :searchQuery")
+  public abstract Cursor searchSubreddits(String searchQuery);
 }

@@ -2,7 +2,10 @@ package com.relic.presentation.displaysubs;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,12 +24,15 @@ import android.widget.Toast;
 
 import com.relic.MainActivity;
 import com.relic.R;
+import com.relic.data.ApplicationDB;
 import com.relic.data.Authenticator;
 import com.relic.data.ListingRepositoryImpl;
+import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
 import com.relic.presentation.adapter.SearchItemAdapter;
+import com.relic.presentation.adapter.SearchSubItemAdapter;
 import com.relic.presentation.adapter.SubItemAdapter;
 import com.relic.presentation.adapter.SubItemOnClick;
 import com.relic.presentation.callbacks.AllSubsLoadedCallback;
@@ -99,18 +105,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
     // calls method to subscribe the adapter to the livedata list
     subscribeToLiveData();
-
-    //TESTing
-    // Search TODO: add additional live data to be observed for recent results
-    (new SubRepositoryImpl(getContext())).searchSubreddits("hearth")
-        .observe(this, new Observer<List<String>>() {
-      @Override
-      public void onChanged(@Nullable List<String> searchResults) {
-        if (searchResults != null && searchResults.size() > 0) {
-          Toast.makeText(getContext(), "RESULTS = " + searchResults.toString(), Toast.LENGTH_SHORT).show();
-        }
-      }
-    });
   }
 
 
@@ -125,21 +119,25 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
 
+    new AttachSearchCursor(searchView, getContext()).execute();
+
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
       @Override
       public boolean onQueryTextSubmit(String query) {
         //Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
         // sends search query to viewmodel
-        viewModel.retrieveSearchResults(query);
+        if (!query.isEmpty()) {
+          viewModel.retrieveSearchResults(query);
+        }
         return false;
       }
 
       @Override
       public boolean onQueryTextChange(String query) {
         //Toast.makeText(getContext(), "Display subs view " + query, Toast.LENGTH_SHORT).show();
-        // sends search query to viewmodel
-        viewModel.retrieveSearchResults(query);
+        // sends search query to viewmodel, use submit because we search whenever query is changed
+        onQueryTextSubmit(query);
         return false;
       }
     });
@@ -224,4 +222,28 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
           .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
     }
   }
+
+  static class AttachSearchCursor extends AsyncTask<String, Cursor, Cursor> {
+    Context context;
+    SearchView searchView;
+
+    AttachSearchCursor(SearchView searchView, Context context) {
+      this.context = context;
+      this.searchView = searchView;
+    }
+
+    @Override
+    protected Cursor doInBackground(String... strings) {
+      //TODO testing
+      SubRepository subRepo = new SubRepositoryImpl(context);
+      return ApplicationDB.getDatabase(context).getSubredditDao().searchSubreddits("test");
+    }
+
+    @Override
+    protected void onPostExecute(Cursor cursor) {
+      SearchSubItemAdapter adapter = new SearchSubItemAdapter(context, cursor, false);
+      searchView.setSuggestionsAdapter(adapter);
+    }
+  }
+
 }

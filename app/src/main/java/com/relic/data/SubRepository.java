@@ -1,6 +1,7 @@
 package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
+import android.database.Cursor;
 
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.models.SubredditModel;
@@ -32,4 +33,6 @@ public interface SubRepository {
   LiveData<List<String>> searchSubreddits(String searchValue);
 
   SubGateway getSubGateway();
+
+  Cursor searchSubs(String searchQuery);
 }

@@ -3,6 +3,7 @@ package com.relic.data;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -261,4 +262,8 @@ public class SubRepositoryImpl implements SubRepository {
     }
   }
 
+  @Override
+  public Cursor searchSubs(String searchQuery) {
+    return null;
+  }
 }
