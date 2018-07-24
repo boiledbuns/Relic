@@ -1,6 +1,7 @@
 package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.database.Cursor;
 
 import com.relic.data.gateway.SubGateway;
@@ -27,10 +28,10 @@ public interface SubRepository {
 
   /**
    * Returns a list of subreddit names matching the search value
-   * @param searchValue
-   * @return
+   * @param liveResults the livedata results list to be updated when results are parsed form the api
+   * @param query query to find matching subreddits for
    */
-  LiveData<List<String>> searchSubreddits(String searchValue);
+  void searchSubreddits(MutableLiveData<List<String>> liveResults, String query);
 
   SubGateway getSubGateway();
 

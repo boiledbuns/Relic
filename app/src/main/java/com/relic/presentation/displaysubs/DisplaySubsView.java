@@ -121,22 +121,11 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
 
-    Fragment currentFragment = this;
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
       @Override
       public boolean onQueryTextSubmit(String query) {
-        LiveData <List<String>> searchResults = viewModel.retrieveSearchResults(query);
-
-        // sends search query to viewmodel and attach a listener to the livedata returned
-        if (searchResults != null) {
-          searchResults.observe(currentFragment, new Observer<List<String>>() {
-            @Override
-            public void onChanged(@Nullable List<String> results) {
-              Toast.makeText(currentFragment.getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
-            }
-          });
-        }
+        viewModel.retrieveSearchResults(query);
         return false;
       }
 
@@ -150,7 +139,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
 
   /**
-   * Gets livedata list of subscribed subs from the VM and attach a listener to it
+   * Subscribes to various livedata values from the viewmodel
    */
   private void subscribeToLiveData() {
     // allows the list to be updated as data is updated
@@ -166,6 +155,17 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         // execute bindings only once everything is loaded (on callback)
         // execute changes and sync
         displaySubsBinding.executePendingBindings();
+      }
+    });
+
+    // subscribes to search results
+    viewModel.getSearchResults().observe(this, new Observer<List<String>>() {
+      @Override
+      public void onChanged(@Nullable List<String> results) {
+        // update the view based on search results
+        if (results != null) {
+          Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
+        }
       }
     });
   }

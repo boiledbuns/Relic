@@ -25,7 +25,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   private Authenticator auth;
 
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
-  private LiveData <List<String>> searchResults;
+  private MutableLiveData <List<String>> searchResults;
 
   private String prevQuery;
 
@@ -56,26 +56,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   }
 
 
-  @Override
-  public LiveData<List<String>> retrieveSearchResults(String query) {
-    Log.d(TAG, "Retrieving search results for " + query);
-
-    // retrieves search results only if the query is non empty
-    // also ignores first entry as query when the sea
-    if (!query.isEmpty()) {
-      if (prevQuery == null) {
-        // TODO reinitialize
-      }
-      // replaces the current livedata with a new one based on new query string
-      searchResults = subRepo.searchSubreddits(query);
-      // sets the new query as the prev query
-      prevQuery = query;
-    }
-    
-    return searchResults;
-  }
-
-
   /**
    * Retrieves more posts either from the start or leading off the current "after" page
    * @param resetPosts whether the post list should be restarted
@@ -86,6 +66,30 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
       // refresh token before performing any requests
       auth.refreshToken(this);
       subRepo.retrieveMoreSubscribedSubs(null);
+    }
+  }
+
+
+  @Override
+  public LiveData<List<String>> getSearchResults() {
+    return searchResults;
+  }
+
+
+  @Override
+  public void retrieveSearchResults(String query) {
+    Log.d(TAG, "Retrieving search results for " + query);
+
+    // retrieves search results only if the query is non empty
+    // also ignores first entry as query when the sea
+    if (!query.isEmpty()) {
+      if (prevQuery == null) {
+        // TODO reinitialize
+      }
+      // replaces the current livedata with a new one based on new query string
+      subRepo.searchSubreddits(searchResults, query);
+      // sets the new query as the prev query
+      prevQuery = query;
     }
   }
 
