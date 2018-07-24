@@ -243,7 +243,7 @@ public class SubRepositoryImpl implements SubRepository {
       e.printStackTrace();
     }
 
-    return  parsedMatches;
+    return parsedMatches;
   }
 
 

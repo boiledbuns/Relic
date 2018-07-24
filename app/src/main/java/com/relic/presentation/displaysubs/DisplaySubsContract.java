@@ -18,9 +18,7 @@ public interface DisplaySubsContract {
 
     void retrieveMoreSubs(boolean resetPosts);
 
-    LiveData<List<String>> getSearchList();
-
-    void retrieveSearchResults(String search);
+    LiveData<List<String>> retrieveSearchResults(String search);
   }
 
 }

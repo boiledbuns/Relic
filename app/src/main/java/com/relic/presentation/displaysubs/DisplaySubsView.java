@@ -1,5 +1,6 @@
 package com.relic.presentation.displaysubs;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -116,29 +117,33 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     searchMenuItem = menu.findItem(R.id.search_item);
     searchView = (SearchView) searchMenuItem.getActionView();
 
+    // inialize a few of the view properties for the searchvie
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
 
-    new AttachSearchCursor(searchView, getContext()).execute();
-
+    Fragment currentFragment = this;
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
       @Override
       public boolean onQueryTextSubmit(String query) {
-        //Toast.makeText(getContext(), "Display subs view " + s, Toast.LENGTH_SHORT).show();
-        // sends search query to viewmodel
-        if (!query.isEmpty()) {
-          viewModel.retrieveSearchResults(query);
+        LiveData <List<String>> searchResults = viewModel.retrieveSearchResults(query);
+
+        // sends search query to viewmodel and attach a listener to the livedata returned
+        if (searchResults != null) {
+          searchResults.observe(currentFragment, new Observer<List<String>>() {
+            @Override
+            public void onChanged(@Nullable List<String> results) {
+              Toast.makeText(currentFragment.getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
+            }
+          });
         }
         return false;
       }
 
       @Override
       public boolean onQueryTextChange(String query) {
-        //Toast.makeText(getContext(), "Display subs view " + query, Toast.LENGTH_SHORT).show();
         // sends search query to viewmodel, use submit because we search whenever query is changed
-        onQueryTextSubmit(query);
-        return false;
+        return onQueryTextSubmit(query);
       }
     });
   }
@@ -163,23 +168,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         displaySubsBinding.executePendingBindings();
       }
     });
-
-    // allows the search result adapter to be updated when search queries are entered
-    viewModel.getSearchList().observe(this, new Observer<List<String>>() {
-      @Override
-      public void onChanged(@Nullable List<String> searchResults) {
-        if (searchResults != null) {
-          if (searchResults.isEmpty()) {
-            // TODO show the empty card or picture thing
-          } else {
-            // Sends the search results to the adapter to be displayed
-            searchItemAdapter.setSearchResults(searchResults);
-            Log.d(TAG, "Results sent to adapter, size = " + searchResults.size());
-          }
-        }
-      }
-    });
-
   }
 
 

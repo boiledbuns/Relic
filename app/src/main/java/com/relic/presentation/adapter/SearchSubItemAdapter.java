@@ -2,7 +2,6 @@ package com.relic.presentation.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.databinding.DataBindingUtil;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import com.relic.R;
 
 public class SearchSubItemAdapter extends CursorAdapter {
-
 
   public SearchSubItemAdapter(Context context, Cursor c, boolean autoRequery) {
     super(context, c, autoRequery);
