@@ -10,6 +10,10 @@
     <dimen name="toolbar_h2">12dp</dimen>
     <dimen name="search_padding">4dp</dimen>
 
+    <dimen name="search_suggestions_margin_side">20dp</dimen>
+    <dimen name="search_suggestions_padding_side">6dp</dimen>
+    <dimen name="search_item_padding">6dp</dimen>
+
 
     <dimen name="subitem_height">30dp</dimen>
     <dimen name="subitem_margin">3dp</dimen>

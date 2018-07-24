@@ -4,6 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <variable
+            name="searchIsVisbile"
+            type="Boolean"/>
     </data>
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -11,20 +14,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Displays search results -->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/search_subs_recyclerview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/search_suggestions_margin_side"
+            android:layout_marginEnd="@dimen/search_suggestions_margin_side"
+            android:visibility="@{searchIsVisible ? `VISIBLE` : `GONE`}"/>
 
+        <!-- displays all subscribed subs-->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/display_subs_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutManager="android.support.v7.widget.GridLayoutManager"
             android:clipToPadding="false"
             android:paddingEnd="@dimen/subitem_margin"
-            android:paddingBottom="@dimen/subitem_margin"
-            android:visibility="invisible"/>
+            android:paddingBottom="@dimen/subitem_margin"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

@@ -27,8 +27,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
   private MutableLiveData <List<String>> searchResults;
 
-  private String prevQuery;
-
 
   public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
     subRepo = subRepository;
@@ -84,13 +82,8 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     // retrieves search results only if the query is non empty
     // also ignores first entry as query when the sea
     if (!query.isEmpty()) {
-      if (prevQuery == null) {
-        // TODO reinitialize
-      }
       // replaces the current livedata with a new one based on new query string
       subRepo.searchSubreddits(searchResults, query);
-      // sets the new query as the prev query
-      prevQuery = query;
     }
   }
 
