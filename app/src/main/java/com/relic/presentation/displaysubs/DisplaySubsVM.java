@@ -38,6 +38,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
     // initialize the livedata with null value until we get db values
     searchResults = new MediatorLiveData<>();
+    searchResults.setValue(null);
     obvSubsMediator = new MediatorLiveData<>();
     obvSubsMediator.setValue(null);
 

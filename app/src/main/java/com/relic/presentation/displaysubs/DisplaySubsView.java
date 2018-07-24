@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,6 +83,8 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
 
     searchItemAdapter = new SearchItemAdapter();
+    displaySubsBinding.searchSubsRecyclerview.setAdapter(searchItemAdapter);
+    displaySubsBinding.searchSubsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
 
     // displays the items in 3 columns
     ((GridLayoutManager) displaySubsBinding.displaySubsRecyclerview.getLayoutManager())
@@ -120,6 +123,22 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // inialize a few of the view properties for the searchvie
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
+
+
+    // sets the listener for the search item on the menu to capture expand and collapse events
+    searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+      @Override
+      public boolean onMenuItemActionExpand(MenuItem menuItem) {
+        displaySubsBinding.displaySubsRecyclerview.setAdapter(new SearchItemAdapter());
+        return true;
+      }
+
+      @Override
+      public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+        return true;
+      }
+    });
+
 
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -165,6 +184,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         // update the view based on search results
         if (results != null) {
           Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
+          searchItemAdapter.setSearchResults(results);
         }
       }
     });
@@ -208,29 +228,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       // replace the current screen with the newly created fragment
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
-    }
-  }
-
-  static class AttachSearchCursor extends AsyncTask<String, Cursor, Cursor> {
-    Context context;
-    SearchView searchView;
-
-    AttachSearchCursor(SearchView searchView, Context context) {
-      this.context = context;
-      this.searchView = searchView;
-    }
-
-    @Override
-    protected Cursor doInBackground(String... strings) {
-      //TODO testing
-      SubRepository subRepo = new SubRepositoryImpl(context);
-      return ApplicationDB.getDatabase(context).getSubredditDao().searchSubreddits("test");
-    }
-
-    @Override
-    protected void onPostExecute(Cursor cursor) {
-      SearchSubItemAdapter adapter = new SearchSubItemAdapter(context, cursor, false);
-      searchView.setSuggestionsAdapter(adapter);
     }
   }
 

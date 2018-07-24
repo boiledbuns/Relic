@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout>
+
     <data>
         <variable
             name="subredditName"
             type="String"/>
     </data>
-    <android.support.constraint.ConstraintLayout
+
+    <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content">
 
         <TextView
             android:id="@+id/searchsub_subname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{subredditName}"/>
+            android:text="test"/>
+
+    </RelativeLayout>
     
-    </android.support.constraint.ConstraintLayout>
 </layout>
