@@ -1,13 +1,10 @@
 package com.relic.presentation.displaysubs;
 
-import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,11 +20,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.relic.MainActivity;
 import com.relic.R;
-import com.relic.data.ApplicationDB;
 import com.relic.data.Authenticator;
 import com.relic.data.ListingRepositoryImpl;
 import com.relic.data.SubRepository;
@@ -35,7 +30,7 @@ import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
 import com.relic.presentation.adapter.SearchItemAdapter;
-import com.relic.presentation.adapter.SearchSubItemAdapter;
+import com.relic.presentation.adapter.SearchSubItemOnClick;
 import com.relic.presentation.adapter.SubItemAdapter;
 import com.relic.presentation.adapter.SubItemOnClick;
 import com.relic.presentation.callbacks.AllSubsLoadedCallback;
@@ -47,7 +42,6 @@ import java.util.List;
 public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   private final String TAG = "DISPLAY_SUBS_VIEW";
   DisplaySubsContract.VM viewModel;
-  public View rootView;
 
   private SearchView searchView;
   private MenuItem searchMenuItem;
@@ -82,19 +76,18 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     displaySubsBinding = DataBindingUtil
         .inflate(inflater, R.layout.display_subs, container, false);
 
-    // initialize the adapters for the subs and attach it to the recyclerview
-    subAdapter = new SubItemAdapter(new OnClick());
+    // initialize the adapter for subscribed subs recyclerview
+    subAdapter = new SubItemAdapter(new OnClickSubItem());
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
-
-    searchItemAdapter = new SearchItemAdapter();
-    displaySubsBinding.searchSubsRecyclerview.setAdapter(searchItemAdapter);
-    displaySubsBinding.searchSubsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
-
     // displays the subscribed subs in 3 columns
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
     displaySubsBinding.displaySubsRecyclerview.setLayoutManager(gridLayoutManager);
 
-    rootView = displaySubsBinding.getRoot();
+    // initialize the adapter for the search subs recyclerview
+    SearchSubItemOnClick searchSubItemOnClick = new OnClickSearchSubItem(this);
+    searchItemAdapter = new SearchItemAdapter(searchSubItemOnClick);
+    displaySubsBinding.searchSubsRecyclerview.setAdapter(searchItemAdapter);
+    displaySubsBinding.searchSubsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
 
     // sets defaults for the actionbar
     getActivity().findViewById(R.id.my_toolbar_title).setOnClickListener(null);
@@ -135,12 +128,14 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       public boolean onMenuItemActionExpand(MenuItem menuItem) {
         // update visibility for the search recyclerview
         searchIsVisible.setValue(true);
-        displaySubsBinding.displaySubsRecyclerview.setAdapter(new SearchItemAdapter());
+        //displaySubsBinding.displaySubsRecyclerview.setAdapter(new SearchItemAdapter());
         return true;
       }
 
       @Override
       public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+        // update visibility for the search recyclerview
+        searchIsVisible.setValue(false);
         return true;
       }
     });
@@ -188,7 +183,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       public void onChanged(@Nullable List<String> results) {
         // update the view based on search results
         if (results != null) {
-          Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
+          //Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
           searchItemAdapter.setSearchResults(results);
         }
       }
@@ -199,12 +194,12 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   private void initializeLivedata() {
     // initialize livedata properties for binding
     searchIsVisible = new MutableLiveData<>();
-    searchIsVisible.setValue(false);
     // initialize observer for updating binding on change
     searchIsVisible.observe(this, (Boolean isVisible) -> {
-      displaySubsBinding.setSearchIsVisbile(isVisible);
+      displaySubsBinding.setSearchIsVisible(isVisible);
       displaySubsBinding.executePendingBindings();
     });
+    searchIsVisible.setValue(false);
   }
 
 
@@ -231,7 +226,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   /**
    * onClick class for the xml file to hook to
    */
-  public class OnClick implements SubItemOnClick {
+  class OnClickSubItem implements SubItemOnClick {
     public void onClick(SubredditModel subItem) {
       Log.d(TAG, subItem.getSubName());
 
@@ -247,5 +242,35 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
           .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
     }
   }
+
+
+  class OnClickSearchSubItem implements SearchSubItemOnClick {
+    LifecycleOwner owner;
+
+    public OnClickSearchSubItem (Fragment fragment) {
+      // initializes reference to a lifecycle owner
+      owner = fragment;
+    }
+
+    @Override
+    public void onClick(String subName) {
+      Log.d(TAG, "Search item clicked");
+
+      SubRepository subRepo = new SubRepositoryImpl(getContext());
+      subRepo.getSingleSub(subName).observe(owner, (SubredditModel subModel) -> {
+        // add the subreddit object to the bundle
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("SubredditModel", subModel);
+
+        DisplaySubView subFrag = new DisplaySubView();
+        subFrag.setArguments(bundle);
+
+        // replace the current screen with the newly created fragment
+        getActivity().getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+      });
+    }
+  }
+
 
 }

@@ -38,6 +38,6 @@ public abstract class SubredditDao {
   @Query("SELECT name FROM SubredditEntity WHERE name = :subName")
   public abstract LiveData<List<String>> getSubscribed(String subName);
 
-  @Query("SELECT id as _id FROM SubredditEntity WHERE name = :searchQuery")
-  public abstract Cursor searchSubreddits(String searchQuery);
+  @Query("SELECT name FROM SubredditEntity WHERE name = :query")
+  public abstract LiveData<List<String>> searchSubreddits(String query);
 }

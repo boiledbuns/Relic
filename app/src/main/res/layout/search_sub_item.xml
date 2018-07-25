@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout>
-
     <data>
         <variable
             name="subredditName"
             type="String"/>
+
+        <variable
+            name="searchItemOnClick"
+            type="com.relic.presentation.adapter.SearchSubItemOnClick"/>
     </data>
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:padding="@dimen/search_item_padding"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content">
+        android:layout_width="match_parent"
+        android:onClick="@{()->searchItemOnClick.onClick(subredditName)}">
 
         <TextView
             android:id="@+id/searchsub_subname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:text="@{subredditName}"/>
 
     </RelativeLayout>

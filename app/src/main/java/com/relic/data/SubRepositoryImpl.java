@@ -2,9 +2,11 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -209,14 +211,18 @@ public class SubRepositoryImpl implements SubRepository {
       volleyQueue.add(new RedditOauthRequest(Request.Method.POST, end,
           response -> {
             Log.d(TAG, response);
-            // parse the reponse as a list of sub names and update the livedata accordingly
+
+//            List<String> livedataResults = liveResults.getValue();
+//            livedataResults.addAll(parseSearchedSubs(response));
+//
+//            liveResults.setValue(livedataResults);
+
             liveResults.setValue(parseSearchedSubs(response));
           },
           error -> {
             Log.d(TAG, "error retrieving this search results");
           }, authToken));
   }
-
 
   /**
    * Parses the api response to obtain the list of subreddit names
@@ -255,8 +261,4 @@ public class SubRepositoryImpl implements SubRepository {
     }
   }
 
-  @Override
-  public Cursor searchSubs(String searchQuery) {
-    return null;
-  }
 }

@@ -35,5 +35,4 @@ public interface SubRepository {
 
   SubGateway getSubGateway();
 
-  Cursor searchSubs(String searchQuery);
 }

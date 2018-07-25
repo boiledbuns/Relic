@@ -32,5 +32,4 @@ public interface DisplaySubsContract {
      */
     void retrieveSearchResults(String query);
   }
-
 }

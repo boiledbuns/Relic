@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.relic.R;
@@ -16,6 +15,12 @@ import java.util.List;
 public class SearchItemAdapter extends RecyclerView.Adapter <SearchItemAdapter.SearchSubItemVH> {
   private final String TAG = "SEARCH_SUBITEM_ADAPTER";
   private List <String> searchResults;
+
+  private SearchSubItemOnClick onclick;
+
+  public SearchItemAdapter(SearchSubItemOnClick searchSubItemOnClick) {
+    onclick = searchSubItemOnClick;
+  }
 
   class SearchSubItemVH extends RecyclerView.ViewHolder {
     SearchSubItemBinding searchSubItemBinding;
@@ -32,6 +37,7 @@ public class SearchItemAdapter extends RecyclerView.Adapter <SearchItemAdapter.S
     SearchSubItemBinding searchSubItemBinding = DataBindingUtil
         .inflate(LayoutInflater.from(viewGroup.getContext()), R.layout.search_sub_item, viewGroup, false);
 
+    searchSubItemBinding.setSearchItemOnClick(onclick);
     return new SearchSubItemVH(searchSubItemBinding);
   }
 
