@@ -258,16 +258,22 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
       SubRepository subRepo = new SubRepositoryImpl(getContext());
       subRepo.getSingleSub(subName).observe(owner, (SubredditModel subModel) -> {
-        // add the subreddit object to the bundle
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("SubredditModel", subModel);
+        if (subModel == null) {
+          // retrieve the sub if it hasn't already been downloaded
+          subRepo.retrieveSingleSub(subName);
+        }
+        else {
+            // add the subreddit object to the bundle
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("SubredditModel", subModel);
 
-        DisplaySubView subFrag = new DisplaySubView();
-        subFrag.setArguments(bundle);
+            DisplaySubView subFrag = new DisplaySubView();
+            subFrag.setArguments(bundle);
 
-        // replace the current screen with the newly created fragment
-        getActivity().getSupportFragmentManager().beginTransaction()
-            .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+            // replace the current screen with the newly created fragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+        }
       });
     }
   }

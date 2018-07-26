@@ -152,7 +152,7 @@ public class SubRepositoryImpl implements SubRepository {
           }
 
         }, (VolleyError e) -> {
-      Log.d(TAG, "There was an error retrieving the respone from the server " + e.getMessage());
+      Log.d(TAG, "There was an error retrieving the response from the server " + e.getMessage());
     }, authToken));
   }
 

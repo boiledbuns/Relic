@@ -61,7 +61,6 @@ public class DisplaySubView extends Fragment {
     if (this.getArguments() != null) {
       // parse the SubredditModel from the arguments
       SubredditModel subModel = this.getArguments().getParcelable("SubredditModel");
-
       if (subModel != null) {
         subName = subModel.getSubName();
         // get the viewmodel and inject the dependencies into it

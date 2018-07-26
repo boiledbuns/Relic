@@ -2,7 +2,10 @@ package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.relic.data.PostRepository;
@@ -18,7 +21,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   private SubredditModel currentSub;
   private PostRepository postRepo;
 
-  private MediatorLiveData<List<PostModel>> postsMediator;
+  private MediatorLiveData<List<PostModel>> postListMediator;
 
   public void init(SubredditModel subModel, PostRepository postRepo) {
     Log.d(TAG, subModel.getSubName());
@@ -26,10 +29,26 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     this.postRepo = postRepo;
 
     // initialize the mediator
-    postsMediator = new MediatorLiveData<>();
-    postsMediator.setValue(null);
+    postListMediator = new MediatorLiveData<>();
+    postListMediator.addSource(postRepo.getPosts(currentSub.getSubName()), new Observer<List<PostModel>>() {
+      @Override
+      public void onChanged(@Nullable List<PostModel> postModels) {
+        if (postModels.isEmpty()) {
+          Log.d(TAG, "empty posts");
+          retrieveMorePosts(true);
+        }
+        else {
+          Log.d(TAG, "not empty posts");
+          postListMediator.setValue(postModels);
+        }
+      }
+    });
+  }
 
-    postsMediator.addSource(postRepo.getPosts(currentSub.getSubName()), postsMediator::setValue);
+
+  @Override
+  public String getSubName() {
+    return currentSub.getSubName();
   }
 
 
@@ -38,13 +57,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
    * @return the lists of posts
    */
   public LiveData<List<PostModel>> getPosts() {
-    return postsMediator;
-  }
-
-
-  @Override
-  public String getSubName() {
-    return currentSub.getSubName();
+    return postListMediator;
   }
 
 
