@@ -11,5 +11,9 @@
     <string name="searchmenu_title">Search</string>
     <string name="search_subreddit_hint">subreddit name</string>
 
+    <!-- appbarlayout --> 
+    <!--<string name="appbar_scrolling_view_behavior">android.support.</string>-->
+    <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+
 
 </resources>

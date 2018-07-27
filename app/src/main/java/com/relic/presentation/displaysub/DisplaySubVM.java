@@ -18,31 +18,37 @@ import java.util.List;
 
 public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
   private final String TAG = "DISPLAYSUB_VM";
+  private boolean isInitialized = false;
   private SubredditModel currentSub;
   private PostRepository postRepo;
 
   private MediatorLiveData<List<PostModel>> postListMediator;
 
   public void init(SubredditModel subModel, PostRepository postRepo) {
-    Log.d(TAG, subModel.getSubName());
-    this.currentSub = subModel;
-    this.postRepo = postRepo;
+    // ensure that the subreddit model is initialized only once
+    if (!isInitialized) {
+      Log.d(TAG, subModel.getSubName());
+      this.currentSub = subModel;
+      this.postRepo = postRepo;
 
-    // initialize the mediator
-    postListMediator = new MediatorLiveData<>();
-    postListMediator.addSource(postRepo.getPosts(currentSub.getSubName()), new Observer<List<PostModel>>() {
-      @Override
-      public void onChanged(@Nullable List<PostModel> postModels) {
-        if (postModels.isEmpty()) {
-          Log.d(TAG, "empty posts");
-          retrieveMorePosts(true);
+      // initialize the mediator for loading posts
+      postListMediator = new MediatorLiveData<>();
+      postListMediator.addSource(postRepo.getPosts(currentSub.getSubName()), new Observer<List<PostModel>>() {
+        @Override
+        public void onChanged(@Nullable List<PostModel> postModels) {
+          if (postModels.isEmpty()) {
+            Log.d(TAG, "empty posts");
+            retrieveMorePosts(true);
+          } else {
+            Log.d(TAG, "not empty posts");
+            postListMediator.setValue(postModels);
+          }
         }
-        else {
-          Log.d(TAG, "not empty posts");
-          postListMediator.setValue(postModels);
-        }
-      }
-    });
+
+      });
+
+      isInitialized = true;
+    }
   }
 
 

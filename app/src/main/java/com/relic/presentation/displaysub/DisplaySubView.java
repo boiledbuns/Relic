@@ -148,18 +148,23 @@ public class DisplaySubView extends Fragment {
     displaySubVM.getPosts().observe(this, new Observer<List<PostModel>>() {
       @Override
       public void onChanged(@Nullable List<PostModel> postModels) {
+        Log.d(TAG, "Post models retrieved");
         if (postModels != null) {
+          Log.d(TAG, "size of " + postModels.size());
           // tells VM to retrieve more posts if there are no posts currently stored for this sub
-          if (postModels.size() == 0) {
-            displaySubVM.retrieveMorePosts(true);
-            Log.d(TAG, "Requesting more posts from vm");
-          } else {
-            swipeRefresh.setRefreshing(false);
-            // update the view whenever the livedata changes
-            Log.d(TAG, "SIZE " + postModels.size());
-            postAdapter.setPostList(postModels);
-          }
+//          if (postModels.size() == 0) {
+//            displaySubVM.retrieveMorePosts(true);
+//            Log.d(TAG, "Requesting more posts from vm");
+//          } else {
+//            swipeRefresh.setRefreshing(false);
+//            // update the view whenever the livedata changes
+//            Log.d(TAG, "SIZE " + postModels.size());
+//            postAdapter.setPostList(postModels);
+//          }
+          postAdapter.setPostList(postModels);
           displaySubBinding.executePendingBindings();
+
+          swipeRefresh.setRefreshing(false);
         }
       }
     });
