@@ -3,18 +3,19 @@ package com.relic.presentation.displaysub;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.chip.Chip;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,12 +23,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.relic.MainActivity;
 import com.relic.R;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubBinding;
@@ -37,6 +39,7 @@ import com.relic.presentation.adapter.PostItemAdapter;
 import com.relic.presentation.adapter.PostItemOnclick;
 import com.relic.presentation.displaypost.DisplayPostView;
 import com.relic.presentation.displaysubinfo.DisplaySubInfoView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -67,7 +70,7 @@ public class DisplaySubView extends Fragment {
         displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
 
         // initialization occurs for vm only when the view is first created
-        displaySubVM.init(subModel, new PostRepositoryImpl(this.getContext()));
+        displaySubVM.init(subModel, new SubRepositoryImpl(this.getContext()), new PostRepositoryImpl(this.getContext()));
       }
     } else {
       Toast.makeText(this.getContext(), "There was an issue loading this sub", Toast.LENGTH_SHORT).show();
@@ -103,7 +106,8 @@ public class DisplaySubView extends Fragment {
       displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
     }
 
-    subscribeToPosts();
+    // Subscribe to livedata exposed by the viewmodel
+    subscribeToVM();
 
     // recreate saved the saved instance instance
     if (savedInstanceState != null) {
@@ -143,7 +147,7 @@ public class DisplaySubView extends Fragment {
   }
 
 
-  private void subscribeToPosts() {
+  private void subscribeToVM() {
     // observe the livedata list contained in the viewmodel
     displaySubVM.getPosts().observe(this, new Observer<List<PostModel>>() {
       @Override
@@ -151,20 +155,20 @@ public class DisplaySubView extends Fragment {
         Log.d(TAG, "Post models retrieved");
         if (postModels != null) {
           Log.d(TAG, "size of " + postModels.size());
-          // tells VM to retrieve more posts if there are no posts currently stored for this sub
-//          if (postModels.size() == 0) {
-//            displaySubVM.retrieveMorePosts(true);
-//            Log.d(TAG, "Requesting more posts from vm");
-//          } else {
-//            swipeRefresh.setRefreshing(false);
-//            // update the view whenever the livedata changes
-//            Log.d(TAG, "SIZE " + postModels.size());
-//            postAdapter.setPostList(postModels);
-//          }
           postAdapter.setPostList(postModels);
           displaySubBinding.executePendingBindings();
 
           swipeRefresh.setRefreshing(false);
+        }
+      }
+    });
+
+    // observe the subreddit model
+    displaySubVM.getSubModel().observe(this, new Observer<SubredditModel>() {
+      @Override
+      public void onChanged(@Nullable SubredditModel subredditModel) {
+        if (subredditModel != null) {
+          displaySubBinding.setSubModel(subredditModel);
         }
       }
     });
@@ -213,23 +217,26 @@ public class DisplaySubView extends Fragment {
     AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
     if (appCompatActivity != null) {
       // sets title and tells user default sorting
-      ((MainActivity) getActivity()).customSetTitle(subName, "popular");
-      View title = ((MainActivity) getActivity()).customGetTitle();
-      if (title != null) {
-        title.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
+      Toolbar myToolbar = displaySubBinding.getRoot().findViewById(R.id.display_sub_toolbar);
+      TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
+      title.setText(getText(R.string.app_name));
+      ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
 
-            DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
-            Bundle bundle = new Bundle();
-            bundle.putString("name", subName);
+      // set onclick to display sub info when the title is clicked
+      title.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
 
-            displaySubInfoView.setArguments(bundle);
-            displaySubInfoView.showNow(getFragmentManager(), TAG);
-          }
-        });
-      }
+          DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
+          Bundle bundle = new Bundle();
+          bundle.putString("name", subName);
+
+          displaySubInfoView.setArguments(bundle);
+          displaySubInfoView.showNow(getFragmentManager(), TAG);
+        }
+      });
+
     }
   }
 
@@ -291,5 +298,17 @@ public class DisplaySubView extends Fragment {
     Log.d(TAG, "First position = " + manager.findFirstCompletelyVisibleItemPosition());
   }
 
-
+  @BindingAdapter({"bind:thumbnail"})
+  public static void loadBannerImage (ImageView imgView, String bannerUrl) {
+    if (bannerUrl != null) {
+      // does not load image if the banner img string is empty
+      try {
+        Log.d("DISPLAY_SUB_VIEW", "URL = " + bannerUrl);
+        Picasso.get().load(bannerUrl).fit().centerCrop().into(imgView);
+      }
+      catch (Error e) {
+        Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString());
+      }
+    }
+  }
 }

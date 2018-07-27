@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.relic.data.PostRepository;
+import com.relic.data.SubRepository;
+import com.relic.domain.Subreddit;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
@@ -20,16 +22,22 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   private final String TAG = "DISPLAYSUB_VM";
   private boolean isInitialized = false;
   private SubredditModel currentSub;
+  private SubRepository subRepo;
   private PostRepository postRepo;
 
-  private MediatorLiveData<List<PostModel>> postListMediator;
 
-  public void init(SubredditModel subModel, PostRepository postRepo) {
+  private MediatorLiveData<List<PostModel>> postListMediator;
+  private LiveData<SubredditModel> subModel;
+
+  public void init(SubredditModel subModel, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is initialized only once
     if (!isInitialized) {
       Log.d(TAG, subModel.getSubName());
       this.currentSub = subModel;
       this.postRepo = postRepo;
+      this.subRepo = subRepo;
+
+      this.subModel = subRepo.getSingleSub(subModel.getSubName());
 
       // initialize the mediator for loading posts
       postListMediator = new MediatorLiveData<>();
@@ -49,6 +57,11 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
       isInitialized = true;
     }
+  }
+
+
+  public LiveData<SubredditModel> getSubModel() {
+    return subModel;
   }
 
 

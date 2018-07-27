@@ -13,6 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.relic.MainActivity;
 import com.relic.R;
@@ -90,8 +92,9 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     displaySubsBinding.searchSubsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
 
     // sets defaults for the actionbar
-    getActivity().findViewById(R.id.my_toolbar_title).setOnClickListener(null);
-    ((MainActivity) getActivity()).customSetTitle(R.string.app_name, null);
+    //getActivity().findViewById(R.id.my_toolbar_title).setOnClickListener(null);
+    Toolbar myToolbar = displaySubsBinding.getRoot().findViewById(R.id.display_subs_toolbar);
+    ((TextView) myToolbar.findViewById(R.id.my_toolbar_title)).setText(getText(R.string.app_name));
 
     // attach the actions associated with loading the posts
     attachScrollListeners();

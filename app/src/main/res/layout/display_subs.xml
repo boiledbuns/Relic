@@ -13,11 +13,15 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/display_subs_swiperefreshlayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <include layout="@layout/toolbar"
+                android:id="@+id/display_subs_toolbar"/>
 
             <!-- displays all subscribed subs-->
             <android.support.v7.widget.RecyclerView
@@ -26,7 +30,8 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:paddingEnd="@dimen/subitem_margin"
-                android:paddingBottom="@dimen/subitem_margin"/>
+                android:paddingBottom="@dimen/subitem_margin"
+                android:layout_below="@+id/display_subs_toolbar"/>
 
             <!-- Displays search results -->
             <android.support.v7.widget.RecyclerView

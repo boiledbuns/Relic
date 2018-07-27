@@ -41,20 +41,18 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 
     setSupportActionBar(findViewById(R.id.my_toolbar));
 
-    findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Toast.makeText(getApplicationContext(), "NAVBAR", Toast.LENGTH_SHORT).show();
-      }
-    });
+//    findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
+//      @Override
+//      public void onClick(View view) {
+//        Toast.makeText(getApplicationContext(), "NAVBAR", Toast.LENGTH_SHORT).show();
+//      }
+//    });
   }
 
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
     super.onCreate(savedInstanceState, persistentState);
-    // removes custom title
-    getSupportActionBar().setTitle("");
   }
 
 
@@ -75,42 +73,38 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
       getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
-
-    // initialize references to the title
-    titleTW = findViewById(R.id.my_toolbar_title);
-    subtitleTW= findViewById(R.id.my_toolbar_subtitle);
   }
 
-  public void customSetTitle (String title, String subtitle) {
-    if (titleTW != null) {
-      titleTW.setText(title);
-    }
-    if (subtitleTW != null) {
-      subtitleTW.setText(subtitle);
-    } else {
-      subtitleTW.setText("");
-    }
-  }
-
-  public void customSetTitle (int resId, String subtitle) {
-    if (titleTW != null) {
-      titleTW.setText(resId);
-    }
-    if (subtitleTW != null) {
-      subtitleTW.setText(subtitle);
-    } else {
-      subtitleTW.setText("");
-    }
-  }
-
-
-  public TextView customGetTitle() {
-    return findViewById(R.id.my_toolbar_title);
-  }
-
-  public View customGetActionbar() {
-    return findViewById(R.id.my_toolbar);
-  }
+//  public void customSetTitle (String title, String subtitle) {
+//    if (titleTW != null) {
+//      titleTW.setText(title);
+//    }
+//    if (subtitleTW != null) {
+//      subtitleTW.setText(subtitle);
+//    } else {
+//      subtitleTW.setText("");
+//    }
+//  }
+//
+//  public void customSetTitle (int resId, String subtitle) {
+//    if (titleTW != null) {
+//      titleTW.setText(resId);
+//    }
+//    if (subtitleTW != null) {
+//      subtitleTW.setText(subtitle);
+//    } else {
+//      subtitleTW.setText("");
+//    }
+//  }
+//
+//
+//  public TextView customGetTitle() {
+//    return findViewById(R.id.my_toolbar_title);
+//  }
+//
+//  public View customGetActionbar() {
+//    return findViewById(R.id.my_toolbar);
+//  }
 
 }
 
