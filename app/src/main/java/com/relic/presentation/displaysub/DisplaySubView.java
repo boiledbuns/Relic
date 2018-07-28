@@ -63,14 +63,13 @@ public class DisplaySubView extends Fragment {
 
     if (this.getArguments() != null) {
       // parse the SubredditModel from the arguments
-      SubredditModel subModel = this.getArguments().getParcelable("SubredditModel");
-      if (subModel != null) {
-        subName = subModel.getSubName();
+      String subredditName = this.getArguments().getString("SubredditName");
+      if (subredditName != null) {
         // get the viewmodel and inject the dependencies into it
         displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
 
         // initialization occurs for vm only when the view is first created
-        displaySubVM.init(subModel, new SubRepositoryImpl(this.getContext()), new PostRepositoryImpl(this.getContext()));
+        displaySubVM.init(subredditName, new SubRepositoryImpl(this.getContext()), new PostRepositoryImpl(this.getContext()));
       }
     } else {
       Toast.makeText(this.getContext(), "There was an issue loading this sub", Toast.LENGTH_SHORT).show();

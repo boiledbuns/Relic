@@ -2,7 +2,6 @@ package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
@@ -10,7 +9,6 @@ import android.util.Log;
 
 import com.relic.data.PostRepository;
 import com.relic.data.SubRepository;
-import com.relic.domain.Subreddit;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
@@ -19,29 +17,26 @@ import java.util.List;
 
 
 public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
-  private final String TAG = "DISPLAYSUB_VM";
+  private final String TAG = "DISPLAY_SUB_VM";
   private boolean isInitialized = false;
-  private SubredditModel currentSub;
+  private String subName;
   private SubRepository subRepo;
   private PostRepository postRepo;
 
-
   private MediatorLiveData<List<PostModel>> postListMediator;
-  private LiveData<SubredditModel> subModel;
+  private MediatorLiveData<SubredditModel> subMediator;
 
-  public void init(SubredditModel subModel, SubRepository subRepo, PostRepository postRepo) {
+  public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is initialized only once
     if (!isInitialized) {
-      Log.d(TAG, subModel.getSubName());
-      this.currentSub = subModel;
+      Log.d(TAG, subredditName);
+      subName = subredditName;
       this.postRepo = postRepo;
       this.subRepo = subRepo;
 
-      this.subModel = subRepo.getSingleSub(subModel.getSubName());
-
       // initialize the mediator for loading posts
       postListMediator = new MediatorLiveData<>();
-      postListMediator.addSource(postRepo.getPosts(currentSub.getSubName()), new Observer<List<PostModel>>() {
+      postListMediator.addSource(postRepo.getPosts(subName), new Observer<List<PostModel>>() {
         @Override
         public void onChanged(@Nullable List<PostModel> postModels) {
           if (postModels.isEmpty()) {
@@ -54,20 +49,35 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
         }
 
       });
-
       isInitialized = true;
     }
+
+    this.subMediator = new MediatorLiveData<>();
+    this.subMediator.addSource(subRepo.getSingleSub(subName), new Observer<SubredditModel>() {
+      @Override
+      public void onChanged(@Nullable SubredditModel newModel) {
+        if (newModel == null) {
+          Log.d(TAG, "No subreddit not saved locally, retrieving from network");
+          subRepo.retrieveSingleSub(subName);
+        }
+        else {
+          Log.d(TAG, "Subreddit loaded");
+          subMediator.setValue(newModel);
+        }
+      }
+    });
+
   }
 
 
   public LiveData<SubredditModel> getSubModel() {
-    return subModel;
+    return subMediator;
   }
 
 
   @Override
   public String getSubName() {
-    return currentSub.getSubName();
+    return subName;
   }
 
 
@@ -87,11 +97,11 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public void retrieveMorePosts(boolean resetPosts) {
     if (resetPosts) {
       // we pass null for the value of next to tell repo that we're refreshing
-      postRepo.retrieveMorePosts(currentSub.getSubName(), null);
+      postRepo.retrieveMorePosts(subName, null);
     }
     else {
       // retrieve the "after" value for the next posting
-      postRepo.getNextPostingVal(this, currentSub.getSubName());
+      postRepo.getNextPostingVal(this, subName);
     }
   }
 
@@ -100,7 +110,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public void onNextListing(String nextVal) {
     Log.d(TAG, "Retrieving next posts with " + nextVal);
     // retrieve the "after" value for the next posting
-    postRepo.retrieveMorePosts(currentSub.getSubName(), nextVal);
+    postRepo.retrieveMorePosts(subName, nextVal);
   }
 
 }

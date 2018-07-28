@@ -235,7 +235,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
       // add the subreddit object to the bundle
       Bundle bundle = new Bundle();
-      bundle.putParcelable("SubredditModel", subItem);
+      bundle.putString("SubredditName", subItem.getSubName());
 
       DisplaySubView subFrag = new DisplaySubView();
       subFrag.setArguments(bundle);
@@ -250,7 +250,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   class OnClickSearchSubItem implements SearchSubItemOnClick {
     LifecycleOwner owner;
 
-    public OnClickSearchSubItem (Fragment fragment) {
+    OnClickSearchSubItem (Fragment fragment) {
       // initializes reference to a lifecycle owner
       owner = fragment;
     }
@@ -259,25 +259,17 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     public void onClick(String subName) {
       Log.d(TAG, "Search item clicked");
 
-      SubRepository subRepo = new SubRepositoryImpl(getContext());
-      subRepo.getSingleSub(subName).observe(owner, (SubredditModel subModel) -> {
-        if (subModel == null) {
-          // retrieve the sub if it hasn't already been downloaded
-          subRepo.retrieveSingleSub(subName);
-        }
-        else {
-            // add the subreddit object to the bundle
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("SubredditModel", subModel);
+      // add the subreddit object to the bundle
+      Bundle bundle = new Bundle();
+      bundle.putString("SubredditName", subName);
 
-            DisplaySubView subFrag = new DisplaySubView();
-            subFrag.setArguments(bundle);
+      DisplaySubView subFrag = new DisplaySubView();
+      subFrag.setArguments(bundle);
 
-            // replace the current screen with the newly created fragment
-            getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
-        }
-      });
+      // replace the current screen with the newly created fragment
+      getActivity().getSupportFragmentManager().beginTransaction()
+          .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+
     }
   }
 
