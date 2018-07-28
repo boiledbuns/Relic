@@ -47,8 +47,10 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
             postListMediator.setValue(postModels);
           }
         }
-
       });
+      // retrieve the banner image from the subredddit css
+      subRepo.getSubGateway().retrieveSubBanner(subName);
+
       isInitialized = true;
     }
 
@@ -61,7 +63,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
           subRepo.retrieveSingleSub(subName);
         }
         else {
-          Log.d(TAG, "Subreddit loaded");
+          Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl());
           subMediator.setValue(newModel);
         }
       }

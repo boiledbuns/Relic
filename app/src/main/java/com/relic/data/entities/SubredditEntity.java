@@ -29,7 +29,7 @@ public class SubredditEntity {
   public String display_name;
 
   @ColumnInfo(name = "bannerUrl")
-  public String banner_url;
+  public String banner_background_image;
   @ColumnInfo(name = "iconUrl")
   public String icon_img;
 

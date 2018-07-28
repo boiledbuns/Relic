@@ -51,6 +51,7 @@ public class DisplaySubView extends Fragment {
 
   private SearchView searchView;
   private MenuItem searchMenuItem;
+  private Toolbar myToolbar;
 
   private DisplaySubBinding displaySubBinding;
   private PostItemAdapter postAdapter;
@@ -64,6 +65,7 @@ public class DisplaySubView extends Fragment {
     if (this.getArguments() != null) {
       // parse the SubredditModel from the arguments
       String subredditName = this.getArguments().getString("SubredditName");
+      subName = subredditName;
       if (subredditName != null) {
         // get the viewmodel and inject the dependencies into it
         displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
@@ -212,31 +214,27 @@ public class DisplaySubView extends Fragment {
    * Initializes actionbar menus and on clicks
    */
   private void initializeActionbar() {
-    // need to obtain a reference to appcompatactivity to use the support action bar
-    AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
-    if (appCompatActivity != null) {
-      // sets title and tells user default sorting
-      Toolbar myToolbar = displaySubBinding.getRoot().findViewById(R.id.display_sub_toolbar);
-      TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
-      title.setText(getText(R.string.app_name));
-      ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
+    // initialize reference to toolbar and the main title
+    myToolbar = displaySubBinding.getRoot().findViewById(R.id.display_sub_toolbar);
+    TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
 
-      // set onclick to display sub info when the title is clicked
-      title.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
+    title.setText(subName);
+    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
 
-          DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
-          Bundle bundle = new Bundle();
-          bundle.putString("name", subName);
+    // set onclick to display sub info when the title is clicked
+    title.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
 
-          displaySubInfoView.setArguments(bundle);
-          displaySubInfoView.showNow(getFragmentManager(), TAG);
-        }
-      });
+        DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
+        Bundle bundle = new Bundle();
+        bundle.putString("name", subName);
 
-    }
+        displaySubInfoView.setArguments(bundle);
+        displaySubInfoView.showNow(getFragmentManager(), TAG);
+      }
+    });
   }
 
 
@@ -297,13 +295,13 @@ public class DisplaySubView extends Fragment {
     Log.d(TAG, "First position = " + manager.findFirstCompletelyVisibleItemPosition());
   }
 
-  @BindingAdapter({"bind:thumbnail"})
-  public static void loadBannerImage (ImageView imgView, String bannerUrl) {
-    if (bannerUrl != null) {
+  @BindingAdapter({"bind:bannerImage"})
+  public static void loadBannerImage (ImageView bannerImageView, String bannerUrl) {
+    if (bannerUrl != null && !bannerUrl.isEmpty()) {
       // does not load image if the banner img string is empty
       try {
         Log.d("DISPLAY_SUB_VIEW", "URL = " + bannerUrl);
-        Picasso.get().load(bannerUrl).fit().centerCrop().into(imgView);
+        Picasso.get().load(bannerUrl).fit().centerCrop().into(bannerImageView);
       }
       catch (Error e) {
         Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString());

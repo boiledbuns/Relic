@@ -29,7 +29,7 @@ public abstract class SubredditDao {
   @Query("DELETE FROM SubredditEntity")
   public abstract void deleteAll();
 
-  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description FROM SubredditEntity WHERE name = :subName")
+  @Query("SELECT id, name, bannerImgUrl, nsfw, isSubscribed, subscriberCount, description FROM SubredditEntity WHERE name = :subName")
   public abstract LiveData<SubredditModel> getSub(String subName);
 
   @Query("SELECT * FROM SubredditEntity WHERE name LIKE :search")

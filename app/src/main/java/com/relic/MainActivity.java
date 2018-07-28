@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
         .replace(R.id.main_content_frame, loginFragment).commit();
     }
 
-    setSupportActionBar(findViewById(R.id.my_toolbar));
-
 //    findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
 //      @Override
 //      public void onClick(View view) {

@@ -14,6 +14,7 @@ public class SubredditModel implements Subreddit, Parcelable {
   public String id;
   public String name;
   public String bannerUrl;
+  public String bannerImgUrl;
   public boolean nsfw;
   private boolean isSubscribed;
   private int subscriberCount;
@@ -45,7 +46,7 @@ public class SubredditModel implements Subreddit, Parcelable {
 
   @Override
   public String getBannerUrl() {
-    return bannerUrl;
+    return bannerImgUrl;
   }
 
   @Override

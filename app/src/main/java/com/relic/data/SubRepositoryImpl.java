@@ -86,7 +86,7 @@ public class SubRepositoryImpl implements SubRepository {
         Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
         response -> {
           try {
-            List<SubredditEntity> subreddts = parseSubreddits(response);
+            //List<SubredditEntity> subreddits = parseSubreddits(response);
             // insert the subs and listing into the room instance
             new InsertSubsTask(this, appDb, parseAfterValue(response),
                 parseSubreddits(response), after == null).execute(parseAfterValue(response).afterPosting);
@@ -120,7 +120,8 @@ public class SubRepositoryImpl implements SubRepository {
 
     while (subIterator.hasNext()) {
       JSONObject currentSub = (JSONObject) ((JSONObject) subIterator.next()).get("data");
-      Log.d(TAG, "keys = " + currentSub.keySet());
+      //Log.d(TAG, "keys = " + currentSub.keySet());
+      Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
       subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity.class));
     }
 

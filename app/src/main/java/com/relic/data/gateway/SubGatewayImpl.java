@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.relic.R;
 import com.relic.data.ApplicationDB;
 import com.relic.data.Request.RedditOauthRequest;
@@ -155,4 +157,47 @@ public class SubGatewayImpl implements SubGateway {
 
     return info;
   }
+
+
+  @Override
+  public void retrieveSubBanner(String subName) {
+    String end = ENDPOINT + "r/" + subName + "/stylesheet.css";
+    requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
+      (String response) -> {
+        Log.d(TAG, "subname css : " + response);
+
+
+        int position = response.indexOf("#header");
+        response = response.substring(position);
+
+        // jump to the position of the css property for the banner image
+        String backgroundProp = "background-image:url(";
+        int bannerUrlPosition = response.indexOf(backgroundProp) + backgroundProp.length() + 1 ;
+        
+        // proceed if a background image was found at all
+        if (bannerUrlPosition == backgroundProp.length() + 1) {
+          Log.d(TAG, " position of banner URL " + bannerUrlPosition);
+
+          boolean complete = false;
+          StringBuilder stringBuilder = new StringBuilder();
+          // iterate through the response from that position until the full banner image url is parsed
+          while (!complete) {
+            char charAtPosition = response.charAt(bannerUrlPosition);
+            // set loop flag to false if the end of the url is found
+            if (charAtPosition == '"') {
+              complete = true;
+            } else {
+              stringBuilder.append(charAtPosition);
+              bannerUrlPosition++;
+            }
+          }
+          Log.d(TAG, " banner url = " + stringBuilder.toString());
+        }
+
+      }, (VolleyError error) -> {
+        Log.d(TAG, "Error retrieving response from server " + error.toString());
+      }, authToken));
+  }
+
+
 }

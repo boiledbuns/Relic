@@ -51,8 +51,9 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   private DisplaySubsBinding displaySubsBinding;
   private SwipeRefreshLayout swipeRefreshLayout;
 
-  SubItemAdapter subAdapter;
-  SearchItemAdapter searchItemAdapter;
+  private Toolbar myToolbar;
+  private SubItemAdapter subAdapter;
+  private SearchItemAdapter searchItemAdapter;
 
   private MutableLiveData<Boolean> searchIsVisible;
 
@@ -93,7 +94,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
     // sets defaults for the actionbar
     //getActivity().findViewById(R.id.my_toolbar_title).setOnClickListener(null);
-    Toolbar myToolbar = displaySubsBinding.getRoot().findViewById(R.id.display_subs_toolbar);
+    myToolbar = displaySubsBinding.getRoot().findViewById(R.id.display_subs_toolbar);
     ((TextView) myToolbar.findViewById(R.id.my_toolbar_title)).setText(getText(R.string.app_name));
 
     // attach the actions associated with loading the posts
@@ -115,6 +116,8 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+
     super.onCreateOptionsMenu(menu, inflater);
     inflater.inflate(R.menu.search_menu, menu);
 

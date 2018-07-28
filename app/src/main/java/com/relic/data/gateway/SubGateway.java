@@ -8,4 +8,6 @@ public interface SubGateway {
 
   LiveData<Boolean> subscribe(String subreddit);
   LiveData<Boolean> unsubscribe(String subreddit);
+
+  void retrieveSubBanner(String subreddit);
 }

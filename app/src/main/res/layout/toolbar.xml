@@ -17,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/toolbar_h1"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:text="test"/>
 
         <TextView
             android:id="@+id/my_toolbar_subtitle"
