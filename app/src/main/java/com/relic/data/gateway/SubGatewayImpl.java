@@ -166,14 +166,13 @@ public class SubGatewayImpl implements SubGateway {
       (String response) -> {
         Log.d(TAG, "subname css : " + response);
 
-
         int position = response.indexOf("#header");
         response = response.substring(position);
 
         // jump to the position of the css property for the banner image
         String backgroundProp = "background-image:url(";
         int bannerUrlPosition = response.indexOf(backgroundProp) + backgroundProp.length() + 1 ;
-        
+
         // proceed if a background image was found at all
         if (bannerUrlPosition == backgroundProp.length() + 1) {
           Log.d(TAG, " position of banner URL " + bannerUrlPosition);

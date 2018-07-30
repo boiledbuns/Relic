@@ -61,6 +61,7 @@ public class DisplaySubView extends Fragment {
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
 
     if (this.getArguments() != null) {
       // parse the SubredditModel from the arguments
@@ -93,7 +94,6 @@ public class DisplaySubView extends Fragment {
 
     attachScrollListeners();
     initializeActionbar();
-    setHasOptionsMenu(true);
     return displaySubBinding.getRoot();
   }
 
@@ -218,23 +218,24 @@ public class DisplaySubView extends Fragment {
     myToolbar = displaySubBinding.getRoot().findViewById(R.id.display_sub_toolbar);
     TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
 
-    title.setText(subName);
-    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
+//    title.setText(subName);
+//    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
+    myToolbar.setTitle(subName);
 
     // set onclick to display sub info when the title is clicked
-    title.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
-
-        DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
-        Bundle bundle = new Bundle();
-        bundle.putString("name", subName);
-
-        displaySubInfoView.setArguments(bundle);
-        displaySubInfoView.showNow(getFragmentManager(), TAG);
-      }
-    });
+//    title.setOnClickListener(new View.OnClickListener() {
+//      @Override
+//      public void onClick(View view) {
+//        Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
+//
+//        DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
+//        Bundle bundle = new Bundle();
+//        bundle.putString("name", subName);
+//
+//        displaySubInfoView.setArguments(bundle);
+//        displaySubInfoView.showNow(getFragmentManager(), TAG);
+//      }
+//    });
   }
 
 

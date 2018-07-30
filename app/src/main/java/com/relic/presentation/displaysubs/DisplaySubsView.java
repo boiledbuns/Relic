@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
@@ -93,9 +94,13 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     displaySubsBinding.searchSubsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
 
     // sets defaults for the actionbar
-    //getActivity().findViewById(R.id.my_toolbar_title).setOnClickListener(null);
     myToolbar = displaySubsBinding.getRoot().findViewById(R.id.display_subs_toolbar);
     ((TextView) myToolbar.findViewById(R.id.my_toolbar_title)).setText(getText(R.string.app_name));
+
+    AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+    if (parentActivity != null) {
+      parentActivity.setSupportActionBar(myToolbar);
+    }
 
     // attach the actions associated with loading the posts
     attachScrollListeners();
@@ -116,8 +121,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-
     super.onCreateOptionsMenu(menu, inflater);
     inflater.inflate(R.menu.search_menu, menu);
 

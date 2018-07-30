@@ -5,8 +5,7 @@
     android:id="@+id/my_toolbar"
     android:layout_width="match_parent"
     android:layout_height="@dimen/toolbar_height"
-    android:background="?attr/colorPrimary"
-    android:elevation="@dimen/toolbar_height">
+    android:background="?attr/colorPrimary">
 
     <RelativeLayout
         android:layout_width="match_parent"
