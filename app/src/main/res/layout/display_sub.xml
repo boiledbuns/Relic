@@ -21,20 +21,28 @@
             <android.support.design.widget.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:contentScrim="@color/backgroundSecondary">
 
-                <ImageView
-                    android:id="@+id/display_sub_banner"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:bannerImage="@{subModel.bannerUrl}"
-                    app:layout_collapseMode="parallax"/>
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.2">
 
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/display_sub_toolbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/toolbar_height"
-                    app:layout_collapseMode="pin"/>
+                    <ImageView
+                        android:id="@+id/display_sub_banner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:bannerImage="@{subModel.bannerUrl}"/>
+
+                </RelativeLayout>
+
+                <include layout="@layout/toolbar"
+                     android:id="@+id/display_sub_toolbar"
+                     android:layout_width="match_parent"
+                     android:layout_height="@dimen/toolbar_height"
+                     app:layout_collapseMode="pin"/>
 
                 <!--<RelativeLayout-->
                     <!--android:layout_width="match_parent"-->

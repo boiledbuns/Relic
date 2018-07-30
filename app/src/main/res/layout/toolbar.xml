@@ -4,12 +4,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/my_toolbar"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/toolbar_height"
-    android:background="?attr/colorPrimary">
+    android:layout_height="@dimen/toolbar_height">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/my_toolbar_title"

@@ -222,6 +222,7 @@ public class DisplaySubView extends Fragment {
 //    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
     myToolbar.setTitle(subName);
 
+    ((AppCompatActivity) getActivity()).setSupportActionBar(myToolbar);
     // set onclick to display sub info when the title is clicked
 //    title.setOnClickListener(new View.OnClickListener() {
 //      @Override
@@ -236,6 +237,7 @@ public class DisplaySubView extends Fragment {
 //        displaySubInfoView.showNow(getFragmentManager(), TAG);
 //      }
 //    });
+
   }
 
 
