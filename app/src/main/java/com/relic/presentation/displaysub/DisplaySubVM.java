@@ -19,6 +19,7 @@ import java.util.List;
 public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
   private final String TAG = "DISPLAY_SUB_VM";
   private boolean isInitialized = false;
+
   private String subName;
   private SubRepository subRepo;
   private PostRepository postRepo;
@@ -29,7 +30,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is initialized only once
     if (!isInitialized) {
-      Log.d(TAG, subredditName);
+      Log.d(TAG, "VM to display " + subredditName + " initialized");
       subName = subredditName;
       this.postRepo = postRepo;
       this.subRepo = subRepo;
@@ -48,27 +49,27 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
           }
         }
       });
+
       // retrieve the banner image from the subredddit css
       subRepo.getSubGateway().retrieveSubBanner(subName);
 
+      this.subMediator = new MediatorLiveData<>();
+      this.subMediator.addSource(subRepo.getSingleSub(subName), new Observer<SubredditModel>() {
+        @Override
+        public void onChanged(@Nullable SubredditModel newModel) {
+          if (newModel == null) {
+            Log.d(TAG, "No subreddit not saved locally, retrieving from network");
+            subRepo.retrieveSingleSub(subName);
+          }
+          else {
+            Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl());
+            subMediator.setValue(newModel);
+          }
+        }
+      });
+
       isInitialized = true;
     }
-
-    this.subMediator = new MediatorLiveData<>();
-    this.subMediator.addSource(subRepo.getSingleSub(subName), new Observer<SubredditModel>() {
-      @Override
-      public void onChanged(@Nullable SubredditModel newModel) {
-        if (newModel == null) {
-          Log.d(TAG, "No subreddit not saved locally, retrieving from network");
-          subRepo.retrieveSingleSub(subName);
-        }
-        else {
-          Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl());
-          subMediator.setValue(newModel);
-        }
-      }
-    });
-
   }
 
 
@@ -115,4 +116,8 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     postRepo.retrieveMorePosts(subName, nextVal);
   }
 
+  public void clearVM () {
+    Log.d(TAG, "View model cleard");
+    super.onCleared();
+  }
 }

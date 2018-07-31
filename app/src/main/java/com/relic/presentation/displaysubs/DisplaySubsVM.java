@@ -18,30 +18,37 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import java.util.List;
 
 public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback, RetrieveNextListingCallback{
-  final String TAG = "DISPLAY_SUBS_VM";
+  private final String TAG = "DISPLAY_SUBS_VM";
+  private boolean initialized;
 
   private SubRepository subRepo;
   private ListingRepository listingRepo;
-  private Authenticator auth;
+  private Authenticator authenticator ;
 
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
   private MutableLiveData <List<String>> searchResults;
 
 
   public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
-    subRepo = subRepository;
-    listingRepo = ListingRepository;
-    this.auth = auth;
-    auth.refreshToken(this);
+    // initialize the viewmodel only if it hasn't already been initialized
+    if (!initialized) {
+      Log.d(TAG, "subreddit initialized");
 
-    // initialize the livedata with null value until we get db values
-    searchResults = new MediatorLiveData<>();
-    searchResults.setValue(null);
-    obvSubsMediator = new MediatorLiveData<>();
-    obvSubsMediator.setValue(null);
+      subRepo = subRepository;
+      listingRepo = ListingRepository;
+      authenticator = auth;
+      auth.refreshToken(this);
 
-    // add the live data from the repo as a source
-    obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
+      // initialize the livedata with null value until we get db values
+      searchResults = new MediatorLiveData<>();
+      searchResults.setValue(null);
+
+      // initialize the subreddit mediator with subscribed subs data
+      obvSubsMediator = new MediatorLiveData<>();
+      obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
+
+      initialized = true;
+    }
   }
 
 
@@ -63,7 +70,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   public void retrieveMoreSubs(boolean resetPosts) {
     if (resetPosts) {
       // refresh token before performing any requests
-      auth.refreshToken(this);
+      authenticator.refreshToken(this);
       subRepo.retrieveMoreSubscribedSubs(null);
     }
   }
@@ -80,7 +87,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     Log.d(TAG, "Retrieving search results for " + query);
 
     // retrieves search results only if the query is non empty
-    // also ignores first entry as query when the sea
+    // also ignores first query entry (always empty)
     if (!query.isEmpty()) {
       // replaces the current livedata with a new one based on new query string
       subRepo.searchSubreddits(searchResults, query);

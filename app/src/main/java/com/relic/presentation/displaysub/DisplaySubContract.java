@@ -20,5 +20,7 @@ public class DisplaySubContract {
     String getSubName();
 
     void retrieveMorePosts(boolean resetPosts);
+
+    void clearVM();
   }
 }

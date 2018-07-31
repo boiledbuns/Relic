@@ -7,6 +7,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -67,11 +68,10 @@ public class DisplaySubView extends Fragment {
       // parse the SubredditModel from the arguments
       String subredditName = this.getArguments().getString("SubredditName");
       subName = subredditName;
-      if (subredditName != null) {
-        // get the viewmodel and inject the dependencies into it
-        displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
 
-        // initialization occurs for vm only when the view is first created
+      if (subredditName != null && getActivity()!= null) {
+        // get the viewmodel and inject the dependencies into it
+        displaySubVM = ViewModelProviders.of(getActivity()).get(DisplaySubVM.class);
         displaySubVM.init(subredditName, new SubRepositoryImpl(this.getContext()), new PostRepositoryImpl(this.getContext()));
       }
     } else {
@@ -115,9 +115,12 @@ public class DisplaySubView extends Fragment {
       Integer position = savedInstanceState.getInt(SCROLL_POSITION);
       Log.d(TAG, "Previous position = " + position);
       // scroll to the previous position before reconfiguration change
-      displaySubBinding.displayPostsRecyclerview.smoothScrollToPosition(position);
+
+      // Temporary fix until a better solution is found for jumping to last view position on
+      //displaySubBinding.displayPostsRecyclerview.smoothScrollToPosition(position);
     }
   }
+
 
 
   @Override
@@ -222,21 +225,25 @@ public class DisplaySubView extends Fragment {
 //    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
     myToolbar.setTitle(subName);
 
-    ((AppCompatActivity) getActivity()).setSupportActionBar(myToolbar);
+    AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+    if (parentActivity != null) {
+      parentActivity.setSupportActionBar(myToolbar);
+    }
+
     // set onclick to display sub info when the title is clicked
-//    title.setOnClickListener(new View.OnClickListener() {
-//      @Override
-//      public void onClick(View view) {
-//        Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
-//
-//        DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
-//        Bundle bundle = new Bundle();
-//        bundle.putString("name", subName);
-//
-//        displaySubInfoView.setArguments(bundle);
-//        displaySubInfoView.showNow(getFragmentManager(), TAG);
-//      }
-//    });
+    title.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
+
+        DisplaySubInfoView displaySubInfoView = new DisplaySubInfoView();
+        Bundle bundle = new Bundle();
+        bundle.putString("name", subName);
+
+        displaySubInfoView.setArguments(bundle);
+        displaySubInfoView.showNow(getFragmentManager(), TAG);
+      }
+    });
 
   }
 
@@ -310,5 +317,12 @@ public class DisplaySubView extends Fragment {
         Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString());
       }
     }
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    // clear the vm as it is tied to activity context
+    displaySubVM.clearVM();
   }
 }

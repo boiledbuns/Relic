@@ -13,6 +13,8 @@ public interface SubRepository {
 
   LiveData<List<SubredditModel>> getSubscribedSubs();
 
+  //LiveData<Boolean> onAllSubsRetrieved();
+
   /**
    * Fetches and stores more Subreddits from the Reddit API into the local database
    * @param after the "after" value to fetch the next list of subscribed subreddits (as the results
@@ -21,8 +23,8 @@ public interface SubRepository {
   void retrieveMoreSubscribedSubs(String after);
 
   LiveData<SubredditModel> getSingleSub(String subName);
-  void retrieveSingleSub(String subName);
 
+  void retrieveSingleSub(String subName);
 
   LiveData<List<SubredditModel>> findSubreddit(String name);
 

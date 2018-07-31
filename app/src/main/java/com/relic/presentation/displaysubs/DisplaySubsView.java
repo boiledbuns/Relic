@@ -63,12 +63,14 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
 
-    // retrieve the instance of the viewmodel and attach a reference to it in this view
-    viewModel = ViewModelProviders.of(this).get(DisplaySubsVM.class);
+    if (getActivity() != null) {
+      // retrieve the instance of the viewmodel and attach a reference to it in this view
+      viewModel = ViewModelProviders.of(getActivity()).get(DisplaySubsVM.class);
 
-    // initialize the repository and inject it into the viewmodel
-    viewModel.init(new SubRepositoryImpl(getContext()), new ListingRepositoryImpl(getContext()),
-        Authenticator.getAuthenticator(this.getContext()));
+      // initialize the repository and inject it into the viewmodel
+      viewModel.init(new SubRepositoryImpl(getContext()), new ListingRepositoryImpl(getContext()),
+          Authenticator.getAuthenticator(this.getContext()));
+    }
   }
 
 
@@ -220,7 +222,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         // refresh the current list and retrieve more posts
         subAdapter.resetSubList();
         viewModel.retrieveMoreSubs(true);
-        // TODO start the loading animation for the screen
+        //swipeRefreshLayout.setRefreshing(true);
       }
     });
   }
@@ -228,7 +230,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
   @Override
   public void onAllSubsLoaded() {
-    // TODO: stop the loading animation
+    swipeRefreshLayout.setRefreshing(false);
   }
 
 
