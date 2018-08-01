@@ -2,13 +2,9 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -45,6 +41,7 @@ public class SubRepositoryImpl implements SubRepository {
   private JSONParser parser;
   private Gson gson;
 
+  private MutableLiveData <Boolean> allSubscribedSubsLoaded;
 
   public SubRepositoryImpl(Context context) {
     Authenticator auth = new Authenticator(context);
@@ -60,8 +57,20 @@ public class SubRepositoryImpl implements SubRepository {
         .getString(tokenKey, "DEFAULT");
 
     appDb = ApplicationDB.getDatabase(context);
+    initializeLivedata();
   }
 
+
+  private void initializeLivedata() {
+    allSubscribedSubsLoaded = new MutableLiveData<>();
+    allSubscribedSubsLoaded.setValue(true);
+  }
+
+
+  @Override
+  public LiveData<Boolean> getAllSubscribedSubsLoaded() {
+    return allSubscribedSubsLoaded;
+  }
 
   /**
    * Returns the list of subscribed subs from the database
@@ -80,6 +89,10 @@ public class SubRepositoryImpl implements SubRepository {
     if (after != null) {
       ending = "?limit=50&after=" + after;
     }
+    else {
+      // update livedata to show that not all subs are loaded
+      allSubscribedSubsLoaded.setValue(false);
+    }
 
     // create the new request to reddit servers and store the data in persistence layer
     volleyQueue.add(new RedditOauthRequest(
@@ -89,7 +102,7 @@ public class SubRepositoryImpl implements SubRepository {
             //List<SubredditEntity> subreddits = parseSubreddits(response);
             // insert the subs and listing into the room instance
             new InsertSubsTask(this, appDb, parseAfterValue(response),
-                parseSubreddits(response), after == null).execute(parseAfterValue(response).afterPosting);
+                parseSubreddits(response), after == null, allSubscribedSubsLoaded).execute(parseAfterValue(response).afterPosting);
 
           } catch (ParseException e) {
             Log.e(TAG, "Error parsing the response: " + e.toString());
@@ -165,13 +178,15 @@ public class SubRepositoryImpl implements SubRepository {
     private String after;
     private ListingEntity listing;
     private boolean delete;
+    private MutableLiveData <Boolean> allSubbedSubsLoaded;
 
-    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditEntity> subs, boolean delete) {
+    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditEntity> subs, boolean delete, MutableLiveData <Boolean> allSubbedSubsLoaded) {
       this.subDB = subDB;
       this.subRepo = subRepo;
       this.subs = subs;
       this.listing = listing;
       this.delete = delete;
+      this.allSubbedSubsLoaded = allSubbedSubsLoaded;
     }
 
     @Override
@@ -195,7 +210,10 @@ public class SubRepositoryImpl implements SubRepository {
       if (after != null) {
         // retrieve more subs without refreshing if the string is null
         subRepo.retrieveMoreSubscribedSubs(after);
+      } else {
+        allSubbedSubsLoaded.setValue(true);
       }
+
     }
   }
 

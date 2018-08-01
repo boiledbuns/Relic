@@ -14,6 +14,8 @@ public interface DisplaySubsContract {
   interface VM {
     void init(SubRepository subRepo, ListingRepository listingRepo, Authenticator auth);
 
+    LiveData<Boolean> getAllSubscribedSubsLoaded();
+
     LiveData<List<SubredditModel>> getSubscribedList();
 
     void retrieveMoreSubs(boolean resetPosts);

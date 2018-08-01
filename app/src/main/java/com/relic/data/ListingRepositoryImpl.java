@@ -1,5 +1,7 @@
 package com.relic.data;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -14,35 +16,55 @@ public class ListingRepositoryImpl implements ListingRepository {
 
   private ApplicationDB appDB;
 
+  private MutableLiveData<String> listingKey;
+
 
   public ListingRepositoryImpl (Context context) {
     //TODO convert VolleyQueue into a singleton
     appDB = ApplicationDB.getDatabase(context);
+
+    // initialize the listing key
+    listingKey = new MutableLiveData<>();
   }
 
+
   @Override
-  public void getKey(String key, RetrieveNextListingCallback callback) {
+  public LiveData<String> getKey() {
+    return listingKey;
+  }
+
+
+  @Override
+  public void retrieveKey(String key) {
     if (key != null) {
-      new RetrieveListingAfterTask(appDB, callback).execute(key);
+      new RetrieveListingAfterTask(appDB, listingKey).execute(key);
     }
   }
 
+
   static class RetrieveListingAfterTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB appDB;
-    RetrieveNextListingCallback callback;
+    MutableLiveData<String> listingKey;
+    String key;
 
-    RetrieveListingAfterTask(ApplicationDB appDB, RetrieveNextListingCallback callback) {
+    RetrieveListingAfterTask(ApplicationDB appDB, MutableLiveData<String> listingKey) {
       super();
       this.appDB = appDB;
-      this.callback = callback;
+      this.listingKey = listingKey;
     }
 
     @Override
     protected Integer doInBackground(String... strings) {
       // get the "after" value for the string value
-      String subAfter = appDB.getListingDAO().getNext(strings[0]);
-      callback.onNextListing(subAfter);
+      key = appDB.getListingDAO().getNext(strings[0]);
       return null;
+    }
+
+    @Override
+    protected void onPostExecute(Integer integer) {
+      super.onPostExecute(integer);
+      listingKey.setValue(key);
+      listingKey.setValue(key);
     }
   }
 

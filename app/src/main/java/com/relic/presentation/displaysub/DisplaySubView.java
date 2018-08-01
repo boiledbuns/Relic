@@ -102,11 +102,6 @@ public class DisplaySubView extends Fragment {
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
 
-    if (displaySubVM == null) {
-      // fetch the viewmodel if the fragment survives a reconfiguration change
-      displaySubVM = ViewModelProviders.of(this).get(DisplaySubVM.class);
-    }
-
     // Subscribe to livedata exposed by the viewmodel
     subscribeToVM();
 
@@ -319,10 +314,4 @@ public class DisplaySubView extends Fragment {
     }
   }
 
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    // clear the vm as it is tied to activity context
-    displaySubVM.clearVM();
-  }
 }

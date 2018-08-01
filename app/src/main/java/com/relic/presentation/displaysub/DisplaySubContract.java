@@ -21,6 +21,5 @@ public class DisplaySubContract {
 
     void retrieveMorePosts(boolean resetPosts);
 
-    void clearVM();
   }
 }

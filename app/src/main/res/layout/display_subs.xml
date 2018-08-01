@@ -4,10 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
+
         <variable
             name="searchIsVisible"
             type="Boolean"/>
-        <import type="android.view.View"/>
+
+        <variable
+            name="subscribedListIsVisible"
+            type="Boolean"/>
     </data>
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -31,7 +36,8 @@
                 android:clipToPadding="false"
                 android:paddingEnd="@dimen/subitem_margin"
                 android:paddingBottom="@dimen/subitem_margin"
-                android:layout_below="@+id/display_subs_toolbar"/>
+                android:layout_below="@+id/display_subs_toolbar"
+                android:visibility="@{subscribedListIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
 
             <!-- Displays search results -->
             <android.support.v7.widget.RecyclerView

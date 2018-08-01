@@ -24,11 +24,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.relic.MainActivity;
 import com.relic.R;
 import com.relic.data.Authenticator;
 import com.relic.data.ListingRepositoryImpl;
-import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubsBinding;
@@ -117,7 +115,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     super.onActivityCreated(savedInstanceState);
 
     // calls method to subscribe the adapter to the livedata list
-    subscribeToLiveData();
+    observeLivedata();
   }
 
 
@@ -139,7 +137,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       public boolean onMenuItemActionExpand(MenuItem menuItem) {
         // update visibility for the search recyclerview
         searchIsVisible.setValue(true);
-        //displaySubsBinding.displaySubsRecyclerview.setAdapter(new SearchItemAdapter());
         return true;
       }
 
@@ -171,21 +168,25 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
   /**
    * Subscribes to various livedata values from the viewmodel
    */
-  private void subscribeToLiveData() {
+  private void observeLivedata() {
     // allows the list to be updated as data is updated
-    viewModel.getSubscribedList().observe(this, new Observer<List<SubredditModel>>() {
-      @Override
-      public void onChanged(@Nullable List<SubredditModel> subredditsList) {
-        // updates the view once the list is loaded
-        if (subredditsList != null) {
-          subAdapter.setList(new ArrayList<>(subredditsList));
-          Log.d(TAG, "Changes to subreddit list received");
-          swipeRefreshLayout.setRefreshing(false);
-        }
-        // execute bindings only once everything is loaded (on callback)
-        // execute changes and sync
-        displaySubsBinding.executePendingBindings();
+    viewModel.getSubscribedList().observe(this, (List<SubredditModel> subredditsList) -> {
+      // updates the view once the list is loaded
+      if (subredditsList != null) {
+        subAdapter.setList(new ArrayList<>(subredditsList));
+        Log.d(TAG, "Changes to subreddit list received");
       }
+    });
+
+    // observe whether all subscribed subreddits have been loaded
+    viewModel.getAllSubscribedSubsLoaded().observe(this, (Boolean completelyLoaded) -> {
+      Log.d(TAG, "Refreshing status changed to " + completelyLoaded);
+      if (completelyLoaded) {
+        swipeRefreshLayout.setRefreshing(false);
+      } else {
+        swipeRefreshLayout.setRefreshing(true);
+      }
+      displaySubsBinding.setSubscribedListIsVisible(completelyLoaded);
     });
 
     // subscribes to search results
@@ -222,7 +223,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         // refresh the current list and retrieve more posts
         subAdapter.resetSubList();
         viewModel.retrieveMoreSubs(true);
-        //swipeRefreshLayout.setRefreshing(true);
       }
     });
   }
@@ -230,7 +230,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
   @Override
   public void onAllSubsLoaded() {
-    swipeRefreshLayout.setRefreshing(false);
+    //swipeRefreshLayout.setRefreshing(false);
   }
 
 

@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface SubRepository {
 
+  LiveData<Boolean> getAllSubscribedSubsLoaded();
+
   LiveData<List<SubredditModel>> getSubscribedSubs();
 
   //LiveData<Boolean> onAllSubsRetrieved();

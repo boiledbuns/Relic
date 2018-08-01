@@ -76,7 +76,7 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     }
     else {
       // retrieve the next listing for the comments on this post
-      listingRepo.getKey(postFullname, this);
+      //listingRepo.retrieveKey(postFullname, this);
     }
   }
 

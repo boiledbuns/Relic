@@ -27,6 +27,8 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
   private MutableLiveData <List<String>> searchResults;
+  private MediatorLiveData <String> listingKeyMediator;
+  private MediatorLiveData<Boolean> onAllSubsLoaded;
 
 
   public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
@@ -34,23 +36,46 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     if (!initialized) {
       Log.d(TAG, "subreddit initialized");
 
+      // initialize references to repos objects
       subRepo = subRepository;
       listingRepo = ListingRepository;
       authenticator = auth;
+
+      initializeObservers();
+
       auth.refreshToken(this);
-
-      // initialize the livedata with null value until we get db values
-      searchResults = new MediatorLiveData<>();
-      searchResults.setValue(null);
-
-      // initialize the subreddit mediator with subscribed subs data
-      obvSubsMediator = new MediatorLiveData<>();
-      obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
-
       initialized = true;
     }
   }
 
+
+  /**
+   * Initialize observers for livedata
+   */
+  private void initializeObservers () {
+    // initialize the livedata with null value until we get db values
+    searchResults = new MediatorLiveData<>();
+    searchResults.setValue(null);
+
+    // initialize the subreddit mediator with subscribed subs data
+    obvSubsMediator = new MediatorLiveData<>();
+    obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
+
+    // Observe changes to keys to request new data
+    listingKeyMediator = new MediatorLiveData<>();
+    listingKeyMediator.addSource(listingRepo.getKey(),
+      (@Nullable String nextVal) -> {
+        if (nextVal != null) {
+          onNextListing(nextVal);
+        }
+      });
+  }
+
+
+  @Override
+  public LiveData<Boolean> getAllSubscribedSubsLoaded() {
+    return subRepo.getAllSubscribedSubsLoaded();
+  }
 
   /**
    * Exposes subscribed subs to the ui for binding
@@ -97,7 +122,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   @Override
   public void onAuthenticated() {
-    listingRepo.getKey("SUB_REPO", this);
+    listingRepo.retrieveKey("SUB_REPO");
   }
 
 

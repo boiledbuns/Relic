@@ -28,8 +28,8 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   private MediatorLiveData<SubredditModel> subMediator;
 
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
-    // ensure that the subreddit model is initialized only once
-    if (!isInitialized) {
+    // ensure that the subreddit model is reinitialized when the subreddit changes
+    if (!subredditName.equals(subName)) {
       Log.d(TAG, "VM to display " + subredditName + " initialized");
       subName = subredditName;
       this.postRepo = postRepo;
@@ -114,10 +114,5 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     Log.d(TAG, "Retrieving next posts with " + nextVal);
     // retrieve the "after" value for the next posting
     postRepo.retrieveMorePosts(subName, nextVal);
-  }
-
-  public void clearVM () {
-    Log.d(TAG, "View model cleard");
-    super.onCleared();
   }
 }
