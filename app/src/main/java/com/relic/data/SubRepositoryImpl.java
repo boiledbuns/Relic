@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
 public class SubRepositoryImpl implements SubRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String KEY = "SUBSCRIBED";
@@ -61,6 +62,9 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
 
+  /**
+   * Initializes all the livedata that this repository exposes
+   */
   private void initializeLivedata() {
     allSubscribedSubsLoaded = new MutableLiveData<>();
     allSubscribedSubsLoaded.setValue(true);
@@ -73,7 +77,7 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
   /**
-   * Returns the list of subscribed subs from the database
+   * Returns the list of subscribed subs from the sqLite instance
    * @return list of subscribed subs in the database as livedata
    */
   @Override
@@ -85,8 +89,8 @@ public class SubRepositoryImpl implements SubRepository {
   @Override
   public void retrieveMoreSubscribedSubs(String after) {
     String ending = "";
-    // change the string if not refreshing the entire list of subscribed subreddits
     if (after != null) {
+      // change the query string if fetching all subscribed subreddits from scratch
       ending = "?limit=50&after=" + after;
     }
     else {
@@ -99,19 +103,23 @@ public class SubRepositoryImpl implements SubRepository {
         Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
         response -> {
           try {
-            //List<SubredditEntity> subreddits = parseSubreddits(response);
             // insert the subs and listing into the room instance
             new InsertSubsTask(this, appDb, parseAfterValue(response),
                 parseSubreddits(response), after == null, allSubscribedSubsLoaded).execute(parseAfterValue(response).afterPosting);
-
-          } catch (ParseException e) {
+          }
+          catch (ParseException e) {
             Log.e(TAG, "Error parsing the response: " + e.toString());
           }
         },
         error -> Log.d(TAG, "Error : " + error.getMessage()), authToken));
   }
 
-
+  /**
+   * Parses the "after" value from the listing to get the next listing
+   * @param response JSON formatted response
+   * @return a listing entity to hold the after value
+   * @throws ParseException potential GSON exception when unmarshalling object
+   */
   private ListingEntity parseAfterValue(String response) throws ParseException {
     JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
     // create a new listing to ensure that the db has an "after" value for checking if we need to
@@ -119,20 +127,21 @@ public class SubRepositoryImpl implements SubRepository {
     return new ListingEntity(TAG, (String) data.get("after"));
   }
 
-
+  /**
+   * Parses a "listing" for subreddits into a list of Subreddit
+   * @param response JSON formatted listing for the subreddits to be parsed
+   * @return list of subreddit entities parsed from the string
+   * @throws ParseException potential GSON exception when unmarshalling object
+   */
   private List<SubredditEntity> parseSubreddits(String response) throws ParseException {
     //Log.d(TAG, response);
-    // GSON reader used to unmarshall json objects
-
     JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
     List <SubredditEntity> subscribed = new ArrayList<>();
 
     // get all the subs that the user is subscribed to
     JSONArray subs = (JSONArray) data.get("children");
-    Iterator subIterator = subs.iterator();
-
-    while (subIterator.hasNext()) {
-      JSONObject currentSub = (JSONObject) ((JSONObject) subIterator.next()).get("data");
+    for (Object sub : subs) {
+      JSONObject currentSub = (JSONObject) ((JSONObject) sub).get("data");
       //Log.d(TAG, "keys = " + currentSub.keySet());
       Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
       subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity.class));
@@ -215,12 +224,6 @@ public class SubRepositoryImpl implements SubRepository {
       }
 
     }
-  }
-
-
-  @Override
-  public LiveData<List<SubredditModel>> findSubreddit(String subredditName) {
-    return null;
   }
 
 

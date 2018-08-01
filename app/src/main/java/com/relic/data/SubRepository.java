@@ -11,11 +11,15 @@ import java.util.List;
 
 public interface SubRepository {
 
+  /**
+   * @return whether all subscribed subs have been retrieved as livedata
+   */
   LiveData<Boolean> getAllSubscribedSubsLoaded();
 
+  /**
+   * @return list of subscribed subs in the database as livedata
+   */
   LiveData<List<SubredditModel>> getSubscribedSubs();
-
-  //LiveData<Boolean> onAllSubsRetrieved();
 
   /**
    * Fetches and stores more Subreddits from the Reddit API into the local database
@@ -24,11 +28,17 @@ public interface SubRepository {
    */
   void retrieveMoreSubscribedSubs(String after);
 
+  /**
+   * @param subName "friendly" subreddit name for the subreddit to retrieve
+   * @return the subreddit model stored locally with the name that matches the subname param
+   */
   LiveData<SubredditModel> getSingleSub(String subName);
 
+  /**
+   * Retrieves and parses the subreddit from network and
+   * @param subName "friendly" subreddit name for subreddit to retrieve
+   */
   void retrieveSingleSub(String subName);
-
-  LiveData<List<SubredditModel>> findSubreddit(String name);
 
   /**
    * Returns a list of subreddit names matching the search value
@@ -37,6 +47,8 @@ public interface SubRepository {
    */
   void searchSubreddits(MutableLiveData<List<String>> liveResults, String query);
 
+  /**
+   * @return subreddit gateway for more specific features relating to single subreddit
+   */
   SubGateway getSubGateway();
-
 }
