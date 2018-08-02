@@ -13,6 +13,12 @@ public class DisplaySubContract {
   interface ViewModel {
     void init(String subredditName, SubRepository subRepo, PostRepository postRepo);
 
+    /**
+     * Used to check if the viewmodel has already been initialized
+     * @return
+     */
+    boolean isInitialized();
+
     LiveData<SubredditModel> getSubModel();
 
     LiveData<List<PostModel>> getPosts();

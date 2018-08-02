@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -57,7 +60,10 @@ public class DisplaySubView extends Fragment {
   private DisplaySubBinding displaySubBinding;
   private PostItemAdapter postAdapter;
   private SwipeRefreshLayout swipeRefresh;
+  private AppBarLayout appBarLayout;
   private String subName;
+  private boolean vmAlreadyInitialized;
+  private boolean fragmentOpened;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +78,7 @@ public class DisplaySubView extends Fragment {
       if (subredditName != null && getActivity()!= null) {
         // get the viewmodel and inject the dependencies into it
         displaySubVM = ViewModelProviders.of(getActivity()).get(DisplaySubVM.class);
+        vmAlreadyInitialized = displaySubVM.isInitialized();
         displaySubVM.init(subredditName, new SubRepositoryImpl(this.getContext()), new PostRepositoryImpl(this.getContext()));
       }
     } else {
@@ -212,8 +219,10 @@ public class DisplaySubView extends Fragment {
    * Initializes actionbar menus and on clicks
    */
   private void initializeActionbar() {
-    // initialize reference to toolbar and the main title
+    // initialize reference to the toolbar and appbarlayout
     myToolbar = displaySubBinding.getRoot().findViewById(R.id.display_sub_toolbar);
+    appBarLayout = displaySubBinding.getRoot().findViewById(R.id.display_sub_appbarlayout);
+
     TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
 
 //    title.setText(subName);
@@ -240,6 +249,20 @@ public class DisplaySubView extends Fragment {
       }
     });
 
+    appBarLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+      @Override
+      public void onViewAttachedToWindow(View view) {
+        if (fragmentOpened) {
+          appBarLayout.setExpanded(false);
+          fragmentOpened = false;
+        }
+      }
+
+      @Override
+      public void onViewDetachedFromWindow(View view) {
+        appBarLayout.setExpanded(false);
+      }
+    });
   }
 
 
@@ -256,10 +279,22 @@ public class DisplaySubView extends Fragment {
       DisplayPostView postFrag = new DisplayPostView();
       postFrag.setArguments(bundle);
 
-      getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
+      // checks if the appbarlayout is currently minimized
+//      boolean currentlyExpanded = appBarLayout.getHeight() > getResources().getDimension(R.dimen.toolbar_height);
+
+//      CollapsingToolbarLayout collapsingToolbarLayout = appBarLayout.findViewById(R.id.display_sub_collapsingtoolbarlayout);
+//      collapsingToolbarLayout.setVisibility(View.GONE);
+
+      if (getActivity() != null) {
+        getActivity().getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
+        // set flag to show that a fragment has opened
+        fragmentOpened = true;
       }
+
+    }
   }
+
 
 
   /**

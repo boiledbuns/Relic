@@ -236,7 +236,6 @@ public class SubRepositoryImpl implements SubRepository {
 
 //            List<String> livedataResults = liveResults.getValue();
 //            livedataResults.addAll(parseSearchedSubs(response));
-//
 //            liveResults.setValue(livedataResults);
 
             liveResults.setValue(parseSearchedSubs(response));

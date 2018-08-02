@@ -72,6 +72,11 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     }
   }
 
+  @Override
+  public boolean isInitialized() {
+    return isInitialized;
+  }
+
 
   public LiveData<SubredditModel> getSubModel() {
     return subMediator;
