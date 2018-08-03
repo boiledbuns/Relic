@@ -16,6 +16,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
+import com.relic.data.dao.PostDao;
+import com.relic.data.models.SubredditModel;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -237,6 +239,7 @@ public class PostRepositoryImpl implements PostRepository {
   @Override
   public void retrievePost(String subredditName, String postFullName) {
     String ending = ENDPOINT + "r/" + subredditName + "/comments/" + postFullName.substring(3);
+
     Log.d(TAG, ending);
 
     // create the new request and submit it
@@ -245,12 +248,13 @@ public class PostRepositoryImpl implements PostRepository {
               @Override
               public void onResponse(String response) {
                 Log.d(TAG, "Loaded response " + response);
-//                try {
-//                  parsePosts(response, subredditName);
-//                }
-//                catch (ParseException error) {
-//                  Log.d(TAG, "Error: " + error.getMessage());
-//                }
+                try {
+                  PostEntity post = parsePost(response);
+                  new InsertPostTask().execute(appDB, post);
+                }
+                catch (ParseException error) {
+                  Log.d(TAG, "Error: " + error.getMessage());
+                }
               }
             }, new Response.ErrorListener() {
           @Override
@@ -258,6 +262,25 @@ public class PostRepositoryImpl implements PostRepository {
             Log.d(TAG, "Error: " + error.networkResponse.statusCode);
           }
         }, authToken));
+  }
+
+
+  private PostEntity parsePost(String response) throws ParseException {
+    Gson gson = new GsonBuilder().create();
+    JSONObject data = (JSONObject)((JSONObject) ((JSONArray) JSONParser.parse(response)).get(0)).get("data");
+    JSONObject child = (JSONObject) ((JSONArray) data.get("children")).get(0);
+    JSONObject post = (JSONObject) child.get("data");
+
+    return gson.fromJson(post.toJSONString(), PostEntity.class);
+  }
+
+  private class InsertPostTask extends AsyncTask <Object, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB applicationDB = (ApplicationDB) objects[0];
+      applicationDB.getPostDao().insertPost((PostEntity) objects[1]);
+      return null;
+    }
   }
 
 }

@@ -25,4 +25,7 @@ public abstract class PostDao {
 
   @Query("SELECT id, title, author, selftext, score, commentCount, created, thumbnail, url FROM PostEntity WHERE id = :postName")
   public abstract LiveData<PostModel> getSinglePost(String postName);
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  public abstract void insertPost(PostEntity post);
 }
