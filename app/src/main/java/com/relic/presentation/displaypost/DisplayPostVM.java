@@ -1,7 +1,10 @@
 package com.relic.presentation.displaypost;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.relic.data.CommentRepository;
@@ -13,15 +16,16 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 
 import java.util.List;
 
-public class DisplayPostVM extends ViewModel implements DisplayPostContract.ViewModel, RetrieveNextListingCallback {
+public class DisplayPostVM extends ViewModel implements DisplayPostContract.ViewModel {
   private String TAG = "DISPLAYPOST_VM";
 
   private ListingRepository listingRepo;
   private PostRepository postRepo;
   private CommentRepository commentRepo;
 
-  private LiveData<PostModel> currentPost;
-  private LiveData<List<CommentModel>> commentList;
+  private MediatorLiveData<PostModel> currentPost;
+  private MediatorLiveData<List<CommentModel>> commentList;
+  private MediatorLiveData <String> commentListingKey;
 
   private String postFullname;
   private String subName;
@@ -33,14 +37,43 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     this.postRepo = postRepo;
     this.commentRepo = commentRepo;
 
-    // retrieves the livedata post to be exposed to the view
-    currentPost = postRepo.getPost(fullname);
     subName = subreddit;
     postFullname = fullname;
 
-    // retrieve the comment list as livedata so that we can expose it to the view first
-    commentList = commentRepo.getComments(fullname);
+    currentPost = new MediatorLiveData<>();
+    commentList = new MediatorLiveData<>();
+    commentListingKey = new MediatorLiveData<>();
+
+    observeLivedata();
     retrieveMoreComments(false);
+  }
+  
+  private void observeLivedata() {
+    // retrieves the livedata post to be exposed to the view
+    currentPost.addSource(postRepo.getPost(postFullname),
+        (PostModel post) -> {
+          if (post != null) {
+            // TODO add additional actions to trigger when post loaded
+            currentPost.setValue(post);
+          }
+        });
+
+    // retrieve the comment list as livedata so that we can expose it to the view first
+    commentList.addSource(commentRepo.getComments(postFullname),
+        (List<CommentModel> comments) -> {
+          if (comments != null) {
+            commentList.setValue(comments);
+          }
+        });
+
+    commentListingKey.addSource(listingRepo.getKey(),
+        (String nextListingKey) -> {
+          if (nextListingKey != null) {
+            // retrieve the next listing using its key
+            commentRepo.retrieveComments(subName, postFullname, nextListingKey);
+          }
+        });
+
   }
 
 
@@ -76,15 +109,8 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     }
     else {
       // retrieve the next listing for the comments on this post
-      //listingRepo.retrieveKey(postFullname, this);
+      listingRepo.retrieveKey(postFullname);
     }
   }
 
-
-  @Override
-  public void onNextListing(String nextVal) {
-    Log.d(TAG, "Next Value " + nextVal);
-    // retrieve the first set of comments
-    commentRepo.retrieveComments(subName, postFullname, nextVal);
-  }
 }

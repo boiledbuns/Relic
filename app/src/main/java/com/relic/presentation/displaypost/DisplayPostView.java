@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,11 +38,12 @@ public class DisplayPostView extends Fragment {
 
   private DisplayPostContract.ViewModel displayPostVM;
   private DisplayPostBinding displayPostBinding;
+  private Toolbar myToolbar;
   private CommentAdapter commentAdapter;
   private SwipeRefreshLayout swipeRefreshLayout;
 
   private String postFullname;
-  private String subreddit;
+  private String subredditName;
   private static List picEndings = Arrays.asList("jpg", "png");
 
   @Override
@@ -56,14 +58,20 @@ public class DisplayPostView extends Fragment {
     displayPostBinding = DataBindingUtil
         .inflate(inflater, R.layout.display_post, container, false);
 
+    myToolbar = displayPostBinding.getRoot().findViewById(R.id.display_post_toolbar);
+
     try {
       // parse the full name of the post to be displayed
       postFullname = getArguments().getString("full_name");
-      subreddit = getArguments().getString("subreddit");
+      subredditName = getArguments().getString("subreddit");
       Log.d(TAG, "Post fullname : " + postFullname);
     }
     catch (Exception e) {
       Toast.makeText(getContext(), "Fragment not loaded properly!", Toast.LENGTH_SHORT).show();
+    }
+
+    if (subredditName != null) {
+      myToolbar.setTitle(subredditName);
     }
 
     commentAdapter = new CommentAdapter();
@@ -84,7 +92,7 @@ public class DisplayPostView extends Fragment {
     // create the VM and initialize it with injected dependencies
     displayPostVM = ViewModelProviders.of(this).get(DisplayPostVM.class);
     displayPostVM.init(new ListingRepositoryImpl(getContext()), new PostRepositoryImpl(getContext()),
-        new CommentRepositoryImpl(getContext()), subreddit, postFullname);
+        new CommentRepositoryImpl(getContext()), subredditName, postFullname);
 
     subscribeToVM();
 
