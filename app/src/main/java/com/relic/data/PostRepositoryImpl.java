@@ -118,8 +118,7 @@ public class PostRepositoryImpl implements PostRepository {
       public void onErrorResponse(VolleyError error) {
         Log.d(TAG, "Error: " + error.getMessage());
       }
-    }, authToken)
-    );
+    }, authToken));
   }
 
 
@@ -235,8 +234,30 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
 
-  public void retrieveSinglePost(String postFullName) {
+  @Override
+  public void retrievePost(String subredditName, String postFullName) {
+    String ending = ENDPOINT + "r/" + subredditName + "/comments/" + postFullName.substring(3);
+    Log.d(TAG, ending);
 
+    // create the new request and submit it
+    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ending,
+            new Response.Listener<String>() {
+              @Override
+              public void onResponse(String response) {
+                Log.d(TAG, "Loaded response " + response);
+//                try {
+//                  parsePosts(response, subredditName);
+//                }
+//                catch (ParseException error) {
+//                  Log.d(TAG, "Error: " + error.getMessage());
+//                }
+              }
+            }, new Response.ErrorListener() {
+          @Override
+          public void onErrorResponse(VolleyError error) {
+            Log.d(TAG, "Error: " + error.networkResponse.statusCode);
+          }
+        }, authToken));
   }
 
 }

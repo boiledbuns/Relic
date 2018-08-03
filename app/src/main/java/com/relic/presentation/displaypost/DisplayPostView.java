@@ -96,7 +96,7 @@ public class DisplayPostView extends Fragment {
 
     subscribeToVM();
 
-    // Testing user gateway using user "reddit"
+    // TODO: Testing user gateway using user "reddit"
     UserGateway userGateway = new UserGatewayImpl(getContext());
     userGateway.getUser("reddit");
   }
@@ -130,6 +130,10 @@ public class DisplayPostView extends Fragment {
   }
 
 
+  /**
+   * Attaches custom scroll listeners to allow more comments to be retrieved when the recyclerview
+   * is scrolled all the way to the bottom
+   */
   private void attachScrollListeners() {
     displayPostBinding.displayCommentsRecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
@@ -147,7 +151,7 @@ public class DisplayPostView extends Fragment {
     swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {
-        displayPostVM.retrieveMoreComments(true);
+        displayPostVM.refresh();
       }
     });
   }
@@ -173,8 +177,8 @@ public class DisplayPostView extends Fragment {
       // does not load image if the banner img string is empty
       Picasso.get().load(useUrl).fit().centerCrop().into(imgView);
     }
-    catch (Error e) {
-      Log.d("DISPLAYPOST_VIEW", "Issue loading image " + e.toString());
+    catch (Error error) {
+      Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
     }
   }
 

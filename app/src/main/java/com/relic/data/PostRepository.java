@@ -16,4 +16,5 @@ public interface PostRepository {
 
   LiveData<PostModel> getPost(String postFullName);
 
+  void retrievePost(String subredditName, String postFullName);
 }

@@ -45,40 +45,7 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     commentListingKey = new MediatorLiveData<>();
 
     observeLivedata();
-    retrieveMoreComments(false);
-  }
-  
-  private void observeLivedata() {
-    // retrieves the livedata post to be exposed to the view
-    currentPost.addSource(postRepo.getPost(postFullname),
-        (PostModel post) -> {
-          if (post != null) {
-            // TODO add additional actions to trigger when post loaded
-            currentPost.setValue(post);
-          }
-        });
-
-    // retrieve the comment list as livedata so that we can expose it to the view first
-    commentList.addSource(commentRepo.getComments(postFullname),
-        (List<CommentModel> comments) -> {
-          if (comments != null) {
-            commentList.setValue(comments);
-          }
-        });
-
-    commentListingKey.addSource(listingRepo.getKey(),
-        (String nextListingKey) -> {
-          if (nextListingKey != null) {
-            // retrieve the next listing using its key
-            commentRepo.retrieveComments(subName, postFullname, nextListingKey);
-          }
-        });
-
-  }
-
-
-  public void refresh() {
-
+    retrieveMoreComments(true);
   }
 
 
@@ -97,6 +64,50 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
    */
   public LiveData<List<CommentModel>> getCommentList() {
     return commentList;
+  }
+
+
+  /**
+   * Add sources and listeners to all local livedata
+   */
+  private void observeLivedata() {
+    // retrieves the livedata post to be exposed to the view
+    currentPost.addSource(postRepo.getPost(postFullname),
+        (PostModel post) -> {
+          if (post != null) {
+            // TODO add additional actions to trigger when post loaded
+            currentPost.setValue(post);
+          }
+        });
+
+    // retrieve the comment list as livedata so that we can expose it to the view first
+    commentList.addSource(commentRepo.getComments(postFullname),
+        (List<CommentModel> comments) -> {
+          if (comments != null) {
+            // TODO add additional actions to trigger when comments loaded
+            commentList.setValue(comments);
+          }
+        });
+
+    commentListingKey.addSource(listingRepo.getKey(),
+        (String nextListingKey) -> {
+          if (nextListingKey != null) {
+            // retrieve the next listing using its key
+            commentRepo.retrieveComments(subName, postFullname, nextListingKey);
+          }
+        });
+
+  }
+
+
+  /**
+   * Refreshes the post and comment data from network
+   */
+  public void refresh() {
+    // retrieves post from network
+    postRepo.retrievePost(subName, postFullname);
+    // retrieves comments form network
+    retrieveMoreComments(true);
   }
 
 
