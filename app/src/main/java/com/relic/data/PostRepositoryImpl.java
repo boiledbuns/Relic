@@ -39,6 +39,8 @@ public class PostRepositoryImpl implements PostRepository {
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "POST_REPO";
 
+  private String[] sortByMethods = {"best", "controversial", "hot", "new", "random", "rising", "top"};
+
   private Context context;
   private String authToken;
   private JSONParser JSONParser;
@@ -71,17 +73,6 @@ public class PostRepositoryImpl implements PostRepository {
   public LiveData<List<PostModel>> getPosts(String subreddit) {
     return appDB.getPostDao().getSubredditPosts(subreddit);
   }
-
-
-//  public void retrieveMorePosts2(String subredditName, String after) {
-//
-//  }
-//
-//
-//  public void reset(){
-//
-//  }
-
 
 
   /**
@@ -121,6 +112,30 @@ public class PostRepositoryImpl implements PostRepository {
         Log.d(TAG, "Error: " + error.getMessage());
       }
     }, authToken));
+  }
+
+
+  /**
+   * Deletes all locally stored posts and retrieves a new set based on the sorting method specified
+   * by the caller
+   * @param subredditName name of the subreddit for the posts to be retrieved
+   * @param sortByCode code for the associated sort by method
+   */
+  @Override
+  public void retrieveSortedPosts(String subredditName, int sortByCode) {
+    // TODO delete previous posts for this subreddit from the db
+    // TODO add marker for posts from frontpage/popular/all to prevent deleting them?
+    // TODO convert normal retrieve posts to use this method, sorting hot by default
+
+    // generate the ending of the request url based on sorting method specified by the used
+    String ending = "r/" + subredditName + "/" + sortByMethods[sortByCode + 1];
+    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
+        (String response) -> {
+          
+        },
+        (VolleyError volleyError) -> {
+
+        }, authToken));
   }
 
 
@@ -283,4 +298,14 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
+  // Exposes sorting option codes
+  public static class SortOptions {
+    static int SORT_BEST = 1;
+    static int SORT_CONTROVERSIAL = 2;
+    static int SORT_HOT = 3;
+    static int SORT_NEW = 4;
+    static int SORT_RANDOM = 5;
+    static int SORT_RISING = 6;
+    static int SORT_TOP = 7;
+  }
 }

@@ -108,6 +108,7 @@ public class SubGatewayImpl implements SubGateway {
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
         (response -> {
           Log.d(TAG, response);
+          success.setValue(true);
         }),
         (error -> {
           Log.d(TAG, "Error subscribing to subreddit");
@@ -126,6 +127,7 @@ public class SubGatewayImpl implements SubGateway {
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
         (response -> {
           Log.d(TAG, response);
+          success.setValue(true);
         }),
         (error -> {
           Log.d(TAG, "Error unsubscribing to subreddit");
@@ -135,7 +137,11 @@ public class SubGatewayImpl implements SubGateway {
     return success;
   }
 
-
+  /**
+   * Parse response from subreddit into a string
+   * @param response JSON representation of the subreddit information
+   * @return subreddit information
+   */
   private String parseSubredditInfo(String response) {
     String info = response;
     JSONParser parser = new JSONParser();

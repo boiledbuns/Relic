@@ -17,4 +17,6 @@ public interface PostRepository {
   LiveData<PostModel> getPost(String postFullName);
 
   void retrievePost(String subredditName, String postFullName);
+
+  void retrieveSortedPosts(String subredditName, int sortByCode);
 }
