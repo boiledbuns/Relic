@@ -15,5 +15,13 @@
     <!--<string name="appbar_scrolling_view_behavior">android.support.</string>-->
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 
+    <string name="sortby_title">sort by</string>
+    <string name="sortby_best">best</string>
+    <string name="sortby_controversial">controversial</string>
+    <string name="sortby_hot">hot</string>
+    <string name="sortby_new">new</string>
+    <string name="sortby_random">random</string>
+    <string name="sortby_rising">rising</string>
+    <string name="sortby_top">top</string>
 
 </resources>

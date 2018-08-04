@@ -259,7 +259,7 @@ public class PostRepositoryImpl implements PostRepository {
             }, new Response.ErrorListener() {
           @Override
           public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "Error: " + error.networkResponse.statusCode);
+            Log.d(TAG, "Error: "   + error.networkResponse.statusCode);
           }
         }, authToken));
   }
@@ -274,7 +274,7 @@ public class PostRepositoryImpl implements PostRepository {
     return gson.fromJson(post.toJSONString(), PostEntity.class);
   }
 
-  private class InsertPostTask extends AsyncTask <Object, Integer, Integer> {
+  private static class InsertPostTask extends AsyncTask <Object, Integer, Integer> {
     @Override
     protected Integer doInBackground(Object... objects) {
       ApplicationDB applicationDB = (ApplicationDB) objects[0];

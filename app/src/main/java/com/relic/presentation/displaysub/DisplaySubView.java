@@ -128,10 +128,10 @@ public class DisplaySubView extends Fragment {
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
-    inflater.inflate(R.menu.search_menu, menu);
+    //inflater.inflate(R.menu.search_menu, menu);
+    inflater.inflate(R.menu.display_sub_menu, menu);
 
-    searchMenuItem = menu.findItem(R.id.search_item);
-
+    searchMenuItem = menu.findItem(R.id.display_sub_searchitem);
     searchView = (SearchView) searchMenuItem.getActionView();
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
@@ -224,10 +224,17 @@ public class DisplaySubView extends Fragment {
     appBarLayout = displaySubBinding.getRoot().findViewById(R.id.display_sub_appbarlayout);
 
     TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
+    CollapsingToolbarLayout collapsingToolbarLayout = displaySubBinding.getRoot().findViewById(R.id.display_sub_collapsingtoolbarlayout);
+
+
+    //collapsingToolbarLayout.setText
 
 //    title.setText(subName);
 //    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
     myToolbar.setTitle(subName);
+    myToolbar.setSubtitle("Sorting by new");
+
+
 
     AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
     if (parentActivity != null) {

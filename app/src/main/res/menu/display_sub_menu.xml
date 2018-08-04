@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/display_sub_searchitem"
+          android:title="@string/searchmenu_title"
+          android:icon="@drawable/ic_search"
+          app:showAsAction="ifRoom|collapseActionView"
+          app:actionViewClass="android.support.v7.widget.SearchView"
+          app:queryBackground="@android:color/transparent"/>
+
+    <item android:id="@+id/display_sub_sort"
+          android:title="@string/sortby_title"
+          android:icon="@drawable/ic_sort"
+          app:showAsAction="always">
+
+        <menu>
+            <item android:title="@string/sortby_best" app:showAsAction="withText"/>
+            <item android:title="@string/sortby_controversial" app:showAsAction="withText"/>
+            <item android:title="@string/sortby_hot" app:showAsAction="withText"/>
+            <item android:title="@string/sortby_new" app:showAsAction="withText"/>
+            <item android:title="@string/sortby_random" app:showAsAction="withText"/>
+            <item android:title="@string/sortby_rising" app:showAsAction="withText"/>
+            <item android:title="@string/sortby_top" app:showAsAction="withText"/>
+        </menu>
+
+    </item>
+</menu>

@@ -4,8 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/my_toolbar"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/toolbar_height"
-    android:background="@color/backgroundSecondary">
+    android:layout_height="@dimen/toolbar_height">
 
     <RelativeLayout
         android:layout_width="match_parent"
