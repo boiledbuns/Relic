@@ -2,6 +2,7 @@ package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
   private MediatorLiveData<List<PostModel>> postListMediator;
   private MediatorLiveData<SubredditModel> subMediator;
+  private MutableLiveData<Boolean> subscribed;
 
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is reinitialized when the subreddit changes
@@ -35,12 +37,16 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       this.postRepo = postRepo;
       this.subRepo = subRepo;
 
-      // initialize the mediator for loading posts
+      // initialize observables
+      subscribed = new MutableLiveData<>();
       postListMediator = new MediatorLiveData<>();
+      subMediator = new MediatorLiveData<>();
+
+
       postListMediator.addSource(postRepo.getPosts(subName), new Observer<List<PostModel>>() {
         @Override
         public void onChanged(@Nullable List<PostModel> postModels) {
-          if (postModels.isEmpty()) {
+          if (postModels != null && postModels.isEmpty()) {
             Log.d(TAG, "empty posts");
             retrieveMorePosts(true);
           } else {
@@ -52,7 +58,6 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
       // TODO: STILL TESTING retrieve the banner image from the subredddit css
       //subRepo.getSubGateway().retrieveSubBanner(subName);
-      this.subMediator = new MediatorLiveData<>();
       this.subMediator.addSource(subRepo.getSingleSub(subName), new Observer<SubredditModel>() {
         @Override
         public void onChanged(@Nullable SubredditModel newModel) {
@@ -63,6 +68,8 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
           else {
             Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl());
             subMediator.setValue(newModel);
+            // update subscribed observable
+            subscribed.setValue(newModel.getIsSubscribed());
           }
         }
       });
@@ -119,4 +126,20 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     // retrieve the "after" value for the next posting
     postRepo.retrieveMorePosts(subName, nextVal);
   }
+
+
+  public void subscribeToSub() {
+    MediatorLiveData<Boolean> successLive = new MediatorLiveData<>();
+    successLive.addSource(subRepo.getSubGateway().subscribe(subName), (Boolean success) -> {
+      if (success != null) {
+        successLive.setValue(success);
+
+        //subscribed.setValue(success);
+
+        // unsubscribe after consuming event
+
+      }
+    });
+  }
+
 }

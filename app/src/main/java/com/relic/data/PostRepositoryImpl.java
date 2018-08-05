@@ -131,7 +131,7 @@ public class PostRepositoryImpl implements PostRepository {
     String ending = "r/" + subredditName + "/" + sortByMethods[sortByCode + 1];
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
         (String response) -> {
-          
+
         },
         (VolleyError volleyError) -> {
 

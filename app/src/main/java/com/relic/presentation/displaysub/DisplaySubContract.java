@@ -10,7 +10,7 @@ import com.relic.data.models.SubredditModel;
 import java.util.List;
 
 public class DisplaySubContract {
-  interface ViewModel {
+  public interface ViewModel {
     void init(String subredditName, SubRepository subRepo, PostRepository postRepo);
 
     /**
@@ -27,5 +27,6 @@ public class DisplaySubContract {
 
     void retrieveMorePosts(boolean resetPosts);
 
+    LiveData<Boolean> subscribeToSub();
   }
 }
