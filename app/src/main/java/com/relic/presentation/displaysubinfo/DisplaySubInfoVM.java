@@ -1,6 +1,7 @@
 package com.relic.presentation.displaysubinfo;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
@@ -54,10 +55,13 @@ public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContrac
   }
 
   public LiveData<Boolean> subscribe() {
-    return subGateway.subscribe(subredditName);
+    //return subGateway.subscribe(subredditName);
+    return new MutableLiveData<>();
   }
 
   public LiveData<Boolean> unsubscribe() {
-    return subGateway.unsubscribe(subredditName);
+    //return subGateway.unsubscribe(subredditName);
+    return new MutableLiveData<>();
+
   }
 }

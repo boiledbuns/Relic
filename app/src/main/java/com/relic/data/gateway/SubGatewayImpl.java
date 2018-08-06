@@ -3,8 +3,10 @@ package com.relic.data.gateway;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -83,7 +85,7 @@ public class SubGatewayImpl implements SubGateway {
         end += "r/" + subredditName + "/sidebar";
       }
     }
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
+    requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
         (response) -> {
           // determine the appropriate parsing method to be used
           switch (action) {
@@ -99,43 +101,51 @@ public class SubGatewayImpl implements SubGateway {
         }, authToken));
   }
 
+  @Override
+  public LiveData<Boolean> subscribe(String subName) {
+    String end = ENDPOINT + "api/subscribe?action=sub&sr_name=" + subName ;
 
-  public LiveData<Boolean> subscribe(String name) {
+    Log.d(TAG, "Subscribing to " + end);
     MutableLiveData<Boolean> success = new MutableLiveData<>();
-    success.setValue(true);
 
-    String end = ENDPOINT + "api/subscribe?action=sub&sr_name=" + name;
-    requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
-        (response -> {
-          Log.d(TAG, response);
-          success.setValue(true);
-        }),
-        (error -> {
-          Log.d(TAG, "Error subscribing to subreddit");
-          success.setValue(false);
-        }), authToken));
+    // delay response request a bit to ensure it doesn't occur until the livedata has been subscribed to
+    new Handler().postDelayed(()-> {
+        requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
+            (response -> {
+              Log.d(TAG, "Subscribed to " + subName);
+              success.setValue(true);
+            }),
+            (VolleyError error) -> {
+              Log.d(TAG, "Error subscribing to subreddit " + error.networkResponse.headers);
+              success.setValue(false);
+            }, authToken));
+      }, 2000);
 
     return success;
   }
 
+  @Override
+  public LiveData<Boolean> unsubscribe(String subName) {
+    String end = ENDPOINT + "api/subscribe?action=unsub&sr_name=" + subName;
 
-  public LiveData<Boolean> unsubscribe(String name) {
+    Log.d(TAG, "Unsubscribing to " + end);
     MutableLiveData<Boolean> success = new MutableLiveData<>();
-    success.setValue(true);
 
-    String end = ENDPOINT + "api/subscribe?action=unsub&sr_name=" + name;
-    requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
-        (response -> {
-          Log.d(TAG, response);
-          success.setValue(true);
-        }),
-        (error -> {
-          Log.d(TAG, "Error unsubscribing to subreddit");
-          success.setValue(false);
-        }), authToken));
+    new Handler().postDelayed(() -> {
+      requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
+          (response -> {
+            Log.d(TAG, "Unsubscribed to " + subName);
+            success.setValue(true);
+          }),
+          (VolleyError error) -> {
+            Log.d(TAG, "Error unsubscribing to subreddit " + error.networkResponse.headers);
+            success.setValue(false);
+          }, authToken));
+    }, 2000);
 
     return success;
   }
+
 
   /**
    * Parse response from subreddit into a string

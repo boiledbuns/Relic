@@ -5,8 +5,10 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.View;
 
 import com.relic.data.PostRepository;
 import com.relic.data.SubRepository;
@@ -27,7 +29,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
   private MediatorLiveData<List<PostModel>> postListMediator;
   private MediatorLiveData<SubredditModel> subMediator;
-  private MutableLiveData<Boolean> subscribed;
+  private MediatorLiveData<Boolean> isSubscribed;
 
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is reinitialized when the subreddit changes
@@ -38,7 +40,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       this.subRepo = subRepo;
 
       // initialize observables
-      subscribed = new MutableLiveData<>();
+      isSubscribed = new MediatorLiveData<>();
       postListMediator = new MediatorLiveData<>();
       subMediator = new MediatorLiveData<>();
 
@@ -69,7 +71,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
             Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl());
             subMediator.setValue(newModel);
             // update subscribed observable
-            subscribed.setValue(newModel.getIsSubscribed());
+            isSubscribed.setValue(newModel.getIsSubscribed());
           }
         }
       });
@@ -88,6 +90,10 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     return subMediator;
   }
 
+
+  public LiveData<Boolean> getIsSubscribed() {
+    return isSubscribed;
+  }
 
   @Override
   public String getSubName() {
@@ -128,18 +134,35 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   }
 
 
-  public void subscribeToSub() {
-    MediatorLiveData<Boolean> successLive = new MediatorLiveData<>();
-    successLive.addSource(subRepo.getSubGateway().subscribe(subName), (Boolean success) -> {
-      if (success != null) {
-        successLive.setValue(success);
+  public void updateSubStatus(boolean toSubscribe) {
+    Log.d(TAG, "Changing to subscribed " + toSubscribe);
+
+    if (toSubscribe) {
+      // subscribe if not currently subscribed
+      LiveData <Boolean> successObservable = subRepo.getSubGateway().subscribe(subName);
+      isSubscribed.addSource(successObservable, (Boolean success) -> {
+
+        if (success != null && success) {
+          Log.d(TAG, "subscribing");
+          isSubscribed.setValue(true);
+        }
+        // unsubscribe after consuming event
+        isSubscribed.removeSource(successObservable);
+      });
+    } else {
+      // unsubscribe if already subscribed
+      LiveData <Boolean> successObservable = subRepo.getSubGateway().unsubscribe(subName);
+      isSubscribed.addSource(successObservable, (Boolean success) -> {
+
+        if (success != null && success) {
+          Log.d(TAG, "unsubscribing");
+          isSubscribed.setValue(false);
+        }
 
         //subscribed.setValue(success);
-
-        // unsubscribe after consuming event
-
-      }
-    });
+        isSubscribed.removeSource(successObservable);
+      });
+    }
   }
 
 }

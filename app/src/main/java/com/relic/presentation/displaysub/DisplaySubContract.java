@@ -1,6 +1,7 @@
 package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.LiveData;
+import android.view.View;
 
 import com.relic.data.PostRepository;
 import com.relic.data.SubRepository;
@@ -23,10 +24,12 @@ public class DisplaySubContract {
 
     LiveData<List<PostModel>> getPosts();
 
+    LiveData<Boolean> getIsSubscribed();
+
     String getSubName();
 
     void retrieveMorePosts(boolean resetPosts);
 
-    LiveData<Boolean> subscribeToSub();
+    void updateSubStatus(boolean subscribe);
   }
 }

@@ -9,8 +9,8 @@
             type="com.relic.presentation.displaysub.DisplaySubContract.ViewModel"/>
 
         <variable
-            name="displaySubView"
-            type="com.relic.presentation.displaysub.DisplaySubView"/>
+            name="isSubscribed"
+            type="Boolean"/>
 
         <variable
             name="subModel"
@@ -53,8 +53,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:textAllCaps="false"
-                        android:text="@{subModel.isSubscribed ? `subbed` : `subscribe`}"
-                        android:onClick="@{displaySubView.subscribeToSubreddit}"/>
+                        android:text="@{isSubscribed ? `subbed` : `subscribe`}"
+                        android:onClick="@{() -> displaySubVM.updateSubStatus(isSubscribed? false : true)}"/>
 
                 </RelativeLayout>
 
