@@ -40,4 +40,8 @@ public abstract class SubredditDao {
 
   @Query("SELECT name FROM SubredditEntity WHERE name = :query")
   public abstract LiveData<List<String>> searchSubreddits(String query);
+
+  @Query("UPDATE SubredditEntity SET isSubscribed = :subscribed WHERE name = :subredditName")
+  public abstract void updateSubscription(boolean subscribed, String subredditName);
+
 }

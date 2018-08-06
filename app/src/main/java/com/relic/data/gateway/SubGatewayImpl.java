@@ -3,6 +3,7 @@ package com.relic.data.gateway;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
@@ -114,12 +115,14 @@ public class SubGatewayImpl implements SubGateway {
             (response -> {
               Log.d(TAG, "Subscribed to " + subName);
               success.setValue(true);
+              // update local entity to reflect the changes once successfully subscribed
+              new UpdateLocalSubSubscription().execute(appDb, subName, true);
             }),
             (VolleyError error) -> {
               Log.d(TAG, "Error subscribing to subreddit " + error.networkResponse.headers);
               success.setValue(false);
             }, authToken));
-      }, 2000);
+      }, 500);
 
     return success;
   }
@@ -136,12 +139,14 @@ public class SubGatewayImpl implements SubGateway {
           (response -> {
             Log.d(TAG, "Unsubscribed to " + subName);
             success.setValue(true);
+            // update local entity to reflect the changes once successfully subscribed
+            new UpdateLocalSubSubscription().execute(appDb, subName, false);
           }),
           (VolleyError error) -> {
             Log.d(TAG, "Error unsubscribing to subreddit " + error.networkResponse.headers);
             success.setValue(false);
           }, authToken));
-    }, 2000);
+    }, 500);
 
     return success;
   }
@@ -214,5 +219,16 @@ public class SubGatewayImpl implements SubGateway {
       }, authToken));
   }
 
+  private static class UpdateLocalSubSubscription extends AsyncTask {
+    @Override
+    protected Object doInBackground(Object[] objects) {
+      ApplicationDB appDB = (ApplicationDB) objects[0];
+      String subName = (String) objects[1];
+      boolean subStatus = (boolean) objects[2];
+
+      appDB.getSubredditDao().updateSubscription(subStatus, subName);
+      return null;
+    }
+  }
 
 }
