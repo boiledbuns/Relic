@@ -174,14 +174,14 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       // updates the view once the list is loaded
       if (subredditsList != null) {
         subAdapter.setList(new ArrayList<>(subredditsList));
-        Log.d(TAG, "Changes to subreddit list received");
+        Log.d(TAG, "Changes to subreddit list received " + subredditsList);
       }
     });
 
     // observe whether all subscribed subreddits have been loaded
     viewModel.getAllSubscribedSubsLoaded().observe(this, (Boolean completelyLoaded) -> {
       Log.d(TAG, "Refreshing status changed to " + completelyLoaded);
-      if (completelyLoaded) {
+      if (completelyLoaded != null || completelyLoaded) {
         swipeRefreshLayout.setRefreshing(false);
       } else {
         swipeRefreshLayout.setRefreshing(true);
@@ -209,7 +209,6 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // initialize observer for updating binding on change
     searchIsVisible.observe(this, (Boolean isVisible) -> {
       displaySubsBinding.setSearchIsVisible(isVisible);
-      displaySubsBinding.executePendingBindings();
     });
     searchIsVisible.setValue(false);
   }

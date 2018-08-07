@@ -64,7 +64,6 @@ public class ListingRepositoryImpl implements ListingRepository {
     protected void onPostExecute(Integer integer) {
       super.onPostExecute(integer);
       listingKey.setValue(key);
-      listingKey.setValue(key);
     }
   }
 

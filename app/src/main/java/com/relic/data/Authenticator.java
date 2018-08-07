@@ -1,5 +1,6 @@
 package com.relic.data;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
@@ -118,7 +119,7 @@ public class Authenticator {
         new Response.ErrorListener() {
           @Override
           public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, error.toString());
+            Log.d(TAG, "Error retrieving access token through reddit " + error.toString());
           }
         })
     );

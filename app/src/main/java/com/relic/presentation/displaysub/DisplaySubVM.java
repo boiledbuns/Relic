@@ -29,7 +29,6 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
   private MediatorLiveData<List<PostModel>> postListMediator;
   private MediatorLiveData<SubredditModel> subMediator;
-  private MediatorLiveData<Boolean> isSubscribed;
 
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is reinitialized when the subreddit changes
@@ -40,7 +39,6 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       this.subRepo = subRepo;
 
       // initialize observables
-      isSubscribed = new MediatorLiveData<>();
       postListMediator = new MediatorLiveData<>();
       subMediator = new MediatorLiveData<>();
 
@@ -70,8 +68,6 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
           else {
             Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl());
             subMediator.setValue(newModel);
-            // update subscribed observable
-            isSubscribed.setValue(newModel.getIsSubscribed());
           }
         }
       });
@@ -90,10 +86,6 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     return subMediator;
   }
 
-
-  public LiveData<Boolean> getIsSubscribed() {
-    return isSubscribed;
-  }
 
   @Override
   public String getSubName() {
@@ -140,27 +132,26 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     if (toSubscribe) {
       // subscribe if not currently subscribed
       LiveData <Boolean> successObservable = subRepo.getSubGateway().subscribe(subName);
-      isSubscribed.addSource(successObservable, (Boolean success) -> {
+      subMediator.addSource(successObservable, (Boolean success) -> {
 
         if (success != null && success) {
           Log.d(TAG, "subscribing");
-          isSubscribed.setValue(true);
         }
         // unsubscribe after consuming event
-        isSubscribed.removeSource(successObservable);
+        subMediator.removeSource(successObservable);
       });
     } else {
       // unsubscribe if already subscribed
       LiveData <Boolean> successObservable = subRepo.getSubGateway().unsubscribe(subName);
-      isSubscribed.addSource(successObservable, (Boolean success) -> {
+      subMediator.addSource(successObservable, (Boolean success) -> {
 
         if (success != null && success) {
           Log.d(TAG, "unsubscribing");
-          isSubscribed.setValue(false);
+          //subMediator.setValue(false);
         }
 
         //subscribed.setValue(success);
-        isSubscribed.removeSource(successObservable);
+        subMediator.removeSource(successObservable);
       });
     }
   }

@@ -180,19 +180,19 @@ public class DisplaySubView extends Fragment {
     });
 
     //
-    displaySubVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
-      @Override
-      public void onChanged(@Nullable Boolean subscribed) {
-        if (subscribed != null) {
-          if (subscribed) {
-            Toast.makeText(getContext(), "Successfully subscribed", Toast.LENGTH_SHORT).show();
-          } else {
-            Toast.makeText(getContext(), "Successfully unsubscribed", Toast.LENGTH_SHORT).show();
-          }
-          // TODO remove this observer once we have consumed the event
-        }
-      }
-    });
+//    displaySubVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
+//      @Override
+//      public void onChanged(@Nullable Boolean subscribed) {
+//        if (subscribed != null) {
+//          if (subscribed) {
+//            Toast.makeText(getContext(), "Successfully subscribed", Toast.LENGTH_SHORT).show();
+//          } else {
+//            Toast.makeText(getContext(), "Successfully unsubscribed", Toast.LENGTH_SHORT).show();
+//          }
+//          // TODO remove this observer once we have consumed the event
+//        }
+//      }
+//    });
   }
 
 

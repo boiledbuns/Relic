@@ -24,7 +24,7 @@ public class DisplaySubContract {
 
     LiveData<List<PostModel>> getPosts();
 
-    LiveData<Boolean> getIsSubscribed();
+   // LiveData<Boolean> getIsSubscribed();
 
     String getSubName();
 

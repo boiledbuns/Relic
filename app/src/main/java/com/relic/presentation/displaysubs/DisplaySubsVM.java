@@ -3,7 +3,6 @@ package com.relic.presentation.displaysubs;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -25,9 +24,8 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   private ListingRepository listingRepo;
   private Authenticator authenticator ;
 
-  private MediatorLiveData <List<SubredditModel>> obvSubsMediator;
+  private MediatorLiveData <List<SubredditModel>> subscribedSubsMediator;
   private MutableLiveData <List<String>> searchResults;
-  private MediatorLiveData <String> listingKeyMediator;
   private MediatorLiveData<Boolean> onAllSubsLoaded;
 
 
@@ -41,11 +39,22 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
       listingRepo = ListingRepository;
       authenticator = auth;
 
-      initializeObservers();
+      // initialize the mediator live data and associated livedata
+      searchResults = new MediatorLiveData<>();
+      searchResults.setValue(null);
 
-      auth.refreshToken(this);
+      // initialize the subreddit mediator with subscribed subs data
+      subscribedSubsMediator = new MediatorLiveData<>();
+      subscribedSubsMediator.setValue(null);
+
+      onAllSubsLoaded = new MediatorLiveData<>();
+      onAllSubsLoaded.setValue(null);
+
+      initializeObservers();
       initialized = true;
     }
+    // refresh the token even if the vm has already been initialized
+    auth.refreshToken(this);
   }
 
 
@@ -53,22 +62,17 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
    * Initialize observers for livedata
    */
   private void initializeObservers () {
-    // initialize the livedata with null value until we get db values
-    searchResults = new MediatorLiveData<>();
-    searchResults.setValue(null);
+    //subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), subscribedSubsMediator::setValue);
+    subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), (List<SubredditModel> subscribedSubs) -> {
+      Log.d(TAG, " subs loaded " + subscribedSubs);
+        subscribedSubsMediator.setValue(subscribedSubs);
+    });
 
-    // initialize the subreddit mediator with subscribed subs data
-    obvSubsMediator = new MediatorLiveData<>();
-    obvSubsMediator.addSource(subRepo.getSubscribedSubs(), obvSubsMediator::setValue);
-
-    // Observe changes to keys to request new data
-    listingKeyMediator = new MediatorLiveData<>();
-    listingKeyMediator.addSource(listingRepo.getKey(),
-      (@Nullable String nextVal) -> {
-        if (nextVal != null) {
-          onNextListing(nextVal);
-        }
-      });
+//    // Observe changes to keys to request new data
+//    subscribedSubsMediator.addSource(listingRepo.getKey(), (@Nullable String nextVal) -> {
+//      // retrieve posts only if the "after" value is empty
+//      subRepo.retrieveMoreSubscribedSubs(nextVal);
+//    });
   }
 
 
@@ -83,7 +87,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
    */
   @Override
   public LiveData<List<SubredditModel>> getSubscribedList() {
-    return obvSubsMediator;
+    return subscribedSubsMediator;
   }
 
 
@@ -96,7 +100,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     if (resetPosts) {
       // refresh token before performing any requests
       authenticator.refreshToken(this);
-      subRepo.retrieveMoreSubscribedSubs(null);
     }
   }
 
@@ -122,7 +125,9 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   @Override
   public void onAuthenticated() {
-    listingRepo.retrieveKey("SUB_REPO");
+    //listingRepo.retrieveKey("SUB_REPO");
+    Log.d(TAG, "On authenticated called");
+    subRepo.retrieveMoreSubscribedSubs(null);
   }
 
 

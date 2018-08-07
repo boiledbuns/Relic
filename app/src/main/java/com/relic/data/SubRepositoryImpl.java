@@ -52,15 +52,18 @@ public class SubRepositoryImpl implements SubRepository {
     gson = new GsonBuilder().create();
 
     // retrieve the auth token shared preferences
-    String authKey = context.getResources().getString(R.string.AUTH_PREF);
-    String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
-    authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-        .getString(tokenKey, "DEFAULT");
-
+    authToken = checkToken();
     appDb = ApplicationDB.getDatabase(context);
     initializeLivedata();
   }
 
+  private String checkToken() {
+    // retrieve the auth token shared preferences
+    String authKey = context.getResources().getString(R.string.AUTH_PREF);
+    String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
+    return context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+        .getString(tokenKey, "DEFAULT");
+  }
 
   /**
    * Initializes all the livedata that this repository exposes
@@ -111,7 +114,7 @@ public class SubRepositoryImpl implements SubRepository {
             Log.e(TAG, "Error parsing the response: " + e.toString());
           }
         },
-        error -> Log.d(TAG, "Error : " + error.getMessage()), authToken));
+        (VolleyError error) -> Log.d(TAG, "Error : " + error.networkResponse.statusCode), checkToken()));
   }
 
   /**
@@ -176,7 +179,7 @@ public class SubRepositoryImpl implements SubRepository {
 
         }, (VolleyError e) -> {
       Log.d(TAG, "There was an error retrieving the response from the server " + e.getMessage());
-    }, authToken));
+    }, checkToken()));
   }
 
 
@@ -242,7 +245,7 @@ public class SubRepositoryImpl implements SubRepository {
           },
           error -> {
             Log.d(TAG, "error retrieving this search results");
-          }, authToken));
+          }, checkToken()));
   }
 
   /**
