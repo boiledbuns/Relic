@@ -161,13 +161,13 @@ public class DisplaySubView extends Fragment {
     int actionCode = 0;
 
     switch (item.getItemId()) {
-      case R.id.display_sub_best: actionCode = PostRepository.SORT_BEST;
-      case R.id.display_sub_controversial: actionCode = PostRepository.SORT_CONTROVERSIAL;
-      case R.id.display_sub_hot: actionCode = PostRepository.SORT_HOT;
-      case R.id.display_sub_new: actionCode = PostRepository.SORT_NEW;
-      case R.id.display_sub_random: actionCode = PostRepository.SORT_RANDOM;
-      case R.id.display_sub_rising: actionCode = PostRepository.SORT_RISING;
-      case R.id.display_sub_top: actionCode = PostRepository.SORT_TOP;
+      case R.id.display_sub_best: actionCode = PostRepository.SORT_BEST; break;
+      case R.id.display_sub_controversial: actionCode = PostRepository.SORT_CONTROVERSIAL; break;
+      case R.id.display_sub_hot: actionCode = PostRepository.SORT_HOT; break;
+      case R.id.display_sub_new: actionCode = PostRepository.SORT_NEW; break;
+      case R.id.display_sub_random: actionCode = PostRepository.SORT_RANDOM; break;
+      case R.id.display_sub_rising: actionCode = PostRepository.SORT_RISING; break;
+      case R.id.display_sub_top: actionCode = PostRepository.SORT_TOP; break;
 
       default: override = super.onOptionsItemSelected(item);
     }
@@ -176,6 +176,7 @@ public class DisplaySubView extends Fragment {
     if (actionCode != 0) {
       //TODO route action through the vm
       Toast.makeText(getContext(), "Sorting option selected " + actionCode, Toast.LENGTH_SHORT).show();
+      displaySubVM.changeSortingMethod(actionCode);
     }
 
     return override;

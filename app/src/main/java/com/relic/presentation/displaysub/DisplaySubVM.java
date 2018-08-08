@@ -119,6 +119,14 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
 
   @Override
+  public void changeSortingMethod(int sortingCode) {
+    // remove all posts from current db for this subreddit before retrieving new posts
+    postRepo.clearAllSubPosts(subName);
+    postRepo.retrieveSortedPosts(subName, sortingCode);
+  }
+
+
+  @Override
   public void onNextListing(String nextVal) {
     Log.d(TAG, "Retrieving next posts with " + nextVal);
     // retrieve the "after" value for the next posting

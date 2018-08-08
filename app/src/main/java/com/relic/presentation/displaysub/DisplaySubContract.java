@@ -28,6 +28,8 @@ public class DisplaySubContract {
 
     String getSubName();
 
+    void changeSortingMethod(int sortingCode);
+
     void retrieveMorePosts(boolean resetPosts);
 
     void updateSubStatus(boolean subscribe);

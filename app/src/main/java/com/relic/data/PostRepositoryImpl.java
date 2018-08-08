@@ -101,7 +101,7 @@ public class PostRepositoryImpl implements PostRepository {
           public void onResponse(String response) {
             //Log.d(TAG, "Loaded reponse ");
             try {
-              parsePosts(response, subredditName);
+              new InsertPostsTask(appDB, parsePosts(response, subredditName)).execute();
             }
             catch (ParseException error) {
               Log.d(TAG, "Error: " + error.getMessage());
@@ -129,13 +129,20 @@ public class PostRepositoryImpl implements PostRepository {
     // TODO convert normal retrieve posts to use this method, sorting hot by default
 
     // generate the ending of the request url based on sorting method specified by the used
-    String ending = "r/" + subredditName + "/" + sortByMethods[sortByCode + 1];
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
+    String ending = ENDPOINT + "r/" + subredditName + "/" + sortByMethods[sortByCode - 1] + "?t=day";
+    Log.d(TAG, ending);
+    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ending,
         (String response) -> {
           Log.d(TAG, response);
+          try {
+            parsePosts(response, subredditName);
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+
         },
         (VolleyError volleyError) -> {
-
+          Log.d(TAG, "Error retrieving sorted posts " + volleyError.networkResponse.statusCode);
         }, checkToken()));
   }
 
@@ -145,7 +152,8 @@ public class PostRepositoryImpl implements PostRepository {
    * @param response the json response from the server with the listing object
    * @throws ParseException
    */
-  private void parsePosts(String response, String subreddit) throws ParseException {
+  private List<PostEntity> parsePosts(String response, String subreddit) throws ParseException {
+    //TODO separate into two separate methods and switch to multithreaded to avoid locking main thread
     JSONObject listingData = (JSONObject) ((JSONObject) JSONParser.parse(response)).get("data");
     JSONArray listingPosts = (JSONArray) (listingData).get("children");
 
@@ -174,6 +182,8 @@ public class PostRepositoryImpl implements PostRepository {
 
     // insert all the post entities into the db
     new InsertPostsTask(appDB, postEntities).execute(listing);
+
+    return postEntities;
   }
 
 
@@ -299,14 +309,18 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
-  // Exposes sorting option codes
-  public static class SortOptions {
-    static int SORT_BEST = 1;
-    static int SORT_CONTROVERSIAL = 2;
-    static int SORT_HOT = 3;
-    static int SORT_NEW = 4;
-    static int SORT_RANDOM = 5;
-    static int SORT_RISING = 6;
-    static int SORT_TOP = 7;
+  @Override
+  public void clearAllSubPosts(String subredditName) {
+    new ClearSubredditPosts().execute(appDB, subredditName);
+  }
+
+  private static class ClearSubredditPosts extends AsyncTask <Object, Integer, Integer>{
+    @Override
+      protected Integer doInBackground(Object... objects) {
+        ApplicationDB appDB = (ApplicationDB) objects[0];
+        appDB.getPostDao().deleteAllFromSub((String) objects[1]);
+
+        return null;
+      }
   }
 }
