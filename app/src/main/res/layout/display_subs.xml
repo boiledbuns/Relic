@@ -15,42 +15,45 @@
             type="Boolean"/>
     </data>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/display_subs_swiperefreshlayout"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <RelativeLayout
+        <include layout="@layout/toolbar"
+             android:id="@+id/display_subs_toolbar"/>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/display_subs_swiperefreshlayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_below="@+id/display_subs_toolbar">
 
-            <include layout="@layout/toolbar"
-                android:id="@+id/display_subs_toolbar"/>
+        <!-- displays all subscribed subs-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/display_subs_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingEnd="@dimen/subitem_margin"
+            android:paddingBottom="@dimen/subitem_margin"
+            android:visibility="@{subscribedListIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
+            <!--android:layout_below="@+id/display_subs_toolbar"-->
 
-            <!-- displays all subscribed subs-->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/display_subs_recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingEnd="@dimen/subitem_margin"
-                android:paddingBottom="@dimen/subitem_margin"
-                android:layout_below="@+id/display_subs_toolbar"
-                android:visibility="@{subscribedListIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
 
-            <!-- Displays search results -->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/search_subs_recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/search_suggestions_margin_side"
-                android:layout_marginEnd="@dimen/search_suggestions_margin_side"
-                android:background="@color/lightGray"
-                android:visibility="@{searchIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
+        <!-- Displays search results -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/search_subs_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/search_suggestions_margin_side"
+            android:layout_marginEnd="@dimen/search_suggestions_margin_side"
+            android:background="@color/lightGray"
+            android:visibility="@{searchIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
 
-        </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </RelativeLayout>
 
 </layout>

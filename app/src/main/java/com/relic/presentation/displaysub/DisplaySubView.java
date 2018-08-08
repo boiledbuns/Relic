@@ -31,7 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.relic.R;
+import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
@@ -99,7 +101,9 @@ public class DisplaySubView extends Fragment {
     // initialize the reference to the swiperefresh layout
     swipeRefresh = displaySubBinding.getRoot().findViewById(R.id.display_posts_swipeRefreshLayout);
 
+    // attach the listeners responsible checking if the user has scrolled to the bottom of the view
     attachScrollListeners();
+    // initialize menu onclicks
     initializeActionbar();
     return displaySubBinding.getRoot();
   }
@@ -117,7 +121,6 @@ public class DisplaySubView extends Fragment {
       Integer position = savedInstanceState.getInt(SCROLL_POSITION);
       Log.d(TAG, "Previous position = " + position);
       // scroll to the previous position before reconfiguration change
-
       // Temporary fix until a better solution is found for jumping to last view position on
       //displaySubBinding.displayPostsRecyclerview.smoothScrollToPosition(position);
     }
@@ -152,12 +155,38 @@ public class DisplaySubView extends Fragment {
     });
   }
 
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    boolean override = true;
+    int actionCode = 0;
 
+    switch (item.getItemId()) {
+      case R.id.display_sub_best: actionCode = PostRepository.SORT_BEST;
+      case R.id.display_sub_controversial: actionCode = PostRepository.SORT_CONTROVERSIAL;
+      case R.id.display_sub_hot: actionCode = PostRepository.SORT_HOT;
+      case R.id.display_sub_new: actionCode = PostRepository.SORT_NEW;
+      case R.id.display_sub_random: actionCode = PostRepository.SORT_RANDOM;
+      case R.id.display_sub_rising: actionCode = PostRepository.SORT_RISING;
+      case R.id.display_sub_top: actionCode = PostRepository.SORT_TOP;
+
+      default: override = super.onOptionsItemSelected(item);
+    }
+
+    // perform the sort if anything one of the valid sorting options have been selected
+    if (actionCode != 0) {
+      //TODO route action through the vm
+      Toast.makeText(getContext(), "Sorting option selected " + actionCode, Toast.LENGTH_SHORT).show();
+    }
+
+    return override;
+  }
+
+  /**
+   * Observe all the livedata exposed by the viewmodel and attach the appropriate event listeners
+   */
   private void subscribeToVM() {
-    // observe the livedata list contained in the viewmodel
-    displaySubVM.getPosts().observe(this, new Observer<List<PostModel>>() {
-      @Override
-      public void onChanged(@Nullable List<PostModel> postModels) {
+    // observe the livedata list of posts for this subreddit
+    displaySubVM.getPosts().observe(this, (@Nullable List<PostModel> postModels) -> {
         Log.d(TAG, "Post models retrieved");
         if (postModels != null) {
           Log.d(TAG, "size of " + postModels.size());
@@ -166,17 +195,13 @@ public class DisplaySubView extends Fragment {
 
           swipeRefresh.setRefreshing(false);
         }
-      }
     });
 
-    // observe the subreddit model
-    displaySubVM.getSubModel().observe(this, new Observer<SubredditModel>() {
-      @Override
-      public void onChanged(@Nullable SubredditModel subredditModel) {
+    // observe the subreddit model representing this subreddit
+    displaySubVM.getSubModel().observe(this, (@Nullable SubredditModel subredditModel) -> {
         if (subredditModel != null) {
           displaySubBinding.setSubModel(subredditModel);
         }
-      }
     });
 
 //    displaySubVM.getIsSubscribed().observe(this, new Observer<Boolean>() {

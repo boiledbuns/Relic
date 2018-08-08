@@ -126,6 +126,8 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   }
 
 
+
+
   public void updateSubStatus(boolean toSubscribe) {
     Log.d(TAG, "Changing to subscribed " + toSubscribe);
 
