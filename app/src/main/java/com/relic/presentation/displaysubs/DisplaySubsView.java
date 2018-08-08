@@ -181,7 +181,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // observe whether all subscribed subreddits have been loaded
     viewModel.getAllSubscribedSubsLoaded().observe(this, (Boolean completelyLoaded) -> {
       Log.d(TAG, "Refreshing status changed to " + completelyLoaded);
-      if (completelyLoaded != null || completelyLoaded) {
+      if (completelyLoaded) {
         swipeRefreshLayout.setRefreshing(false);
       } else {
         swipeRefreshLayout.setRefreshing(true);

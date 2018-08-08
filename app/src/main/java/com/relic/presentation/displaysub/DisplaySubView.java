@@ -179,7 +179,6 @@ public class DisplaySubView extends Fragment {
       }
     });
 
-    //
 //    displaySubVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
 //      @Override
 //      public void onChanged(@Nullable Boolean subscribed) {
@@ -241,14 +240,8 @@ public class DisplaySubView extends Fragment {
     TextView title = myToolbar.findViewById(R.id.my_toolbar_title);
     CollapsingToolbarLayout collapsingToolbarLayout = displaySubBinding.getRoot().findViewById(R.id.display_sub_collapsingtoolbarlayout);
 
-
-    //collapsingToolbarLayout.setText
-
-//    title.setText(subName);
-//    ((TextView) myToolbar.findViewById(R.id.my_toolbar_subtitle)).setText("popular");
     myToolbar.setTitle(subName);
     myToolbar.setSubtitle("Sorting by new");
-
 
 
     AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
@@ -257,7 +250,7 @@ public class DisplaySubView extends Fragment {
     }
 
     // set onclick to display sub info when the title is clicked
-    title.setOnClickListener(new View.OnClickListener() {
+    appBarLayout.findViewById(R.id.display_sub_toolbar).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         Toast.makeText(getActivity(), "Title Clicked", Toast.LENGTH_SHORT).show();
@@ -271,6 +264,8 @@ public class DisplaySubView extends Fragment {
       }
     });
 
+    // adds listener for state change for the appbarlayout issue that always opens it when
+    // returning to this fragment after popping another off of the stack
     appBarLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
       @Override
       public void onViewAttachedToWindow(View view) {

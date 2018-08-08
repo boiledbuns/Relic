@@ -19,6 +19,7 @@ import java.util.List;
 public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback, RetrieveNextListingCallback{
   private final String TAG = "DISPLAY_SUBS_VM";
   private boolean initialized;
+  private boolean refreshing;
 
   private SubRepository subRepo;
   private ListingRepository listingRepo;
@@ -53,8 +54,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
       initializeObservers();
       initialized = true;
     }
-    // refresh the token even if the vm has already been initialized
-    auth.refreshToken(this);
   }
 
 
@@ -65,9 +64,17 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     //subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), subscribedSubsMediator::setValue);
     subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), (List<SubredditModel> subscribedSubs) -> {
       Log.d(TAG, " subs loaded " + subscribedSubs);
+      if (subscribedSubs.isEmpty()) {
+        // refresh the token even if the vm has already been initialized
+        authenticator.refreshToken(this);
+      } else {
         subscribedSubsMediator.setValue(subscribedSubs);
+      }
     });
 
+//    onAllSubsLoaded.addSource(subRepo.getAllSubscribedSubsLoaded(), (Boolean allSubsLoaded) -> {
+//      if
+//    });
 //    // Observe changes to keys to request new data
 //    subscribedSubsMediator.addSource(listingRepo.getKey(), (@Nullable String nextVal) -> {
 //      // retrieve posts only if the "after" value is empty
@@ -98,6 +105,7 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   @Override
   public void retrieveMoreSubs(boolean resetPosts) {
     if (resetPosts) {
+      refreshing = true;
       // refresh token before performing any requests
       authenticator.refreshToken(this);
     }

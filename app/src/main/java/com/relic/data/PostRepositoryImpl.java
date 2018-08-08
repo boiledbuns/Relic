@@ -42,7 +42,6 @@ public class PostRepositoryImpl implements PostRepository {
   private String[] sortByMethods = {"best", "controversial", "hot", "new", "random", "rising", "top"};
 
   private Context context;
-  private String authToken;
   private JSONParser JSONParser;
   private ApplicationDB appDB;
 
@@ -54,16 +53,18 @@ public class PostRepositoryImpl implements PostRepository {
     requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
     JSONParser = new JSONParser();
 
-    // get the oauth token from the app's shared preferences
-    String authKey = context.getResources().getString(R.string.AUTH_PREF);
-    String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
-    authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-        .getString(tokenKey, "DEFAULT");
-
     // initialize reference to the database
     appDB = ApplicationDB.getDatabase(context);
   }
 
+  // get the oauth token from the app's shared preferences
+  private String checkToken() {
+    // retrieve the auth token shared preferences
+    String authKey = context.getResources().getString(R.string.AUTH_PREF);
+    String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
+    return context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+        .getString(tokenKey, "DEFAULT");
+  }
 
   /**
    * Exposes the livedata list of posts
@@ -111,7 +112,7 @@ public class PostRepositoryImpl implements PostRepository {
       public void onErrorResponse(VolleyError error) {
         Log.d(TAG, "Error: " + error.getMessage());
       }
-    }, authToken));
+    }, checkToken()));
   }
 
 
@@ -135,7 +136,7 @@ public class PostRepositoryImpl implements PostRepository {
         },
         (VolleyError volleyError) -> {
 
-        }, authToken));
+        }, checkToken()));
   }
 
 
@@ -276,7 +277,7 @@ public class PostRepositoryImpl implements PostRepository {
           public void onErrorResponse(VolleyError error) {
             Log.d(TAG, "Error: "   + error.networkResponse.statusCode);
           }
-        }, authToken));
+        }, checkToken()));
   }
 
 

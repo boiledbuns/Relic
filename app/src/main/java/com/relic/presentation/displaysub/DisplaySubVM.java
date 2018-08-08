@@ -62,7 +62,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
         @Override
         public void onChanged(@Nullable SubredditModel newModel) {
           if (newModel == null) {
-            Log.d(TAG, "No subreddit not saved locally, retrieving from network");
+            Log.d(TAG, "No subreddit saved locally, retrieving from network");
             subRepo.retrieveSingleSub(subName);
           }
           else {
