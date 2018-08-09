@@ -24,4 +24,11 @@
     <string name="sortby_rising">rising</string>
     <string name="sortby_top">top</string>
 
+    <string name="sort_scope_hour">hour</string>
+    <string name="sort_scope_day">day</string>
+    <string name="sort_scope_week">week</string>
+    <string name="sort_scope_month">month</string>
+    <string name="sort_scope_year">year</string>
+    <string name="sort_scope_all">all</string>
+
 </resources>

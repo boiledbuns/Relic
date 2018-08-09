@@ -9,10 +9,10 @@ import android.support.annotation.NonNull;
 @Entity
 public class PostEntity {
   // api metadata
+  @PrimaryKey(autoGenerate = true)
+  public int order;
 
   // every post is associated with a listing (many posts to one listing)
-  @NonNull
-  @PrimaryKey
   @ColumnInfo(name = "id")
   public String name;
 //  public String getSubreddit_id;

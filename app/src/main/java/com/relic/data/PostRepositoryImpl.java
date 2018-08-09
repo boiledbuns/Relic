@@ -39,7 +39,7 @@ public class PostRepositoryImpl implements PostRepository {
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
   private final String TAG = "POST_REPO";
 
-  private String[] sortByMethods = {"best", "controversial", "hot", "new", "random", "rising", "top"};
+  private String[] sortByMethods = {"best", "controversial", "hot", "new", "rising", "top"};
 
   private Context context;
   private JSONParser JSONParser;
@@ -99,9 +99,10 @@ public class PostRepositoryImpl implements PostRepository {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            //Log.d(TAG, "Loaded reponse ");
+            //Log.d(TAG, "Loaded response ");
             try {
-              new InsertPostsTask(appDB, parsePosts(response, subredditName)).execute();
+              parsePosts(response, subredditName);
+              //new InsertPostsTask(appDB, parsePosts(response, subredditName)).execute();
             }
             catch (ParseException error) {
               Log.d(TAG, "Error: " + error.getMessage());

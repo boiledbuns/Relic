@@ -1,7 +1,5 @@
 package com.relic.presentation.displaysub;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
@@ -33,7 +31,6 @@ import android.widget.Toast;
 import com.relic.R;
 import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
-import com.relic.data.SubRepository;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
@@ -134,6 +131,9 @@ public class DisplaySubView extends Fragment {
     //inflater.inflate(R.menu.search_menu, menu);
     inflater.inflate(R.menu.display_sub_menu, menu);
 
+
+    //menu.findItem(R.id.display_sub_hot).getSubMenu().addSubMenu(R.menu.order_scope_menu);
+
     searchMenuItem = menu.findItem(R.id.display_sub_searchitem);
     searchView = (SearchView) searchMenuItem.getActionView();
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
@@ -165,7 +165,6 @@ public class DisplaySubView extends Fragment {
       case R.id.display_sub_controversial: actionCode = PostRepository.SORT_CONTROVERSIAL; break;
       case R.id.display_sub_hot: actionCode = PostRepository.SORT_HOT; break;
       case R.id.display_sub_new: actionCode = PostRepository.SORT_NEW; break;
-      case R.id.display_sub_random: actionCode = PostRepository.SORT_RANDOM; break;
       case R.id.display_sub_rising: actionCode = PostRepository.SORT_RISING; break;
       case R.id.display_sub_top: actionCode = PostRepository.SORT_TOP; break;
 
@@ -176,6 +175,14 @@ public class DisplaySubView extends Fragment {
     if (actionCode != 0) {
       //TODO route action through the vm
       Toast.makeText(getContext(), "Sorting option selected " + actionCode, Toast.LENGTH_SHORT).show();
+      // TODO check connection
+
+      // delete current items in the adapter
+      displaySubBinding.displayPostsRecyclerview.getLayoutManager().scrollToPosition(0);
+      appBarLayout.setExpanded(true);
+      swipeRefresh.setRefreshing(true);
+      postAdapter.clearCurrentPosts();
+
       displaySubVM.changeSortingMethod(actionCode);
     }
 
@@ -241,16 +248,14 @@ public class DisplaySubView extends Fragment {
     });
 
     // Attach listener for refreshing the sub
-    swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-      @Override
-      public void onRefresh() {
-        // empties current items to show that it's being refreshed
-        postAdapter.resetPostList();
+    swipeRefresh.setOnRefreshListener(() -> {
+      // empties current items to show that it's being refreshed
+      displaySubBinding.displayPostsRecyclerview.getLayoutManager().scrollToPosition(0);
+      postAdapter.clearCurrentPosts();
 
-        // refresh the listing for this sub
-        displaySubVM.retrieveMorePosts(true);
-        Log.d(TAG, "Top pulled, posts refreshed");
-      }
+      // refresh the listing for this sub
+      displaySubVM.retrieveMorePosts(true);
+      Log.d(TAG, "Top pulled, posts refreshed");
     });
   }
 
@@ -268,7 +273,6 @@ public class DisplaySubView extends Fragment {
 
     myToolbar.setTitle(subName);
     myToolbar.setSubtitle("Sorting by new");
-
 
     AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
     if (parentActivity != null) {

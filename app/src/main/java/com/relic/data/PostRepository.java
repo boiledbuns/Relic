@@ -12,9 +12,8 @@ public interface PostRepository {
   int SORT_CONTROVERSIAL = 2;
   int SORT_HOT = 3;
   int SORT_NEW = 4;
-  int SORT_RANDOM = 5;
-  int SORT_RISING = 6;
-  int SORT_TOP = 7;
+  int SORT_RISING = 5;
+  int SORT_TOP = 6;
 
   /**
    * exposes livedata list of posts for a given subreddit

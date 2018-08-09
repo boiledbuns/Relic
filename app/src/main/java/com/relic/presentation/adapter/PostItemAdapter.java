@@ -108,7 +108,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
   /**
    * Clears all the data from the current list and tells list to show as empty
    */
-  public void resetPostList() {
+  public void clearCurrentPosts() {
     if (postList != null) {
       postList.clear();
       notifyDataSetChanged();
