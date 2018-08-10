@@ -47,10 +47,11 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
         @Override
         public void onChanged(@Nullable List<PostModel> postModels) {
           if (postModels != null && postModels.isEmpty()) {
-            Log.d(TAG, "empty posts");
-            retrieveMorePosts(true);
+            Log.d(TAG, "Local posts have been emptied -> retrieving more posts");
+            // we pass null for the value of next to tell repo that we're refreshing
+            postRepo.retrieveMorePosts(subName, null);
           } else {
-            Log.d(TAG, "not empty posts");
+            Log.d(TAG, postModels.size() + " posts retrieved were from the network");
             postListMediator.setValue(postModels);
           }
         }
@@ -108,14 +109,16 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   @Override
   public void retrieveMorePosts(boolean resetPosts) {
     if (resetPosts) {
-      // we pass null for the value of next to tell repo that we're refreshing
-      postRepo.retrieveMorePosts(subName, null);
+      // all we have to do is clear entries in room -> our observer for the posts will auto
+      // download new posts when it's empty
+      postRepo.clearAllSubPosts(subName);
     }
     else {
       // retrieve the "after" value for the next posting
       postRepo.getNextPostingVal(this, subName);
     }
   }
+
 
 
   @Override

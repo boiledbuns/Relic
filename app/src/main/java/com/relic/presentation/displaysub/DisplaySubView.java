@@ -130,8 +130,6 @@ public class DisplaySubView extends Fragment {
     super.onCreateOptionsMenu(menu, inflater);
     //inflater.inflate(R.menu.search_menu, menu);
     inflater.inflate(R.menu.display_sub_menu, menu);
-
-
     //menu.findItem(R.id.display_sub_hot).getSubMenu().addSubMenu(R.menu.order_scope_menu);
 
     searchMenuItem = menu.findItem(R.id.display_sub_searchitem);
@@ -173,17 +171,19 @@ public class DisplaySubView extends Fragment {
 
     // perform the sort if anything one of the valid sorting options have been selected
     if (actionCode != 0) {
-      //TODO route action through the vm
       Toast.makeText(getContext(), "Sorting option selected " + actionCode, Toast.LENGTH_SHORT).show();
-      // TODO check connection
 
       // delete current items in the adapter
-      displaySubBinding.displayPostsRecyclerview.getLayoutManager().scrollToPosition(0);
+      LinearLayoutManager lm = (LinearLayoutManager) displaySubBinding.displayPostsRecyclerview.getLayoutManager();
+
+
       appBarLayout.setExpanded(true);
       swipeRefresh.setRefreshing(true);
       postAdapter.clearCurrentPosts();
 
+
       displaySubVM.changeSortingMethod(actionCode);
+      lm.scrollToPositionWithOffset(0, 0);
     }
 
     return override;
@@ -253,7 +253,7 @@ public class DisplaySubView extends Fragment {
       displaySubBinding.displayPostsRecyclerview.getLayoutManager().scrollToPosition(0);
       postAdapter.clearCurrentPosts();
 
-      // refresh the listing for this sub
+      // tells vm to clear the posts -> triggers action to retrieve more
       displaySubVM.retrieveMorePosts(true);
       Log.d(TAG, "Top pulled, posts refreshed");
     });

@@ -85,11 +85,7 @@ public class PostRepositoryImpl implements PostRepository {
   public void retrieveMorePosts(String subredditName, String after) {
     String ending = "r/" + subredditName;
     // reset posts for this subreddit if the after values have been set to null
-    if (after == null) {
-      // delete all the current items for the db
-      new DeleteSubPostsTask(appDB).execute(subredditName);
-    }
-    else {
+    if (after != null) {
       // change the api endpoint to access to get the next post listing
       ending += "?after=" + after;
     }
