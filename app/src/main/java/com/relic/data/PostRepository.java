@@ -8,12 +8,21 @@ import com.relic.data.models.PostModel;
 import java.util.List;
 
 public interface PostRepository {
+  int SORT_DEFAULT = 0;
   int SORT_BEST = 1;
   int SORT_CONTROVERSIAL = 2;
   int SORT_HOT = 3;
   int SORT_NEW = 4;
   int SORT_RISING = 5;
   int SORT_TOP = 6;
+
+  int SCOPE_NONE = 0;
+  int SCOPE_HOUR = 1;
+  int SCOPE_DAY = 2;
+  int SCOPE_WEEK = 3;
+  int SCOPE_MONTH = 4;
+  int SCOPE_YEAR = 5;
+  int SCOPE_ALL = 6;
 
   /**
    * exposes livedata list of posts for a given subreddit
@@ -51,11 +60,14 @@ public interface PostRepository {
   void retrievePost(String subredditName, String postFullName);
 
   /**
-   * retrieves posts from network based on sorting method and stores them locally
+   * changes the sorting method for the repository and
    * @param subredditName
    * @param sortByCode
    */
-  void retrieveSortedPosts(String subredditName, int sortByCode);
+  void changeSortingMethod(String subredditName, int sortByCode, int sortScopeCode);
+
+
+  void changeSortingMethod(String subredditName, int sortByCode);
 
   /**
    * //TODO tentative -> should expose or not

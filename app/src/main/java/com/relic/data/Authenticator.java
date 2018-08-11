@@ -3,6 +3,7 @@ package com.relic.data;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,6 +21,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,8 +48,9 @@ public class Authenticator {
 
   private Context appContext;
   private RequestQueue requestQueue;
+  private Date lastRefresh;
 
-  private static Authenticator INSTANCE;
+  //private static Authenticator INSTANCE;
 
   /**
    * Private constructor to initialize the single instance of the Authenticator
@@ -60,16 +64,24 @@ public class Authenticator {
     tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
     refreshTokenKey = context.getResources().getString(R.string.REFRESH_TOKEN_KEY);
     redirectCode = context.getString(R.string.REDIRECT_CODE);
-  }
 
 
-  public static Authenticator getAuthenticator(Context context) {
-    if (INSTANCE == null) {
-      // initialize the instance of the authenticator if it's null
-      INSTANCE = new Authenticator(context);
+    if (isAuthenticated()) {
+      // refresh the auth token
+      // move the date change to the refresh method
+      Log.d(TAG, "Current date/time: " + Calendar.getInstance().getTime());
+      lastRefresh = Calendar.getInstance().getTime();
     }
-    return INSTANCE;
   }
+
+
+//  public static Authenticator getAuthenticator(Context context) {
+//    if (INSTANCE == null) {
+//      // initialize the instance of the authenticator if it's null
+//      INSTANCE = new Authenticator(context);
+//    }
+//    return INSTANCE;
+//  }
 
 
   public String getUrl() {
@@ -136,6 +148,8 @@ public class Authenticator {
           public void onResponse(String response) {
             Log.d(TAG, "Token refreshed" + response);
             saveReturn(response, callback);
+
+            // set time of refresh
           }
         },
         new Response.ErrorListener() {

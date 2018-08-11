@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- actionbar -->
+    <!-- toolbar -->
     <dimen name="toolbar_height">52dp</dimen>
     <dimen name="toolbar_paddingtop">4dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
@@ -8,8 +8,13 @@
 
     <dimen name="toolbar_h1">18dp</dimen>
     <dimen name="toolbar_h2">12dp</dimen>
-    <dimen name="search_padding">4dp</dimen>
 
+    <dimen name="toolbar_subtitle_margin_side">32dp</dimen>
+    <dimen name="toolbar_subtitle_margin_bottom">16dp</dimen>
+
+    <dimen name="appbarlayout_title_margin_bottom">40dp</dimen>
+
+    <dimen name="search_padding">4dp</dimen>
     <dimen name="search_suggestions_margin_side">20dp</dimen>
     <dimen name="search_suggestions_padding_side">6dp</dimen>
     <dimen name="search_item_padding">6dp</dimen>
@@ -54,4 +59,8 @@
 
     <!-- display image -->
     <dimen name="displayimage_margin">12dp</dimen>
+
+
+    <!-- display sub info -->
+    <dimen name="displaysub_info_padding">16dp</dimen>
 </resources>

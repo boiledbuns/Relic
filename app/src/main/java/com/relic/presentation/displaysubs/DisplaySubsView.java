@@ -67,7 +67,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
       // initialize the repository and inject it into the viewmodel
       viewModel.init(new SubRepositoryImpl(getContext()), new ListingRepositoryImpl(getContext()),
-          Authenticator.getAuthenticator(this.getContext()));
+          new Authenticator(getContext()));
     }
   }
 

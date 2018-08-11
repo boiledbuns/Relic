@@ -29,7 +29,9 @@
                 android:layout_height="170dp"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snapMargins"
                 app:expandedTitleTextAppearance="@style/collapsingTitleAppearance"
-                app:contentScrim="@color/backgroundSecondary">
+                app:expandedTitleMarginBottom="@dimen/appbarlayout_title_margin_bottom"
+                app:contentScrim="@color/backgroundSecondary"
+                app:scrimAnimationDuration="6">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -48,17 +50,31 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
+                        android:layout_margin="@dimen/postitem_margin"
                         android:textAllCaps="false"
+                        android:textSize="15sp"
+                        android:minWidth="82dp"
                         android:text="@{subModel.isSubscribed ? `subbed` : `subscribe`}"
                         android:onClick="@{() -> displaySubVM.updateSubStatus(!subModel.isSubscribed)}"/>
 
                 </RelativeLayout>
 
                 <include layout="@layout/toolbar"
-                     android:id="@+id/display_sub_toolbar"
-                     android:layout_width="match_parent"
-                     android:layout_height="@dimen/toolbar_height"
-                     app:layout_collapseMode="pin"/>
+                    android:id="@+id/display_sub_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/toolbar_height"
+                    app:layout_collapseMode="pin"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="@dimen/toolbar_subtitle_margin_side"
+                    android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"
+
+                    android:text="sorting by hot"/>
+
 
             </android.support.design.widget.CollapsingToolbarLayout>
 

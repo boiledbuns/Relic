@@ -29,7 +29,8 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 
     // initialize the request queue and authenticator instance
     VolleyQueue.init(getApplicationContext());
-    auth = Authenticator.getAuthenticator(this);
+    //auth = Authenticator.getAuthenticator(this);
+    auth = new Authenticator(this);
     initializeDefaultView();
 
     if (!auth.isAuthenticated()) {
@@ -72,38 +73,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
   }
-
-//  public void customSetTitle (String title, String subtitle) {
-//    if (titleTW != null) {
-//      titleTW.setText(title);
-//    }
-//    if (subtitleTW != null) {
-//      subtitleTW.setText(subtitle);
-//    } else {
-//      subtitleTW.setText("");
-//    }
-//  }
-//
-//  public void customSetTitle (int resId, String subtitle) {
-//    if (titleTW != null) {
-//      titleTW.setText(resId);
-//    }
-//    if (subtitleTW != null) {
-//      subtitleTW.setText(subtitle);
-//    } else {
-//      subtitleTW.setText("");
-//    }
-//  }
-//
-//
-//  public TextView customGetTitle() {
-//    return findViewById(R.id.my_toolbar_title);
-//  }
-//
-//  public View customGetActionbar() {
-//    return findViewById(R.id.my_toolbar);
-//  }
-
 }
 
 

@@ -2,13 +2,10 @@ package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
 
 import com.relic.data.PostRepository;
 import com.relic.data.SubRepository;
@@ -22,6 +19,7 @@ import java.util.List;
 public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
   private final String TAG = "DISPLAY_SUB_VM";
   private boolean isInitialized = false;
+  private int currentSortingCode = PostRepository.SORT_HOT;
 
   private String subName;
   private SubRepository subRepo;
@@ -42,12 +40,15 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       postListMediator = new MediatorLiveData<>();
       subMediator = new MediatorLiveData<>();
 
-
+      // observe the list of posts stored locally
       postListMediator.addSource(postRepo.getPosts(subName), new Observer<List<PostModel>>() {
         @Override
         public void onChanged(@Nullable List<PostModel> postModels) {
           if (postModels != null && postModels.isEmpty()) {
             Log.d(TAG, "Local posts have been emptied -> retrieving more posts");
+
+            // retrieves the posts based on the current
+
             // we pass null for the value of next to tell repo that we're refreshing
             postRepo.retrieveMorePosts(subName, null);
           } else {
@@ -123,9 +124,12 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
   @Override
   public void changeSortingMethod(int sortingCode) {
+    // change the current sorting method
+    currentSortingCode = sortingCode;
+
     // remove all posts from current db for this subreddit before retrieving new posts
     postRepo.clearAllSubPosts(subName);
-    postRepo.retrieveSortedPosts(subName, sortingCode);
+    postRepo.changeSortingMethod(subName, sortingCode);
   }
 
 

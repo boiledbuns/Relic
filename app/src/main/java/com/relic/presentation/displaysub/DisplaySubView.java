@@ -176,14 +176,12 @@ public class DisplaySubView extends Fragment {
       // delete current items in the adapter
       LinearLayoutManager lm = (LinearLayoutManager) displaySubBinding.displayPostsRecyclerview.getLayoutManager();
 
-
       appBarLayout.setExpanded(true);
       swipeRefresh.setRefreshing(true);
       postAdapter.clearCurrentPosts();
 
-
       displaySubVM.changeSortingMethod(actionCode);
-      lm.scrollToPositionWithOffset(0, 0);
+      //lm.scrollToPositionWithOffset(0, 0);
     }
 
     return override;
@@ -212,19 +210,6 @@ public class DisplaySubView extends Fragment {
         }
     });
 
-//    displaySubVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
-//      @Override
-//      public void onChanged(@Nullable Boolean subscribed) {
-//        if (subscribed != null) {
-//          if (subscribed) {
-//            Toast.makeText(getContext(), "Successfully subscribed", Toast.LENGTH_SHORT).show();
-//          } else {
-//            Toast.makeText(getContext(), "Successfully unsubscribed", Toast.LENGTH_SHORT).show();
-//          }
-//          // TODO remove this observer once we have consumed the event
-//        }
-//      }
-//    });
   }
 
 
@@ -308,6 +293,14 @@ public class DisplaySubView extends Fragment {
       @Override
       public void onViewDetachedFromWindow(View view) {
         appBarLayout.setExpanded(false);
+      }
+    });
+
+    appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+      @Override
+      public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+        boolean collapsed = offset > appBarLayout.getTotalScrollRange();
+        myToolbar.setSubtitle("Sorting by hot");
       }
     });
   }

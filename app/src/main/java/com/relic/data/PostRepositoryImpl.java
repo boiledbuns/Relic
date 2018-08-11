@@ -40,12 +40,14 @@ public class PostRepositoryImpl implements PostRepository {
   private final String TAG = "POST_REPO";
 
   private String[] sortByMethods = {"best", "controversial", "hot", "new", "rising", "top"};
+  private String[] sortScopes = {"hour", "day", "week", "month", "year", "all"};
 
   private Context context;
   private JSONParser JSONParser;
   private ApplicationDB appDB;
 
   private RequestQueue requestQueue;
+  private int currentSortingCode = PostRepository.SORT_HOT;
 
 
   public PostRepositoryImpl(Context context) {
@@ -113,20 +115,29 @@ public class PostRepositoryImpl implements PostRepository {
   }
 
 
+
+  public void changeSortingMethod(String subredditName, int sortByCode) {
+    changeSortingMethod(subredditName, sortByCode, 0);
+  }
+
+
   /**
    * Deletes all locally stored posts and retrieves a new set based on the sorting method specified
    * by the caller
    * @param subredditName name of the subreddit for the posts to be retrieved
    * @param sortByCode code for the associated sort by method
+   * @param sortScopeCode  code for the associate time span to sort by
    */
   @Override
-  public void retrieveSortedPosts(String subredditName, int sortByCode) {
-    // TODO delete previous posts for this subreddit from the db
-    // TODO add marker for posts from frontpage/popular/all to prevent deleting them?
-    // TODO convert normal retrieve posts to use this method, sorting hot by default
-
+  public void changeSortingMethod(String subredditName, int sortByCode, int sortScopeCode) {
     // generate the ending of the request url based on sorting method specified by the used
-    String ending = ENDPOINT + "r/" + subredditName + "/" + sortByMethods[sortByCode - 1] + "?t=day";
+    String ending = ENDPOINT + "r/" + subredditName;
+
+    if (sortByCode != SORT_DEFAULT && sortByCode <= sortByMethods.length) {
+      // build the appropriate endpoint based on the "sort by" code and time scope
+      ending += "/" + sortByMethods[sortByCode - 1] + "?t=" + sortScopes[sortScopeCode - 1];
+    }
+
     Log.d(TAG, ending);
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, ending,
         (String response) -> {
