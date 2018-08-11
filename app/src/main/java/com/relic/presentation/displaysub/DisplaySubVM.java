@@ -19,7 +19,8 @@ import java.util.List;
 public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
   private final String TAG = "DISPLAY_SUB_VM";
   private boolean isInitialized = false;
-  private int currentSortingCode = PostRepository.SORT_HOT;
+  private int currentSortingCode = PostRepository.SORT_DEFAULT;
+  private int currentSortingScope = PostRepository.SCOPE_ALL;
 
   private String subName;
   private SubRepository subRepo;
@@ -44,14 +45,13 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       postListMediator.addSource(postRepo.getPosts(subName), new Observer<List<PostModel>>() {
         @Override
         public void onChanged(@Nullable List<PostModel> postModels) {
+          // retrieve posts when the posts stored locally for this sub have been cleared
           if (postModels != null && postModels.isEmpty()) {
             Log.d(TAG, "Local posts have been emptied -> retrieving more posts");
-
-            // retrieves the posts based on the current
-
-            // we pass null for the value of next to tell repo that we're refreshing
-            postRepo.retrieveMorePosts(subName, null);
-          } else {
+            // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
+            postRepo.retrieveSortedPosts(subName, currentSortingCode, currentSortingScope);
+          }
+          else {
             Log.d(TAG, postModels.size() + " posts retrieved were from the network");
             postListMediator.setValue(postModels);
           }
@@ -110,8 +110,7 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   @Override
   public void retrieveMorePosts(boolean resetPosts) {
     if (resetPosts) {
-      // all we have to do is clear entries in room -> our observer for the posts will auto
-      // download new posts when it's empty
+      // all we have to do is clear entries in room -> our observer for the posts will auto download new posts when it's empty
       postRepo.clearAllSubPosts(subName);
     }
     else {
@@ -123,13 +122,13 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
 
   @Override
-  public void changeSortingMethod(int sortingCode) {
-    // change the current sorting method
+  public void changeSortingMethod(int sortingCode, int sortScope) {
+    // update the current sorting method and scope
     currentSortingCode = sortingCode;
+    currentSortingScope = sortScope;
 
-    // remove all posts from current db for this subreddit before retrieving new posts
+    // remove all posts from current db for this subreddit (triggers retrieval)
     postRepo.clearAllSubPosts(subName);
-    postRepo.changeSortingMethod(subName, sortingCode);
   }
 
 
@@ -139,8 +138,6 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     // retrieve the "after" value for the next posting
     postRepo.retrieveMorePosts(subName, nextVal);
   }
-
-
 
 
   public void updateSubStatus(boolean toSubscribe) {

@@ -28,7 +28,7 @@ public class DisplaySubContract {
 
     String getSubName();
 
-    void changeSortingMethod(int sortingCode);
+    void changeSortingMethod(int sortingCode, int sortScope);
 
     void retrieveMorePosts(boolean resetPosts);
 

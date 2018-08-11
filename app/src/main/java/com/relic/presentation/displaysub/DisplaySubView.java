@@ -156,32 +156,32 @@ public class DisplaySubView extends Fragment {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     boolean override = true;
-    int actionCode = 0;
+    boolean validOption = false;
+
+    int actionCode = PostRepository.SORT_DEFAULT;
+    int scopeCode = PostRepository.SCOPE_NONE;
 
     switch (item.getItemId()) {
-      case R.id.display_sub_best: actionCode = PostRepository.SORT_BEST; break;
-      case R.id.display_sub_controversial: actionCode = PostRepository.SORT_CONTROVERSIAL; break;
-      case R.id.display_sub_hot: actionCode = PostRepository.SORT_HOT; break;
-      case R.id.display_sub_new: actionCode = PostRepository.SORT_NEW; break;
-      case R.id.display_sub_rising: actionCode = PostRepository.SORT_RISING; break;
-      case R.id.display_sub_top: actionCode = PostRepository.SORT_TOP; break;
-
+      case R.id.display_sub_best: actionCode = PostRepository.SORT_BEST; validOption = true; break;
+      case R.id.display_sub_controversial: actionCode = PostRepository.SORT_CONTROVERSIAL; validOption = true; break;
+      case R.id.display_sub_hot: actionCode = PostRepository.SORT_HOT; validOption = true; break;
+      case R.id.display_sub_new: actionCode = PostRepository.SORT_NEW; validOption = true; break;
+      case R.id.display_sub_rising: actionCode = PostRepository.SORT_RISING; validOption = true; break;
+      case R.id.display_sub_top: actionCode = PostRepository.SORT_TOP; validOption = true; break;
       default: override = super.onOptionsItemSelected(item);
     }
 
     // perform the sort if anything one of the valid sorting options have been selected
-    if (actionCode != 0) {
+    if (validOption) {
       Toast.makeText(getContext(), "Sorting option selected " + actionCode, Toast.LENGTH_SHORT).show();
-
-      // delete current items in the adapter
-      LinearLayoutManager lm = (LinearLayoutManager) displaySubBinding.displayPostsRecyclerview.getLayoutManager();
-
+      // update the view to reflect the refresh action
       appBarLayout.setExpanded(true);
       swipeRefresh.setRefreshing(true);
+      // delete current items in the adapter
       postAdapter.clearCurrentPosts();
 
-      displaySubVM.changeSortingMethod(actionCode);
-      //lm.scrollToPositionWithOffset(0, 0);
+      // tell vm to coordinate the change
+      displaySubVM.changeSortingMethod(actionCode, scopeCode);
     }
 
     return override;

@@ -60,14 +60,15 @@ public interface PostRepository {
   void retrievePost(String subredditName, String postFullName);
 
   /**
-   * changes the sorting method for the repository and
+   * clears all current posts for this subreddit and retrieves new ones based on the sorting
+   * method specified
    * @param subredditName
    * @param sortByCode
    */
-  void changeSortingMethod(String subredditName, int sortByCode, int sortScopeCode);
+  void retrieveSortedPosts(String subredditName, int sortByCode, int sortScopeCode);
 
 
-  void changeSortingMethod(String subredditName, int sortByCode);
+  void retrieveSortedPosts(String subredditName, int sortByCode);
 
   /**
    * //TODO tentative -> should expose or not

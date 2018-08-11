@@ -4,20 +4,17 @@ package com.relic.data;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
-import com.relic.data.dao.PostDao;
-import com.relic.data.models.SubredditModel;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -29,10 +26,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class PostRepositoryImpl implements PostRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -84,13 +79,9 @@ public class PostRepositoryImpl implements PostRepository {
    * @param after the full name of the page to retrieve the posts from
    */
   @Override
-  public void retrieveMorePosts(String subredditName, String after) {
-    String ending = "r/" + subredditName;
-    // reset posts for this subreddit if the after values have been set to null
-    if (after != null) {
-      // change the api endpoint to access to get the next post listing
-      ending += "?after=" + after;
-    }
+  public void retrieveMorePosts(String subredditName, @NonNull String after) {
+    // change the api endpoint to access to get the next post listing
+    String ending = "r/" + subredditName + "?after=" + after;
 
     // create the new request and submit it
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
@@ -116,8 +107,8 @@ public class PostRepositoryImpl implements PostRepository {
 
 
 
-  public void changeSortingMethod(String subredditName, int sortByCode) {
-    changeSortingMethod(subredditName, sortByCode, 0);
+  public void retrieveSortedPosts(String subredditName, int sortByCode) {
+    retrieveSortedPosts(subredditName, sortByCode, 0);
   }
 
 
@@ -129,13 +120,19 @@ public class PostRepositoryImpl implements PostRepository {
    * @param sortScopeCode  code for the associate time span to sort by
    */
   @Override
-  public void changeSortingMethod(String subredditName, int sortByCode, int sortScopeCode) {
+  public void retrieveSortedPosts(String subredditName, int sortByCode, int sortScopeCode) {
     // generate the ending of the request url based on sorting method specified by the used
     String ending = ENDPOINT + "r/" + subredditName;
 
+    // change the endpoint based on which sorting option the user has selected
     if (sortByCode != SORT_DEFAULT && sortByCode <= sortByMethods.length) {
       // build the appropriate endpoint based on the "sort by" code and time scope
-      ending += "/" + sortByMethods[sortByCode - 1] + "?t=" + sortScopes[sortScopeCode - 1];
+      ending += "/" + sortByMethods[sortByCode - 1];
+
+      // add the scope to the query string if it has been selected
+      if (sortScopeCode != PostRepository.SCOPE_NONE) {
+        ending += "?t=" + sortScopes[sortScopeCode - 1];
+      }
     }
 
     Log.d(TAG, ending);
