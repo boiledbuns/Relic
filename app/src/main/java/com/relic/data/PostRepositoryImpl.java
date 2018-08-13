@@ -121,7 +121,7 @@ public class PostRepositoryImpl implements PostRepository {
    */
   @Override
   public void retrieveSortedPosts(String subredditName, int sortByCode, int sortScopeCode) {
-    // generate the ending of the request url based on sorting method specified by the used
+    // generate the ending of the request url based on sorting mzethod specified by the used
     String ending = ENDPOINT + "r/" + subredditName;
 
     // change the endpoint based on which sorting option the user has selected
