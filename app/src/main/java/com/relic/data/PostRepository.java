@@ -2,6 +2,8 @@ package com.relic.data;
 
 import android.arch.lifecycle.LiveData;
 
+import com.relic.data.gateway.PostGateway;
+import com.relic.data.gateway.SubGateway;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 
@@ -76,4 +78,11 @@ public interface PostRepository {
    * @param subredditName
    */
   void clearAllSubPosts(String subredditName);
+
+  /**
+   * Exposes gateway for vm to interact with objects stored on the server
+   * @return gateway object for exponsing post actions
+   */
+  PostGateway getPostGateway();
+
 }

@@ -23,7 +23,7 @@ public class PostGatewayImpl implements  PostGateway {
   RequestQueue requestQueue;
 
 
-  private PostGatewayImpl(Context context) {
+  public PostGatewayImpl(Context context) {
     appDb = ApplicationDB.getDatabase(context);
     // Get the key values needed to get the actual authtoken from shared preferences
     String authKey = context.getString(R.string.AUTH_PREF);
@@ -85,4 +85,6 @@ public class PostGatewayImpl implements  PostGateway {
 
     return null;
   }
+
+
 }

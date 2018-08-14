@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
+import com.relic.data.gateway.PostGateway;
+import com.relic.data.gateway.PostGatewayImpl;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -37,7 +39,7 @@ public class PostRepositoryImpl implements PostRepository {
   private String[] sortByMethods = {"best", "controversial", "hot", "new", "rising", "top"};
   private String[] sortScopes = {"hour", "day", "week", "month", "year", "all"};
 
-  private Context context;
+  private Context currentContext;
   private JSONParser JSONParser;
   private ApplicationDB appDB;
 
@@ -46,7 +48,7 @@ public class PostRepositoryImpl implements PostRepository {
 
 
   public PostRepositoryImpl(Context context) {
-    this.context = context;
+    currentContext = context;
     requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
     JSONParser = new JSONParser();
 
@@ -57,9 +59,9 @@ public class PostRepositoryImpl implements PostRepository {
   // get the oauth token from the app's shared preferences
   private String checkToken() {
     // retrieve the auth token shared preferences
-    String authKey = context.getResources().getString(R.string.AUTH_PREF);
-    String tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
-    return context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+    String authKey = currentContext.getResources().getString(R.string.AUTH_PREF);
+    String tokenKey = currentContext.getResources().getString(R.string.TOKEN_KEY);
+    return currentContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
   }
 
@@ -176,10 +178,11 @@ public class PostRepositoryImpl implements PostRepository {
     while (postIterator.hasNext()) {
       JSONObject post = (JSONObject) ((JSONObject) postIterator.next()).get("data");
       //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
-      Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
-      Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
-      Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
-      //Log.d(TAG, "post keys " + post.keySet().toString());
+      //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
+      //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
+      //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
+      Log.d(TAG, "permalink : " + post.get("permalink") + " "+ post.get("url"));
+      Log.d(TAG, "post keys " + post.keySet().toString());
 
       // unmarshall the object and add it into a list
       postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
@@ -327,5 +330,10 @@ public class PostRepositoryImpl implements PostRepository {
 
         return null;
       }
+  }
+
+  @Override
+  public PostGateway getPostGateway() {
+    return new PostGatewayImpl(currentContext);
   }
 }

@@ -6,6 +6,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="android.text.Html"/>
+
         <variable
             name="postItem"
             type="com.relic.data.models.PostModel"/>
@@ -17,7 +18,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
-
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/displaypost_nestedscroll"
@@ -38,6 +38,7 @@
                      android:layout_height="@dimen/toolbar_height"
                      android:elevation="8dp"/>
 
+                <!-- image displayed if the post is an image link -->
                 <ImageView
                     android:id="@+id/displaypost_preview"
                     android:layout_width="match_parent"
@@ -53,8 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/displaypost_paddingtop"
-                    android:layout_marginBottom="@dimen/displaypost_bottommargin"
-                    android:background="?attr/colorPrimary">
+                    android:layout_marginBottom="@dimen/displaypost_bottommargin">
 
                     <TextView
                         android:id="@+id/display_post_title"
@@ -64,11 +64,29 @@
                         android:textSize="@dimen/title_textsize"
                         android:text="@{postItem.title}"/>
 
+                    <!-- card link displayed if the post is a link to another site -->
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/display_post_linkcard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/display_post_linkcard">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{postItem.domain}"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{postItem.url}"/>
+                    </android.support.v7.widget.CardView>
+
                     <TextView
                         android:id="@+id/display_post_author"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/display_post_title"
+                        android:layout_below="@id/display_post_linkcard"
                         android:text="@{postItem.author}"/>
 
                     <TextView

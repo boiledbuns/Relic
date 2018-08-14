@@ -10,6 +10,7 @@ import android.util.Log;
 import com.relic.data.CommentRepository;
 import com.relic.data.ListingRepository;
 import com.relic.data.PostRepository;
+import com.relic.data.gateway.PostGateway;
 import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
@@ -22,6 +23,7 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
   private ListingRepository listingRepo;
   private PostRepository postRepo;
   private CommentRepository commentRepo;
+  private PostGateway postGateway;
 
   private MediatorLiveData<PostModel> currentPost;
   private MediatorLiveData<List<CommentModel>> commentList;
@@ -36,6 +38,7 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     this.listingRepo = listingRepo;
     this.postRepo = postRepo;
     this.commentRepo = commentRepo;
+    postGateway = postRepo.getPostGateway();
 
     subName = subreddit;
     postFullname = fullname;
@@ -98,7 +101,6 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
         });
 
   }
-
 
   /**
    * Refreshes the post and comment data from network
