@@ -275,7 +275,7 @@ public class DisplaySubView extends Fragment {
         bundle.putString("name", subName);
 
         displaySubInfoView.setArguments(bundle);
-        displaySubInfoView.showNow(getFragmentManager(), TAG);
+        displaySubInfoView.show(getActivity().getSupportFragmentManager(), TAG);
       }
     });
 
