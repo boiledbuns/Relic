@@ -146,7 +146,8 @@ public class SubRepositoryImpl implements SubRepository {
     for (Object sub : subs) {
       JSONObject currentSub = (JSONObject) ((JSONObject) sub).get("data");
       //Log.d(TAG, "keys = " + currentSub.keySet());
-      Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
+      // Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
+      Log.d(TAG, currentSub.get("display_name") + "banner url  = " + currentSub.get("community_icon") + " " + currentSub.get("icon_img"));
       subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity.class));
     }
 

@@ -20,6 +20,8 @@ public class SubredditEntity {
   public String public_description_html;
   @ColumnInfo(name = "bannerImgUrl")
   public String banner_img;
+  @ColumnInfo(name = "subIcon")
+  public String community_icon;
 
   @ColumnInfo(name = "isSubscribed")
   public boolean user_is_subscriber;

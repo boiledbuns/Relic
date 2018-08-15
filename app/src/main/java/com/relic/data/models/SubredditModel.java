@@ -18,6 +18,7 @@ public class SubredditModel implements Subreddit, Parcelable {
   public boolean nsfw;
   private boolean isSubscribed;
   private int subscriberCount;
+  private String subIcon;
   private String description;
 
   public SubredditModel () { }
@@ -112,5 +113,13 @@ public class SubredditModel implements Subreddit, Parcelable {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getSubIcon() {
+    return subIcon;
+  }
+
+  public void setSubIcon(String subIcon) {
+    this.subIcon = subIcon;
   }
 }
