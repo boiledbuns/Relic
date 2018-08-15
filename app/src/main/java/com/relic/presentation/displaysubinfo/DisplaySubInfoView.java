@@ -27,7 +27,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
 
   private DisplaySubInfoContract.ViewModel displaySubInfoVM;
   private DisplaySubContract.ViewModel displaySubVM;
-  private DisplaySubInfoBinding displaySubInfoBinding;
+  // private DisplaySubInfoBinding displaySubInfoBinding;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    displaySubInfoBinding = DataBindingUtil.bind(LayoutInflater.from(getActivity()).inflate(R.layout.display_sub_info, container, false));
+    // displaySubInfoBinding = DataBindingUtil.bind(LayoutInflater.from(getActivity()).inflate(R.layout.display_sub_info, container, false));
     subscribeToVM();
 
     //return displaySubInfoBinding.getRoot();

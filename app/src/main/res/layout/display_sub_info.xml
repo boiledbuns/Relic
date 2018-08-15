@@ -9,30 +9,70 @@
             type="com.relic.data.models.SubredditModel"/>
     </data>
 
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:orientation="vertical"
-        android:padding="@dimen/displaysub_info_padding">
+        android:layout_height="500dp">
 
-        <TextView
+        <RelativeLayout
+            android:id="@+id/display_subinfo_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/displaysub_info_padding"
-            android:text="Tester mans"/>
+            android:layout_height="match_parent"
+            android:padding="@dimen/displaysub_info_padding"
+            android:background="@color/paleDarkGray">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/displaysub_info_padding"
-            android:text="@{subModel.description}"/>
+            <ImageView
+                android:id="@+id/display_subinfo_icon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"/>
 
-        <TextView
+            <TextView
+                android:id="@+id/display_subinfo_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/displaysub_info_padding"
+                android:layout_toEndOf="@id/display_subinfo_icon"
+                android:text="/r/Subreddit name"/>
+
+            <TextView
+                android:id="@+id/display_subinfo_subcount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/display_subinfo_subtitle"
+                android:layout_toEndOf="@id/display_subinfo_icon"
+                android:layout_marginBottom="@dimen/displaysub_info_padding"
+                android:text="10000 subscribers"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/display_subinfo_subcount"
+                android:layout_alignParentEnd="true"
+                android:text="Subscribe"/>
+        </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="100 subscribers"/>
+            android:src="@drawable/ic_add"
+            app:layout_anchor="@id/display_subinfo_header"
+            app:layout_anchorGravity="bottom|right|end"/>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/display_subinfo_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/displaysub_info_padding"
+            android:layout_below="@id/display_subinfo_header"
+            android:text="@{subModel.description}"/>
+
+
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+
+
+
 
 
 </layout>
