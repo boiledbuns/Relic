@@ -1,6 +1,5 @@
-package com.relic.presentation.displaysubinfo;
+package com.relic.presentation.displaysub;
 
-import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
@@ -8,8 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +17,7 @@ import com.relic.R;
 import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubInfoBinding;
-import com.relic.presentation.displaysub.DisplaySubContract;
-import com.relic.presentation.displaysub.DisplaySubVM;
+import com.relic.presentation.displaysubinfo.DisplaySubInfoContract;
 import com.squareup.picasso.Picasso;
 
 public class DisplaySubInfoView extends BottomSheetDialogFragment{
@@ -31,7 +27,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
   private DisplaySubContract.ViewModel displaySubVM;
 
   private View displaySubInfoView;
-  // private DisplaySubInfoBinding displaySubInfoBinding;
+  private DisplaySubInfoBinding displaySubInfoBinding;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,19 +44,19 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    displaySubInfoView = inflater.inflate(R.layout.display_sub_info, container, false);
-    // displaySubInfoBinding = DataBindingUtil.bind(LayoutInflater.from(getActivity()).inflate(R.layout.display_sub_info, container, false));
+    displaySubInfoBinding = DisplaySubInfoBinding.bind(inflater.inflate(R.layout.display_sub_info, container, false));
+
     subscribeToVM();
     loadSubIcon();
 
-    return displaySubInfoView;
+    return displaySubInfoBinding.getRoot();
   }
 
   private void loadSubIcon() {
     // observe the livedata for sub model and load the image once it loads
     displaySubVM.getSubModel().observe(this, (SubredditModel subModel) -> {
 
-      ImageView icon = displaySubInfoView.findViewById(R.id.display_subinfo_icon);
+      ImageView icon = displaySubInfoBinding.getRoot().findViewById(R.id.display_subinfo_icon);
       String iconUrl = subModel.getSubIcon();
 
       if (iconUrl != null && !iconUrl.isEmpty()) {
@@ -100,6 +96,11 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
    * Add observers and onchange actions to all appropriate live data
    */
   private void subscribeToVM() {
+    displaySubVM.getSubModel().observe(this, (@NonNull SubredditModel subModel) -> {
+      // updates the submodel bound to the view
+      displaySubInfoBinding.setSubModel(subModel);
+    });
+
 //    displaySubInfoVM.getSubreddit().observe(this, (SubredditModel subModel) -> {
 //      if (subModel == null) {
 //        Log.d(TAG, "EMPTY");

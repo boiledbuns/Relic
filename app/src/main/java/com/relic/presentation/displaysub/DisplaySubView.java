@@ -40,7 +40,6 @@ import com.relic.presentation.adapter.ImageOnClick;
 import com.relic.presentation.adapter.PostItemAdapter;
 import com.relic.presentation.adapter.PostItemOnclick;
 import com.relic.presentation.displaypost.DisplayPostView;
-import com.relic.presentation.displaysubinfo.DisplaySubInfoView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

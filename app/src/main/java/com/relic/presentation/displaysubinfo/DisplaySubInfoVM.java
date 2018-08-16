@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import com.relic.data.SubRepository;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.models.SubredditModel;
+import com.relic.presentation.displaysubinfo.DisplaySubInfoContract;
 
 public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContract.ViewModel {
   private SubRepository subRepo;

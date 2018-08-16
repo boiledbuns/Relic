@@ -5,6 +5,10 @@
 
     <data>
         <variable
+            name="displaySubVM"
+            type="com.relic.presentation.displaysub.DisplaySubContract.ViewModel"/>
+
+        <variable
             name="subModel"
             type="com.relic.data.models.SubredditModel"/>
     </data>
@@ -47,7 +51,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/display_subinfo_subcount"
                 android:layout_alignParentEnd="true"
-                android:text="Subscribe"/>
+                android:text="@{subModel.isSubscribed ? `subbed` : `subscribe`}"
+                android:onClick="@{() -> displaySubVM.updateSubStatus(!subModel.isSubscribed)}"/>
         </RelativeLayout>
 
         <android.support.design.widget.FloatingActionButton
