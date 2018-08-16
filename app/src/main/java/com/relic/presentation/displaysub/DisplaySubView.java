@@ -295,13 +295,13 @@ public class DisplaySubView extends Fragment {
       }
     });
 
-    appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-      @Override
-      public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-        boolean collapsed = offset > appBarLayout.getTotalScrollRange();
-        myToolbar.setSubtitle("Sorting by hot");
-      }
-    });
+//    appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+//      @Override
+//      public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+//        boolean collapsed = offset > appBarLayout.getTotalScrollRange();
+//        myToolbar.setSubtitle("Sorting by hot");
+//      }
+//    });
   }
 
 

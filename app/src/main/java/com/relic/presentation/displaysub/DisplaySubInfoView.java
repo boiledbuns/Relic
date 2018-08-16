@@ -45,6 +45,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
     displaySubInfoBinding = DisplaySubInfoBinding.bind(inflater.inflate(R.layout.display_sub_info, container, false));
+    displaySubInfoBinding.setDisplaySubVM(displaySubVM);
 
     subscribeToVM();
     loadSubIcon();
