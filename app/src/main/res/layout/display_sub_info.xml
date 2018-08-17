@@ -32,12 +32,21 @@
                 android:layout_marginEnd="@dimen/displaysub_info_padding"/>
 
             <TextView
-                android:id="@+id/display_subinfo_subtitle"
+                android:id="@+id/display_subinfo_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/displaysub_info_padding"
                 android:layout_toEndOf="@id/display_subinfo_icon"
-                android:text="/r/Subreddit name"/>
+                android:text="@{`r/` + subModel.subName}"/>
+
+            <TextView
+                android:id="@+id/display_subinfo_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/displaysub_info_padding"
+                android:layout_below="@id/display_subinfo_title"
+                android:layout_toEndOf="@id/display_subinfo_icon"
+                android:text="@{subModel.headerTitle}"/>
 
             <TextView
                 android:id="@+id/display_subinfo_subcount"
@@ -65,6 +74,14 @@
                 android:padding="@dimen/displaysub_info_padding"
                 android:background="@color/paleDarkGray"
                 android:text="@{subModel.description}"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/display_subinfo_description"
+                android:padding="@dimen/displaysub_info_padding"
+                android:background="@color/paleDarkGray"
+                android:text="@{subModel.submitText}"/>
 
         </RelativeLayout>
 

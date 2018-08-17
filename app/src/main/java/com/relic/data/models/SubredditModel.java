@@ -20,6 +20,8 @@ public class SubredditModel implements Subreddit, Parcelable {
   private int subscriberCount;
   private String subIcon;
   private String description;
+  private String submitText;
+  private String headerTitle;
 
   public SubredditModel () { }
 
@@ -121,5 +123,21 @@ public class SubredditModel implements Subreddit, Parcelable {
 
   public void setSubIcon(String subIcon) {
     this.subIcon = subIcon;
+  }
+
+  public void setHeaderTitle(String headerTitle) {
+    this.headerTitle = headerTitle;
+  }
+
+  public String getSubmitText() {
+    return submitText;
+  }
+
+  public void setSubmitText(String submitText) {
+    this.submitText = submitText;
+  }
+
+  public String getHeaderTitle() {
+    return headerTitle;
   }
 }

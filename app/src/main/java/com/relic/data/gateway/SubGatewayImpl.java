@@ -13,6 +13,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.JsonParser;
 import com.relic.R;
 import com.relic.data.ApplicationDB;
 import com.relic.data.Request.RedditOauthRequest;
@@ -50,20 +51,81 @@ public class SubGatewayImpl implements SubGateway {
 
   public LiveData<String> getAdditionalSubInfo(String subredditName) {
     MutableLiveData<String> subinfo = new MutableLiveData<>();
-    // get sub info and sidebar info
+    // get sub info
     String end = ENDPOINT + "r/" + subredditName + "/about";
     Log.d(TAG, "from " + end);
     requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
         (response) -> {
-          subinfo.setValue(parseSubredditInfo(response));
+          JSONParser parser = new JSONParser();
+          try {
+            Log.d(TAG, response);
+            JSONObject subInfoObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+            Log.d(TAG, subInfoObject.keySet().toString());
+
+            // user_is_moderator, header_title, subreddit_type, submit_text, display_name, accounts_active, submit_text_html, description_html
+            // user_has_favorited, user_is_contributor, user_is_moderator, public_description, active_user_count, user_is_banned
+            // public_traffic
+
+            String info = subInfoObject.get("header_title") +
+                "---- accounts active " + subInfoObject.get("active_user_count").toString() +
+                "---- description html " + Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()) +
+                "---- submit text " + subInfoObject.get("submit_text");
+            Log.d(TAG, info);
+
+            // update the subreddit model with the new info
+            new InsertSubInfoTask().execute(appDb, subredditName,
+                subInfoObject.get("header_title"),
+                Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()).toString(),
+                subInfoObject.get("submit_text"));
+
+          } catch (ParseException e) {
+            Log.d(TAG, "Error parsing the response");
+          }
         }, (error) -> {
           Log.d(TAG, "Error retrieving the response from the server");
         }, authToken));
 
-    subinfo.setValue("yeet");
     return subinfo;
   }
 
+
+  private static class InsertSubInfoTask extends AsyncTask {
+    @Override
+    protected Object doInBackground(Object[] objects) {
+      ApplicationDB applicationDB = (ApplicationDB) objects[0];
+
+      applicationDB.getSubredditDao().updateSubInfo(
+        // subreddit name, headerTitle, description, submitText
+          (String) objects[1],
+          (String) objects[2],
+          (String) objects[3],
+          (String) objects[4]
+      );
+      return null;
+    }
+  }
+
+
+
+
+  @Override
+  public LiveData<String> getSidebar(String subredditName) {
+    MutableLiveData<String> sidebar = new MutableLiveData<>();
+
+    // get sub sidebar
+    String end = ENDPOINT + "r/" + subredditName + "/about/sidebar";
+    Log.d(TAG, "from " + end);
+    requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
+        (response) -> {
+          Log.d(TAG, "sidebar : " + response);
+          sidebar.setValue("test");
+        }, (error) -> {
+      Log.d(TAG, "Error retrieving the response from the server");
+    }, authToken));
+
+    sidebar.setValue("yeet");
+    return sidebar;
+  }
 
   @Override
   public LiveData<Boolean> getIsSubscribed(String subredditName) {
@@ -73,34 +135,6 @@ public class SubGatewayImpl implements SubGateway {
     return isSubscribed;
   }
 
-
-  /**
-   * Routes the api request through this single method based on request
-   * @param action
-   */
-  private void route(int action, String subredditName, String subredditFullname, MutableLiveData<String> livedata) {
-    String end = ENDPOINT;
-    // determine the appropriate api endpoint to be used
-    switch (action) {
-      case(GET_SUBINFO): {
-        end += "r/" + subredditName + "/sidebar";
-      }
-    }
-    requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
-        (response) -> {
-          // determine the appropriate parsing method to be used
-          switch (action) {
-            case(GET_SUBINFO): {
-              livedata.postValue(response);
-            }
-            case(SUBSCRIBE): {
-            }
-          }
-        },
-        (error) -> {
-          Log.d(TAG, "Error retrieving the response from the server ");
-        }, authToken));
-  }
 
   @Override
   public LiveData<Boolean> subscribe(String subName) {
@@ -165,6 +199,10 @@ public class SubGatewayImpl implements SubGateway {
       Log.d(TAG, response);
       JSONObject subInfoObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
       Log.d(TAG, subInfoObject.keySet().toString());
+
+      // user_is_moderator, header_title, subreddit_type, submit_text, display_name, accounts_active, submit_text_html, description_html
+      // user_has_favorited, user_is_contributor, user_is_moderator, public_description, active_user_count, user_is_banned
+      // public_traffic
 
       info = subInfoObject.get("public_description") +
           subInfoObject.get("accounts_active").toString() +

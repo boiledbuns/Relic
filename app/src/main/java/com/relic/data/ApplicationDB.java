@@ -15,7 +15,7 @@ import com.relic.data.entities.PostEntity;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.models.SubredditModel;
 
-@Database(entities = {SubredditEntity.class, PostEntity.class, ListingEntity.class, CommentEntity.class}, version = 5, exportSchema = false)
+@Database(entities = {SubredditEntity.class, PostEntity.class, ListingEntity.class, CommentEntity.class}, version = 6, exportSchema = false)
 public abstract class ApplicationDB extends RoomDatabase{
   private static ApplicationDB INSTANCE;
 

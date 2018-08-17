@@ -4,6 +4,9 @@ import android.arch.lifecycle.LiveData;
 
 public interface SubGateway {
   LiveData<String> getAdditionalSubInfo(String subredditName);
+
+  LiveData<String> getSidebar(String subredditName);
+
   LiveData<Boolean> getIsSubscribed(String subredditName);
 
   LiveData<Boolean> subscribe(String subreddit);

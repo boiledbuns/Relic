@@ -61,6 +61,9 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
       });
 
       // TODO: STILL TESTING retrieve the banner image from the subredddit css
+      subRepo.getSubGateway().getAdditionalSubInfo(subName);
+      subRepo.getSubGateway().getSidebar(subName);
+
       //subRepo.getSubGateway().retrieveSubBanner(subName);
       this.subMediator.addSource(subRepo.getSingleSub(subName), new Observer<SubredditModel>() {
         @Override

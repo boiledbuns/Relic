@@ -29,7 +29,7 @@ public abstract class SubredditDao {
   @Query("DELETE FROM SubredditEntity")
   public abstract void deleteAll();
 
-  @Query("SELECT id, name, bannerImgUrl, nsfw, isSubscribed, subscriberCount, description, subIcon FROM SubredditEntity WHERE name = :subName")
+  @Query("SELECT id, name, bannerImgUrl, nsfw, isSubscribed, subscriberCount, description, subIcon, submitText, headerTitle FROM SubredditEntity WHERE name = :subName")
   public abstract LiveData<SubredditModel> getSub(String subName);
 
   @Query("SELECT * FROM SubredditEntity WHERE name LIKE :search")
@@ -44,4 +44,6 @@ public abstract class SubredditDao {
   @Query("UPDATE SubredditEntity SET isSubscribed = :subscribed WHERE name = :subredditName")
   public abstract void updateSubscription(boolean subscribed, String subredditName);
 
+  @Query("UPDATE SubredditEntity SET headerTitle = :headerTitle, description = :description,  submitText = :submitText WHERE name = :subredditName")
+  public abstract void updateSubInfo(String subredditName, String headerTitle, String description, String submitText);
 }

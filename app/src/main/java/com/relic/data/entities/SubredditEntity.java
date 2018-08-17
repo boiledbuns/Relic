@@ -13,11 +13,6 @@ public class SubredditEntity {
 
   public String fullName;
 
-  // Subreddit information
-  @ColumnInfo(name = "description")
-  public String public_description;
-  @ColumnInfo(name = "descriptionHtml")
-  public String public_description_html;
   @ColumnInfo(name = "bannerImgUrl")
   public String banner_img;
   @ColumnInfo(name = "subIcon")
@@ -43,4 +38,16 @@ public class SubredditEntity {
   public boolean show_media;
   public boolean user_is_banned;
   public boolean user_is_moderator;
+
+  // Subreddit information
+  @ColumnInfo(name = "description")
+  public String public_description;
+  @ColumnInfo(name = "descriptionHtml")
+  public String public_description_html;
+
+  @ColumnInfo(name = "submitText")
+  public String submit_text;
+
+  @ColumnInfo(name = "headerTitle")
+  public String header_title;
 }
