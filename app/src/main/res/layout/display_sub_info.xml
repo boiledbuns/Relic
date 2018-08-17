@@ -13,77 +13,94 @@
             type="com.relic.data.models.SubredditModel"/>
     </data>
 
+    
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:id="@+id/display_subinfo_header"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/displaysub_info_padding"
-            android:background="@color/lightGray">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <ImageView
-                android:id="@+id/display_subinfo_icon"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="@dimen/displaysub_info_padding"
-                android:layout_marginEnd="@dimen/displaysub_info_padding"/>
-
-            <TextView
-                android:id="@+id/display_subinfo_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/displaysub_info_padding"
-                android:layout_toEndOf="@id/display_subinfo_icon"
-                android:text="@{`r/` + subModel.subName}"/>
-
-            <TextView
-                android:id="@+id/display_subinfo_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/displaysub_info_padding"
-                android:layout_below="@id/display_subinfo_title"
-                android:layout_toEndOf="@id/display_subinfo_icon"
-                android:text="@{subModel.headerTitle}"/>
-
-            <TextView
-                android:id="@+id/display_subinfo_subcount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/display_subinfo_subtitle"
-                android:layout_toEndOf="@id/display_subinfo_icon"
-                android:layout_marginBottom="@dimen/displaysub_info_padding"
-                android:text="10000 subscribers"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/display_subinfo_subcount"
-                android:layout_alignParentEnd="true"
-                android:visibility="gone"
-                android:text="@{subModel.isSubscribed ? `subbed` : `subscribe`}"
-                android:onClick="@{() -> displaySubVM.updateSubStatus(!subModel.isSubscribed)}"/>
-
-            <TextView
-                android:id="@+id/display_subinfo_description"
+            <RelativeLayout
+                android:id="@+id/display_subinfo_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/display_subinfo_subcount"
-                android:padding="@dimen/displaysub_info_padding"
-                android:background="@color/paleDarkGray"
-                android:text="@{subModel.description}"/>
+                android:paddingTop="@dimen/displaysub_info_padding"
+                android:background="@color/lightGray">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/display_subinfo_description"
-                android:padding="@dimen/displaysub_info_padding"
-                android:background="@color/paleDarkGray"
-                android:text="@{subModel.submitText}"/>
+                <ImageView
+                    android:id="@+id/display_subinfo_icon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="@dimen/displaysub_info_padding"
+                    android:layout_marginEnd="@dimen/displaysub_info_padding"/>
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/display_subinfo_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/displaysub_info_padding"
+                    android:layout_toEndOf="@id/display_subinfo_icon"
+                    android:text="@{`r/` + subModel.subName}"/>
+
+                <TextView
+                    android:id="@+id/display_subinfo_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/displaysub_info_padding"
+                    android:layout_below="@id/display_subinfo_title"
+                    android:layout_toEndOf="@id/display_subinfo_icon"
+                    android:text="@{subModel.headerTitle}"/>
+
+
+
+                <TextView
+                    android:id="@+id/display_subinfo_subcount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/display_subinfo_subtitle"
+                    android:layout_toEndOf="@id/display_subinfo_icon"
+                    android:layout_marginBottom="@dimen/displaysub_info_padding"
+                    android:text="10000 subscribers"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/display_subinfo_subcount"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone"
+                    android:text="@{subModel.isSubscribed ? `subbed` : `subscribe`}"
+                    android:onClick="@{() -> displaySubVM.updateSubStatus(!subModel.isSubscribed)}"/>
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/display_subinfo_subcount">
+
+                    <TextView
+                        android:id="@+id/display_subinfo_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/displaysub_info_padding"
+                        android:background="@color/paleDarkGray"
+                        android:text="@{subModel.description}"/>
+
+                </ScrollView>
+
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_below="@id/display_subinfo_description"-->
+                    <!--android:padding="@dimen/displaysub_info_padding"-->
+                    <!--android:background="@color/paleDarkGray"-->
+                    <!--android:text="@{`===========` + subModel.submitText}"/>-->
+
+            </RelativeLayout>
+
+
+        </android.support.v4.widget.NestedScrollView>
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -98,13 +115,6 @@
             android:layout_marginTop="-20dp"/>
 
 
-
     </android.support.design.widget.CoordinatorLayout>
-
-
-
-
-
-
 
 </layout>
