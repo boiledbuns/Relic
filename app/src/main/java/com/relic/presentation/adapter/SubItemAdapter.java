@@ -67,12 +67,13 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
   /**
    *
-   * @param subs list of all posts
+   * @param newSubs list of all posts
    */
-  public void setList(List<SubredditModel> subs) {
+  public void setList(List<SubredditModel> newSubs) {
     // set the entire list if the current list is null
-    if (subs == null) {
-      this.subList = new ArrayList<>();
+    if (subList == null) {
+      this.subList = newSubs;
+      notifyDataSetChanged();
     }
     else {
       DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
@@ -83,12 +84,12 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
         @Override
         public int getNewListSize() {
-          return subs.size();
+          return newSubs.size();
         }
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-          return (subList.get(oldItemPosition).id == subs.get(newItemPosition).id);
+          return (subList.get(oldItemPosition).id.equals(newSubs.get(newItemPosition).id));
         }
 
         @Override
@@ -96,8 +97,8 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
           return true;
         }
       });
-      // sets the old list as the new one and use diff util to update this adapter
-      subList = subs;
+
+      subList = newSubs;
       diffResult.dispatchUpdatesTo(this);
     }
   }

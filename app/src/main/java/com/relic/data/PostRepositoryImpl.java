@@ -149,7 +149,7 @@ public class PostRepositoryImpl implements PostRepository {
 
         },
         (VolleyError volleyError) -> {
-          Log.d(TAG, "Error retrieving sorted posts " + volleyError.networkResponse.statusCode);
+          Log.d(TAG, "Error retrieving sorted posts " + volleyError.networkResponse);
         }, checkToken()));
   }
 

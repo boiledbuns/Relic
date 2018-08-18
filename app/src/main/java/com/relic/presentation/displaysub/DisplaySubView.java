@@ -343,6 +343,7 @@ public class DisplaySubView extends Fragment {
       // Parses the url type and routes it appropriately
       String urlEnding = url.substring(url.length() - 3);
       if (urlEnding.equals("jpg") || urlEnding.equals("png") || urlEnding.equals("gif")) {
+        // TODO separate and route according to file ext
         // create a new bundle for to pass the image url along
         Bundle bundle = new Bundle();
         bundle.putString("image_url", url);
@@ -352,7 +353,7 @@ public class DisplaySubView extends Fragment {
 
         // replace the current fragment with the new display image frag and add it to the frag stack
         getActivity().getSupportFragmentManager().beginTransaction()
-            .add(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG).commit();
+            .replace(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG).commit();
       } else {
         // open the url in the browser
         Intent openInBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

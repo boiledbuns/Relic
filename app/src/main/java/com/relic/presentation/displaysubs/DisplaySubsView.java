@@ -172,7 +172,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     // allows the list to be updated as data is updated
     viewModel.getSubscribedList().observe(this, (List<SubredditModel> subredditsList) -> {
       // updates the view once the list is loaded
-      if (subredditsList != null) {
+      if (subredditsList != null && !subredditsList.isEmpty()) {
         subAdapter.setList(new ArrayList<>(subredditsList));
         Log.d(TAG, "Changes to subreddit list received " + subredditsList);
       }
@@ -275,7 +275,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
       // replace the current screen with the newly created fragment
       getActivity().getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+          .add(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
 
     }
   }

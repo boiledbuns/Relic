@@ -3,6 +3,7 @@ package com.relic.data;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.models.SubredditModel;
