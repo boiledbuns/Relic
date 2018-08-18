@@ -63,4 +63,8 @@
 
     <!-- display sub info -->
     <dimen name="displaysub_info_padding">16dp</dimen>
+
+    <dimen name="displaysub_icon_size">75dp</dimen>
+    <dimen name="displaysub_icon_padding">8dp</dimen>
+
 </resources>

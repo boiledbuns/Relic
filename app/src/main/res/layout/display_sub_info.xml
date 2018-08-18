@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
+
         <variable
             name="displaySubVM"
             type="com.relic.presentation.displaysub.DisplaySubContract.ViewModel"/>
@@ -30,19 +32,37 @@
                 android:paddingTop="@dimen/displaysub_info_padding"
                 android:background="@color/lightGray">
 
-                <ImageView
-                    android:id="@+id/display_subinfo_icon"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                <RelativeLayout
+                    android:id="@+id/display_subinfo_iconcontainer"
+                    android:layout_width="@dimen/displaysub_icon_size"
+                    android:layout_height="@dimen/displaysub_icon_size"
                     android:layout_marginStart="@dimen/displaysub_info_padding"
-                    android:layout_marginEnd="@dimen/displaysub_info_padding"/>
+                    android:layout_marginEnd="@dimen/displaysub_info_padding"
+                    android:padding="@dimen/displaysub_icon_padding"
+                    android:background="@color/paleDarkGray">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textAllCaps="true"
+                        android:textSize="45dp"
+                        android:visibility="@{subModel.subIcon == null || subModel.subIcon.empty ? View.VISIBLE : View.GONE}"
+                        android:text="@{subModel.subName.substring(0,1)}"/>
+
+                    <ImageView
+                        android:id="@+id/display_subinfo_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/display_subinfo_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/displaysub_info_padding"
-                    android:layout_toEndOf="@id/display_subinfo_icon"
+                    android:layout_toEndOf="@id/display_subinfo_iconcontainer"
                     android:text="@{`r/` + subModel.subName}"/>
 
                 <TextView
@@ -51,17 +71,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/displaysub_info_padding"
                     android:layout_below="@id/display_subinfo_title"
-                    android:layout_toEndOf="@id/display_subinfo_icon"
+                    android:layout_toEndOf="@id/display_subinfo_iconcontainer"
                     android:text="@{subModel.headerTitle}"/>
-
-
 
                 <TextView
                     android:id="@+id/display_subinfo_subcount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/display_subinfo_subtitle"
-                    android:layout_toEndOf="@id/display_subinfo_icon"
+                    android:layout_toEndOf="@id/display_subinfo_iconcontainer"
                     android:layout_marginBottom="@dimen/displaysub_info_padding"
                     android:text="10000 subscribers"/>
 

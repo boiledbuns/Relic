@@ -284,14 +284,19 @@ public class DisplaySubView extends Fragment {
       @Override
       public void onViewAttachedToWindow(View view) {
         if (fragmentOpened) {
+          displaySubBinding.displaySubBanner.setVisibility(View.GONE);
           appBarLayout.setExpanded(false);
           fragmentOpened = false;
+          displaySubBinding.displaySubBanner.setVisibility(View.VISIBLE);
         }
       }
 
       @Override
       public void onViewDetachedFromWindow(View view) {
-        appBarLayout.setExpanded(false);
+//        displaySubBinding.displaySubBanner.setVisibility(View.GONE);
+//        appBarLayout.setExpanded(false);
+//        fragmentOpened = false;
+//        displaySubBinding.displaySubBanner.setVisibility(View.VISIBLE);
       }
     });
 
