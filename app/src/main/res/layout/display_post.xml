@@ -54,7 +54,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/displaypost_paddingtop"
-                    android:layout_marginBottom="@dimen/displaypost_bottommargin">
+                    android:layout_marginBottom="@dimen/displaypost_bottommargin"
+                    android:background="@color/backgroundSecondary">
 
                     <TextView
                         android:id="@+id/display_post_title"
@@ -69,7 +70,7 @@
                         android:id="@+id/display_post_linkcard"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/display_post_linkcard">
+                        android:layout_below="@id/display_post_title">
 
                         <TextView
                             android:layout_width="wrap_content"

@@ -124,6 +124,7 @@ public class DisplayPostView extends Fragment {
         if (commentModels != null) {
           commentAdapter.setComments(commentModels);
           Log.d(TAG, "Comments " + commentModels.size());
+          swipeRefreshLayout.setRefreshing(false);
         }
       }
     });

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class CommentRepositoryImpl implements CommentRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -97,6 +98,24 @@ public class CommentRepositoryImpl implements CommentRepository {
           }
         }, authToken));
     }
+
+
+  @Override
+  public void clearComments(String postFullname) {
+    new ClearCommentsTask().execute(appDB, postFullname);
+  }
+
+  private static class ClearCommentsTask extends AsyncTask<Object, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB appDB = (ApplicationDB) objects[0];
+      String postFullname = (String) objects[1];
+
+      // delete the locally stored post comment data using the comment dao
+      appDB.getCommentDAO().deletePostComments(postFullname);
+      return null;
+    }
+  }
 
 
   /**

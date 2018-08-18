@@ -31,24 +31,28 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
 
   private String postFullname;
   private String subName;
-
+  private boolean initialized;
+  private boolean alreadyEmpty;
 
   public void init(ListingRepository listingRepo, PostRepository postRepo, CommentRepository commentRepo, String subreddit, String fullname) {
-    // initialize reference to repos for this VM
-    this.listingRepo = listingRepo;
-    this.postRepo = postRepo;
-    this.commentRepo = commentRepo;
-    postGateway = postRepo.getPostGateway();
+    if (!initialized) {
+      // initialize reference to repos for this VM
+      this.listingRepo = listingRepo;
+      this.postRepo = postRepo;
+      this.commentRepo = commentRepo;
+      postGateway = postRepo.getPostGateway();
 
-    subName = subreddit;
-    postFullname = fullname;
+      subName = subreddit;
+      postFullname = fullname;
 
-    currentPost = new MediatorLiveData<>();
-    commentList = new MediatorLiveData<>();
-    commentListingKey = new MediatorLiveData<>();
+      currentPost = new MediatorLiveData<>();
+      commentList = new MediatorLiveData<>();
+      commentListingKey = new MediatorLiveData<>();
 
-    observeLivedata();
-    retrieveMoreComments(true);
+      observeLivedata();
+      retrieveMoreComments(true);
+      initialized = true;
+    }
   }
 
 
@@ -77,7 +81,7 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     // retrieves the livedata post to be exposed to the view
     currentPost.addSource(postRepo.getPost(postFullname),
         (PostModel post) -> {
-          if (post != null) {
+          if (post != null ) {
             // TODO add additional actions to trigger when post loaded
             currentPost.setValue(post);
           }
@@ -86,7 +90,11 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     // retrieve the comment list as livedata so that we can expose it to the view first
     commentList.addSource(commentRepo.getComments(postFullname),
         (List<CommentModel> comments) -> {
-          if (comments != null) {
+          if (comments.isEmpty()) {
+            // retrieve more comments if we detect that none are stored locally
+            commentRepo.retrieveComments(subName, postFullname, null);
+          }
+          else {
             // TODO add additional actions to trigger when comments loaded
             commentList.setValue(comments);
           }
@@ -116,9 +124,8 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
   @Override
   public void retrieveMoreComments(boolean refresh) {
     if (refresh) {
-      // TODO: delete the first set of comments
-      // retrieve the first set of comments
-      commentRepo.retrieveComments(subName, postFullname, null);
+      // delete comments stored locally, let observer retrieve more once it registers the change
+      commentRepo.clearComments(postFullname);
     }
     else {
       // retrieve the next listing for the comments on this post
