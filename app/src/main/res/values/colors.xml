@@ -8,7 +8,9 @@
 
     <color name="primaryText">#b4bbc6</color>
     <color name="background">#35373a</color>
+
     <color name="backgroundSecondary">#384559</color>
+    <color name="backgroundSecondaryB">#29374d</color>
 
 
     <color name="darkGray">#384559</color>

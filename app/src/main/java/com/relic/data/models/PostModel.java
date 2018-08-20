@@ -20,6 +20,7 @@ public class PostModel implements Post {
   private String thumbnail;
 
   private boolean nsfw;
+  private boolean visited;
 
   public PostModel() {}
 
@@ -112,6 +113,14 @@ public class PostModel implements Post {
 
   public void setNsfw(boolean nsfw) {
     this.nsfw = nsfw;
+  }
+
+  public boolean isVisited() {
+    return visited;
+  }
+
+  public void setVisited(boolean visited) {
+    this.visited = visited;
   }
 
 

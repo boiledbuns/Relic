@@ -45,8 +45,6 @@ public class PostEntity {
   public int view_count;
   public int gilded;
 
-  public boolean visited;
-
   @ColumnInfo(name = "nsfw")
   public boolean over_18;
 
@@ -59,6 +57,7 @@ public class PostEntity {
   public boolean locked;
   public boolean archived;
   public boolean pinned;
+  public boolean visited;
 
   public String subreddit;
 

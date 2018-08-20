@@ -33,5 +33,7 @@ public class DisplaySubContract {
     void retrieveMorePosts(boolean resetPosts);
 
     void updateSubStatus(boolean subscribe);
+
+    void visitPost(String postFullname);
   }
 }

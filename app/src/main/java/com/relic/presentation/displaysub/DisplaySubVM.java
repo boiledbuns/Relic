@@ -175,4 +175,8 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
     }
   }
 
+  @Override
+  public void visitPost(String postFullname) {
+    postRepo.getPostGateway().visitPost(postFullname);
+  }
 }

@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="@dimen/postitem_padding_top"
-            android:background="@color/backgroundSecondary">
+            android:background="@{postModel.visited ? @color/backgroundSecondaryB : @color/backgroundSecondary}">
 
             <LinearLayout
                 android:id="@+id/postitem_titlegroup"

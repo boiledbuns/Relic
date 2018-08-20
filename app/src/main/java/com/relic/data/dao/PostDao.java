@@ -28,4 +28,7 @@ public abstract class PostDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertPost(PostEntity post);
+
+  @Query("UPDATE PostEntity SET visited = 1 where id = :postFullname")
+  public abstract void updateVisited(String postFullname);
 }

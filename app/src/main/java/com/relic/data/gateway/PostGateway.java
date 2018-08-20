@@ -12,4 +12,6 @@ public interface PostGateway {
   LiveData<Boolean> gildPost(String fullname, boolean gild);
 
   LiveData<Boolean> reportPosts(String fullname, boolean report);
+
+  LiveData<Boolean> visitPost(String postFullname);
 }

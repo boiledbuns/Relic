@@ -3,6 +3,7 @@ package com.relic.data.gateway;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -86,5 +87,19 @@ public class PostGatewayImpl implements  PostGateway {
     return null;
   }
 
+  @Override
+  public LiveData<Boolean> visitPost(String postFullname) {
+    Log.d(TAG, "Setting " + postFullname + "to visited");
+    new UpdateVisitStatus().execute(appDb, postFullname);
+    return null;
+  }
 
+  private static class UpdateVisitStatus extends AsyncTask<Object, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB appDb = (ApplicationDB) objects[0];
+      appDb.getPostDao().updateVisited((String) objects[1]);
+      return null;
+    }
+  }
 }

@@ -95,7 +95,12 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-          return postList.get(oldItemPosition).getId().equals(newPostList.get(newItemPosition).getId());
+          PostModel oldPost = postList.get(oldItemPosition);
+          PostModel newPost = newPostList.get(newItemPosition);
+          boolean check = oldPost.getId().equals(newPost.getId())
+            && oldPost.isVisited() == newPost.isVisited();
+
+          return check;
         }
       });
       // sets the new list as the current one

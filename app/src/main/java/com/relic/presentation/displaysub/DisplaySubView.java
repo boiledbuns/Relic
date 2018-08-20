@@ -328,6 +328,9 @@ public class DisplaySubView extends Fragment {
             .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
         // set flag to show that a fragment has opened
         fragmentOpened = true;
+
+        // update post to show that it has been visited
+        displaySubVM.visitPost(postId);
       }
 
     }
