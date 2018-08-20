@@ -31,4 +31,6 @@
     <string name="sort_scope_year">year</string>
     <string name="sort_scope_all">all</string>
 
+    <string name="nsfw">nsfw</string>
+
 </resources>

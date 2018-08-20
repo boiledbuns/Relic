@@ -19,6 +19,8 @@ public class PostModel implements Post {
   public String url;
   private String thumbnail;
 
+  private boolean nsfw;
+
   public PostModel() {}
 
   //  public String subName;
@@ -103,4 +105,47 @@ public class PostModel implements Post {
   public void setThumbnail(String thumbnail) {
     this.thumbnail = thumbnail.equals("self") ? null : thumbnail;
   }
+
+  public boolean isNsfw() {
+    return nsfw;
+  }
+
+  public void setNsfw(boolean nsfw) {
+    this.nsfw = nsfw;
+  }
+
+
+//  public boolean isStickied() {
+//    return stickied;
+//  }
+//
+//  public void setStickied(boolean stickied) {
+//    this.stickied = stickied;
+//  }
+//
+//  public boolean isLocked() {
+//    return locked;
+//  }
+//
+//  public void setLocked(boolean locked) {
+//    this.locked = locked;
+//  }
+//
+//  public boolean isArchived() {
+//    return archived;
+//  }
+//
+//  public void setArchived(boolean archived) {
+//    this.archived = archived;
+//  }
+//
+//  public boolean isPinned() {
+//    return pinned;
+//  }
+//
+//  public void setPinned(boolean pinned) {
+//    this.pinned = pinned;
+//  }
+//
+
 }

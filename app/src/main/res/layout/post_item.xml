@@ -23,13 +23,13 @@
         android:onClick="@{() -> postOnClick.onClick(postModel.id, postModel.subreddit)}"
         android:layout_marginStart="@dimen/postitem_margin"
         android:layout_marginEnd="@dimen/postitem_margin"
-        android:layout_marginTop="@dimen/postitem_margin"
-        app:cardBackgroundColor="?attr/colorPrimary">
+        android:layout_marginTop="@dimen/postitem_margin">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/postitem_padding_top">
+            android:padding="@dimen/postitem_padding_top"
+            android:background="@color/backgroundSecondary">
 
             <LinearLayout
                 android:id="@+id/postitem_titlegroup"
@@ -58,11 +58,23 @@
                         android:text="@{postModel.title}"/>
 
                     <TextView
+                        android:id="@+id/postitem_nsfw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/postitem_title"
+                        android:textColor="@color/warning"
+                        android:textAllCaps="true"
+                        android:visibility="@{postModel.nsfw ? View.VISIBLE : View.GONE}"
+                        android:text="@string/nsfw"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/postitem_title"
+                        android:layout_toEndOf="@id/postitem_nsfw"
                         android:text="@{postModel.domain}"/>
                 </RelativeLayout>
+
 
                 <ImageView
                     android:layout_width="@dimen/postitem_image_width"
@@ -72,6 +84,7 @@
                     android:paddingTop="@dimen/postitem_selftext_margin"
                     android:onClick="@{() -> postOnClickImage.onClick(postModel.url)}"
                     app:thumbnail="@{postModel.thumbnail}"/>
+
             </LinearLayout>
 
             <TextView

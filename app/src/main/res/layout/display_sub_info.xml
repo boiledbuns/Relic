@@ -29,8 +29,16 @@
                 android:id="@+id/display_subinfo_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/displaysub_info_padding"
                 android:background="@color/lightGray">
+
+                <TextView
+                    android:id="@+id/display_subinfo_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/displaysub_info_padding"
+                    android:layout_marginStart="@dimen/displaysub_info_padding"
+                    android:layout_marginBottom="@dimen/displaysub_info_padding"
+                    android:text="@{`r/` + subModel.subName}"/>
 
                 <RelativeLayout
                     android:id="@+id/display_subinfo_iconcontainer"
@@ -38,6 +46,7 @@
                     android:layout_height="@dimen/displaysub_icon_size"
                     android:layout_marginStart="@dimen/displaysub_info_padding"
                     android:layout_marginEnd="@dimen/displaysub_info_padding"
+                    android:layout_below="@id/display_subinfo_title"
                     android:padding="@dimen/displaysub_icon_padding"
                     android:background="@color/paleDarkGray">
 
@@ -57,13 +66,7 @@
 
                 </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/display_subinfo_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/displaysub_info_padding"
-                    android:layout_toEndOf="@id/display_subinfo_iconcontainer"
-                    android:text="@{`r/` + subModel.subName}"/>
+
 
                 <TextView
                     android:id="@+id/display_subinfo_subtitle"

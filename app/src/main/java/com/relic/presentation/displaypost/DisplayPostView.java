@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -112,6 +113,14 @@ public class DisplayPostView extends Fragment {
       public void onChanged(@Nullable PostModel postModel) {
         if (postModel != null) {
           displayPostBinding.setPostItem(postModel);
+
+          if (postModel.getCommentCount() == 0) {
+            // hide the loading icon if some comments have been loaded
+            displayPostBinding.displayPostLoadingComments.setVisibility(View.GONE);
+
+            // TODO show the no comment image if this sub has no comments
+            Snackbar.make(displayPostBinding.getRoot(), "No comments for this post", Snackbar.LENGTH_SHORT).show();
+          }
         }
       }
     });
@@ -125,6 +134,9 @@ public class DisplayPostView extends Fragment {
           commentAdapter.setComments(commentModels);
           Log.d(TAG, "Comments " + commentModels.size());
           swipeRefreshLayout.setRefreshing(false);
+
+          // hide the loading icon if some comments have been loaded
+          displayPostBinding.displayPostLoadingComments.setVisibility(View.GONE);
         }
       }
     });

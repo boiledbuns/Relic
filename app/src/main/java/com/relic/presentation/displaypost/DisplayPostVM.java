@@ -49,6 +49,11 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
       commentList = new MediatorLiveData<>();
       commentListingKey = new MediatorLiveData<>();
 
+      // initialize livedata for listeners
+      currentPost.setValue(null);
+      commentList.setValue(null);
+      commentListingKey.setValue(null);
+
       observeLivedata();
       retrieveMoreComments(true);
       initialized = true;

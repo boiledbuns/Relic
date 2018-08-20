@@ -14,7 +14,7 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  @Query("SELECT id, title, author, selftext, score, commentCount, created, subreddit, domain, url, thumbnail FROM PostEntity WHERE subreddit = :subName ORDER BY `order` ASC")
+  @Query("SELECT * FROM PostEntity WHERE subreddit = :subName ORDER BY `order` ASC")
   public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -23,7 +23,7 @@ public abstract class PostDao {
   @Query("DELETE FROM PostEntity WHERE subreddit = :subName")
   public abstract void deleteAllFromSub(String subName);
 
-  @Query("SELECT id, title, author, selftext, score, commentCount, created, thumbnail, url FROM PostEntity WHERE id = :postName")
+  @Query("SELECT * FROM PostEntity WHERE id = :postName")
   public abstract LiveData<PostModel> getSinglePost(String postName);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)

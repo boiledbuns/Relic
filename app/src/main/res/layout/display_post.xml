@@ -63,6 +63,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/displaypost_title_marginbottom"
                         android:textSize="@dimen/title_textsize"
+                        android:fontFamily="sans-serif"
                         android:text="@{postItem.title}"/>
 
                     <!-- card link displayed if the post is a link to another site -->
@@ -107,6 +108,11 @@
                         android:text="@{postItem.htmlSelfText}"/>
                 </RelativeLayout>
 
+                <ProgressBar
+                    android:id="@+id/display_post_loadingComments"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"/>
+
                 <!-- recyclerview for the comments -->
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/display_comments_recyclerview"
@@ -115,6 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/displaypost_rvpadding"/>
+
 
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
