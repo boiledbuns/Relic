@@ -19,8 +19,18 @@ public class PostModel implements Post {
   public String url;
   private String thumbnail;
 
-  private boolean nsfw;
+  private String authorFlair;
+
   private boolean visited;
+
+  private boolean saved;
+
+  private boolean nsfw;
+  private boolean stickied;
+  private boolean pinned;
+  private boolean locked;
+  private boolean archived;
+
 
   public PostModel() {}
 
@@ -124,37 +134,52 @@ public class PostModel implements Post {
   }
 
 
-//  public boolean isStickied() {
-//    return stickied;
-//  }
-//
-//  public void setStickied(boolean stickied) {
-//    this.stickied = stickied;
-//  }
-//
-//  public boolean isLocked() {
-//    return locked;
-//  }
-//
-//  public void setLocked(boolean locked) {
-//    this.locked = locked;
-//  }
-//
-//  public boolean isArchived() {
-//    return archived;
-//  }
-//
-//  public void setArchived(boolean archived) {
-//    this.archived = archived;
-//  }
-//
-//  public boolean isPinned() {
-//    return pinned;
-//  }
-//
-//  public void setPinned(boolean pinned) {
-//    this.pinned = pinned;
-//  }
-//
+  public boolean isStickied() {
+    return stickied;
+  }
 
+  public void setStickied(boolean stickied) {
+    this.stickied = stickied;
+  }
+
+  public boolean isLocked() {
+    return locked;
+  }
+
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
+  public boolean isPinned() {
+    return pinned;
+  }
+
+  public void setPinned(boolean pinned) {
+    this.pinned = pinned;
+  }
+
+
+  public boolean isSaved() {
+    return saved;
+  }
+
+  public void setSaved(boolean saved) {
+    this.saved = saved;
+  }
+
+  public String getAuthorFlair() {
+    return authorFlair;
+  }
+
+  public void setAuthorFlair(String authorFlair) {
+    this.authorFlair = authorFlair;
+  }
 }

@@ -59,8 +59,10 @@ public class DisplaySubView extends Fragment {
   private SwipeRefreshLayout swipeRefresh;
   private AppBarLayout appBarLayout;
   private String subName;
+
   private boolean vmAlreadyInitialized;
   private boolean fragmentOpened;
+  private boolean scrollLocked;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -198,6 +200,8 @@ public class DisplaySubView extends Fragment {
           postAdapter.setPostList(postModels);
           displaySubBinding.executePendingBindings();
 
+          // unlock scrolling to allow more posts to be loaded
+          scrollLocked = false;
           swipeRefresh.setRefreshing(false);
         }
     });
@@ -223,7 +227,9 @@ public class DisplaySubView extends Fragment {
         super.onScrollStateChanged(recyclerView, newState);
 
         // checks if the recyclerview can no longer scroll downwards
-        if (!recyclerView.canScrollVertically(1)) {
+        if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
+          // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
+          scrollLocked = true;
           // fetch the next post listing
           displaySubVM.retrieveMorePosts(false);
           Log.d(TAG, "Bottom reached, more posts retrieved");
@@ -315,6 +321,10 @@ public class DisplaySubView extends Fragment {
    */
   private class PostItemOnClick implements PostItemOnclick {
     public void onClick(String postId, String subreddit) {
+      // update post to show that it has been visited
+      displaySubVM.visitPost(postId);
+      postAdapter.notifyItemChanged(1);
+
       // create a new bundle for the post id
       Bundle bundle = new Bundle();
       bundle.putString("full_name", postId);
@@ -328,9 +338,6 @@ public class DisplaySubView extends Fragment {
             .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
         // set flag to show that a fragment has opened
         fragmentOpened = true;
-
-        // update post to show that it has been visited
-        displaySubVM.visitPost(postId);
       }
 
     }

@@ -47,7 +47,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/title_margin"
-                        android:text="@{postModel.author + ` ` + postModel.created}"/>
+                        android:layout_marginBottom="2dp"
+                        android:text="@{postModel.authorFlair + ` ` + postModel.author + ` ` + postModel.created}"/>
 
                     <TextView
                         android:id="@+id/postitem_title"
@@ -75,6 +76,11 @@
                         android:text="@{postModel.domain}"/>
                 </RelativeLayout>
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{postModel.stickied ? View.VISIBLE : View.GONE}"
+                    android:src="@drawable/ic_pinned"/>
 
                 <ImageView
                     android:layout_width="@dimen/postitem_image_width"

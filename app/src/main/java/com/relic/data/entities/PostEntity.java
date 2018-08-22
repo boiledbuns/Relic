@@ -25,6 +25,8 @@ public class PostEntity {
   public String selftext;
   @ColumnInfo(name = "authorFlair")
   public String author_flair_text;
+//  @ColumnInfo(name = "linkFlair")
+//  public String link_flair_richtext;
   //public String media_embed;
   public int score;
   //public int likes;
@@ -58,6 +60,7 @@ public class PostEntity {
   public boolean archived;
   public boolean pinned;
   public boolean visited;
+  public boolean saved;
 
   public String subreddit;
 
