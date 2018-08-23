@@ -17,6 +17,7 @@ public class PostEntity {
   public String name;
 //  public String getSubreddit_id;
 //  public String postListingId;
+  public boolean clicked;
 
   // content columns
   public String title;
@@ -67,4 +68,6 @@ public class PostEntity {
 //  @Ignore
 //  private boolean isEdited;
 //
+  @ColumnInfo(name = "userUpvoted")
+  public Boolean likes;
 }

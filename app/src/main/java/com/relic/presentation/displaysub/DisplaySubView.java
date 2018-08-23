@@ -230,6 +230,8 @@ public class DisplaySubView extends Fragment {
         if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
           // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
           scrollLocked = true;
+          // TODO : add animation for loading posts
+
           // fetch the next post listing
           displaySubVM.retrieveMorePosts(false);
           Log.d(TAG, "Bottom reached, more posts retrieved");

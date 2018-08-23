@@ -30,6 +30,7 @@ public class PostModel implements Post {
   private boolean pinned;
   private boolean locked;
   private boolean archived;
+  private Boolean userUpvoted;
 
 
   public PostModel() {}
@@ -181,5 +182,13 @@ public class PostModel implements Post {
 
   public void setAuthorFlair(String authorFlair) {
     this.authorFlair = authorFlair;
+  }
+
+  public Boolean getUserUpvoted() {
+    return userUpvoted;
+  }
+
+  public void setUserUpvoted(Boolean userUpvoted) {
+    this.userUpvoted = userUpvoted;
   }
 }
