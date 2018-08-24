@@ -179,4 +179,10 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
   public void visitPost(String postFullname) {
     postRepo.getPostGateway().visitPost(postFullname);
   }
+
+  @Override
+  public void voteOnPost(String postFullname, int voteValue) {
+    Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue);
+    postRepo.getPostGateway().voteOnPost(postFullname, voteValue);
+  }
 }

@@ -187,7 +187,11 @@ public class PostRepositoryImpl implements PostRepository {
       //Log.d(TAG, "post keys " + post.keySet().toString());
 
       // unmarshall the object and add it into a list
-      postEntities.add(gson.fromJson(post.toJSONString(), PostEntity.class));
+      PostEntity postEntity = gson.fromJson(post.toJSONString(), PostEntity.class);
+      Boolean likes = (Boolean) post.get("likes");
+      postEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
+
+      postEntities.add(postEntity);
     }
 
     // insert all the post entities into the db

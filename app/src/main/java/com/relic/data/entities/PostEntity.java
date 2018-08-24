@@ -4,7 +4,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 @Entity
 public class PostEntity {
@@ -64,10 +63,5 @@ public class PostEntity {
   public boolean saved;
 
   public String subreddit;
-
-//  @Ignore
-//  private boolean isEdited;
-//
-  @ColumnInfo(name = "userUpvoted")
-  public Boolean likes;
+  public int userUpvoted;
 }

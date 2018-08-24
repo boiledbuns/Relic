@@ -48,7 +48,8 @@ public class PostGatewayImpl implements  PostGateway {
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, ending,
         (String response) -> {
           success.setValue(true);
-          // update the locally stored instance
+          // convert int value into boolean object, update the locally stored instance
+          new UpdateVoteStatus().execute(appDb, fullname, voteStatus);
         },
         (VolleyError error) -> {
           Log.d(TAG, "Sorry, there was an error voting on the post " + fullname + " to " + voteStatus);
@@ -102,4 +103,14 @@ public class PostGatewayImpl implements  PostGateway {
       return null;
     }
   }
+
+  private static class UpdateVoteStatus extends AsyncTask<Object, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB appDb = (ApplicationDB) objects[0];
+      appDb.getPostDao().updateVote((String) objects[1], (int) objects[2]);
+      return null;
+    }
+  }
+
 }

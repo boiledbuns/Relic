@@ -11,6 +11,10 @@ import com.relic.data.models.SubredditModel;
 import java.util.List;
 
 public class DisplaySubContract {
+  static int UPVOTE = 1;
+  static int DOWNVOTE = -1;
+  static int RESET = 0;
+
   public interface ViewModel {
     void init(String subredditName, SubRepository subRepo, PostRepository postRepo);
 
@@ -35,5 +39,7 @@ public class DisplaySubContract {
     void updateSubStatus(boolean subscribe);
 
     void visitPost(String postFullname);
+
+    void voteOnPost(String postFullname, int voteValue);
   }
 }

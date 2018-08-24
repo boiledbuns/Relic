@@ -125,9 +125,7 @@
                     android:layout_marginStart="12dp"
                     app:chipIcon="@drawable/ic_upvote"
                     app:iconStartPadding="2dp"
-                    app:chipBackgroundColor="?attr/colorAccent">
-
-                </android.support.design.chip.Chip>
+                    app:chipBackgroundColor="?attr/colorAccent"/>
 
                 <android.support.design.chip.Chip
                     android:layout_width="wrap_content"
@@ -139,11 +137,14 @@
                     app:chipBackgroundColor="?attr/colorAccent"/>
 
                 <TextView
+                    android:id="@+id/display_post_upvote"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@{(postModel.userUpvoted != null ? postModel.userUpvoted : false) ? @drawable/ic_upvote_active : @drawable/ic_upvote}"
-                    android:drawableEnd="@{(postModel.userUpvoted != null ? !postModel.userUpvoted : false) ? @drawable/ic_downvote_active : @drawable/ic_downvote}"
+                    android:drawableStart="@{(postModel.userUpvoted == 1) ? @drawable/ic_upvote_active : @drawable/ic_upvote}"
+                    android:drawableEnd="@{(postModel.userUpvoted == -1) ? @drawable/ic_downvote_active : @drawable/ic_downvote}"
                     android:text="@{Integer.toString(postModel.score)}"/>
+
+
             </android.support.design.chip.ChipGroup>
 
 
