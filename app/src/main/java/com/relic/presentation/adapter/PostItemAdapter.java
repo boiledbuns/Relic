@@ -46,9 +46,25 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         PostModel postModel = postList.get(itemPosition);
 
         // determine the new vote value based on the current one and change the vote accordingly
-        int newStatus = postModel.getUserUpvoted() == 0 ? 1 : 0;
-        viewModel.voteOnPost(postModel.getId(), newStatus);
+        int newStatus = postModel.getUserUpvoted() <= 0 ? 1 : 0;
+
+        // optimistic, update copy cached in adapter and make request to api to update in server
+        postModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
+        viewModel.voteOnPost(postModel.getId(), newStatus);
+      });
+
+      // add onclick for the downvote button
+      this.postBinding.displayPostDownvote.setOnClickListener((View view) -> {
+        PostModel postModel = postList.get(itemPosition);
+
+        // determine the new vote value based on the current one and change the vote accordingly
+        int newStatus = postModel.getUserUpvoted() >= 0 ? -1 : 0;
+
+        // optimistic, update copy cached in adapter and make request to api to update in server
+        postModel.setUserUpvoted(newStatus);
+        notifyItemChanged(itemPosition);
+        viewModel.voteOnPost(postModel.getId(), newStatus);
       });
     }
   }

@@ -16,7 +16,7 @@ import com.relic.data.VolleyAccessor;
 
 public class PostGatewayImpl implements  PostGateway {
   private final String ENDPOINT = "https://oauth.reddit.com/";
-  public static String TAG = "SUB_GATEWAY";
+  public static String TAG = "POST_GATEWAY";
   private String authToken;
 
   private ApplicationDB appDb;
@@ -46,13 +46,16 @@ public class PostGatewayImpl implements  PostGateway {
     MutableLiveData<Boolean> success = new MutableLiveData<>();
 
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, ending,
-        (String response) -> {
+        response -> {
+          Log.d(TAG, "Success voting on post : " + fullname + " to " + voteStatus);
           success.setValue(true);
-          // convert int value into boolean object, update the locally stored instance
+
+          // update the local model appropriately
           new UpdateVoteStatus().execute(appDb, fullname, voteStatus);
         },
         (VolleyError error) -> {
           Log.d(TAG, "Sorry, there was an error voting on the post " + fullname + " to " + voteStatus);
+          success.setValue(false);
         }, authToken));
 
     return success;

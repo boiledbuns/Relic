@@ -31,10 +31,29 @@
             android:padding="@dimen/postitem_padding_top"
             android:background="@{postModel.visited ? @color/backgroundSecondaryB : @color/backgroundSecondary}">
 
+            <!-- top row of values -->
+            <TextView
+                android:id="@+id/postitem_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/title_margin"
+                android:layout_marginTop="@dimen/displaypost_title_icon_padding"
+                android:text="@{postModel.author + ` ` + postModel.created}"/>
+
+            <ImageView
+                android:id="@+id/postitem_stickied"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{postModel.stickied ? View.VISIBLE : View.GONE}"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_pinned"/>
+
             <LinearLayout
                 android:id="@+id/postitem_titlegroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_author"
+                android:layout_marginTop="3dp"
                 android:layout_marginBottom="@dimen/postitem_selftext_margin">
 
                 <RelativeLayout
@@ -43,19 +62,10 @@
                     android:layout_weight="1">
 
                     <TextView
-                        android:id="@+id/postitem_author"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/title_margin"
-                        android:layout_marginBottom="2dp"
-                        android:text="@{postModel.authorFlair + ` ` + postModel.author + ` ` + postModel.created}"/>
-
-                    <TextView
                         android:id="@+id/postitem_title"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:textSize="@dimen/title_textsize"
-                        android:layout_below="@id/postitem_author"
                         android:text="@{postModel.title}"/>
 
                     <TextView
@@ -76,18 +86,13 @@
                         android:text="@{postModel.domain}"/>
                 </RelativeLayout>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="@{postModel.stickied ? View.VISIBLE : View.GONE}"
-                    android:src="@drawable/ic_pinned"/>
 
                 <ImageView
+                    android:id="@+id/postitem_thumbnail"
                     android:layout_width="@dimen/postitem_image_width"
                     android:layout_height="@dimen/postitem_image_width"
                     android:visibility="@{postModel.thumbnail == null? View.GONE : View.VISIBLE}"
                     android:paddingStart="@dimen/postitem_selftext_margin"
-                    android:paddingTop="@dimen/postitem_selftext_margin"
                     android:onClick="@{() -> postOnClickImage.onClick(postModel.url)}"
                     app:thumbnail="@{postModel.thumbnail}"/>
 
@@ -98,10 +103,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/postitem_titlegroup"
-                android:layout_marginBottom="@dimen/postitem_selftext_margin"
                 android:maxLines="3"
                 android:ellipsize="marquee"
-                android:visibility="@{postModel.selftext == null ? View.GONE : View.VISIBLE}"
+                android:visibility="@{postModel.selftext.empty ? View.GONE : View.VISIBLE}"
                 android:text="@{postModel.selftext}"/>
 
             <android.support.design.chip.ChipGroup
@@ -109,23 +113,47 @@
                 android:id="@+id/postitem_extra_info"
                 android:layout_below="@id/postitem_selftext"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/postitem_selftext_margin">
+
+                <!--<TextView-->
+                    <!--android:id="@+id/display_post_votes"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_below="@id/postitem_extra_info"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:text="@{Integer.toString(postModel.score)}"/>-->
+                <!-- post upvotes and voting buttons -->
+
+                <ImageView
+                    android:id="@+id/display_post_upvote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:src="@{(postModel.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
+
+                <android.support.design.chip.Chip
+                    android:id="@+id/display_post_votes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipText="@{Integer.toString(postModel.score)}"
+                    app:chipBackgroundColor="?attr/colorAccent"/>
+
+                <ImageView
+                    android:id="@+id/display_post_downvote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:src="@{(postModel.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
 
                 <android.support.design.chip.Chip
                     style="@style/RelicChip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     app:chipText="@{postModel.subreddit}"
                     app:chipBackgroundColor="?attr/colorAccent"
                     android:textColor="@color/mainFont"/>
-
-                <android.support.design.chip.Chip
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    app:chipIcon="@drawable/ic_upvote"
-                    app:iconStartPadding="2dp"
-                    app:chipBackgroundColor="?attr/colorAccent"/>
 
                 <android.support.design.chip.Chip
                     android:layout_width="wrap_content"
@@ -136,21 +164,11 @@
                     app:chipText="@{Integer.toString(postModel.commentCount)}"
                     app:chipBackgroundColor="?attr/colorAccent"/>
 
-                <TextView
-                    android:id="@+id/display_post_upvote"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@{(postModel.userUpvoted == 1) ? @drawable/ic_upvote_active : @drawable/ic_upvote}"
-                    android:drawableEnd="@{(postModel.userUpvoted == -1) ? @drawable/ic_downvote_active : @drawable/ic_downvote}"
-                    android:text="@{Integer.toString(postModel.score)}"/>
-
-
             </android.support.design.chip.ChipGroup>
 
 
         </RelativeLayout>
-        
-    </android.support.v7.widget.CardView>
 
+    </android.support.v7.widget.CardView>
 
 </layout>
