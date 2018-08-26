@@ -119,8 +119,7 @@
                     android:nestedScrollingEnabled="false"
                     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/displaypost_rvpadding"/>
+                    android:layout_height="wrap_content"/>
 
 
             </LinearLayout>

@@ -41,7 +41,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
       super(postBinding.getRoot());
       this.postBinding = postBinding;
 
-      // add onclick for the upvote button
+      // initialize onclick for the upvote button
       this.postBinding.displayPostUpvote.setOnClickListener((View view) -> {
         PostModel postModel = postList.get(itemPosition);
 
@@ -54,7 +54,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         viewModel.voteOnPost(postModel.getId(), newStatus);
       });
 
-      // add onclick for the downvote button
+      // initialize onclick for the downvote button
       this.postBinding.displayPostDownvote.setOnClickListener((View view) -> {
         PostModel postModel = postList.get(itemPosition);
 
@@ -65,6 +65,17 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         postModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
         viewModel.voteOnPost(postModel.getId(), newStatus);
+      });
+
+      // initialize onclick for post item
+      this.postBinding.postitemCard.setOnClickListener((View view) -> {
+        PostModel postModel = postList.get(itemPosition);
+
+        // update the view and local model to reflect onclick
+        postModel.setVisited(true);
+        notifyItemChanged(itemPosition);
+
+        onClick.onClick(postModel.getId(), postModel.getSubreddit());
       });
     }
   }

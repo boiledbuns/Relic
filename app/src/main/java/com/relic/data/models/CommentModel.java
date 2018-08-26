@@ -6,10 +6,12 @@ public class CommentModel {
   public String author;
   private String body;
   public String created;
-  public int score;
+  private int score;
 
   public boolean gilded;
   public boolean isSubmitter;
+
+  private int userUpvoted;
 
   public CommentModel() {}
 
@@ -27,5 +29,21 @@ public class CommentModel {
 
   public void setBody(String body) {
     this.body = body;
+  }
+
+  public int getScore() {
+    return score;
+  }
+
+  public void setScore(int score) {
+    this.score = score;
+  }
+
+  public int getUserUpvoted() {
+    return userUpvoted;
+  }
+
+  public void setUserUpvoted(int userUpvoted) {
+    this.userUpvoted = userUpvoted;
   }
 }

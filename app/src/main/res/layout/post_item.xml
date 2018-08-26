@@ -18,9 +18,9 @@
     </data>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/postitem_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> postOnClick.onClick(postModel.id, postModel.subreddit)}"
         android:layout_marginStart="@dimen/postitem_margin"
         android:layout_marginEnd="@dimen/postitem_margin"
         android:layout_marginTop="@dimen/postitem_margin">

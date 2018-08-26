@@ -11,7 +11,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:padding="@dimen/displaypost_rvpadding"
+        android:background="@{@color/backgroundSecondary}">
 
         <TextView
             android:id="@+id/commentitem_score"
@@ -39,6 +42,20 @@
             android:text="@{Html.fromHtml(Html.fromHtml(commentModel.body).toString()).toString()}"
             android:paddingBottom="0dp"
             android:layout_marginBottom="0dp"/>
+
+        <ImageView
+            android:id="@+id/commentitem_upvote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:src="@{(commentModel.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
+
+        <ImageView
+            android:id="@+id/commentitem_downvote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:src="@{(commentModel.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
 
     </RelativeLayout>
 

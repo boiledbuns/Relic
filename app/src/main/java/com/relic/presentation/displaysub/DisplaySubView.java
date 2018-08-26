@@ -325,7 +325,6 @@ public class DisplaySubView extends Fragment {
     public void onClick(String postId, String subreddit) {
       // update post to show that it has been visited
       displaySubVM.visitPost(postId);
-      postAdapter.notifyItemChanged(1);
 
       // create a new bundle for the post id
       Bundle bundle = new Bundle();
