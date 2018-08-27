@@ -31,6 +31,9 @@ public class CommentEntity {
   public boolean score_hidden;
 
 
+  public int userUpvoted;
+
+
   //boolean edited;
 
   public CommentEntity(){}

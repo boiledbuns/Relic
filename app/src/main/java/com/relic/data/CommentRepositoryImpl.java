@@ -145,8 +145,15 @@ public class CommentRepositoryImpl implements CommentRepository {
     JSONObject commentPOJO;
     while (commentIterator.hasNext()) {
       commentPOJO = (JSONObject) ((JSONObject) commentIterator.next()).get("data");
+
+      CommentEntity commentEntity = gson.fromJson(commentPOJO.toString(), CommentEntity.class);
+      Log.d(TAG, "comments keys : " + commentPOJO.keySet());
+
+      Boolean likes = (Boolean) commentPOJO.get("likes");
+      commentEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
+
       // unmarshall the comment pojo and add it to list
-      commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity.class));
+      commentEntities.add(commentEntity);
       Log.d(TAG, commentPOJO.get("id").toString());
     }
 

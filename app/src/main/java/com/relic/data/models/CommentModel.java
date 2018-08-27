@@ -7,11 +7,11 @@ public class CommentModel {
   private String body;
   public String created;
   private int score;
+  private int userUpvoted;
 
   public boolean gilded;
   public boolean isSubmitter;
 
-  private int userUpvoted;
 
   public CommentModel() {}
 

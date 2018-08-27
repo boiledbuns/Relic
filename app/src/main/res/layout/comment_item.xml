@@ -36,6 +36,7 @@
             android:layout_toEndOf="@+id/commentitem_author"/>
 
         <TextView
+            android:id="@+id/commentitem_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/commentitem_author"
@@ -47,7 +48,7 @@
             android:id="@+id/commentitem_upvote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_below="@id/commentitem_body"
             android:src="@{(commentModel.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
 
         <ImageView
@@ -55,6 +56,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_below="@id/commentitem_body"
+            android:layout_toEndOf="@id/commentitem_upvote"
             android:src="@{(commentModel.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
 
     </RelativeLayout>
