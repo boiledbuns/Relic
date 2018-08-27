@@ -50,16 +50,6 @@ public class DisplayPostView extends Fragment {
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-  }
-
-
-  @Nullable
-  @Override
-  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    displayPostBinding = DataBindingUtil
-        .inflate(inflater, R.layout.display_post, container, false);
-
-    myToolbar = displayPostBinding.getRoot().findViewById(R.id.display_post_toolbar);
 
     try {
       // parse the full name of the post to be displayed
@@ -71,11 +61,26 @@ public class DisplayPostView extends Fragment {
       Toast.makeText(getContext(), "Fragment not loaded properly!", Toast.LENGTH_SHORT).show();
     }
 
+    // create the VM and initialize it with injected dependencies
+    displayPostVM = ViewModelProviders.of(this).get(DisplayPostVM.class);
+    displayPostVM.init(new ListingRepositoryImpl(getContext()), new PostRepositoryImpl(getContext()),
+        new CommentRepositoryImpl(getContext()), subredditName, postFullname);
+  }
+
+
+  @Nullable
+  @Override
+  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    displayPostBinding = DataBindingUtil
+        .inflate(inflater, R.layout.display_post, container, false);
+
+    myToolbar = displayPostBinding.getRoot().findViewById(R.id.display_post_toolbar);
+
     if (subredditName != null) {
       myToolbar.setTitle(subredditName);
     }
 
-    commentAdapter = new CommentAdapter();
+    commentAdapter = new CommentAdapter(displayPostVM);
     displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
 
     // get a reference to the swipe refresh layout and attach the scroll listeners
@@ -89,11 +94,6 @@ public class DisplayPostView extends Fragment {
   @Override
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-
-    // create the VM and initialize it with injected dependencies
-    displayPostVM = ViewModelProviders.of(this).get(DisplayPostVM.class);
-    displayPostVM.init(new ListingRepositoryImpl(getContext()), new PostRepositoryImpl(getContext()),
-        new CommentRepositoryImpl(getContext()), subredditName, postFullname);
 
     subscribeToVM();
 

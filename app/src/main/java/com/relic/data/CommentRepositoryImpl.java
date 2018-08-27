@@ -72,7 +72,6 @@ public class CommentRepositoryImpl implements CommentRepository {
   }
 
 
-
   @Override
   public void retrieveComments(String subName, String postFullName, String after) {
     String ending = "r/" + subName + "/comments/" + postFullName.substring(3) + "?count=20";
@@ -154,7 +153,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 
       // unmarshall the comment pojo and add it to list
       commentEntities.add(commentEntity);
-      Log.d(TAG, commentPOJO.get("id").toString());
+      Log.d(TAG, commentPOJO.get("link_id").toString());
     }
 
     // insert the comments

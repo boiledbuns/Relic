@@ -9,7 +9,8 @@ import android.support.annotation.NonNull;
 public class CommentEntity {
   @NonNull
   @PrimaryKey
-  public String id;
+  @ColumnInfo(name = "id")
+  public String link_id;
 
   //public String replies;
   public String created;

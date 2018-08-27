@@ -138,4 +138,9 @@ public class DisplayPostVM extends ViewModel implements DisplayPostContract.View
     }
   }
 
+  @Override
+  public void voteOnPost(String postFullname, int voteValue) {
+    Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue);
+    postRepo.getPostGateway().voteOnPost(postFullname, voteValue);
+  }
 }

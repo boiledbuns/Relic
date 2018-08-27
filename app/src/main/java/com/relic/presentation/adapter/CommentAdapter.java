@@ -6,11 +6,14 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.relic.R;
 import com.relic.data.models.CommentModel;
 import com.relic.databinding.CommentItemBinding;
+import com.relic.presentation.displaypost.DisplayPostContract;
+import com.relic.presentation.displaypost.DisplayPostView;
 
 import java.util.List;
 
@@ -18,16 +21,46 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
   private final String TAG = "COMMENT_ADAPTER";
   private List<CommentModel> commentList;
 
+  private DisplayPostContract.ViewModel  displayPostVM;
+
   class CommentItemVH extends RecyclerView.ViewHolder {
     CommentItemBinding commentItemBinding;
+    int itemPosition;
 
     public CommentItemVH(CommentItemBinding commentItemBinding) {
       super(commentItemBinding.getRoot());
 
       this.commentItemBinding = commentItemBinding;
+
+      // initialize onclicks for the views comment items
+      commentItemBinding.commentitemUpvote.setOnClickListener((View view) -> {
+        CommentModel commentModel = commentList.get(itemPosition);
+        // determine the new vote value based on the current one and change the vote accordingly
+        int newStatus = commentModel.getUserUpvoted() == 0 ? 1 : 0;
+
+        // optimistic, update copy cached in adapter and make request to api to update in server
+        commentModel.setUserUpvoted(newStatus);
+        notifyItemChanged(itemPosition);
+        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
+      });
+
+      commentItemBinding.commentitemDownvote.setOnClickListener((View view) -> {
+        CommentModel commentModel = commentList.get(itemPosition);
+        // determine the new vote value based on the current one and change the vote accordingly
+        int newStatus = commentModel.getUserUpvoted() == 0 ? -1 : 0;
+
+        // optimistic, update copy cached in adapter and make request to api to update in server
+        commentModel.setUserUpvoted(newStatus);
+        notifyItemChanged(itemPosition);
+        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
+      });
     }
   }
 
+  public CommentAdapter(DisplayPostContract.ViewModel viewmodel) {
+    super();
+    displayPostVM = viewmodel;
+  }
 
   @NonNull
   @Override
@@ -43,10 +76,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
 
   @Override
   public void onBindViewHolder(@NonNull CommentItemVH holder, int position) {
-    // attach the current binding to the viewholder
+    // attach the current binding to the viewholder and update its position value
     holder.commentItemBinding.setCommentModel(commentList.get(position));
+    holder.itemPosition = position;
+
     Log.d(TAG, "Comment " + commentList.get(position).getBody());
-    holder.commentItemBinding.executePendingBindings();
+    //holder.commentItemBinding.executePendingBindings();
   }
 
 

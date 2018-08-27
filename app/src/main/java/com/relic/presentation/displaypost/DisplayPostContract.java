@@ -43,5 +43,7 @@ public interface DisplayPostContract {
 
 
     void refresh();
+
+    void voteOnPost(String postFullname, int voteValue);
   }
 }
