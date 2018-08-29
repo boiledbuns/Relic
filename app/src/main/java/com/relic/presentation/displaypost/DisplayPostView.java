@@ -82,6 +82,7 @@ public class DisplayPostView extends Fragment {
 
     commentAdapter = new CommentAdapter(displayPostVM);
     displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
+    displayPostBinding.displayCommentsRecyclerview.setItemAnimator(null);
 
     // get a reference to the swipe refresh layout and attach the scroll listeners
     swipeRefreshLayout = displayPostBinding.getRoot().findViewById(R.id.postitem_swiperefresh);

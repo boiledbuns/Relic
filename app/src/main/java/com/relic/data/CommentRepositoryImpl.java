@@ -133,7 +133,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     // get the data from the listing object
     comments = (JSONObject) comments.get("data");
     ListingEntity listing = new ListingEntity(postFullName, (String) comments.get("after"));
-    Log.d(TAG, "after " + (String) comments.keySet().toString() + " " + (String) comments.get("after"));
+    Log.d(TAG, "after " + comments.keySet().toString() + " " + comments.get("after"));
 
     // get the list of children (comments) associated with the post
     JSONArray commentChildren = ((JSONArray) comments.get("children"));
@@ -150,10 +150,11 @@ public class CommentRepositoryImpl implements CommentRepository {
 
       Boolean likes = (Boolean) commentPOJO.get("likes");
       commentEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
+      commentEntity.setId((String) commentPOJO.get("id"));
 
       // unmarshall the comment pojo and add it to list
       commentEntities.add(commentEntity);
-      Log.d(TAG, commentPOJO.get("link_id").toString());
+      Log.d(TAG, commentPOJO.get("id").toString());
     }
 
     // insert the comments

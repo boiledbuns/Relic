@@ -10,7 +10,7 @@ public class CommentEntity {
   @NonNull
   @PrimaryKey
   @ColumnInfo(name = "id")
-  public String link_id;
+  private String id;
 
   //public String replies;
   public String created;
@@ -38,4 +38,13 @@ public class CommentEntity {
   //boolean edited;
 
   public CommentEntity(){}
+
+  @NonNull
+  public String getId() {
+    return id;
+  }
+
+  public void setId(@NonNull String id) {
+    this.id = "t1_" + id;
+  }
 }

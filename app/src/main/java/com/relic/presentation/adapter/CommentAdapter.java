@@ -118,7 +118,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
 
         @Override
         public boolean areContentsTheSame(int i, int i1) {
-          return (commentList.get(i).getId().equals(newComments.get(i1).getId()));
+          CommentModel oldComment = commentList.get(i);
+          CommentModel newComment = newComments.get(i1);
+
+          boolean isSame = true;
+          isSame = oldComment.getUserUpvoted() == newComment.getUserUpvoted();
+
+          return isSame;
         }
       });
 

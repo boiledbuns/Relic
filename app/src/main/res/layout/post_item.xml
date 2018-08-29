@@ -41,11 +41,18 @@
                 android:text="@{postModel.author + ` ` + postModel.created}"/>
 
             <ImageView
+                android:id="@+id/postitem_saved"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_save"/>
+
+            <ImageView
                 android:id="@+id/postitem_stickied"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="@{postModel.stickied ? View.VISIBLE : View.GONE}"
-                android:layout_alignParentEnd="true"
+                android:layout_toLeftOf="@id/postitem_saved"
                 android:src="@drawable/ic_pinned"/>
 
             <LinearLayout
