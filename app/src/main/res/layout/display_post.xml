@@ -116,6 +116,32 @@
                             android:layout_below="@id/display_post_author"
                             android:layout_marginTop="@dimen/displaypost_body_margintop"
                             android:text="@{postItem.htmlSelfText}"/>
+
+                        <ImageView
+                            android:id="@+id/display_post_upvote"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/display_post_text"
+                            android:src="@{(postItem.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
+
+                        <android.support.design.chip.Chip
+                            android:id="@+id/display_post_votes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/display_post_text"
+                            android:layout_toEndOf="@id/display_post_upvote"
+                            app:chipText="@{Integer.toString(postItem.score)}"
+                            app:chipBackgroundColor="?attr/colorAccent"/>
+
+                        <ImageView
+                            android:id="@+id/display_post_downvote"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/display_post_text"
+                            android:layout_toEndOf="@id/display_post_votes"
+                            android:src="@{(postItem.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
+
+
                     </RelativeLayout>
 
                     <ProgressBar

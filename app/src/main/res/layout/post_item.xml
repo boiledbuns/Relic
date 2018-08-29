@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/title_margin"
                 android:layout_marginTop="@dimen/displaypost_title_icon_padding"
-                android:text="@{postModel.author + ` ` + postModel.created}"/>
+                android:text="@{postModel.author + ` ` + postModel.created + ` ` + postModel.archived}"/>
 
             <ImageView
                 android:id="@+id/postitem_saved"

@@ -27,7 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -189,6 +191,9 @@ public class PostRepositoryImpl implements PostRepository {
       PostEntity postEntity = gson.fromJson(post.toJSONString(), PostEntity.class);
       Boolean likes = (Boolean) post.get("likes");
       postEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
+
+      Date created = new Date(Double.doubleToLongBits((double) post.get("created")));
+      postEntity.created = created.toString();
 
       postEntities.add(postEntity);
     }

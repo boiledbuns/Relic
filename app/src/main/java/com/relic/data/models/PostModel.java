@@ -31,6 +31,7 @@ public class PostModel implements Post {
   private boolean locked;
   private boolean archived;
   private int userUpvoted;
+  private int viewCount;
 
 
   public PostModel() {}
@@ -190,5 +191,13 @@ public class PostModel implements Post {
 
   public void setUserUpvoted(int userUpvoted) {
     this.userUpvoted = userUpvoted;
+  }
+
+  public int getViewCount() {
+    return viewCount;
+  }
+
+  public void setViewCount(int viewCount) {
+    this.viewCount = viewCount;
   }
 }
