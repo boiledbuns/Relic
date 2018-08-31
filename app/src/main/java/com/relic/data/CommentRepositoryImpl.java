@@ -26,6 +26,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -151,6 +152,9 @@ public class CommentRepositoryImpl implements CommentRepository {
       Boolean likes = (Boolean) commentPOJO.get("likes");
       commentEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
       commentEntity.setId((String) commentPOJO.get("id"));
+
+      Date created = new Date(Double.doubleToLongBits((double) commentPOJO.get("created")));
+      commentEntity.created = created.toString();
 
       // unmarshall the comment pojo and add it to list
       commentEntities.add(commentEntity);
