@@ -34,4 +34,7 @@ public abstract class PostDao {
 
   @Query("UPDATE PostEntity SET userUpvoted = :vote  where id = :postFullname")
   public abstract void updateVote(String postFullname, int vote);
+
+  @Query("UPDATE PostEntity SET saved = :saved  where id = :postFullname")
+  public abstract void updateSave(String postFullname, boolean saved);
 }

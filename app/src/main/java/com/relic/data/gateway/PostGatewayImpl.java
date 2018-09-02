@@ -66,9 +66,25 @@ public class PostGatewayImpl implements  PostGateway {
   public LiveData<Boolean> savePost(String fullname, boolean saved) {
     MutableLiveData<Boolean> success = new MutableLiveData<>();
 
+    // generate the voting endpoint
+    String ending = ENDPOINT + "api/save?id=" + fullname;
 
-    return null;
+    requestQueue.add(new RedditOauthRequest(Request.Method.POST, ending,
+        response -> {
+          Log.d(TAG, "Success post saved status for " + fullname + " to " + saved);
+          success.setValue(true);
+
+          // update the local model appropriately
+          new UpdateSaveStatus().execute(appDb, fullname, saved);
+        },
+        (VolleyError error) -> {
+          Log.d(TAG, "Sorry, there was an error saving the post " + fullname);
+          success.setValue(false);
+        }, authToken));
+
+    return success;
   }
+
 
   @Override
   public LiveData<Boolean> comment(String fullname, String comment) {
@@ -112,6 +128,17 @@ public class PostGatewayImpl implements  PostGateway {
     protected Integer doInBackground(Object... objects) {
       ApplicationDB appDb = (ApplicationDB) objects[0];
       appDb.getPostDao().updateVote((String) objects[1], (int) objects[2]);
+      return null;
+    }
+  }
+
+  private static class UpdateSaveStatus extends  AsyncTask<Object, Integer, Integer> {
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB appDb = (ApplicationDB) objects[0];
+      String postFullname = (String) objects[1];
+      boolean saveStatus = (boolean) objects[2];
+      appDb.getPostDao().updateSave(postFullname, saveStatus);
       return null;
     }
   }
