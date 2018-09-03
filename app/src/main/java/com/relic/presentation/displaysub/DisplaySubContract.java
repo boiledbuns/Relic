@@ -41,5 +41,7 @@ public class DisplaySubContract {
     void visitPost(String postFullname);
 
     void voteOnPost(String postFullname, int voteValue);
+
+    void savePost(String postFullname, boolean save);
   }
 }

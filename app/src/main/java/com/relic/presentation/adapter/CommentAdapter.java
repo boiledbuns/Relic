@@ -23,40 +23,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
 
   private DisplayPostContract.ViewModel  displayPostVM;
 
-  class CommentItemVH extends RecyclerView.ViewHolder {
-    CommentItemBinding commentItemBinding;
-    int itemPosition;
-
-    public CommentItemVH(CommentItemBinding commentItemBinding) {
-      super(commentItemBinding.getRoot());
-
-      this.commentItemBinding = commentItemBinding;
-
-      // initialize onclicks for the views comment items
-      commentItemBinding.commentitemUpvote.setOnClickListener((View view) -> {
-        CommentModel commentModel = commentList.get(itemPosition);
-        // determine the new vote value based on the current one and change the vote accordingly
-        int newStatus = commentModel.getUserUpvoted() == 0 ? 1 : 0;
-
-        // optimistic, update copy cached in adapter and make request to api to update in server
-        commentModel.setUserUpvoted(newStatus);
-        notifyItemChanged(itemPosition);
-        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
-      });
-
-      commentItemBinding.commentitemDownvote.setOnClickListener((View view) -> {
-        CommentModel commentModel = commentList.get(itemPosition);
-        // determine the new vote value based on the current one and change the vote accordingly
-        int newStatus = commentModel.getUserUpvoted() == 0 ? -1 : 0;
-
-        // optimistic, update copy cached in adapter and make request to api to update in server
-        commentModel.setUserUpvoted(newStatus);
-        notifyItemChanged(itemPosition);
-        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
-      });
-    }
-  }
-
   public CommentAdapter(DisplayPostContract.ViewModel viewmodel) {
     super();
     displayPostVM = viewmodel;
@@ -77,11 +43,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
   @Override
   public void onBindViewHolder(@NonNull CommentItemVH holder, int position) {
     // attach the current binding to the viewholder and update its position value
-    holder.commentItemBinding.setCommentModel(commentList.get(position));
-    holder.itemPosition = position;
-
-    Log.d(TAG, "Comment " + commentList.get(position).getBody());
-    //holder.commentItemBinding.executePendingBindings();
+    holder.bind( position);
   }
 
 
@@ -133,4 +95,54 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
     }
     notifyItemChanged(0, commentList.size());
   }
+
+  /**
+   *  Viewholder for ocmments
+   */
+  class CommentItemVH extends RecyclerView.ViewHolder {
+    private CommentItemBinding commentItemBinding;
+    private int itemPosition;
+
+    public CommentItemVH(CommentItemBinding commentItemBinding) {
+      super(commentItemBinding.getRoot());
+
+      this.commentItemBinding = commentItemBinding;
+      initializeItemOnClick();
+    }
+
+    void bind(int position) {
+      commentItemBinding.setCommentModel(commentList.get(position));
+      itemPosition = position;
+    }
+
+    /**
+     * initializes databinding with onclicks to prevent polluting binding with unnecessary handler
+     * objects for handling onclicks
+     */
+    private void initializeItemOnClick () {
+      // initialize onclicks for the views comment items
+      commentItemBinding.commentitemUpvote.setOnClickListener((View view) -> {
+        CommentModel commentModel = commentList.get(itemPosition);
+        // determine the new vote value based on the current one and change the vote accordingly
+        int newStatus = commentModel.getUserUpvoted() == 0 ? 1 : 0;
+
+        // optimistic, update copy cached in adapter and make request to api to update in server
+        commentModel.setUserUpvoted(newStatus);
+        notifyItemChanged(itemPosition);
+        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
+      });
+
+      commentItemBinding.commentitemDownvote.setOnClickListener((View view) -> {
+        CommentModel commentModel = commentList.get(itemPosition);
+        // determine the new vote value based on the current one and change the vote accordingly
+        int newStatus = commentModel.getUserUpvoted() == 0 ? -1 : 0;
+
+        // optimistic, update copy cached in adapter and make request to api to update in server
+        commentModel.setUserUpvoted(newStatus);
+        notifyItemChanged(itemPosition);
+        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
+      });
+    }
+  }
+
 }

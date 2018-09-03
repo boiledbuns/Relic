@@ -182,7 +182,13 @@ public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewMo
 
   @Override
   public void voteOnPost(String postFullname, int voteValue) {
-    Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue);
+    Log.d(TAG, "Voting on post " + postFullname + "value = " + voteValue);
     postRepo.getPostGateway().voteOnPost(postFullname, voteValue);
+  }
+
+  @Override
+  public void savePost(String postFullname, boolean save) {
+    Log.d(TAG, "Saving on post " + postFullname + "save = " + save);
+    postRepo.getPostGateway().savePost(postFullname, save);
   }
 }

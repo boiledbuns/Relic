@@ -63,19 +63,20 @@ public class PostGatewayImpl implements  PostGateway {
 
 
   @Override
-  public LiveData<Boolean> savePost(String fullname, boolean saved) {
+  public LiveData<Boolean> savePost(String fullname, boolean save) {
     MutableLiveData<Boolean> success = new MutableLiveData<>();
 
     // generate the voting endpoint
-    String ending = ENDPOINT + "api/save?id=" + fullname;
+    String saveString = save ? "save" : "unsave";
+    String ending = ENDPOINT + "api/" + saveString + "?id=" + fullname;
 
     requestQueue.add(new RedditOauthRequest(Request.Method.POST, ending,
         response -> {
-          Log.d(TAG, "Success post saved status for " + fullname + " to " + saved);
+          Log.d(TAG, "Success post saved status for " + fullname + " to " + save);
           success.setValue(true);
 
           // update the local model appropriately
-          new UpdateSaveStatus().execute(appDb, fullname, saved);
+          new UpdateSaveStatus().execute(appDb, fullname, save);
         },
         (VolleyError error) -> {
           Log.d(TAG, "Sorry, there was an error saving the post " + fullname);

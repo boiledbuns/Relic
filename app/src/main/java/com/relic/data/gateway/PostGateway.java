@@ -5,7 +5,7 @@ import android.arch.lifecycle.LiveData;
 public interface PostGateway {
   LiveData<Boolean> voteOnPost(String fullname, int voteStatus);
 
-  LiveData<Boolean> savePost(String fullname, boolean saved);
+  LiveData<Boolean> savePost(String fullname, boolean save);
 
   LiveData<Boolean> comment(String fullname, String comment);
 
