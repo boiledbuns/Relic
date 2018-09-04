@@ -24,10 +24,8 @@ public interface SubRepository {
 
   /**
    * Fetches and stores more Subreddits from the Reddit API into the local database
-   * @param after the "after" value to fetch the next list of subscribed subreddits (as the results
-   *              are paged), refreshes if it is null
    */
-  void retrieveMoreSubscribedSubs(String after);
+  void retrieveAllSubscribedSubs();
 
   /**
    * @param subName "friendly" subreddit name for the subreddit to retrieve

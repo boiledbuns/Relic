@@ -82,6 +82,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
     // initialize the adapter for subscribed subs recyclerview
     subAdapter = new SubItemAdapter(new OnClickSubItem());
+    displaySubsBinding.displaySubsRecyclerview.setItemAnimator(null );
     displaySubsBinding.displaySubsRecyclerview.setAdapter(subAdapter);
     // displays the subscribed subs in 3 columns
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
@@ -183,10 +184,9 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       Log.d(TAG, "Refreshing status changed to " + completelyLoaded);
       if (completelyLoaded) {
         swipeRefreshLayout.setRefreshing(false);
-      } else {
-        swipeRefreshLayout.setRefreshing(true);
+        displaySubsBinding.displaySubsRecyclerview.scrollToPosition(0);
+        displaySubsBinding.setSubscribedListIsVisible(true);
       }
-      displaySubsBinding.setSubscribedListIsVisible(completelyLoaded);
     });
 
     // subscribes to search results
@@ -219,6 +219,8 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {
+        displaySubsBinding.setSubscribedListIsVisible(false);
+
         // refresh the current list and retrieve more posts
         subAdapter.resetSubList();
         viewModel.retrieveMoreSubs(true);

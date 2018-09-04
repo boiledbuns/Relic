@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -14,7 +13,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
 import com.relic.data.Request.RedditOauthRequest;
-import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
@@ -89,47 +87,68 @@ public class SubRepositoryImpl implements SubRepository {
     return appDb.getSubredditDao().getAllSubscribed();
   }
 
+  public void retrieveAllSubscribedSubs() {
+    Log.d(TAG, "retrieving all new subscrubed subs");
 
-  @Override
+    // since refreshing, set all subs loaded to reflect that not all subs are loaded
+    allSubscribedSubsLoaded.setValue(false);
+    // delete all locally stored subs
+    new deleteSubscribedSubsTask().execute(appDb);
+
+    retrieveMoreSubscribedSubs(null);
+  }
+
   public void retrieveMoreSubscribedSubs(String after) {
-    String ending = "";
-    if (after != null) {
-      // change the query string if fetching all subscribed subreddits from scratch
-      ending = "?limit=50&after=" + after;
-    }
-    else {
-      // update livedata to show that not all subs are loaded
-      allSubscribedSubsLoaded.setValue(false);
-    }
+//    String ending = "";
+//    if (after == null) {
+//      // if refreshing, set all subs loaded to reflect that not all subs are loaded
+//      allSubscribedSubsLoaded.setValue(false);
+//      // delete all locally stored subs
+//      new deleteSubscribedSubsTask().execute(appDb);
+//    }
+//    else {
+//      // change the query string if fetching all subscribed subreddits from scratch
+//      ending = "?limit=50&after=" + after;
+//    }
 
+    String ending = "subreddits/mine/subscriber?limit=30&after=" + after;
     // create the new request to reddit servers and store the data in persistence layer
     volleyQueue.add(new RedditOauthRequest(
-        Request.Method.GET, ENDPOINT + "subreddits/mine/subscriber" + ending,
+        Request.Method.GET, ENDPOINT + ending,
         response -> {
           try {
+            String newAfter = (String) ((JSONObject) ((JSONObject) parser.parse(response)).get("data")).get("after");
+            Log.d(TAG, "after = " + newAfter);
             // insert the subs and listing into the room instance
-            new InsertSubsTask(this, appDb, parseAfterValue(response),
-                parseSubreddits(response), after == null, allSubscribedSubsLoaded).execute(parseAfterValue(response).afterPosting);
-          }
-          catch (ParseException e) {
+            InsertSubsTask insertSubsTask = new InsertSubsTask();
+            insertSubsTask.subRepo = this;
+            insertSubsTask.subDB = appDb;
+            insertSubsTask.subs = parseSubreddits(response);
+            insertSubsTask.after = newAfter;
+            insertSubsTask.allSubbedSubsLoaded = allSubscribedSubsLoaded;
+            insertSubsTask.execute();
+          } catch (ParseException e) {
             Log.e(TAG, "Error parsing the response: " + e.toString());
           }
         },
         (VolleyError error) -> Log.d(TAG, "Error : " + error.networkResponse.statusCode), checkToken()));
+
+
   }
 
-  /**
-   * Parses the "after" value from the listing to get the next listing
-   * @param response JSON formatted response
-   * @return a listing entity to hold the after value
-   * @throws ParseException potential GSON exception when unmarshalling object
-   */
-  private ListingEntity parseAfterValue(String response) throws ParseException {
-    JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
-    // create a new listing to ensure that the db has an "after" value for checking if we need to
-    // fetch more values or not
-    return new ListingEntity(TAG, (String) data.get("after"));
-  }
+//  /**
+//   * Parses the "after" value from the listing to get the next listing
+//   * @param response JSON formatted response
+//   * @return a listing entity to hold the after value
+//   * @throws ParseException potential GSON exception when unmarshalling object
+//   */
+//  private ListingEntity parseAfterValue(String response) throws ParseException {
+//    JSONObject data = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+//    Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
+//    // create a new listing to ensure that the db has an "after" value for checking if we need to
+//    // fetch more values or not
+//    return new ListingEntity(TAG, (String) data.get("after"));
+//  }
 
   /**
    * Parses a "listing" for subreddits into a list of Subreddit
@@ -148,7 +167,7 @@ public class SubRepositoryImpl implements SubRepository {
       JSONObject currentSub = (JSONObject) ((JSONObject) sub).get("data");
       //Log.d(TAG, "keys = " + currentSub.keySet());
       // Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
-      Log.d(TAG, currentSub.get("display_name") + "banner url  = " + currentSub.get("community_icon") + " " + currentSub.get("icon_img"));
+      //Log.d(TAG, currentSub.get("display_name") + "banner url  = " + currentSub.get("community_icon") + " " + currentSub.get("icon_img"));
       subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity.class));
     }
 
@@ -186,48 +205,31 @@ public class SubRepositoryImpl implements SubRepository {
 
 
   static class InsertSubsTask extends AsyncTask <String, Integer, Integer> {
-    private ApplicationDB subDB;
-    private SubRepository subRepo;
-    private List<SubredditEntity> subs;
-    private String after;
-    private ListingEntity listing;
-    private boolean delete;
-    private MutableLiveData <Boolean> allSubbedSubsLoaded;
-
-    InsertSubsTask(SubRepository subRepo, ApplicationDB subDB, ListingEntity listing, List<SubredditEntity> subs, boolean delete, MutableLiveData <Boolean> allSubbedSubsLoaded) {
-      this.subDB = subDB;
-      this.subRepo = subRepo;
-      this.subs = subs;
-      this.listing = listing;
-      this.delete = delete;
-      this.allSubbedSubsLoaded = allSubbedSubsLoaded;
-    }
+    ApplicationDB subDB;
+    SubRepositoryImpl subRepo;
+    List<SubredditEntity> subs;
+    //ListingEntity listingEntity;
+    String after;
+    MutableLiveData <Boolean> allSubbedSubsLoaded;
 
     @Override
     protected Integer doInBackground(String... Strings) {
-      if (delete) {
-        subDB.getSubredditDao().deleteAll();
-      }
       subDB.getSubredditDao().insertAll(subs);
-      // stores the after value to be used to retrieve the next listing
-      after = Strings[0];
-      // update the listing value if it isn't null (not refresh)
       if (after != null) {
-        subDB.getListingDAO().insertListing(listing);
+//        // checks the after value of the listing for the current subs and update the local listing
+//        subDB.getListingDAO().insertListing(listingEntity);
+        // retrieve more subs without refreshing if the string is null
+        subRepo.retrieveMoreSubscribedSubs(after);
       }
-      return subs.size();
+      return null;
     }
 
     @Override
     protected void onPostExecute(Integer integer) {
-      super.onPostExecute(integer);
-      if (after != null) {
-        // retrieve more subs without refreshing if the string is null
-        subRepo.retrieveMoreSubscribedSubs(after);
-      } else {
+      // if no after value, set value to true to reflect all subs have been loaded
+      if (after == null) {
         allSubbedSubsLoaded.setValue(true);
       }
-
     }
   }
 
@@ -283,6 +285,15 @@ public class SubRepositoryImpl implements SubRepository {
     protected Integer doInBackground(Object... objects) {
       ApplicationDB applicationDB = (ApplicationDB) objects[0];
       applicationDB.getSubredditDao().insert((SubredditEntity) objects[1]);
+      return null;
+    }
+  }
+
+  static class deleteSubscribedSubsTask extends  AsyncTask<ApplicationDB, Integer, Integer>{
+    @Override
+    protected Integer doInBackground(ApplicationDB... appDBs) {
+      ApplicationDB appdb = appDBs[0];
+      appdb.getSubredditDao().deleteAllSubscribed();
       return null;
     }
   }

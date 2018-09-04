@@ -4,8 +4,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.relic.data.Authenticator;
@@ -28,7 +26,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 
   private MediatorLiveData <List<SubredditModel>> subscribedSubsMediator;
   private MutableLiveData <List<String>> searchResults;
-  private MediatorLiveData<Boolean> onAllSubsLoaded;
 
 
   public void init(SubRepository subRepository, ListingRepository ListingRepository, Authenticator auth) {
@@ -48,9 +45,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
       subscribedSubsMediator = new MediatorLiveData<>();
       subscribedSubsMediator.setValue(null);
 
-      onAllSubsLoaded = new MediatorLiveData<>();
-      onAllSubsLoaded.setValue(null);
-
       initializeObservers();
       initialized = true;
     }
@@ -64,22 +58,19 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     //subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), subscribedSubsMediator::setValue);
     subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), (List<SubredditModel> subscribedSubs) -> {
       Log.d(TAG, " subs loaded " + subscribedSubs);
-      if (subscribedSubs.isEmpty()) {
-        // refresh the token even if the vm has already been initialized
-        subRepo.retrieveMoreSubscribedSubs(null);
-        //authenticator.refreshToken(this);
-      } else {
+//      if (subscribedSubs.isEmpty()) {
+//        // refresh the token even if the vm has already been initialized
+//        subRepo.retrieveAllSubscribedSubs();
+//        //authenticator.refreshToken(this);
+//      } else {
         subscribedSubsMediator.setValue(subscribedSubs);
-      }
+//      }
     });
 
-//    onAllSubsLoaded.addSource(subRepo.getAllSubscribedSubsLoaded(), (Boolean allSubsLoaded) -> {
-//      if
-//    });
 //    // Observe changes to keys to request new data
 //    subscribedSubsMediator.addSource(listingRepo.getKey(), (@Nullable String nextVal) -> {
 //      // retrieve posts only if the "after" value is empty
-//      subRepo.retrieveMoreSubscribedSubs(nextVal);
+//      subRepo.retrieveAllSubscribedSubs(nextVal);
 //    });
   }
 
@@ -136,15 +127,15 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
   public void onAuthenticated() {
     //listingRepo.retrieveKey("SUB_REPO");
     Log.d(TAG, "On authenticated called");
-    subRepo.retrieveMoreSubscribedSubs(null);
+    subRepo.retrieveAllSubscribedSubs();
   }
 
 
   @Override
   public void onNextListing(String nextVal) {
-    // retrieve posts only if the "after" value is empty
-    if (nextVal == null) {
-      subRepo.retrieveMoreSubscribedSubs(null);
-    }
+//    // retrieve posts only if the "after" value is empty
+//    if (nextVal == null) {
+//      subRepo.retrieveAllSubscribedSubs();
+//    }
   }
 }
