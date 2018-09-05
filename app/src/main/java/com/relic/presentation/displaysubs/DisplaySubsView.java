@@ -137,14 +137,19 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       @Override
       public boolean onMenuItemActionExpand(MenuItem menuItem) {
         // update visibility for the search recyclerview
-        searchIsVisible.setValue(true);
+        displaySubsBinding.setSearchIsVisible(true);
+        displaySubsBinding.setSubscribedListIsVisible(false);
         return true;
       }
 
       @Override
       public boolean onMenuItemActionCollapse(MenuItem menuItem) {
         // update visibility for the search recyclerview
-        searchIsVisible.setValue(false);
+        displaySubsBinding.setSearchIsVisible(false);
+        displaySubsBinding.setSubscribedListIsVisible(true);
+
+        // clear items in the adapter
+        searchItemAdapter.clearSearchResults();
         return true;
       }
     });
@@ -196,6 +201,7 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
         // update the view based on search results
         if (results != null) {
           //Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
+          Log.d(TAG, " " + results.toString());
           searchItemAdapter.setSearchResults(results);
         }
       }
@@ -204,13 +210,13 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
 
   private void initializeLivedata() {
-    // initialize livedata properties for binding
-    searchIsVisible = new MutableLiveData<>();
-    // initialize observer for updating binding on change
-    searchIsVisible.observe(this, (Boolean isVisible) -> {
-      displaySubsBinding.setSearchIsVisible(isVisible);
-    });
-    searchIsVisible.setValue(false);
+//    // initialize livedata properties for binding
+//    searchIsVisible = new MutableLiveData<>();
+//    // initialize observer for updating binding on change
+//    searchIsVisible.observe(this, (Boolean isVisible) -> {
+//      displaySubsBinding.setSearchIsVisible(isVisible);
+//    });
+//    searchIsVisible.setValue(false);
   }
 
 
@@ -275,9 +281,12 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       DisplaySubView subFrag = new DisplaySubView();
       subFrag.setArguments(bundle);
 
+      // clear items in the adapter
+      searchItemAdapter.clearSearchResults();
+
       // replace the current screen with the newly created fragment
       getActivity().getSupportFragmentManager().beginTransaction()
-          .add(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+          .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
 
     }
   }

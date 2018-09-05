@@ -55,6 +55,12 @@ public class SearchItemAdapter extends RecyclerView.Adapter <SearchItemAdapter.S
     return searchResults != null ? searchResults.size() : 0;
   }
 
+
+  public void clearSearchResults() {
+    searchResults.clear();
+    notifyDataSetChanged();
+  }
+
   public void setSearchResults(List<String> searchResults) {
     if (searchResults != null) {
       Log.d(TAG, "Search results received " + searchResults);
@@ -62,4 +68,6 @@ public class SearchItemAdapter extends RecyclerView.Adapter <SearchItemAdapter.S
       notifyDataSetChanged();
     }
   }
+
+
 }

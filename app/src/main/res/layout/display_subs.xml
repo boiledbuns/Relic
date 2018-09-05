@@ -35,26 +35,28 @@
             android:layout_below="@+id/display_subs_toolbar"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- displays all subscribed subs-->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/display_subs_recyclerview"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingEnd="@dimen/subitem_margin"
-                android:paddingBottom="@dimen/subitem_margin"
-                android:visibility="@{subscribedListIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
-            <!--android:layout_below="@+id/display_subs_toolbar"-->
+                android:layout_height="match_parent">
 
-            <!-- Displays search results -->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/search_subs_recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/search_suggestions_margin_side"
-                android:layout_marginEnd="@dimen/search_suggestions_margin_side"
-                android:background="@color/lightGray"
-                android:visibility="@{searchIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
+                <!-- displays all subscribed subs-->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/display_subs_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingEnd="@dimen/subitem_margin"
+                    android:paddingBottom="@dimen/subitem_margin"
+                    android:visibility="@{subscribedListIsVisible ? View.VISIBLE : View.GONE}"/>
+                <!--android:layout_below="@+id/display_subs_toolbar"-->
+
+                <!-- Displays search results -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/search_subs_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{searchIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
+            </RelativeLayout>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
