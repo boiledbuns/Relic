@@ -13,6 +13,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -22,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -48,6 +50,7 @@ import java.util.List;
 public class DisplaySubView extends Fragment {
   private final String TAG = "DISPLAYSUB_VIEW";
   private final String SCROLL_POSITION = "POSITION";
+
   protected DisplaySubContract.ViewModel displaySubVM;
 
   private SearchView searchView;
@@ -136,9 +139,19 @@ public class DisplaySubView extends Fragment {
     //menu.findItem(R.id.display_sub_hot).getSubMenu().addSubMenu(R.menu.order_scope_menu);
 
     searchMenuItem = menu.findItem(R.id.display_sub_searchitem);
+
+    // get ref to searchview, then adjust the padding on the searchview (when it's expanded)
     searchView = (SearchView) searchMenuItem.getActionView();
     int padding = (int) getResources().getDimension(R.dimen.search_padding);
     searchView.setPadding(0, 0, padding, padding);
+
+    SubMenu sortOptionsMenu = menu.findItem(R.id.display_sub_sort).getSubMenu();
+
+    for (int i = 0 ; i < sortOptionsMenu.size(); i++) {
+      SubMenu sortOptionSubmenu = sortOptionsMenu.getItem(i).getSubMenu();
+      sortOptionSubmenu.add("TETSt");
+      //sortOptionSubmenu.add(Menu.NONE, R.menu.order_scope_menu, Menu.NONE, "TETSt");
+    }
 
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
