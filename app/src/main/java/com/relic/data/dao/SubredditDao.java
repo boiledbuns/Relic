@@ -29,6 +29,9 @@ public abstract class SubredditDao {
   @Query("DELETE FROM SubredditEntity")
   public abstract void deleteAll();
 
+  @Query("DELETE FROM SubredditEntity WHERE isSubscribed")
+  public abstract void deleteAllSubscribed();
+
   @Query("SELECT id, name, bannerImgUrl, nsfw, isSubscribed, subscriberCount, description, subIcon, submitText, headerTitle FROM SubredditEntity WHERE name = :subName")
   public abstract LiveData<SubredditModel> getSub(String subName);
 

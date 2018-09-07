@@ -131,7 +131,7 @@ public class SubRepositoryImpl implements SubRepository {
             Log.e(TAG, "Error parsing the response: " + e.toString());
           }
         },
-        (VolleyError error) -> Log.d(TAG, "Error : " + error.networkResponse.statusCode), checkToken()));
+        (VolleyError error) -> Log.d(TAG, "Error : " + error.networkResponse), checkToken()));
 
 
   }

@@ -27,11 +27,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 public class PostRepositoryImpl implements PostRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -166,6 +170,10 @@ public class PostRepositoryImpl implements PostRepository {
     JSONObject listingData = (JSONObject) ((JSONObject) JSONParser.parse(response)).get("data");
     JSONArray listingPosts = (JSONArray) (listingData).get("children");
 
+    // initialize the date formatter and date for now
+    SimpleDateFormat formatter = new SimpleDateFormat("MMM dd',' hh:mm a");
+    Date current = new Date();
+
     // create the new listing entity
     ListingEntity listing = new ListingEntity(subreddit, (String) listingData.get("after"));
     Log.d(TAG, "Listing after val : " + listing.afterPosting);
@@ -192,8 +200,16 @@ public class PostRepositoryImpl implements PostRepository {
       Boolean likes = (Boolean) post.get("likes");
       postEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
 
-      Date created = new Date(Double.doubleToLongBits((double) post.get("created")));
-      postEntity.created = created.toString();
+      Log.d(TAG, "epoch = " + post.get("created"));
+
+      Date created = new Date((long) ((double) post.get("created"))*1000);
+
+      // add year to stamp if the post year doesn't match the current one
+      if (current.getYear() == created.getYear()) {
+        postEntity.created = created.getYear() + " " + formatter.format(created);
+      } else {
+        postEntity.created = formatter.format(created);
+      }
 
       postEntities.add(postEntity);
     }
