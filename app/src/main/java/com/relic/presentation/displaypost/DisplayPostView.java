@@ -33,6 +33,7 @@ import com.relic.databinding.DisplayPostBinding;
 import com.relic.presentation.adapter.CommentAdapter;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -117,6 +118,9 @@ public class DisplayPostView extends Fragment {
         if (postModel != null) {
           displayPostBinding.setPostItem(postModel);
 
+          // load the image or link card based on the type of link
+          loadLinkPreview(postModel);
+
           if (postModel.getCommentCount() == 0) {
             // hide the loading icon if some comments have been loaded
             displayPostBinding.displayPostLoadingComments.setVisibility(View.GONE);
@@ -172,6 +176,29 @@ public class DisplayPostView extends Fragment {
     });
   }
 
+  private void loadLinkPreview(PostModel postModel) {
+    String linkUrl = postModel.getDomain();
+    boolean notEmpty = !linkUrl.isEmpty();
+    List <String> validUrls = Arrays.asList("self", "i.re");
+
+    if (notEmpty && !validUrls.contains(linkUrl.substring(0, 4))) {
+      // loads the card image
+      Log.d(TAG, linkUrl.substring(0, 4) + "");
+      Picasso.get().load(postModel.getThumbnail()).fit().centerCrop().into(displayPostBinding.displayPostCardThumbnail);
+    }
+    else {
+      String fullUrl = postModel.getUrl();
+      // load the full image for the image
+      if (picEndings.contains(fullUrl.substring(fullUrl.length() - 3))) {
+        try {
+          Picasso.get().load(fullUrl).fit().centerCrop().into(displayPostBinding.displaypostPreview);
+        }
+        catch (Error error) {
+          Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
+        }
+      }
+    }
+  }
 
   /**
    * Bind this method to the preview image to automatically load the image into it
@@ -181,21 +208,25 @@ public class DisplayPostView extends Fragment {
    */
   @BindingAdapter({"bind:previewThumbnail", "bind:previewFullImage"})
   public static void LoadPreviewImage(ImageView imgView, String previewThumbnail, String previewFullImage) {
-    Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewFullImage);
-    String useUrl = previewFullImage;
-
-    // use the thumbnail image url if the full url is not an image
-    if (previewFullImage == null || !picEndings.contains(previewFullImage.substring(previewFullImage.length() - 3))) {
-      useUrl = previewThumbnail;
-    }
-
-    try {
-      // does not load image if the banner img string is empty
-      Picasso.get().load(useUrl).fit().centerCrop().into(imgView);
-    }
-    catch (Error error) {
-      Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
-    }
+//    Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewFullImage);
+//    String useUrl = previewFullImage;
+//
+//    if (picEndings.contains(previewFullImage.substring(previewFullImage.length() - 3))) {
+//      // display card only for link if the link is a thumbnail
+//
+//
+//    } else {
+//      // use the thumbnail image url if the full url is not an image
+//      useUrl = previewThumbnail;
+//    }
+//
+//    try {
+//      // does not load image if the banner img string is empty
+//      Picasso.get().load(useUrl).fit().centerCrop().into(imgView);
+//    }
+//    catch (Error error) {
+//      Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
+//    }
   }
 
 }

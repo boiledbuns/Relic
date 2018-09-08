@@ -45,6 +45,15 @@
                         android:layout_height="match_parent"
                         app:bannerImage="@{subModel.bannerUrl}"/>
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_gravity="bottom"
+                        android:layout_marginStart="@dimen/toolbar_subtitle_margin_side"
+                        android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"
+                        android:text="sorting by hot"/>
+
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -64,16 +73,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/toolbar_height"
                     app:layout_collapseMode="pin"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_gravity="bottom"
-                    android:layout_marginStart="@dimen/toolbar_subtitle_margin_side"
-                    android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"
-                    android:text="sorting by hot"/>
-
 
             </android.support.design.widget.CollapsingToolbarLayout>
 

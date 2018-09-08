@@ -205,7 +205,7 @@ public class PostRepositoryImpl implements PostRepository {
       Date created = new Date((long) ((double) post.get("created"))*1000);
 
       // add year to stamp if the post year doesn't match the current one
-      if (current.getYear() == created.getYear()) {
+      if (current.getYear() != created.getYear()) {
         postEntity.created = created.getYear() + " " + formatter.format(created);
       } else {
         postEntity.created = formatter.format(created);

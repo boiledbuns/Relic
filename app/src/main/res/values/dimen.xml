@@ -58,6 +58,8 @@
     <dimen name="displaypost_body_margintop">20dp</dimen>
 
     <dimen name="displaypost_image_height">180dp</dimen>
+    <dimen name="displaypost_thumbnail_height">40dp</dimen>
+
     <dimen name="displaypost_rvpadding">8dp</dimen>
 
     <!-- display image -->
@@ -69,5 +71,8 @@
 
     <dimen name="displaysub_icon_size">75dp</dimen>
     <dimen name="displaysub_icon_padding">8dp</dimen>
+
+
+    <dimen name="card_padding_small">6dp</dimen>
 
 </resources>

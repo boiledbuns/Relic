@@ -15,8 +15,8 @@ public class PostModel implements Post {
   public String title;
   private int commentCount;
 
-  public String domain;
-  public String url;
+  private String domain;
+  private String url;
   private String thumbnail;
 
   private String authorFlair;
@@ -199,5 +199,21 @@ public class PostModel implements Post {
 
   public void setViewCount(int viewCount) {
     this.viewCount = viewCount;
+  }
+
+  public String getDomain() {
+    return domain;
+  }
+
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
   }
 }
