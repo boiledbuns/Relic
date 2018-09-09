@@ -66,7 +66,7 @@
                         android:id="@+id/display_post_postitem"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/padding_s"
+                        android:padding="@dimen/padding_m"
                         android:layout_marginBottom="@dimen/displaypost_bottommargin"
                         android:background="@color/backgroundSecondary">
 
@@ -77,8 +77,6 @@
                             android:textSize="@dimen/title_size_m"
                             android:fontFamily="sans-serif"
                             android:textStyle="bold"
-                            android:layout_marginStart="@dimen/padding_s"
-                            android:layout_marginEnd="@dimen/padding_s"
                             android:text="@{postItem.title}"/>
 
                         <TextView
@@ -86,8 +84,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/text_spacing_s"
-                            android:layout_marginStart="@dimen/padding_s"
-                            android:layout_marginEnd="@dimen/padding_s"
+                            android:layout_marginBottom="@dimen/padding_m"
                             android:layout_below="@id/display_post_title"
                             android:textSize="@dimen/title_size_s"
                             android:text="@{postItem.author + `   ` +  postItem.created}"/>
@@ -97,8 +94,8 @@
                             android:id="@+id/display_post_linkcard"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/card_thumbnail_size"
+                            android:layout_marginBottom="@dimen/padding_m"
                             android:layout_below="@id/display_post_info"
-                            android:layout_margin="@dimen/padding_m"
                             android:visibility="@{isImage ? View.GONE : View.VISIBLE}">
 
                             <RelativeLayout
@@ -129,8 +126,9 @@
                             android:id="@+id/display_post_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/padding_m"
+                            android:visibility="@{postItem.htmlSelfText == null ? View.VISIBLE : View.GONE}"
                             android:layout_below="@id/display_post_linkcard"
-                            android:layout_marginTop="@dimen/displaypost_body_margintop"
                             android:text="@{postItem.htmlSelfText}"/>
 
                         <ImageView

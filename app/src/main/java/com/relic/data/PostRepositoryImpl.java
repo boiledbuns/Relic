@@ -320,6 +320,8 @@ public class PostRepositoryImpl implements PostRepository {
           @Override
           public void onErrorResponse(VolleyError error) {
             Log.d(TAG, "Error: "   + error.networkResponse);
+            // TODO add livedata for error
+            // TODO maybe retry if not an internet connection issue
           }
         }, checkToken()));
   }

@@ -148,6 +148,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 
       CommentEntity commentEntity = gson.fromJson(commentPOJO.toString(), CommentEntity.class);
       Log.d(TAG, "comments keys : " + commentPOJO.keySet());
+      Log.d(TAG, "replies : " + commentPOJO.get("collapsed") + " " + commentPOJO.get("keys"));
 
       Boolean likes = (Boolean) commentPOJO.get("likes");
       commentEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
