@@ -179,11 +179,12 @@ public class DisplayPostView extends Fragment {
   private void loadLinkPreview(PostModel postModel) {
     String linkUrl = postModel.getDomain();
     boolean notEmpty = !linkUrl.isEmpty();
+    boolean isImage = false;
     List <String> validUrls = Arrays.asList("self", "i.re");
+    Log.d(TAG, linkUrl.substring(0, 4));
 
     if (notEmpty && !validUrls.contains(linkUrl.substring(0, 4))) {
       // loads the card image
-      Log.d(TAG, linkUrl.substring(0, 4) + "");
       Picasso.get().load(postModel.getThumbnail()).fit().centerCrop().into(displayPostBinding.displayPostCardThumbnail);
     }
     else {
@@ -192,12 +193,15 @@ public class DisplayPostView extends Fragment {
       if (picEndings.contains(fullUrl.substring(fullUrl.length() - 3))) {
         try {
           Picasso.get().load(fullUrl).fit().centerCrop().into(displayPostBinding.displaypostPreview);
+          isImage = true;
         }
         catch (Error error) {
           Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
         }
       }
     }
+
+    displayPostBinding.setIsImage(isImage);
   }
 
   /**
@@ -208,24 +212,26 @@ public class DisplayPostView extends Fragment {
    */
   @BindingAdapter({"bind:previewThumbnail", "bind:previewFullImage"})
   public static void LoadPreviewImage(ImageView imgView, String previewThumbnail, String previewFullImage) {
-//    Log.d("DISPLAYPOST_VIEW", "THUMBNAIL URL = " + previewFullImage);
-//    String useUrl = previewFullImage;
+//    String linkUrl = postModel.getDomain();
+//    boolean notEmpty = !linkUrl.isEmpty();
+//    List <String> validUrls = Arrays.asList("self", "i.re");
 //
-//    if (picEndings.contains(previewFullImage.substring(previewFullImage.length() - 3))) {
-//      // display card only for link if the link is a thumbnail
-//
-//
-//    } else {
-//      // use the thumbnail image url if the full url is not an image
-//      useUrl = previewThumbnail;
+//    if (notEmpty && !validUrls.contains(linkUrl.substring(0, 4))) {
+//      // loads the card image
+//      Log.d(TAG, linkUrl.substring(0, 4) + "");
+//      Picasso.get().load(postModel.getThumbnail()).fit().centerCrop().into(displayPostBinding.displayPostCardThumbnail);
 //    }
-//
-//    try {
-//      // does not load image if the banner img string is empty
-//      Picasso.get().load(useUrl).fit().centerCrop().into(imgView);
-//    }
-//    catch (Error error) {
-//      Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
+//    else {
+//      String fullUrl = postModel.getUrl();
+//      // load the full image for the image
+//      if (picEndings.contains(fullUrl.substring(fullUrl.length() - 3))) {
+//        try {
+//          Picasso.get().load(fullUrl).fit().centerCrop().into(displayPostBinding.displaypostPreview);
+//        }
+//        catch (Error error) {
+//          Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
+//        }
+//      }
 //    }
   }
 

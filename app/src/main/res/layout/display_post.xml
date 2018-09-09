@@ -8,6 +8,9 @@
         <import type="android.text.Html"/>
 
         <variable
+            name="isImage"
+            type="Boolean"/>
+        <variable
             name="postItem"
             type="com.relic.data.models.PostModel"/>
     </data>
@@ -53,7 +56,7 @@
                         android:id="@+id/displaypost_preview"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/displaypost_image_height"
-                        android:visibility="@{postItem.thumbnail == null ? View.GONE : View.VISIBLE}"
+                        android:visibility="@{isImage ? View.VISIBLE : View.GONE}"
                         app:previewThumbnail="@{postItem.thumbnail}"
                         app:previewFullImage="@{postItem.url}"/>
 
@@ -63,7 +66,7 @@
                         android:id="@+id/display_post_postitem"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/displaypost_paddingtop"
+                        android:padding="@dimen/padding_s"
                         android:layout_marginBottom="@dimen/displaypost_bottommargin"
                         android:background="@color/backgroundSecondary">
 
@@ -71,63 +74,62 @@
                             android:id="@+id/display_post_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="@dimen/displaypost_title_marginbottom"
-                            android:textSize="@dimen/title_textsize"
+                            android:textSize="@dimen/title_size_m"
                             android:fontFamily="sans-serif"
+                            android:textStyle="bold"
+                            android:layout_marginStart="@dimen/padding_s"
+                            android:layout_marginEnd="@dimen/padding_s"
                             android:text="@{postItem.title}"/>
+
+                        <TextView
+                            android:id="@+id/display_post_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/text_spacing_s"
+                            android:layout_marginStart="@dimen/padding_s"
+                            android:layout_marginEnd="@dimen/padding_s"
+                            android:layout_below="@id/display_post_title"
+                            android:textSize="@dimen/title_size_s"
+                            android:text="@{postItem.author + `   ` +  postItem.created}"/>
 
                         <!-- card link displayed if the post is a link to another site -->
                         <android.support.v7.widget.CardView
                             android:id="@+id/display_post_linkcard"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_title">
+                            android:layout_height="@dimen/card_thumbnail_size"
+                            android:layout_below="@id/display_post_info"
+                            android:layout_margin="@dimen/padding_m"
+                            android:visibility="@{isImage ? View.GONE : View.VISIBLE}">
 
                             <RelativeLayout
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:padding="@dimen/card_padding_small">
+                                android:paddingStart="@dimen/padding_m">
 
                                 <TextView
-                                    android:layout_width="wrap_content"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="@{postItem.domain}"/>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginEnd="@dimen/card_thumbnail_size"
+                                    android:padding="@dimen/card_padding_small"
+                                    android:textSize="@dimen/title_size_s"
                                     android:text="@{postItem.url}"/>
 
                                 <ImageView
                                     android:id="@+id/display_post_card_thumbnail"
-                                    android:layout_width="@dimen/displaypost_thumbnail_height"
-                                    android:layout_height="@dimen/displaypost_thumbnail_height"
+                                    android:layout_width="@dimen/card_thumbnail_size"
+                                    android:layout_height="@dimen/card_thumbnail_size"
                                     android:layout_alignParentEnd="true"/>
 
-                            </RelativeLayout>
+                            </RelativeLayout> 
 
                         </android.support.v7.widget.CardView>
-
-                        <TextView
-                            android:id="@+id/display_post_author"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_linkcard"
-                            android:text="@{postItem.author}"/>
-
-                        <TextView
-                            android:id="@+id/display_post_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_toEndOf="@id/display_post_author"
-                            android:layout_below="@id/display_post_linkcard"
-                            android:text="@{postItem.created}"/>
 
                         <TextView
                             android:id="@+id/display_post_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_author"
+                            android:layout_below="@id/display_post_linkcard"
                             android:layout_marginTop="@dimen/displaypost_body_margintop"
                             android:text="@{postItem.htmlSelfText}"/>
 
