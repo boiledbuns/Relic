@@ -50,6 +50,7 @@ import java.util.List;
 public class DisplaySubView extends Fragment {
   private final String TAG = "DISPLAYSUB_VIEW";
   private final String SCROLL_POSITION = "POSITION";
+  private final String[] SORT_SCOPES = {"hour", "day", "week", "month", "year", "all"};
 
   protected DisplaySubContract.ViewModel displaySubVM;
 
@@ -147,11 +148,13 @@ public class DisplaySubView extends Fragment {
 
     SubMenu sortOptionsMenu = menu.findItem(R.id.display_sub_sort).getSubMenu();
 
-    for (int i = 0 ; i < sortOptionsMenu.size(); i++) {
-      SubMenu sortOptionSubmenu = sortOptionsMenu.getItem(i).getSubMenu();
-      sortOptionSubmenu.add("TETSt");
-      //sortOptionSubmenu.add(Menu.NONE, R.menu.order_scope_menu, Menu.NONE, "TETSt");
-    }
+    // create submenu for sorting methods
+//    for (int i = 0 ; i < sortOptionsMenu.size(); i++) {
+//      SubMenu sortOptionSubmenu = sortOptionsMenu.getItem(i).getSubMenu();
+//      for (int j = 0; j < SORT_SCOPES.length; j ++) {
+//        sortOptionSubmenu.add(SORT_SCOPES[j]);
+//      }
+//    }
 
     // Add query listeners to the searchview
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -199,9 +202,9 @@ public class DisplaySubView extends Fragment {
       // tell vm to coordinate the change
       displaySubVM.changeSortingMethod(actionCode, scopeCode);
     }
-
     return override;
   }
+
 
   /**
    * Observe all the livedata exposed by the viewmodel and attach the appropriate event listeners

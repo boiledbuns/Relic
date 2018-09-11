@@ -15,11 +15,16 @@
           app:showAsAction="always">
 
         <menu>
-            <item android:id="@+id/display_sub_best" android:title="@string/sortby_best" app:showAsAction="withText">
-                <menu/>
-            </item>
+            <item android:id="@+id/display_sub_best" android:title="@string/sortby_best" app:showAsAction="withText"/>
             <item android:id="@+id/display_sub_controversial" android:title="@string/sortby_controversial" app:showAsAction="withText">
-                <menu/>
+                <menu>
+                    <item android:id="@+id/sortby_controversial_hour" android:title="@string/sort_scope_hour"/>
+                    <item android:id="@+id/sortby_controversial_day" android:title="@string/sort_scope_day"/>
+                    <item android:id="@+id/sortby_controversial_week" android:title="@string/sort_scope_week"/>
+                    <item android:id="@+id/sortby_controversial_month" android:title="@string/sort_scope_month"/>
+                    <item android:id="@+id/sortby_controversial_year" android:title="@string/sort_scope_year"/>
+                    <item android:id="@+id/sortby_controversial_all" android:title="@string/sort_scope_all"/>
+                </menu>
             </item>
             <item android:id="@+id/display_sub_hot" android:title="@string/sortby_hot" app:showAsAction="withText">
                 <menu/>
@@ -31,7 +36,14 @@
                 <menu/>
             </item>
             <item android:id="@+id/display_sub_top" android:title="@string/sortby_top" app:showAsAction="withText">
-                <menu/>
+                <menu>
+                    <item android:id="@+id/sortby_top_hour" android:title="@string/sort_scope_hour"/>
+                    <item android:id="@+id/sortby_top_day" android:title="@string/sort_scope_day"/>
+                    <item android:id="@+id/sortby_top_week" android:title="@string/sort_scope_week"/>
+                    <item android:id="@+id/sortby_top_month" android:title="@string/sort_scope_month"/>
+                    <item android:id="@+id/sortby_top_year" android:title="@string/sort_scope_year"/>
+                    <item android:id="@+id/sortby_top_all" android:title="@string/sort_scope_all"/>
+                </menu>
             </item>
         </menu>
 

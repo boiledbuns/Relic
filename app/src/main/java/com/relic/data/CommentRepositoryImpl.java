@@ -25,6 +25,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -142,6 +143,10 @@ public class CommentRepositoryImpl implements CommentRepository {
     Iterator commentIterator = commentChildren.iterator();
     List<CommentEntity> commentEntities = new ArrayList<>();
 
+    // initialize the date formatter and date for now
+    SimpleDateFormat formatter = new SimpleDateFormat("MMM dd',' hh:mm a");
+    Date current = new Date();
+
     JSONObject commentPOJO;
     while (commentIterator.hasNext()) {
       commentPOJO = (JSONObject) ((JSONObject) commentIterator.next()).get("data");
@@ -154,8 +159,13 @@ public class CommentRepositoryImpl implements CommentRepository {
       commentEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
       commentEntity.setId((String) commentPOJO.get("id"));
 
-      Date created = new Date(Double.doubleToLongBits((double) commentPOJO.get("created")));
-      commentEntity.created = created.toString();
+      // add year to stamp if the post year doesn't match the current one
+      Date created = new Date((long) ((double) commentPOJO.get("created"))*1000);
+      if (current.getYear() != created.getYear()) {
+        commentEntity.created = created.getYear() + " " + formatter.format(created);
+      } else {
+        commentEntity.created = formatter.format(created);
+      }
 
       // unmarshall the comment pojo and add it to list
       commentEntities.add(commentEntity);

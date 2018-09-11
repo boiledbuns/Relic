@@ -16,6 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -31,6 +34,7 @@ import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.DisplayPostBinding;
 import com.relic.presentation.adapter.CommentAdapter;
+import com.relic.presentation.editor.EditorView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -81,7 +85,11 @@ public class DisplayPostView extends Fragment {
 
     if (subredditName != null) {
       myToolbar.setTitle(subredditName);
+      // force menu to display
+
+      myToolbar.inflateMenu(R.menu.display_post_menu);
     }
+
 
     commentAdapter = new CommentAdapter(displayPostVM);
     displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
@@ -104,6 +112,8 @@ public class DisplayPostView extends Fragment {
     // TODO: Testing user gateway using user "reddit"
     UserGateway userGateway = new UserGatewayImpl(getContext());
     userGateway.getUser("reddit");
+
+    setHasOptionsMenu(true);
   }
 
 
@@ -202,6 +212,40 @@ public class DisplayPostView extends Fragment {
     }
 
     displayPostBinding.setIsImage(isImage);
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    super.onCreateOptionsMenu(menu, inflater);
+
+    inflater.inflate(R.menu.display_post_menu, menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    boolean override = true;
+
+    Log.d(TAG,  "PLEASE " + item.getItemId());
+    switch (item.getItemId()) {
+      case R.id.post_menu_reply : openPostReplyEditor(postFullname); break;
+      default: override = super.onOptionsItemSelected(item);
+    }
+
+    return override;
+  }
+
+  private void openPostReplyEditor(String fullname) {
+    Log.d(TAG, "reply button pressed");
+
+    // add the subreddit object to the bundle
+    Bundle bundle = new Bundle();
+    bundle.putString(EditorView.BUNDLE_KEY, fullname);
+
+    EditorView subFrag = new EditorView();
+
+    // replace the current screen with the newly created fragment
+    getActivity().getSupportFragmentManager().beginTransaction()
+        .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
   }
 
   /**
