@@ -161,6 +161,15 @@
                             android:layout_below="@id/display_post_text"
                             android:layout_toEndOf="@id/display_post_downvote"
                             android:text="@{postItem.commentCount + ` comments`}"/>
+
+                        <TextView
+                            android:id="@+id/display_post_reply"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/display_post_text"
+                            android:layout_alignParentEnd="true"
+                            android:text="@string/reply"/>
+
                     </RelativeLayout>
 
                     <ProgressBar

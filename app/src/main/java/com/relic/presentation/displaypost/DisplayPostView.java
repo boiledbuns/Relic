@@ -46,6 +46,8 @@ public class DisplayPostView extends Fragment {
 
   private DisplayPostContract.ViewModel displayPostVM;
   private DisplayPostBinding displayPostBinding;
+
+  private View contentView;
   private Toolbar myToolbar;
   private CommentAdapter commentAdapter;
   private SwipeRefreshLayout swipeRefreshLayout;
@@ -81,15 +83,15 @@ public class DisplayPostView extends Fragment {
     displayPostBinding = DataBindingUtil
         .inflate(inflater, R.layout.display_post, container, false);
 
+    contentView = displayPostBinding.getRoot();
+
     myToolbar = displayPostBinding.getRoot().findViewById(R.id.display_post_toolbar);
 
     if (subredditName != null) {
       myToolbar.setTitle(subredditName);
       // force menu to display
-
       myToolbar.inflateMenu(R.menu.display_post_menu);
     }
-
 
     commentAdapter = new CommentAdapter(displayPostVM);
     displayPostBinding.displayCommentsRecyclerview.setAdapter(commentAdapter);
@@ -99,9 +101,10 @@ public class DisplayPostView extends Fragment {
     swipeRefreshLayout = displayPostBinding.getRoot().findViewById(R.id.postitem_swiperefresh);
     attachScrollListeners();
 
+    initializeOnClicks();
+
     return displayPostBinding.getRoot();
   }
-
 
   @Override
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -279,4 +282,13 @@ public class DisplayPostView extends Fragment {
 //    }
   }
 
+
+  /**
+   * inialize main onclicks for the post
+   */
+  private void initializeOnClicks() {
+    contentView.findViewById(R.id.display_post_reply).setOnClickListener((View view) -> {
+      openPostReplyEditor(postFullname);
+    });
+  }
 }
