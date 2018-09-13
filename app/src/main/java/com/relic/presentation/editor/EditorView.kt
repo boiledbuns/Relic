@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.Toolbar
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -18,9 +19,15 @@ class EditorView : Fragment() {
     }
 
     private lateinit var viewModel : EditorContract.VM
+    private lateinit var toolbar : Toolbar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val contentView = inflater.inflate(R.layout.editor, container, false);
+        val contentView = inflater.inflate(R.layout.editor, container, false)
+
+        toolbar = contentView.findViewById(R.id.reply_post_toolbar) as Toolbar
+        toolbar.title = "Replying to post"
+
+
         return contentView
     }
 

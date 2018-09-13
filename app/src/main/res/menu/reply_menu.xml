@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/reply_item"
+        android:title="@string/reply"
+        android:icon="@drawable/ic_send"
+        app:showAsAction="always"/>
+</menu>
