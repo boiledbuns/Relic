@@ -54,6 +54,7 @@ public interface PostRepository {
    */
   LiveData<PostModel> getPost(String postFullName);
 
+  // TODO convert this to return livedata and get rid of get post
   /**
    * retrieves a single post from the network and stores it locally
    * @param subredditName name of subreddit that the post was made in

@@ -9,5 +9,5 @@ class RelicToolbar @JvmOverloads constructor(
     attrs : AttributeSet? = null,
     defStyleAttr : Int = 0
 ): Toolbar (context, attrs, defStyleAttr){
-    
+
 }

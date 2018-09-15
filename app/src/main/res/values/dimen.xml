@@ -84,5 +84,4 @@
     <dimen name="card_padding_small">6dp</dimen>
     <dimen name="card_thumbnail_size">80dp</dimen>
 
-
 </resources>

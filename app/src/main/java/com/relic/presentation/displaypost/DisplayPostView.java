@@ -10,8 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -34,10 +32,10 @@ import com.relic.data.models.CommentModel;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.DisplayPostBinding;
 import com.relic.presentation.adapter.CommentAdapter;
+import com.relic.presentation.editor.EditorContract;
 import com.relic.presentation.editor.EditorView;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -242,9 +240,12 @@ public class DisplayPostView extends Fragment {
 
     // add the subreddit object to the bundle
     Bundle bundle = new Bundle();
-    bundle.putString(EditorView.BUNDLE_KEY, fullname);
+    bundle.putString(EditorView.SUB_NAME_KEY, subredditName);
+    bundle.putString(EditorView.NAME_KEY, fullname);
+    bundle.putInt(EditorView.PARENT_TYPE_KEY, EditorContract.VM.POST_PARENT);
 
     EditorView subFrag = new EditorView();
+    subFrag.setArguments(bundle);
 
     // replace the current screen with the newly created fragment
     getActivity().getSupportFragmentManager().beginTransaction()
@@ -284,7 +285,7 @@ public class DisplayPostView extends Fragment {
 
 
   /**
-   * inialize main onclicks for the post
+   * initialize main onclicks for the post
    */
   private void initializeOnClicks() {
     contentView.findViewById(R.id.display_post_reply).setOnClickListener((View view) -> {
