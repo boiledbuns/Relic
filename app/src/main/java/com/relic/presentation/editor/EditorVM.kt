@@ -26,12 +26,11 @@ class EditorVM : EditorContract.VM, ViewModel() {
 
         postRepo = postRepository
 
-        Log.d("editorvm", "fullname = " + fullName)
         if (parentType == EditorContract.VM.POST_PARENT) {
             // retrieve the post from the post repo
             parentModelText.addSource(postRepo.getPost(fullName)) {
-                Log.d("TEST", "fullname = " + fullName + ": " + it?.selftext)
-                parentModelText.value = it?.selftext
+                Log.d("editorvm", "fullname = " + fullName + ": " + it?.selftext)
+                parentModelText.value = it?.htmlSelfText
             }
         }
         else if (parentType == EditorContract.VM.COMMENT_PARENT) {

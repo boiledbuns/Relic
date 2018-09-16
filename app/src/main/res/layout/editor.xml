@@ -18,29 +18,40 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/parentTextView"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Lorem Ipsum"/>
+            android:layout_height="match_parent"
+            android:padding="@dimen/text_container_padding"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/parentTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/parentTextRule"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="#f2f2f2"
+                android:layout_below="@id/parentTextView"
+                android:layout_marginTop="@dimen/text_spacing_m"
+                android:layout_marginBottom="@dimen/text_spacing_m"/>
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="300dp"
-                android:layout_below="@id/parentTextView"
-                android:background="@null"
-                android:fitsSystemWindows="true"/>
-        </ScrollView>
+                android:layout_below="@id/parentTextRule"
+                android:background="@null"/>
 
-    </RelativeLayout>
+        </RelativeLayout>
+
+    </ScrollView>
+
 </android.support.design.widget.CoordinatorLayout>

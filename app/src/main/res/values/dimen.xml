@@ -77,11 +77,14 @@
 
 
     <dimen name="text_spacing_s">4dp</dimen>
+    <dimen name="text_spacing_m">12dp</dimen>
 
     <dimen name="padding_s">8dp</dimen>
     <dimen name="padding_m">12dp</dimen>
 
     <dimen name="card_padding_small">6dp</dimen>
     <dimen name="card_thumbnail_size">80dp</dimen>
+
+    <dimen name="text_container_padding">8dp</dimen>
 
 </resources>

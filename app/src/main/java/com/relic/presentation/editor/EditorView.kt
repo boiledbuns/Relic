@@ -46,11 +46,8 @@ class EditorView : Fragment() {
             val fullName : String? = arguments?.getString(NAME_KEY)
             val parentType : Int? = arguments?.getInt(PARENT_TYPE_KEY)
 
-            Log.d("editorvm", "view $subName $fullName $parentType")
-
             if (subName != null && fullName != null && parentType != null) {
                 viewModel.let {
-                    Log.d("editorvm", "view ")
                     it.init(subName, fullName, parentType, PostRepositoryImpl(context), CommentRepositoryImpl(context))
                 }
             }

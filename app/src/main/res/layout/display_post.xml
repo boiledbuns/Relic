@@ -127,7 +127,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/padding_m"
-                            android:visibility="@{postItem.htmlSelfText == null ? View.VISIBLE : View.GONE}"
                             android:layout_below="@id/display_post_linkcard"
                             android:text="@{postItem.htmlSelfText}"/>
 
