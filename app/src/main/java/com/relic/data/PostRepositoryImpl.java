@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 public class PostRepositoryImpl implements PostRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
@@ -53,6 +55,7 @@ public class PostRepositoryImpl implements PostRepository {
   private int currentSortingCode = PostRepository.SORT_HOT;
 
 
+  @Inject
   public PostRepositoryImpl(Context context) {
     currentContext = context;
     requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
@@ -289,7 +292,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
   }
 
-  
+
   public LiveData<PostModel> getPost(String postFullName) {
     return appDB.getPostDao().getSinglePost(postFullName);
   }

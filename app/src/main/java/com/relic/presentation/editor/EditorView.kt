@@ -1,31 +1,29 @@
 package com.relic.presentation.editor
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
-import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import com.relic.R
 import com.relic.data.CommentRepositoryImpl
 import com.relic.data.PostRepositoryImpl
+import com.relic.dagger.DaggerRepositoryComponent
+import com.relic.presentation.base.RelicFragment
 import kotlinx.android.synthetic.main.editor.*
 
-class EditorView : Fragment() {
+class EditorView : RelicFragment() {
     companion object {
         const val NAME_KEY = "fullname"
         const val SUB_NAME_KEY = "subreddit"
         const val PARENT_TYPE_KEY = "post_type"
     }
 
-    private lateinit var viewModel : EditorContract.VM
+    private lateinit var viewModel : EditorVM
     private lateinit var toolbar : Toolbar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -40,7 +38,12 @@ class EditorView : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this).get(EditorVM::class.java)
+        viewModel = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return EditorVM(PostRepositoryImpl(context), CommentRepositoryImpl(context)) as T
+            }
+        }).get(EditorVM::class.java)
+
         if (!viewModel.isInitialized()) {
             val subName : String? = arguments?.getString(SUB_NAME_KEY)
             val fullName : String? = arguments?.getString(NAME_KEY)
@@ -48,7 +51,7 @@ class EditorView : Fragment() {
 
             if (subName != null && fullName != null && parentType != null) {
                 viewModel.let {
-                    it.init(subName, fullName, parentType, PostRepositoryImpl(context), CommentRepositoryImpl(context))
+                    it.init(subName, fullName, parentType)
                 }
             }
         }

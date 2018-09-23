@@ -2,17 +2,18 @@ package com.relic.presentation.editor
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.relic.data.CommentRepository
 import com.relic.data.PostRepository
+import javax.inject.Inject
 
-class EditorVM : EditorContract.VM, ViewModel() {
+class EditorVM @Inject constructor(
+        private val postRepo : PostRepository,
+        private val commentRepo: CommentRepository
+): EditorContract.VM, ViewModel() {
+
     private var isInitialized : Boolean = false
-
-    private lateinit var postRepo : PostRepository
-
     private val parentModelText = MediatorLiveData<String>()
 
     override fun isInitialized(): Boolean = isInitialized
@@ -20,11 +21,7 @@ class EditorVM : EditorContract.VM, ViewModel() {
     override fun init(
             subName: String,
             fullName: String,
-            parentType: Int,
-            postRepository: PostRepository,
-            commentRepository: CommentRepository) {
-
-        postRepo = postRepository
+            parentType: Int) {
 
         if (parentType == EditorContract.VM.POST_PARENT) {
             // retrieve the post from the post repo

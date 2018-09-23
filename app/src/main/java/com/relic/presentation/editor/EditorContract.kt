@@ -11,7 +11,7 @@ interface  EditorContract {
             const val COMMENT_PARENT = 1
         }
 
-        fun init(subName: String, fullName: String, parentType : Int, postRepository: PostRepository, commentRepository: CommentRepository)
+        fun init(subName: String, fullName: String, parentType : Int)
 
         fun isInitialized() : Boolean
 

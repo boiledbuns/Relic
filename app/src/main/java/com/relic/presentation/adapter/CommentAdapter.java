@@ -97,7 +97,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
   }
 
   /**
-   *  Viewholder for ocmments
+   *  Viewholder for comments
    */
   class CommentItemVH extends RecyclerView.ViewHolder {
     private CommentItemBinding commentItemBinding;

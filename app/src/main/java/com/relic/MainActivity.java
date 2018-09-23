@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.relic.dagger.DaggerAppComponent;
+import com.relic.dagger.modules.AppModule;
 import com.relic.data.Authenticator;
 import com.relic.data.VolleyQueue;
 import com.relic.presentation.callbacks.AuthenticationCallback;
@@ -72,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
       getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
+  }
+
+  public void buildComponent () {
+     DaggerAppComponent.builder()
+             .appModule(new AppModule(getApplicationContext()))
+             .build();
   }
 }
 
