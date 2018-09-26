@@ -13,8 +13,15 @@ import com.relic.R
 import com.relic.data.CommentRepositoryImpl
 import com.relic.data.PostRepositoryImpl
 import com.relic.dagger.DaggerRepositoryComponent
+import com.relic.dagger.DaggerVMComponent
+import com.relic.dagger.RepositoryComponent
+import com.relic.dagger.VMComponent
+import com.relic.data.CommentRepository
+import com.relic.data.PostRepository
+import com.relic.data.RepoModule
 import com.relic.presentation.base.RelicFragment
 import kotlinx.android.synthetic.main.editor.*
+import javax.inject.Inject
 
 class EditorView : RelicFragment() {
     companion object {
@@ -39,8 +46,17 @@ class EditorView : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            @Inject
+            lateinit var editorVM : EditorVM
+
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return EditorVM(PostRepositoryImpl(context), CommentRepositoryImpl(context)) as T
+                // construct & inject editor VM
+                DaggerVMComponent.builder()
+                        .repoModule(RepoModule(context!!))
+                        .build()
+                        .injectEditor(this)
+
+                return editorVM as T
             }
         }).get(EditorVM::class.java)
 

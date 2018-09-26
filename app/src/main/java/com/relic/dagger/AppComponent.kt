@@ -1,7 +1,7 @@
 package com.relic.dagger
 
-import android.content.Context
 import com.relic.dagger.modules.AppModule
+import com.relic.presentation.editor.EditorVM
 import dagger.Component
 import javax.inject.Singleton
 

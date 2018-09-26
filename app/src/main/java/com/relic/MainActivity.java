@@ -75,12 +75,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
           .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
     }
   }
-
-  public void buildComponent () {
-     DaggerAppComponent.builder()
-             .appModule(new AppModule(getApplicationContext()))
-             .build();
-  }
 }
 
 

@@ -2,6 +2,7 @@ package com.relic.dagger
 
 import com.relic.data.RepoModule
 import com.relic.presentation.editor.EditorVM
+import com.relic.presentation.editor.EditorView
 import dagger.Component
 import javax.inject.Singleton
 
@@ -9,6 +10,7 @@ import javax.inject.Singleton
 @Component(modules = [RepoModule::class])
 interface RepositoryComponent {
 
-    fun inject(editorVM: EditorVM)
+    fun inject(editorView: EditorView)
 
+//    fun buildEditorVM() : EditorVM
 }
