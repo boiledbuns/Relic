@@ -108,7 +108,7 @@ public class DisplayPostView extends Fragment {
   public void onActivityCreated(@Nullable Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
 
-    subscribeToVM();
+    bindViewModel();
 
     // TODO: Testing user gateway using user "reddit"
     UserGateway userGateway = new UserGatewayImpl(getContext());
@@ -121,7 +121,7 @@ public class DisplayPostView extends Fragment {
   /**
    * subscribes the view to the data exposed by the viewmodel
    */
-  private void subscribeToVM() {
+  private void bindViewModel() {
     // Observe the post exposed by the VM
     displayPostVM.getPost().observe(this, new Observer<PostModel>() {
       @Override

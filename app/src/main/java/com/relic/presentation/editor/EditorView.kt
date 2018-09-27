@@ -51,11 +51,11 @@ class EditorView : RelicFragment() {
 
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 // construct & inject editor VM
-                DaggerVMComponent.builder()
+                val component = DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
                         .build()
-                        .injectEditor(this)
 
+                editorVM = component.getEditorVM()
                 return editorVM as T
             }
         }).get(EditorVM::class.java)

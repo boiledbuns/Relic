@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Component( modules = [RepoModule::class])
 interface VMComponent {
 
-    fun editorVM() : EditorVM
+    fun getEditorVM() : EditorVM
 
     fun injectEditor(factory: ViewModelProvider.Factory)
 }

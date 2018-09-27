@@ -73,7 +73,7 @@
     <dimen name="displaysub_icon_padding">8dp</dimen>
 
     <dimen name="title_size_m">20sp</dimen>
-    <dimen name="title_size_s">14sp</dimen>
+    <dimen name="title_size_s">15sp</dimen>
 
 
     <dimen name="text_spacing_s">4dp</dimen>
@@ -86,5 +86,6 @@
     <dimen name="card_thumbnail_size">80dp</dimen>
 
     <dimen name="text_container_padding">8dp</dimen>
+    <dimen name="line_spacing_s">1.1</dimen>
 
 </resources>

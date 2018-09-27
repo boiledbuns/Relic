@@ -127,7 +127,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/padding_m"
+                            android:lineSpacingMultiplier="@dimen/line_spacing_s"
                             android:layout_below="@id/display_post_linkcard"
+                            android:textSize="@dimen/title_size_s"
                             android:text="@{postItem.htmlSelfText}"/>
 
                         <ImageView
