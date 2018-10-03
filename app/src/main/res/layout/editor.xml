@@ -30,7 +30,12 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
-                android:id="@+id/parentTextView"
+                android:id="@+id/parentTitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/parentBodyTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -39,7 +44,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
                 android:background="#f2f2f2"
-                android:layout_below="@id/parentTextView"
+                android:layout_below="@id/parentBodyTextView"
                 android:layout_marginTop="@dimen/text_spacing_m"
                 android:layout_marginBottom="@dimen/text_spacing_m"/>
 

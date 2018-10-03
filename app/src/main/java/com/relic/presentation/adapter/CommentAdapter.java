@@ -83,8 +83,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
           CommentModel oldComment = commentList.get(i);
           CommentModel newComment = newComments.get(i1);
 
-          boolean isSame = true;
-          isSame = oldComment.getUserUpvoted() == newComment.getUserUpvoted();
+          boolean isSame = oldComment.getUserUpvoted() == newComment.getUserUpvoted();
 
           return isSame;
         }

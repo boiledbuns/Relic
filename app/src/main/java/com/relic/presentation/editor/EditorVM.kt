@@ -6,17 +6,25 @@ import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.relic.data.CommentRepository
 import com.relic.data.PostRepository
+import com.relic.presentation.editor.EditorContract.*
 import javax.inject.Inject
 
-class EditorVM @Inject constructor(
+class EditorVM constructor(
         private val postRepo : PostRepository,
         private val commentRepo: CommentRepository
 ): EditorContract.VM, ViewModel() {
 
-    private var isInitialized : Boolean = false
-    private val parentModelText = MediatorLiveData<String>()
+    class Factory @Inject constructor(
+            private val postRepo : PostRepository,
+            private val commentRepo: CommentRepository
+    ) {
+        fun create () : EditorVM {
+            return EditorVM(postRepo, commentRepo)
+        }
+    }
 
-    override fun isInitialized(): Boolean = isInitialized
+    private val _parentModel = MediatorLiveData<ReplyParent>()
+    val parentModel : LiveData<ReplyParent> = _parentModel
 
     override fun init(
             subName: String,
@@ -25,9 +33,9 @@ class EditorVM @Inject constructor(
 
         if (parentType == EditorContract.VM.POST_PARENT) {
             // retrieve the post from the post repo
-            parentModelText.addSource(postRepo.getPost(fullName)) {
+            _parentModel.addSource(postRepo.getPost(fullName)) {
                 Log.d("editorvm", "fullname = " + fullName + ": " + it?.selftext)
-                parentModelText.value = it?.htmlSelfText
+                _parentModel.postValue(ReplyParent(it?.title, it?.htmlSelfText))
             }
         }
         else if (parentType == EditorContract.VM.COMMENT_PARENT) {
@@ -35,12 +43,8 @@ class EditorVM @Inject constructor(
             //commentRepo.get
         }
 
-        isInitialized = true
     }
 
-    override fun getParentText(): LiveData<String> {
-        return parentModelText
-    }
 
 
 
