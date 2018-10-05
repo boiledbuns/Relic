@@ -26,6 +26,8 @@ class EditorVM constructor(
     private val _parentModel = MediatorLiveData<ReplyParent>()
     val parentModel : LiveData<ReplyParent> = _parentModel
 
+    private var currentBody = ""
+
     override fun init(
             subName: String,
             fullName: String,
@@ -45,8 +47,11 @@ class EditorVM constructor(
 
     }
 
+    fun onTextChanged(newText : String) {
+        currentBody = newText
+    }
 
+    fun submitText() {
 
-
-
+    }
 }

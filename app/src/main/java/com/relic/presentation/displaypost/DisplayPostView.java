@@ -240,8 +240,8 @@ public class DisplayPostView extends Fragment {
 
     // add the subreddit object to the bundle
     Bundle bundle = new Bundle();
-    bundle.putString(EditorView.SUB_NAME_KEY, subredditName);
-    bundle.putString(EditorView.NAME_KEY, fullname);
+    bundle.putString(EditorView.SUBNAME_ARG, subredditName);
+    bundle.putString(EditorView.FULLNAME_ARG, fullname);
     bundle.putInt(EditorView.PARENT_TYPE_KEY, EditorContract.VM.POST_PARENT);
 
     EditorView subFrag = new EditorView();

@@ -5,9 +5,9 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
@@ -20,8 +20,8 @@ import kotlinx.android.synthetic.main.editor.*
 
 class EditorView : RelicFragment() {
     companion object {
-        const val NAME_KEY = "fullname"
-        const val SUB_NAME_KEY = "subreddit"
+        const val FULLNAME_ARG = "fullname"
+        const val SUBNAME_ARG = "subreddit"
         const val PARENT_TYPE_KEY = "post_type"
     }
 
@@ -34,14 +34,12 @@ class EditorView : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val subName : String? = arguments?.getString(SUB_NAME_KEY)
-        val fullName : String? = arguments?.getString(NAME_KEY)
+        val subName : String? = arguments?.getString(SUBNAME_ARG)
+        val fullName : String? = arguments?.getString(FULLNAME_ARG)
         val parentType : Int? = arguments?.getInt(PARENT_TYPE_KEY)
 
         if (subName != null && fullName != null && parentType != null) {
-            viewModel.let {
-                it.init(subName, fullName, parentType)
-            }
+            viewModel.init(subName, fullName, parentType)
         }
 
         setHasOptionsMenu(true)
@@ -54,13 +52,30 @@ class EditorView : RelicFragment() {
         toolbar = contentView.findViewById(R.id.reply_post_toolbar) as Toolbar
         toolbar.title = "Replying to post"
 
+        replyEditor.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(editable: Editable?) {
+                viewModel.onTextChanged(editable.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // do nothing
+            }
+        })
+
         return contentView
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        super.onCreateOptionsMenu(menu, inflater)
-        
-        toolbar.navigationIcon = resources.getDrawable(android.R.drawable.ic_menu_close_clear_cancel)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        toolbar.apply {
+            setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel)
+            setNavigationOnClickListener { activity?.onBackPressed() }
+        }
     }
 
     private fun initializeVM() : EditorVM {
@@ -77,10 +92,10 @@ class EditorView : RelicFragment() {
 
     private fun bindVM() {
         viewModel.parentModel.nonNull().observe(this) {
-            it.title?.let{ parentTitleTextView.text = it }
+            parentTitleTextView.text = it.title
 
             if (it.body == null || it.body.isEmpty()) {
-                parentBodyTextView.text = "This post has no text body"
+                parentBodyTextView.text = resources.getString(R.string.empty_parent_body)
             } else {
                 parentBodyTextView.text = it.body
             }
