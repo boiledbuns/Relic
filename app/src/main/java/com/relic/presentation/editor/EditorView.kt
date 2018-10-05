@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
@@ -55,6 +57,12 @@ class EditorView : RelicFragment() {
         return contentView
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        
+        toolbar.navigationIcon = resources.getDrawable(android.R.drawable.ic_menu_close_clear_cancel)
+    }
+
     private fun initializeVM() : EditorVM {
         return ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -70,7 +78,12 @@ class EditorView : RelicFragment() {
     private fun bindVM() {
         viewModel.parentModel.nonNull().observe(this) {
             it.title?.let{ parentTitleTextView.text = it }
-            it.body?.let{ parentBodyTextView.text = it }
+
+            if (it.body == null || it.body.isEmpty()) {
+                parentBodyTextView.text = "This post has no text body"
+            } else {
+                parentBodyTextView.text = it.body
+            }
         }
     }
 

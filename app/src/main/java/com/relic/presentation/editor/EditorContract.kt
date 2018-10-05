@@ -1,9 +1,5 @@
 package com.relic.presentation.editor
 
-import android.arch.lifecycle.LiveData
-import com.relic.data.CommentRepository
-import com.relic.data.PostRepository
-
 interface  EditorContract {
 
     interface VM {

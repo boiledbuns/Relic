@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -21,11 +22,12 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/toolbar_height">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="@dimen/text_container_padding"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -37,7 +39,8 @@
             <TextView
                 android:id="@+id/parentBodyTextView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_below="@id/parentTitleTextView"/>
 
             <View
                 android:id="@+id/parentTextRule"
@@ -53,6 +56,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="300dp"
                 android:layout_below="@id/parentTextRule"
+                android:gravity="top|start"
                 android:background="@null"/>
 
         </RelativeLayout>
