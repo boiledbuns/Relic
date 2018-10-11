@@ -27,4 +27,10 @@ class RepoModule (
     fun provideCommentRepository() : CommentRepository {
         return CommentRepositoryImpl(applicationContext)
     }
+
+    @Provides
+    @Singleton
+    fun provideListingRepository() : ListingRepository {
+        return ListingRepositoryImpl(applicationContext)
+    }
 }

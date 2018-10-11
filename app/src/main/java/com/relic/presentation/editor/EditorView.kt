@@ -17,6 +17,7 @@ import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.editor.*
+import kotlinx.android.synthetic.main.editor.view.*
 
 class EditorView : RelicFragment() {
     companion object {
@@ -52,7 +53,7 @@ class EditorView : RelicFragment() {
         toolbar = contentView.findViewById(R.id.reply_post_toolbar) as Toolbar
         toolbar.title = "Replying to post"
 
-        replyEditor.addTextChangedListener(object : TextWatcher {
+        contentView.replyEditorView.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(editable: Editable?) {
                 viewModel.onTextChanged(editable.toString())
             }
@@ -101,5 +102,4 @@ class EditorView : RelicFragment() {
             }
         }
     }
-
 }

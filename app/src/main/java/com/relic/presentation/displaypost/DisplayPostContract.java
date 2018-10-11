@@ -13,27 +13,16 @@ import java.util.List;
 public interface DisplayPostContract {
   interface ViewModel {
     /**
-     * initialize and inject dependencies into the viewmodel
-     * @param postRepo repository for retrieving posts
-     * @param commentRepo repository for retrieving comments
-     * @param fullName the fullname of the post to be displayed
-     */
-    void init(ListingRepository listingRepo, PostRepository postRepo, CommentRepository commentRepo, String subreddit, String fullName);
-
-
-    /**
      * Exposes the postm to the view
      * @return postmodel as livedata
      */
     LiveData<PostModel> getPost();
-
 
     /**
      * Exposes the postm to the view
      * @return postmodel as livedata
      */
     LiveData<List<CommentModel>> getCommentList();
-
 
     /**
      * Hook for view to tell the VM to retrieve more comments

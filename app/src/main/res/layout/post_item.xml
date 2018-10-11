@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -52,8 +51,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="@{postModel.stickied ? View.VISIBLE : View.GONE}"
-                android:layout_toLeftOf="@id/postitem_saved"
-                android:src="@drawable/ic_pinned"/>
+                android:layout_toStartOf="@id/postitem_saved"
+                android:src="@drawable/ic_pinned"
+                android:layout_marginEnd="@dimen/padding_s"/>
 
             <LinearLayout
                 android:id="@+id/postitem_titlegroup"

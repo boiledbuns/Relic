@@ -44,6 +44,7 @@
             android:layout_below="@id/commentitem_author"
             android:text="@{Html.fromHtml(Html.fromHtml(commentModel.body).toString()).toString()}"
             android:paddingBottom="0dp"
+            android:layout_marginTop="@dimen/text_spacing_s"
             android:layout_marginBottom="0dp"/>
 
         <ImageView
