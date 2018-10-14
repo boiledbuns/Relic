@@ -20,12 +20,8 @@ public abstract class SubredditDao {
   @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description, subIcon FROM SubredditEntity ORDER BY name DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
-  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description, subIcon FROM SubredditEntity " +
-          "WHERE pinned ORDER BY name DESC")
-  public abstract LiveData<List<SubredditModel>> getAllPinnedSubscribed();
-
   @Query("UPDATE SubredditEntity SET pinned = :pinned  WHERE name = :subredditName")
-  public abstract LiveData<List<SubredditModel>> pinSubreddit(String subredditName, boolean pinned);
+  public abstract void updatePinnedStatus(String subredditName, boolean pinned);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertAll(List<SubredditEntity> subredditList);

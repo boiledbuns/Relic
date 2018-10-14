@@ -88,4 +88,6 @@
     <dimen name="text_container_padding">8dp</dimen>
     <dimen name="line_spacing_s">1.1</dimen>
 
+    <dimen name="sub_card_width">40dp</dimen>
+    <dimen name="sub_card_height">80dp</dimen>
 </resources>

@@ -314,7 +314,7 @@ public class SubRepositoryImpl implements SubRepository {
       String subredditNAme = (String) objects[1];
       boolean newStatus = (boolean) objects[2];
 
-      appdb.getSubredditDao().pinSubreddit(subredditNAme, newStatus);
+      appdb.getSubredditDao().updatePinnedStatus(subredditNAme, newStatus);
       return null;
     }
   }

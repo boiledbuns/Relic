@@ -15,7 +15,8 @@
         android:layout_width="match_parent"
         android:layout_marginStart="@dimen/subitem_margin"
         android:layout_marginTop="@dimen/subitem_margin"
-        android:onClick="@{() -> subOnClick.onClick(subredditItem)}">
+        android:onClick="@{() -> subOnClick.onClick(subredditItem)}"
+        android:onLongClick="@{() -> subOnClick.onLongClick(subredditItem)}">
 
         <RelativeLayout
             android:layout_height="0dp"

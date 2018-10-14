@@ -224,15 +224,12 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
 
   public void attachScrollListeners() {
     swipeRefreshLayout = displaySubsBinding.getRoot().findViewById(R.id.display_subs_swiperefreshlayout);
-    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-      @Override
-      public void onRefresh() {
-        displaySubsBinding.setSubscribedListIsVisible(false);
+    swipeRefreshLayout.setOnRefreshListener(() -> {
+      displaySubsBinding.setSubscribedListIsVisible(false);
 
-        // refresh the current list and retrieve more posts
-        subAdapter.resetSubList();
-        viewModel.retrieveMoreSubs(true);
-      }
+      // refresh the current list and retrieve more posts
+      subAdapter.resetSubList();
+      viewModel.retrieveMoreSubs(true);
     });
   }
 
@@ -260,6 +257,11 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
       // replace the current screen with the newly created fragment
       getActivity().getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit();
+    }
+
+    @Override
+    public void onLongClick(SubredditModel subItem) {
+      new 
     }
   }
 
