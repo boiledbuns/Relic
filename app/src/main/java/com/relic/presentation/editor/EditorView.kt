@@ -86,7 +86,7 @@ class EditorView : RelicFragment() {
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
                         .build()
-                        .getEditorVMFactory().create() as T
+                        .getEditorVM().create() as T
             }
         }).get(EditorVM::class.java)
     }

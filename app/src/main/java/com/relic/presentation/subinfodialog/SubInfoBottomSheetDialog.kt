@@ -1,24 +1,50 @@
 package com.relic.presentation.subinfodialog
 
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
+import com.relic.dagger.DaggerVMComponent
+import com.relic.data.RepoModule
+import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
 
 class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val viewModel : SubInfoDialogVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                // inject dependencies into factory and construct viewmodel
+                return DaggerVMComponent.builder()
+                        .repoModule(RepoModule(context!!))
+                        .build()
+                        .getDisplaySubInfoVM().create() as T
+            }
+        }).get(SubInfoDialogVM::class.java)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        bindVm()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.display_subinfo_sheetdialog, container,  false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // initialize onclicks
+        subscribeButtonView.setOnClickListener {  }
+        pinButtonView.setOnClickListener {  }
+    }
+
+    private fun bindVm() {
+        //
+    }
 }

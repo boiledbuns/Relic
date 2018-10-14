@@ -13,7 +13,9 @@ interface VMComponent {
 
     fun getDisplayPostVM() : DisplayPostVM.Factory
 
-    fun getEditorVMFactory() : EditorVM.Factory
+    fun getEditorVM() : EditorVM.Factory
+
+    fun getDisplaySubInfoVM() : EditorVM.Factory
 
     fun injectEditor(factory: ViewModelProvider.Factory)
 }

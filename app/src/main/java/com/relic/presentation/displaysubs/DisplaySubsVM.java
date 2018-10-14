@@ -12,10 +12,12 @@ import com.relic.data.SubRepository;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.data.models.SubredditModel;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
+import com.relic.presentation.subinfodialog.SubInfoDialogContract;
 
 import java.util.List;
 
-public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, AuthenticationCallback, RetrieveNextListingCallback{
+public class DisplaySubsVM extends ViewModel
+        implements DisplaySubsContract.VM, AuthenticationCallback, RetrieveNextListingCallback, SubInfoDialogContract.Delegate{
   private final String TAG = "DISPLAY_SUBS_VM";
   private boolean initialized;
   private boolean refreshing;
@@ -137,4 +139,18 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
 //      subRepo.retrieveAllSubscribedSubs();
 //    }
   }
+
+
+  // Start of SubInfoDialogContract delegate methods
+  @Override
+  public void updateSubscriptionStatus(boolean newStatus) {
+
+  }
+
+  @Override
+  public void updatePinnedStatus(boolean newStatus) {
+
+  }
+  // End of SubInfoDialogContract delegate methods
+
 }

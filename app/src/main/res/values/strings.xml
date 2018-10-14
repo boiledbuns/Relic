@@ -38,4 +38,6 @@
 
     <string name="subscribers">Size</string>
 
+    <string name="subscribe">subscribe</string>
+    <string name="pin"> pin </string>
 </resources>
