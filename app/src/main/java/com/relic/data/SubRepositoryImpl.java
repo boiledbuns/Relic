@@ -93,7 +93,7 @@ public class SubRepositoryImpl implements SubRepository {
     // since refreshing, set all subs loaded to reflect that not all subs are loaded
     allSubscribedSubsLoaded.setValue(false);
     // delete all locally stored subs
-    new deleteSubscribedSubsTask().execute(appDb);
+    new DeleteSubscribedSubsTask().execute(appDb);
 
     retrieveMoreSubscribedSubs(null);
   }
@@ -104,7 +104,7 @@ public class SubRepositoryImpl implements SubRepository {
 //      // if refreshing, set all subs loaded to reflect that not all subs are loaded
 //      allSubscribedSubsLoaded.setValue(false);
 //      // delete all locally stored subs
-//      new deleteSubscribedSubsTask().execute(appDb);
+//      new DeleteSubscribedSubsTask().execute(appDb);
 //    }
 //    else {
 //      // change the query string if fetching all subscribed subreddits from scratch
@@ -293,11 +293,28 @@ public class SubRepositoryImpl implements SubRepository {
     }
   }
 
-  static class deleteSubscribedSubsTask extends  AsyncTask<ApplicationDB, Integer, Integer>{
+  static class DeleteSubscribedSubsTask extends AsyncTask<ApplicationDB, Integer, Integer>{
     @Override
     protected Integer doInBackground(ApplicationDB... appDBs) {
       ApplicationDB appdb = appDBs[0];
       appdb.getSubredditDao().deleteAllSubscribed();
+      return null;
+    }
+  }
+
+  @Override
+  public void pinSubreddit(String subredditName, boolean newPinnedStatus) {
+    new UpdatePinnedSub().execute(appDb, subredditName, newPinnedStatus);
+  }
+
+  static class UpdatePinnedSub extends AsyncTask<Object, Integer, Integer>{
+    @Override
+    protected Integer doInBackground(Object... objects) {
+      ApplicationDB appdb = (ApplicationDB) objects[0];
+      String subredditNAme = (String) objects[1];
+      boolean newStatus = (boolean) objects[2];
+
+      appdb.getSubredditDao().pinSubreddit(subredditNAme, newStatus);
       return null;
     }
   }

@@ -50,4 +50,7 @@ public interface SubRepository {
    * @return subreddit gateway for more specific features relating to single subreddit
    */
   SubGateway getSubGateway();
+
+
+  void pinSubreddit(String subredditName, boolean newPinnedStatus);
 }

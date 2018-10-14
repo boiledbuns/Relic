@@ -11,7 +11,7 @@ import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
-import com.relic.presentation.util.RelicError
+import com.relic.util.RelicError
 import javax.inject.Inject
 
 class DisplayPostVM (

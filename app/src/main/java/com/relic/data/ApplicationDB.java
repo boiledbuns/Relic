@@ -6,14 +6,13 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.relic.data.dao.CommentDao;
-import com.relic.data.dao.ListingDAO;
+import com.relic.data.dao.ListingDao;
 import com.relic.data.dao.PostDao;
 import com.relic.data.dao.SubredditDao;
 import com.relic.data.entities.CommentEntity;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
 import com.relic.data.entities.SubredditEntity;
-import com.relic.data.models.SubredditModel;
 
 @Database(entities = {SubredditEntity.class, PostEntity.class, ListingEntity.class, CommentEntity.class}, version = 7, exportSchema = false)
 public abstract class ApplicationDB extends RoomDatabase{
@@ -21,7 +20,7 @@ public abstract class ApplicationDB extends RoomDatabase{
 
   public abstract SubredditDao getSubredditDao();
   public abstract PostDao getPostDao();
-  public abstract ListingDAO getListingDAO();
+  public abstract ListingDao getListingDAO();
   public abstract CommentDao getCommentDAO();
 
 

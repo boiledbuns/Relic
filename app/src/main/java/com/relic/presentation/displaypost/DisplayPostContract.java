@@ -13,13 +13,13 @@ import java.util.List;
 public interface DisplayPostContract {
   interface ViewModel {
     /**
-     * Exposes the postm to the view
+     * Exposes the postmodel to the view
      * @return postmodel as livedata
      */
     LiveData<PostModel> getPost();
 
     /**
-     * Exposes the postm to the view
+     * Exposes the postmodel to the view
      * @return postmodel as livedata
      */
     LiveData<List<CommentModel>> getCommentList();

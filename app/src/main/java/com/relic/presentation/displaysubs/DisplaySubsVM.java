@@ -50,7 +50,6 @@ public class DisplaySubsVM extends ViewModel implements DisplaySubsContract.VM, 
     }
   }
 
-
   /**
    * Initialize observers for livedata
    */

@@ -107,6 +107,8 @@ public class DisplaySubsView extends Fragment implements AllSubsLoadedCallback{
     attachScrollListeners();
     initializeLivedata();
 
+    displaySubsBinding.pinnedSubs.delegate = viewModel;
+
     return displaySubsBinding.getRoot();
   }
 

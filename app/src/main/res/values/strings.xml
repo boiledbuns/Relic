@@ -34,6 +34,8 @@
 
     <string name="nsfw">nsfw</string>
     <string name="reply">reply</string>
-    <string name="empty_parent_body">"This post has no text body"</string>
+    <string name="empty_parent_body">This post has no text body</string>
+
+    <string name="subscribers">Size</string>
 
 </resources>

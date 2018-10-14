@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query;
 import com.relic.data.entities.ListingEntity;
 
 @Dao
-public abstract class ListingDAO {
+public abstract class ListingDao {
   @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :subName")
   public abstract String getNext(String subName);
 

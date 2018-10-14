@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class SubredditEntity {
+  // reddit subreddit api properties region
+
   @NonNull
   @PrimaryKey
   public String id;
@@ -50,4 +52,9 @@ public class SubredditEntity {
 
   @ColumnInfo(name = "headerTitle")
   public String header_title;
+
+  // end reddit subreddit api properties region
+
+  // local properties region
+  public boolean pinned;
 }
