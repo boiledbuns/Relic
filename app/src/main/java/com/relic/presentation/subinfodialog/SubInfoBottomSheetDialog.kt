@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.data.RepoModule
+import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
 
 class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
@@ -22,14 +23,20 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
                         .build()
-                        .getDisplaySubInfoVM().create() as T
+                        .getDisplaySubInfoVM().create(subName!!) as T
             }
         }).get(SubInfoDialogVM::class.java)
     }
 
+    private lateinit var subName : String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bindVm()
+
+        arguments?.getString(ARG_SUB_NAME)?.apply {
+            subName = this
+            bindVm()
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,8 +46,10 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        subNameTextView.text = subName
+
         // initialize onclicks
-        subscribeButtonView.setOnClickListener {  }
+        subscribeButtonView.setOnClickListener { viewModel.pinSubreddit(true) }
         pinButtonView.setOnClickListener {  }
     }
 

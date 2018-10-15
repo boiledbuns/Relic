@@ -35,6 +35,7 @@ import com.relic.presentation.adapter.SubItemOnClick
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysub.DisplaySubView
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
+import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 
@@ -243,18 +244,20 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
         }
 
         override fun onLongClick(subItem: SubredditModel): Boolean {
-            SubInfoBottomSheetDialog().show(fragmentManager, TAG)
+            val args = Bundle().apply {
+                putString(ARG_SUB_NAME, subItem.name)
+            }
+
+            val newDialog = SubInfoBottomSheetDialog()
+            newDialog.arguments= args
+            newDialog.show(fragmentManager, TAG)
+
             return true
         }
     }
 
     internal inner class OnClickSearchSubItem(fragment: Fragment) : SearchSubItemOnClick {
-        var owner: LifecycleOwner
-
-        init {
-            // initializes reference to a lifecycle owner
-            owner = fragment
-        }
+        val owner: LifecycleOwner = this@DisplaySubsView
 
         override fun onClick(subName: String) {
             Log.d(TAG, "Search item clicked")

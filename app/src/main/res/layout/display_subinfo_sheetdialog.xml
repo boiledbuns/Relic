@@ -5,28 +5,31 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/subNameTextViw"
+        android:id="@+id/subNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:text="test_subname"/>
 
     <TextView
-        android:id="@+id/subCountTextViw"
+        android:id="@+id/subCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/subNameTextView"
         android:text="100 subs"/>
 
     <Button
         android:id="@+id/subscribeButtonView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/subCountTextView"
         android:text="@string/subscribe"/>
 
     <Button
         android:id="@+id/pinButtonView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/subCountTextView"
         android:text="@string/pin"/>
 
 </RelativeLayout>
