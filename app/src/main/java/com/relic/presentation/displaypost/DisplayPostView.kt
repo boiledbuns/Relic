@@ -1,6 +1,5 @@
 package com.relic.presentation.displaypost
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -22,7 +21,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
-import com.relic.data.RepoModule
+import com.relic.dagger.modules.RepoModule
 import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.PostModel
 import com.relic.databinding.DisplayPostBinding

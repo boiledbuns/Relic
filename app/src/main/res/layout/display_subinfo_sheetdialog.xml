@@ -29,7 +29,7 @@
         android:id="@+id/pinButtonView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/subCountTextView"
+        android:layout_below="@id/subscribeButtonView"
         android:text="@string/pin"/>
 
 </RelativeLayout>

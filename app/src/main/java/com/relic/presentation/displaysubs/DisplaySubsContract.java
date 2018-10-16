@@ -13,8 +13,6 @@ import java.util.List;
 
 public interface DisplaySubsContract {
   interface VM {
-    void init(SubRepository subRepo, ListingRepository listingRepo, Authenticator auth);
-
     LiveData<Boolean> getAllSubscribedSubsLoaded();
 
     LiveData<List<SubredditModel>> getSubscribedList();

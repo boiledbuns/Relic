@@ -1,14 +1,20 @@
-package com.relic.data
+package com.relic.dagger.modules
 
 import android.content.Context
+import com.relic.data.CommentRepository
+import com.relic.data.CommentRepositoryImpl
+import com.relic.data.ListingRepository
+import com.relic.data.ListingRepositoryImpl
+import com.relic.data.PostRepository
+import com.relic.data.PostRepositoryImpl
+import com.relic.data.SubRepository
+import com.relic.data.SubRepositoryImpl
 import dagger.Module
 import dagger.Provides
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
-class RepoModule (
-        private val applicationContext : Context) {
+class RepoModule (private val applicationContext : Context) {
 
     @Provides
     @Singleton

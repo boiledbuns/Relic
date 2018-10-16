@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
-import com.relic.data.RepoModule
+import com.relic.dagger.modules.RepoModule
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
 

@@ -3,6 +3,8 @@ package com.relic.presentation.displaysubs
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -23,9 +25,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.relic.R
-import com.relic.data.Authenticator
-import com.relic.data.ListingRepositoryImpl
-import com.relic.data.SubRepositoryImpl
+import com.relic.dagger.DaggerVMComponent
+import com.relic.dagger.modules.AuthModule
+import com.relic.dagger.modules.RepoModule
 import com.relic.data.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.presentation.adapter.SearchItemAdapter
@@ -43,7 +45,17 @@ import java.util.ArrayList
 
 class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
     private val TAG = "DISPLAY_SUBS_VIEW"
-    internal lateinit var viewModel: DisplaySubsVM
+
+    private val viewModel : DisplaySubsVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return DaggerVMComponent.builder()
+                        .authModule(AuthModule(activity!!.applicationContext))
+                        .repoModule(RepoModule(activity!!.applicationContext))
+                        .build().getDisplaySubsVM().create() as T
+            }
+        }).get(DisplaySubsVM::class.java)
+    }
 
     private var searchView: SearchView? = null
     private var searchMenuItem: MenuItem? = null
@@ -60,17 +72,6 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
-        if (activity != null) {
-            // retrieve the instance of the viewmodel and attach a reference to it in this view
-            viewModel = ViewModelProviders.of(activity!!).get(DisplaySubsVM::class.java)
-
-            // initialize the repository and inject it into the viewmodel
-            viewModel.init(
-                    SubRepositoryImpl(context), ListingRepositoryImpl(context),
-                    Authenticator(context!!)
-            )
-        }
     }
 
     override fun onCreateView(
