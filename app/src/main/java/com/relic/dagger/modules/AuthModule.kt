@@ -7,7 +7,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AuthModule(private val applicationContext : Context) {
+class AuthModule (private val applicationContext : Context) {
 
     @Provides
     @Singleton

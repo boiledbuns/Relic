@@ -22,7 +22,7 @@ public abstract class SubredditDao {
 
   @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description, subIcon FROM SubredditEntity " +
           "WHERE pinned = 1 ORDER BY name DESC")
-  public abstract LiveData<List<SubredditModel>> getAllPinnedSubscribed();
+  public abstract LiveData<List<SubredditModel>> getAllPinnedSubs();
 
   @Query("UPDATE SubredditEntity SET pinned = :pinned  WHERE name = :subredditName")
   public abstract void updatePinnedStatus(String subredditName, boolean pinned);

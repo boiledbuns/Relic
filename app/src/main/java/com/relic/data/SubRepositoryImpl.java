@@ -304,18 +304,23 @@ public class SubRepositoryImpl implements SubRepository {
 
   @Override
   public void pinSubreddit(String subredditName, boolean newPinnedStatus) {
-    new UpdatePinnedSub().execute(appDb, subredditName, newPinnedStatus);
+    new UpdatePinnedSubTask().execute(appDb, subredditName, newPinnedStatus);
   }
 
-  static class UpdatePinnedSub extends AsyncTask<Object, Integer, Integer>{
+  static class UpdatePinnedSubTask extends AsyncTask<Object, Integer, Integer>{
     @Override
     protected Integer doInBackground(Object... objects) {
       ApplicationDB appdb = (ApplicationDB) objects[0];
-      String subredditNAme = (String) objects[1];
+      String subredditName = (String) objects[1];
       boolean newStatus = (boolean) objects[2];
 
-      appdb.getSubredditDao().updatePinnedStatus(subredditNAme, newStatus);
+      appdb.getSubredditDao().updatePinnedStatus(subredditName, newStatus);
       return null;
     }
+  }
+
+  @Override
+  public LiveData<List<SubredditModel>> getPinnedsubs() {
+    return appDb.getSubredditDao().getAllPinnedSubs();
   }
 }

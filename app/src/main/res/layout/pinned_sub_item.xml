@@ -5,7 +5,7 @@
     android:layout_height="@dimen/sub_card_height">
 
     <TextView
-        android:id="@+id/subTextView"
+        android:id="@+id/subNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

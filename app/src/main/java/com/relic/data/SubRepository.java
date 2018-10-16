@@ -53,4 +53,6 @@ public interface SubRepository {
 
 
   void pinSubreddit(String subredditName, boolean newPinnedStatus);
+
+  LiveData<List<SubredditModel>> getPinnedsubs();
 }

@@ -43,7 +43,7 @@
                     android:layout_height="match_parent">
 
                     <com.relic.presentation.displaysubs.DisplayPinnedSubsView
-                        android:id="@+id/pinned_subs"
+                        android:id="@+id/pinnedSubsView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -52,7 +52,7 @@
                         android:id="@+id/display_subs_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_below="@id/pinned_subs"
+                        android:layout_below="@id/pinnedSubsView"
                         android:clipToPadding="false"
                         android:paddingEnd="@dimen/subitem_margin"
                         android:paddingBottom="@dimen/subitem_margin"

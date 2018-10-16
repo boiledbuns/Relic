@@ -32,25 +32,19 @@ class DisplaySubsVM (
     }
 
     private val TAG = "DISPLAY_SUBS_VM"
-    private var initialized: Boolean = false
     private var refreshing: Boolean = false
 
     private val subscribedSubsMediator =  MediatorLiveData <List<SubredditModel>> ()
     private val _searchResults = MediatorLiveData <List<String>> ()
-    private var searchResults: LiveData<List<String>> = _searchResults
+    val searchResults: LiveData<List<String>> = _searchResults
 
+    val pinnedSubs = subRepository.pinnedsubs
 
     init {
-        // initialize the viewmodel only if it hasn't already been initialized
-        if (!initialized) {
-            Log.d(TAG, "subreddit initialized")
+        _searchResults.value = null
+        subscribedSubsMediator.value = null
 
-            _searchResults.value = null
-            subscribedSubsMediator.value = null
-
-            initializeObservers()
-            initialized = true
-        }
+        initializeObservers()
     }
 
     /**
@@ -98,10 +92,6 @@ class DisplaySubsVM (
             // refresh token before performing any requests
             authenticator.refreshToken(this)
         }
-    }
-
-    override fun getSearchResults(): LiveData<List<String>> {
-        return searchResults
     }
 
     override fun retrieveSearchResults(query: String) {

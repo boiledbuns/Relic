@@ -2,6 +2,7 @@ package com.relic.presentation.subinfodialog
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import com.relic.data.SubRepository
 import com.relic.data.models.SubredditModel
 import javax.inject.Inject
@@ -12,8 +13,8 @@ class SubInfoDialogVM (
 ) : ViewModel () {
 
     class Factory @Inject constructor(private val subRepository: SubRepository) {
-        fun create(subredditName : String) {
-            SubInfoDialogVM(subRepository, subredditName)
+        fun create(subredditName : String) : SubInfoDialogVM{
+            return SubInfoDialogVM(subRepository, subredditName)
         }
     }
 

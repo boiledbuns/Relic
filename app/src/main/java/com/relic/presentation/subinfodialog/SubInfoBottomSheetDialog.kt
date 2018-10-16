@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
+import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
@@ -22,8 +23,9 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
                 // inject dependencies into factory and construct viewmodel
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
+                        .authModule(AuthModule(context!!))
                         .build()
-                        .getDisplaySubInfoVM().create(subName!!) as T
+                        .getDisplaySubInfoVM().create(subName) as T
             }
         }).get(SubInfoDialogVM::class.java)
     }
@@ -49,11 +51,11 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
         subNameTextView.text = subName
 
         // initialize onclicks
-        subscribeButtonView.setOnClickListener { viewModel.pinSubreddit(true) }
-        pinButtonView.setOnClickListener {  }
+        subscribeButtonView.setOnClickListener { }
+        pinButtonView.setOnClickListener { viewModel.pinSubreddit(true) }
     }
 
     private fun bindVm() {
-        //
+        viewModel
     }
 }

@@ -11,10 +11,11 @@ import com.relic.data.SubRepository
 import com.relic.data.SubRepositoryImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
-class RepoModule (private val applicationContext : Context) {
+class RepoModule @Inject constructor(private val applicationContext : Context) {
 
     @Provides
     @Singleton

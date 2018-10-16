@@ -19,14 +19,6 @@ public interface DisplaySubsContract {
 
     void retrieveMoreSubs(boolean resetPosts);
 
-
-    /**
-     * Exposes the search results livedata to the view
-     * @return livedata wrapping search results
-     */
-    LiveData<List<String>> getSearchResults();
-
-
     /**
      * Makes request for matches based on the query
      * @param query search query to be sent to api

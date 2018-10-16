@@ -1,7 +1,6 @@
 package com.relic.presentation.displaysubs
 
 import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
@@ -40,6 +39,7 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.display_subs.*
 
 import java.util.ArrayList
 
@@ -47,7 +47,7 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
     private val TAG = "DISPLAY_SUBS_VIEW"
 
     private val viewModel : DisplaySubsVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return DaggerVMComponent.builder()
                         .authModule(AuthModule(activity!!.applicationContext))
@@ -66,8 +66,6 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
     private var myToolbar: Toolbar? = null
     private var subAdapter: SubItemAdapter? = null
     private var searchItemAdapter: SearchItemAdapter? = null
-
-    private val searchIsVisible: MutableLiveData<Boolean>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,16 +106,12 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
         attachScrollListeners()
         initializeLivedata()
 
-        displaySubsBinding!!.pinnedSubs.delegate = viewModel
-
         return displaySubsBinding!!.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        // calls method to subscribe the adapter to the livedata list
-        observeLivedata()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindViewModel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -168,19 +162,19 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
     /**
      * Subscribes to various livedata values from the viewmodel
      */
-    private fun observeLivedata() {
+    private fun bindViewModel() {
         // allows the list to be updated as data is updated
         viewModel.subscribedList.nonNull().observe(this) { subredditsList: List<SubredditModel> ->
             // updates the view once the list is loaded
             if (!subredditsList.isEmpty()) {
                 subAdapter!!.setList(ArrayList(subredditsList))
-                Log.d(TAG, "Changes to subreddit list received $subredditsList")
+                //Log.d(TAG, "Changes to subreddit list received $subredditsList")
             }
         }
 
         // observe whether all subscribed subreddits have been loaded
         viewModel.allSubscribedSubsLoaded.nonNull().observe(this) { completelyLoaded: Boolean ->
-            Log.d(TAG, "Refreshing status changed to $completelyLoaded")
+            //Log.d(TAG, "Refreshing status changed to $completelyLoaded")
             if (completelyLoaded) {
                 swipeRefreshLayout!!.isRefreshing = false
                 displaySubsBinding!!.displaySubsRecyclerview.scrollToPosition(0)
@@ -193,10 +187,15 @@ class DisplaySubsView : Fragment(), AllSubsLoadedCallback {
             // update the view based on search results
             if (results != null) {
                 //Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, " " + results.toString())
+                //Log.d(TAG, " " + results.toString())
                 searchItemAdapter!!.setSearchResults(results)
             }
         })
+
+        viewModel.pinnedSubs.nonNull().observe { pinnedSubs ->
+            Log.d(TAG, " pinned subs " + pinnedSubs.size)
+            displaySubsBinding?.pinnedSubsView?.setPinnedSubreddits(pinnedSubs)
+        }
     }
 
     private fun initializeLivedata() {
