@@ -10,10 +10,12 @@ import kotlinx.android.synthetic.main.pinned_sub_item.view.*
 
 class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSubVH> () {
 
-    class PinnedSubVH(itemView : View) : RecyclerView.ViewHolder(itemView) {
+    class PinnedSubVH(private val subItemView : View) : RecyclerView.ViewHolder(subItemView) {
         fun bind (sub : SubredditModel) {
-            itemView.subNameTextView.text = sub.name
-            itemView.subCountTextView.text = sub.subscriberCount.toString()
+            subItemView.apply {
+                subNameTextView.text = sub.name
+                subCountTextView.text = subItemView.context.resources.getString(R.string.subscriber_count, sub.subscriberCount)
+            }
         }
     }
 
@@ -22,7 +24,7 @@ class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSu
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PinnedSubItemAdapter.PinnedSubVH {
         val viewHolder = PinnedSubVH(LayoutInflater
                 .from(parent.context)
-                .inflate(R.layout.pinned_sub_item, parent, true))
+                .inflate(R.layout.pinned_sub_item, parent, false))
 
         viewHolder.bind(pinnedSubs.get(position))
 
@@ -39,5 +41,6 @@ class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSu
 
     fun setPinnedSubreddits(pinnedSubs : List<SubredditModel>) {
         this@PinnedSubItemAdapter.pinnedSubs = pinnedSubs
+        notifyDataSetChanged()
     }
 }

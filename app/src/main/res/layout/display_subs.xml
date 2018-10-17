@@ -44,7 +44,7 @@
 
                     <com.relic.presentation.displaysubs.DisplayPinnedSubsView
                         android:id="@+id/pinnedSubsView"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                     <!-- displays all subscribed subs-->
@@ -55,8 +55,7 @@
                         android:layout_below="@id/pinnedSubsView"
                         android:clipToPadding="false"
                         android:paddingEnd="@dimen/subitem_margin"
-                        android:paddingBottom="@dimen/subitem_margin"
-                        android:visibility="@{subscribedListIsVisible ? View.VISIBLE : View.GONE}"/>
+                        android:paddingBottom="@dimen/subitem_margin"/>
                     <!--android:layout_below="@+id/display_subs_toolbar"-->
 
                     <!-- Displays search results -->
@@ -64,7 +63,7 @@
                         android:id="@+id/search_subs_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="@{searchIsVisible ? View.VISIBLE : View.INVISIBLE}"/>
+                        android:visibility="gone"/>
 
                 </RelativeLayout>
 

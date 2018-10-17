@@ -16,15 +16,18 @@ class DisplayPinnedSubsView @JvmOverloads constructor(
         defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private val adapter = PinnedSubItemAdapter()
+    private val pinnedSubAdapter = PinnedSubItemAdapter()
 
     init {
         LayoutInflater.from(context).inflate(R.layout.display_pinned_subs, this, true)
-        pinnedSubsRecyclerView.adapter = adapter
-        pinnedSubsRecyclerView.layoutManager = LinearLayoutManager(context)
+        pinnedSubsRecyclerView.apply {
+            adapter = pinnedSubAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        }
     }
 
     fun setPinnedSubreddits(pinnedSubs : List<SubredditModel>) {
-        adapter.setPinnedSubreddits(pinnedSubs)
+        pinnedSubsCountTextView.text = resources.getString(R.string.pinned_subs_count, pinnedSubs.size)
+        pinnedSubAdapter.setPinnedSubreddits(pinnedSubs)
     }
 }

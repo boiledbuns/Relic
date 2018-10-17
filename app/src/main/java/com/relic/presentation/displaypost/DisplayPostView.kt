@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
+import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.PostModel
@@ -87,6 +88,7 @@ class DisplayPostView : Fragment() {
                 // construct & inject editor VM
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
+                        .authModule(AuthModule(context!!))
                         .build()
                         .getDisplayPostVM().create(subredditName!!, postFullname!!) as T
             }

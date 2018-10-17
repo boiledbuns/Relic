@@ -33,10 +33,10 @@ public abstract class SubredditDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insert(SubredditEntity subreddit);
 
-  @Query("DELETE FROM SubredditEntity")
+  @Query("DELETE FROM SubredditEntity WHERE pinned != 1")
   public abstract void deleteAll();
 
-  @Query("DELETE FROM SubredditEntity WHERE isSubscribed")
+  @Query("DELETE FROM SubredditEntity WHERE isSubscribed AND pinned != 1")
   public abstract void deleteAllSubscribed();
 
   @Query("SELECT id, name, bannerImgUrl, nsfw, isSubscribed, subscriberCount, description, subIcon, submitText, headerTitle FROM SubredditEntity WHERE name = :subName")

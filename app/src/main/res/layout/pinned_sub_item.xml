@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/sub_card_width"
-    android:layout_height="@dimen/sub_card_height">
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/sub_card_height"
+    android:layout_marginLeft="@dimen/padding_s"
+    android:layout_marginRight="@dimen/padding_s">
 
-    <TextView
-        android:id="@+id/subNameTextView"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_m">
 
-    <TextView
-        android:id="@+id/subCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/subNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"/>
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/subCountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/subNameTextView"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
