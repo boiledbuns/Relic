@@ -79,6 +79,7 @@
     <dimen name="text_spacing_s">4dp</dimen>
     <dimen name="text_spacing_m">12dp</dimen>
 
+    <dimen name="padding_xs">6dp</dimen>
     <dimen name="padding_s">8dp</dimen>
     <dimen name="padding_m">12dp</dimen>
 
@@ -86,7 +87,7 @@
     <dimen name="card_thumbnail_size">80dp</dimen>
 
     <dimen name="text_container_padding">8dp</dimen>
-    <dimen name="line_spacing_s">1.1</dimen>
+    <dimen name="line_spacing_s">1.05</dimen>
 
     <dimen name="sub_card_width">40dp</dimen>
     <dimen name="sub_card_height">80dp</dimen>

@@ -13,7 +13,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -353,8 +352,11 @@ public class DisplaySubView extends Fragment {
       postFrag.setArguments(bundle);
 
       if (getActivity() != null) {
-        getActivity().getSupportFragmentManager().beginTransaction()
-            .replace(R.id.main_content_frame, postFrag).addToBackStack(TAG).commit();
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_content_frame, postFrag)
+                .addToBackStack(TAG)
+                .commit();
         // set flag to show that a fragment has opened
         fragmentOpened = true;
       }

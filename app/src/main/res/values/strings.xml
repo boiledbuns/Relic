@@ -41,7 +41,8 @@
     <string name="subscribe">subscribe</string>
     <string name="pin"> pin </string>
 
-    <string name="subscriber_count">%d subscribers</string>
+    <string name="sub_prefix_name">r/%s</string>
+    <string name="subscriber_count">%d subs</string>
     <string name="pinned_subs_count">%d pinned subreddits </string>
 
 </resources>

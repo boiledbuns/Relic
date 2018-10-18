@@ -2,18 +2,22 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/padding_xs"
+    android:paddingBottom="@dimen/padding_xs">
 
     <TextView
         android:id="@+id/pinnedSubsCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="test"/>
+        android:paddingStart="@dimen/padding_m"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pinnedSubsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/pinnedSubsCountTextView"/>
+        android:layout_below="@id/pinnedSubsCountTextView"
+        android:padding="@dimen/padding_xs"
+        android:clipToPadding="false"/>
 
 </RelativeLayout>

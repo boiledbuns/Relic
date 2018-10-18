@@ -13,7 +13,7 @@ class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSu
     class PinnedSubVH(private val subItemView : View) : RecyclerView.ViewHolder(subItemView) {
         fun bind (sub : SubredditModel) {
             subItemView.apply {
-                subNameTextView.text = sub.name
+                subNameTextView.text = subItemView.context.resources.getString(R.string.sub_prefix_name, sub.subName)
                 subCountTextView.text = subItemView.context.resources.getString(R.string.subscriber_count, sub.subscriberCount)
             }
         }
@@ -26,7 +26,7 @@ class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSu
                 .from(parent.context)
                 .inflate(R.layout.pinned_sub_item, parent, false))
 
-        viewHolder.bind(pinnedSubs.get(position))
+        viewHolder.bind(pinnedSubs[position])
 
         return viewHolder
     }

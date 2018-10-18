@@ -18,8 +18,7 @@ class DisplaySubsVM (
         private val subRepository: SubRepository,
         private val listingRepository: ListingRepository,
         private val authenticator: Authenticator
-) : ViewModel(), DisplaySubsContract.VM, AuthenticationCallback,
-        RetrieveNextListingCallback, SubInfoDialogContract.Delegate {
+) : ViewModel(), DisplaySubsContract.VM, AuthenticationCallback, SubInfoDialogContract.Delegate {
 
     class Factory @Inject constructor(
             private val subRepository: SubRepository,
@@ -34,15 +33,18 @@ class DisplaySubsVM (
     private val TAG = "DISPLAY_SUBS_VM"
     private var refreshing: Boolean = false
 
-    private val subscribedSubsMediator =  MediatorLiveData <List<SubredditModel>> ()
+    private val _subscribedSubsList =  MediatorLiveData <List<SubredditModel>> ()
+    val subscribedSubsList : LiveData<List<SubredditModel>> =  _subscribedSubsList
+
     private val _searchResults = MediatorLiveData <List<String>> ()
     val searchResults: LiveData<List<String>> = _searchResults
 
-    val pinnedSubs = subRepository.pinnedsubs
+    val pinnedSubs : LiveData<List<SubredditModel>> = subRepository.pinnedsubs
+    val allSubscribedSubsLoaded : LiveData<Boolean> = subRepository.allSubscribedSubsLoaded
 
     init {
         _searchResults.value = null
-        subscribedSubsMediator.value = null
+        _subscribedSubsList.value = null
 
         initializeObservers()
     }
@@ -51,35 +53,23 @@ class DisplaySubsVM (
      * Initialize observers for livedata
      */
     private fun initializeObservers() {
-        //subscribedSubsMediator.addSource(subRepo.getSubscribedSubs(), subscribedSubsMediator::setValue);
-        subscribedSubsMediator.addSource <List<SubredditModel>> (subRepository!!.subscribedSubs) { subscribedSubs ->
+        //subscribedSubsList.addSource(subRepo.getSubscribedSubs(), subscribedSubsList::setValue);
+        _subscribedSubsList.addSource <List<SubredditModel>> (subRepository.subscribedSubs) { subscribedSubs ->
             Log.d(TAG, " subs loaded $subscribedSubs")
             //      if (subscribedSubs.isEmpty()) {
             //        // refresh the token even if the vm has already been initialized
             //        subRepo.retrieveAllSubscribedSubs();
             //        //authenticator.refreshToken(this);
             //      } else {
-            subscribedSubsMediator.setValue(subscribedSubs)
+            _subscribedSubsList.setValue(subscribedSubs)
             //      }
         }
 
         //    // Observe changes to keys to request new data
-        //    subscribedSubsMediator.addSource(listingRepo.getKey(), (@Nullable String nextVal) -> {
+        //    subscribedSubsList.addSource(listingRepo.getKey(), (@Nullable String nextVal) -> {
         //      // retrieve posts only if the "after" value is empty
         //      subRepo.retrieveAllSubscribedSubs(nextVal);
         //    });
-    }
-
-    override fun getAllSubscribedSubsLoaded(): LiveData<Boolean> {
-        return subRepository.allSubscribedSubsLoaded
-    }
-
-    /**
-     * Exposes subscribed subs to the ui for binding
-     * @return the livedata list of subscribed subs
-     */
-    override fun getSubscribedList(): LiveData<List<SubredditModel>> {
-        return subscribedSubsMediator
     }
 
     /**
@@ -109,13 +99,6 @@ class DisplaySubsVM (
         //listingRepo.retrieveKey("SUB_REPO");
         Log.d(TAG, "On authenticated called")
         subRepository.retrieveAllSubscribedSubs()
-    }
-
-    override fun onNextListing(nextVal: String) {
-        //    // retrieve posts only if the "after" value is empty
-        //    if (nextVal == null) {
-        //      subRepo.retrieveAllSubscribedSubs();
-        //    }
     }
 
     // Start of SubInfoDialogContract delegate methods

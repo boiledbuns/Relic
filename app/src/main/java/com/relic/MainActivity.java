@@ -1,10 +1,12 @@
 package com.relic;
 
+import android.content.Context;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 //    });
   }
 
-
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
     super.onCreate(savedInstanceState, persistentState);
@@ -71,8 +72,10 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
 
     // add the default view only if there are no additional fragments on the stack
     if (fragCount < 1) {
-      getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
+      getSupportFragmentManager()
+              .beginTransaction()
+              .replace(R.id.main_content_frame, new DisplaySubsView())
+              .commit();
     }
   }
 }

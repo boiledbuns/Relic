@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -38,13 +39,10 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
-import kotlinx.android.synthetic.main.display_subs.*
 
 import java.util.ArrayList
 
 class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
-    private val TAG = "DISPLAY_SUBS_VIEW"
-
     private val viewModel : DisplaySubsVM by lazy {
         ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -68,7 +66,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindViewModel()
-
         setHasOptionsMenu(true)
     }
 
@@ -113,11 +110,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         initializeLivedata()
 
         return displaySubsBinding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //bindViewModel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -174,11 +166,10 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
      */
     private fun bindViewModel() {
         // allows the list to be updated as data is updated
-        viewModel.subscribedList.nonNull().observe(this) { subredditsList: List<SubredditModel> ->
-            // updates the view once the list is loaded
-            if (!subredditsList.isEmpty()) {
+        viewModel.subscribedSubsList.nonNull().observe(this) { subredditsList: List<SubredditModel> ->
+            if (subredditsList.isNotEmpty()) {
                 subAdapter.setList(ArrayList(subredditsList))
-                //Log.d(TAG, "Changes to subreddit list received $subredditsList")
+                Log.d(TAG, "Changes to subreddit list received ${subredditsList.size}")
             }
         }
 
@@ -248,11 +239,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
             val subFrag = DisplaySubView()
             subFrag.arguments = bundle
 
-            // replace the current screen with the newly created fragment
-            activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, subFrag)
-                    .addToBackStack(TAG)
-                    .commit()
+            transitionToFragment(subFrag)
         }
 
         override fun onLongClick(subItem: SubredditModel): Boolean {
@@ -286,8 +273,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
             // TODO : find a way to stop recreating the fragment everytime and keep the position in the list
             // this applies to sub view as well
-            activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit()
+            transitionToFragment(subFrag)
         }
     }
 }
