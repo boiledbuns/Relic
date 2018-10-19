@@ -69,7 +69,7 @@
 
                 </RelativeLayout>
 
-                <include layout="@layout/toolbar"
+                <include layout="@layout/relic_toolbar"
                     android:id="@+id/display_sub_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/toolbar_height"

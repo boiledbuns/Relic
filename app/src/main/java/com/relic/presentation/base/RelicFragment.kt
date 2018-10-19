@@ -14,7 +14,7 @@ open class RelicFragment: Fragment() {
     protected fun transitionToFragment(fragment : Fragment, replace : Boolean = false) {
         activity!!.supportFragmentManager
                 .beginTransaction()
-                .add(R.id.main_content_frame, fragment)
+                .replace(R.id.main_content_frame, fragment)
                 .addToBackStack(TAG)
                 .commit()
     }

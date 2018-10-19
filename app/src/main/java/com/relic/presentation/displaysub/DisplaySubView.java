@@ -129,8 +129,6 @@ public class DisplaySubView extends Fragment {
     }
   }
 
-
-
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
@@ -273,7 +271,7 @@ public class DisplaySubView extends Fragment {
    * Initializes actionbar menus and on clicks
    */
   private void initializeActionbar() {
-    // initialize reference to the toolbar and appbarlayout
+    // initialize reference to the relic_toolbar and appbarlayout
     myToolbar = displaySubBinding.getRoot().findViewById(R.id.display_sub_toolbar);
     appBarLayout = displaySubBinding.getRoot().findViewById(R.id.display_sub_appbarlayout);
 

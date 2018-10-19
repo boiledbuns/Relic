@@ -36,11 +36,11 @@ class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSu
     }
 
     override fun onBindViewHolder(viewHolder: PinnedSubVH, position: Int) {
-        viewHolder.bind(pinnedSubs.get(position))
+        viewHolder.bind(pinnedSubs[position])
     }
 
-    fun setPinnedSubreddits(pinnedSubs : List<SubredditModel>) {
-        this@PinnedSubItemAdapter.pinnedSubs = pinnedSubs
+    fun setPinnedSubreddits(newPinnedSubs : List<SubredditModel>) {
+        this.pinnedSubs = newPinnedSubs
         notifyDataSetChanged()
     }
 }

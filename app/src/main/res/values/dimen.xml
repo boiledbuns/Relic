@@ -2,7 +2,7 @@
 <resources>
     <dimen name="empty">0dp</dimen>
 
-    <!-- toolbar -->
+    <!-- relic_toolbar -->
     <dimen name="toolbar_height">52dp</dimen>
     <dimen name="toolbar_paddingtop">4dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>

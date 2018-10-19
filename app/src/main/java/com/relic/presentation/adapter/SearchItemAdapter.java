@@ -61,7 +61,7 @@ public class SearchItemAdapter extends RecyclerView.Adapter <SearchItemAdapter.S
     notifyDataSetChanged();
   }
 
-  public void setSearchResults(List<String> searchResults) {
+  public void handleSearchResultsPayload(List<String> searchResults) {
     if (searchResults != null) {
       Log.d(TAG, "Search results received " + searchResults);
       this.searchResults = searchResults;

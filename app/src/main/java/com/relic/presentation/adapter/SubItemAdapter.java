@@ -69,7 +69,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
    */
   public void setList(List<SubredditModel> newSubs) {
     // set the entire list if the current list is null
-    if (subList == null) {
+    if (subList.size() == 0) {
       this.subList = newSubs;
       notifyDataSetChanged();
     }
@@ -115,9 +115,8 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 //    }
   }
 
-  public void resetSubList() {
+  public void clearList() {
     subList.clear();
     notifyDataSetChanged();
   }
-
 }

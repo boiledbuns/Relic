@@ -1,26 +1,22 @@
 package com.relic.presentation.displaysubs
 
-import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
@@ -58,8 +54,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
     private lateinit var searchMenuItem: MenuItem
 
     private lateinit var displaySubsBinding: DisplaySubsBinding
-
-    private lateinit var myToolbar: Toolbar
     private lateinit var subAdapter: SubItemAdapter
     private lateinit var searchItemAdapter: SearchItemAdapter
 
@@ -77,38 +71,31 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         displaySubsBinding = DataBindingUtil
                 .inflate(inflater, R.layout.display_subs, container, false)
 
-        // initialize the adapter for subscribed subs recyclerview
-        subAdapter = SubItemAdapter(OnClickSubItem())
         displaySubsBinding.apply {
+            // initialize the adapter for the search subs recyclerview
+            val searchSubItemOnClick = OnClickSearchSubItem(this@DisplaySubsView)
+            subAdapter = SubItemAdapter(OnClickSubItem())
+            searchItemAdapter = SearchItemAdapter(searchSubItemOnClick)
+
             displaySubsRecyclerview.also {
+                it.layoutManager = GridLayoutManager(context, 3)
                 it.itemAnimator = null
                 it.adapter = subAdapter
             }
+
+            searchSubsRecyclerview.apply {
+                adapter = searchItemAdapter
+                layoutManager = LinearLayoutManager(context)
+            }
+
+            (displaySubsToolbar as Toolbar).also {
+                it.setTitle(R.string.app_name)
+                (activity as AppCompatActivity).setSupportActionBar(it)
+            }
         }
-        // displays the subscribed subs in 3 columns
-        val gridLayoutManager = GridLayoutManager(context, 3)
-        displaySubsBinding.displaySubsRecyclerview.layoutManager = gridLayoutManager
-
-        // initialize the adapter for the search subs recyclerview
-        val searchSubItemOnClick = OnClickSearchSubItem(this)
-        searchItemAdapter = SearchItemAdapter(searchSubItemOnClick)
-        displaySubsBinding.searchSubsRecyclerview.apply {
-            adapter = searchItemAdapter
-            layoutManager = LinearLayoutManager(context)
-        }
-
-        // sets defaults for the actionbar
-        myToolbar = displaySubsBinding.root.findViewById(R.id.display_subs_toolbar)
-        (myToolbar.findViewById<View>(R.id.my_toolbar_title) as TextView).text =
-                getText(R.string.app_name)
-
-        val parentActivity = activity as AppCompatActivity?
-        parentActivity?.setSupportActionBar(myToolbar)
 
         // attach the actions associated with loading the posts
         attachScrollListeners()
-        initializeLivedata()
-
         return displaySubsBinding.root
     }
 
@@ -147,7 +134,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
             }
         })
 
-        // Add query listeners to the searchview
+        // add query listeners to the searchview
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.retrieveSearchResults(query)
@@ -161,53 +148,37 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         })
     }
 
-    /**
-     * Subscribes to various livedata values from the viewmodel
-     */
+    // region viewmodel binding and handlers
+
     private fun bindViewModel() {
-        // allows the list to be updated as data is updated
-        viewModel.subscribedSubsList.nonNull().observe(this) { subredditsList: List<SubredditModel> ->
-            if (subredditsList.isNotEmpty()) {
-                subAdapter.setList(ArrayList(subredditsList))
-                Log.d(TAG, "Changes to subreddit list received ${subredditsList.size}")
-            }
+        // allows the list to be updated as subreddits are retrieved from the network
+        viewModel.subscribedSubsList.nonNull().observe(this) {
+            subAdapter.setList(ArrayList(it))
         }
 
         // observe whether all subscribed subreddits have been loaded
-        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) { completelyLoaded: Boolean ->
-            //Log.d(TAG, "Refreshing status changed to $completelyLoaded")
-            if (completelyLoaded) {
-                displaySubsBinding.apply {
-                    displaySubsSwiperefreshlayout.isRefreshing = false
-                    displaySubsRecyclerview.scrollToPosition(0)
-                    subscribedListIsVisible = true
-                }
-            }
+        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) {
+            if (it) handleOnAllSubsLoaded()
         }
 
-        // subscribes to search results
         viewModel.searchResults.nonNull().observe { results ->
-            // update the view based on search results
-            //Toast.makeText(getContext(), " " + results.toString(), Toast.LENGTH_SHORT).show();
-            //Log.d(TAG, " " + results.toString())
-            searchItemAdapter.setSearchResults(results)
+            searchItemAdapter.handleSearchResultsPayload(results)
         }
 
         viewModel.pinnedSubs.nonNull().observe { pinnedSubs ->
-            Log.d(TAG, " pinned subs " + pinnedSubs.size)
             displaySubsBinding.pinnedSubsView.setPinnedSubreddits(pinnedSubs)
         }
     }
 
-    private fun initializeLivedata() {
-        //    // initialize livedata properties for binding
-        //    searchIsVisible = new MutableLiveData<>();
-        //    // initialize observer for updating binding on change
-        //    searchIsVisible.observe(this, (Boolean isVisible) -> {
-        //      displaySubsBinding.setSearchIsVisible(isVisible);
-        //    });
-        //    searchIsVisible.setValue(false);
+    override fun handleOnAllSubsLoaded() {
+        displaySubsBinding.apply {
+            displaySubsSwiperefreshlayout.isRefreshing = false
+            displaySubsRecyclerview.scrollToPosition(0)
+        }
     }
+
+    // end region viewmodel binding and handlers
+
 
     fun attachScrollListeners() {
         displaySubsBinding.apply {
@@ -215,14 +186,10 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
                 displaySubsBinding.subscribedListIsVisible = false
 
                 // refresh the current list and retrieve more posts
-                subAdapter.resetSubList()
+                subAdapter.clearList()
                 viewModel.retrieveMoreSubs(true)
             }
         }
-    }
-
-    override fun onAllSubsLoaded() {
-        //swipeRefreshLayout.setRefreshing(false);
     }
 
     /**
@@ -230,15 +197,19 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
      */
     internal inner class OnClickSubItem : SubItemOnClick {
         override fun onClick(subItem: SubredditModel) {
-            Log.d(TAG, subItem.subName)
+            val subFrag = DisplaySubView()
 
             // add the subreddit object to the bundle
-            val bundle = Bundle()
-            bundle.putString("SubredditName", subItem.subName)
+            val bundle = Bundle().apply {
+                putString("SubredditName", subItem.subName)
+                subFrag.arguments = this
+            }
 
-            val subFrag = DisplaySubView()
-            subFrag.arguments = bundle
+            // clear items before transition to ensure we don't hold too much in memory
+            subAdapter.clearList()
 
+            // TODO : find a way to stop recreating the fragment everytime and keep the position in the list
+            // this applies to sub view as well
             transitionToFragment(subFrag)
         }
 
@@ -256,10 +227,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
     }
 
     internal inner class OnClickSearchSubItem(fragment: Fragment) : SearchSubItemOnClick {
-        val owner: LifecycleOwner = this@DisplaySubsView
-
         override fun onClick(subName: String) {
-            Log.d(TAG, "Search item clicked")
 
             // add the subreddit object to the bundle
             val bundle = Bundle()
@@ -270,10 +238,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
             // clear items in the adapter
             searchItemAdapter.clearSearchResults()
-
-            // TODO : find a way to stop recreating the fragment everytime and keep the position in the list
-            // this applies to sub view as well
-            transitionToFragment(subFrag)
         }
     }
 }
