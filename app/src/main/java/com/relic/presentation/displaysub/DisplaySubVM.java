@@ -15,6 +15,8 @@ import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 import com.shopify.livedataktx.SingleLiveData;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 
@@ -32,7 +34,7 @@ public class DisplaySubVM extends ViewModel
 
   private MediatorLiveData<List<PostModel>> postListMediator;
   private MediatorLiveData<SubredditModel> subMediator;
-  private MutableLiveData<String> navigationLiveData;
+  private MutableLiveData<NavigationData> navigationLiveData;
 
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is reinitialized when the subreddit changes
@@ -114,7 +116,7 @@ public class DisplaySubVM extends ViewModel
     return postListMediator;
   }
 
-  public LiveData<String> getNavigation() {
+  public LiveData<NavigationData> getNavigation() {
     return navigationLiveData;
   }
 
@@ -187,7 +189,9 @@ public class DisplaySubVM extends ViewModel
   public void visitPost(String postFullname) {
     postRepo.getPostGateway().visitPost(postFullname);
 
-    navigationLiveData.setValue(postFullname);
+    navigationLiveData.setValue(
+            new NavigationData.ToPost(postFullname, subName)
+    );
     navigationLiveData.setValue(null);
   }
 
@@ -201,5 +205,13 @@ public class DisplaySubVM extends ViewModel
   public void savePost(String postFullname, boolean save) {
     Log.d(TAG, "Saving on post " + postFullname + "save = " + save);
     postRepo.getPostGateway().savePost(postFullname, save);
+  }
+
+  @Override
+  public void showImage(@NotNull String postThumbnailUrl) {
+    navigationLiveData.setValue(
+            new NavigationData.ToImage(postThumbnailUrl)
+    );
+    navigationLiveData.setValue(null);
   }
 }

@@ -230,9 +230,14 @@ public class DisplaySubView extends Fragment {
         }
     });
 
-    displaySubVM.getNavigation().observe(this, postId -> {
-      if (postId != null) {
-        new PostItemOnClick().onClick(postId, subName);
+    displaySubVM.getNavigation().observe(this, navigationData -> {
+      if (navigationData instanceof NavigationData.ToPost) {
+        NavigationData.ToPost toPost = (NavigationData.ToPost) navigationData;
+        new PostItemOnClick().onClick(toPost.getPostId(), toPost.getSubredditName());
+      }
+      else if (navigationData instanceof NavigationData.ToImage) {
+        NavigationData.ToImage toImage = (NavigationData.ToImage) navigationData;
+        new OnClickImage().onClick(toImage.getThumbnail());
       }
     });
 
@@ -417,7 +422,7 @@ public class DisplaySubView extends Fragment {
       // does not load image if the banner img string is empty
       try {
         Log.d("DISPLAY_SUB_VIEW", "URL = " + bannerUrl);
-        Picasso.get().load(bannerUrl).fit().centerCrop().into(bannerImageView);
+//        Picasso.get().load(bannerUrl).fit().centerCrop().into(bannerImageView);
       }
       catch (Error e) {
         Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString());

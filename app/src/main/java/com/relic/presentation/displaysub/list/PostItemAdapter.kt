@@ -17,7 +17,7 @@ class PostItemAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
-        return PostItemVH(postAdapterDelegate, RelicPostItem(parent.context)).apply {
+        return PostItemVH(RelicPostItem(parent.context)).apply {
             bindPost(postList[position], position)
             initializeOnClicks(this@PostItemAdapter)
         }
@@ -87,9 +87,9 @@ class PostItemAdapter (
 
             // optimistic, update copy cached in adapter and make request to api to update in server
             it.userUpvoted = newStatus
-            notifyItemChanged(itemPosition)
             postAdapterDelegate.voteOnPost(it.id, newStatus)
         }
+        notifyItemChanged(itemPosition)
     }
 
     // initialize onclick for the downvote button
@@ -100,25 +100,25 @@ class PostItemAdapter (
 
             // optimistic, update copy cached in adapter and make request to api to update in server
             it.userUpvoted = newStatus
-            notifyItemChanged(itemPosition)
             postAdapterDelegate.voteOnPost(it.id, newStatus)
         }
+        notifyItemChanged(itemPosition)
     }
 
     fun onPostSavePressed (itemPosition : Int) {
+        postList[itemPosition].also {
+            // calculate new save value based on the previous one and tell vm to update appropriately
+            val newStatus = !it.isSaved
+            postAdapterDelegate.savePost(it.id, newStatus)
 
+            // update the view and local model to reflect onclick
+            it.isSaved = newStatus
+        }
+        notifyItemChanged(itemPosition)
     }
 
     fun onPostLinkPressed (itemPosition : Int) {
-        val postModel = postList[itemPosition]
-
-        // calculate new save value based on the previous one and tell vm to update appropriately
-        val newStatus = !postModel.isSaved
-        postAdapterDelegate.savePost(postModel.id, newStatus)
-
-        // update the view and local model to reflect onclick
-        postModel.isSaved = newStatus
-        notifyItemChanged(itemPosition)
+        postAdapterDelegate.showImage(postList[itemPosition].url)
     }
     // end region for onclick handlers
 }
