@@ -75,7 +75,6 @@
     <dimen name="title_size_m">20sp</dimen>
     <dimen name="title_size_s">15sp</dimen>
 
-
     <dimen name="text_spacing_s">4dp</dimen>
     <dimen name="text_spacing_m">12dp</dimen>
 
@@ -91,4 +90,12 @@
 
     <dimen name="sub_card_width">40dp</dimen>
     <dimen name="sub_card_height">80dp</dimen>
+
+    <dimen name="ic_height_s">22dp</dimen>
+    <dimen name="ic_width_s">22dp</dimen>
+
+    <dimen name="text_s">14sp</dimen>
+    <dimen name="text_m">15sp</dimen>
+    <dimen name="text_l">18sp</dimen>
+
 </resources>

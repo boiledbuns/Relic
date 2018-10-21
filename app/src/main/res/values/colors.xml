@@ -21,6 +21,7 @@
     <color name="paleDarkGray">#313947</color>
 
     <color name="lightGray">#6c7584</color>
+    <color name="icon_color">@color/lightGray</color>
 
     <color name="warning">#9c0436</color>
 

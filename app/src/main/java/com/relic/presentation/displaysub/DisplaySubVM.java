@@ -16,7 +16,9 @@ import com.relic.data.models.SubredditModel;
 import java.util.List;
 
 
-public class DisplaySubVM extends ViewModel implements DisplaySubContract.ViewModel, RetrieveNextListingCallback {
+public class DisplaySubVM extends ViewModel
+        implements DisplaySubContract.ViewModel, DisplaySubContract.SubViewDelegate, RetrieveNextListingCallback {
+
   private final String TAG = "DISPLAY_SUB_VM";
   private boolean isInitialized = false;
   private int currentSortingCode = PostRepository.SORT_DEFAULT;

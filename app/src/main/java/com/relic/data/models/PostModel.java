@@ -108,7 +108,7 @@ public class PostModel implements Post {
   }
 
   public String getHtmlSelfText() {
-    return selftext == null ? null: Html.fromHtml(Html.fromHtml(selftext).toString()).toString();
+    return selftext == null ? selftext: Html.fromHtml(Html.fromHtml(selftext).toString()).toString();
   }
 
   public String getThumbnail() {

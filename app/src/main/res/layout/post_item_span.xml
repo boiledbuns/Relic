@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/backgroundSecondary"
+    android:layout_marginTop="@dimen/postitem_margin"
+    android:paddingTop="@dimen/padding_m"
+    android:paddingBottom="@dimen/padding_m"
+    android:paddingStart="@dimen/padding_s"
+    android:paddingEnd="@dimen/padding_s">
+
+    <!-- top row of values -->
+    <TextView
+        android:id="@+id/primaryMetaTextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_s"
+        android:layout_marginEnd="@dimen/title_margin"/>
+
+    <ImageView
+        android:id="@+id/postitem_saved"
+        android:layout_width="@dimen/ic_width_s"
+        android:layout_height="@dimen/ic_height_s"
+        android:layout_alignParentEnd="true"/>
+
+    <ImageView
+        android:id="@+id/postitem_stickied"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/postitem_saved"
+        android:src="@drawable/ic_pinned"
+        android:layout_marginEnd="@dimen/padding_s"/>
+
+    <LinearLayout
+        android:id="@+id/titleGroupView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/primaryMetaTextview"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="@dimen/padding_s">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/titleView"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="@dimen/padding_xs"
+                android:textSize="@dimen/text_l"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/postitem_nsfw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postitem_title"
+                android:textColor="@color/warning"
+                android:textAllCaps="true"
+                android:visibility="gone"
+                android:text="@string/nsfw"/>
+
+            <TextView
+                android:id="@+id/secondaryMetaTextview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleView"/>
+        </RelativeLayout>
+
+
+        <ImageView
+            android:id="@+id/postitem_thumbnail"
+            android:layout_width="@dimen/postitem_image_width"
+            android:layout_height="@dimen/postitem_image_width"
+            android:visibility="gone"
+            android:paddingStart="@dimen/postitem_selftext_margin"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/postBodyView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleGroupView"
+        android:textSize="@dimen/text_m"
+        android:visibility="gone"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:layout_marginBottom="@dimen/padding_s"/>
+
+    <!-- buttons and options -->
+    <ImageView
+        android:id="@+id/postUpvoteView"
+        android:layout_width="@dimen/ic_width_s"
+        android:layout_height="@dimen/ic_height_s"
+        android:layout_below="@id/postBodyView"
+        android:src="@drawable/ic_upvote"/>
+
+    <ImageView
+        android:id="@+id/postDownvoteView"
+        android:layout_width="@dimen/ic_width_s"
+        android:layout_height="@dimen/ic_height_s"
+        android:layout_below="@id/postBodyView"
+        android:layout_toRightOf="@id/postUpvoteView"
+        android:src="@drawable/ic_downvote"/>
+
+    <ImageView
+        android:id="@+id/postCommentView"
+        android:layout_width="@dimen/ic_width_s"
+        android:layout_height="@dimen/ic_height_s"
+        android:layout_below="@id/postBodyView"
+        android:layout_toRightOf="@id/postDownvoteView"
+        android:src="@drawable/ic_comment"/>
+
+</RelativeLayout>
+

@@ -44,4 +44,8 @@ public class DisplaySubContract {
 
     void savePost(String postFullname, boolean save);
   }
+
+  public interface SubViewDelegate {
+
+  }
 }
