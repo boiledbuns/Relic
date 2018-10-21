@@ -15,7 +15,6 @@ import com.relic.R;
 import com.relic.data.models.PostModel;
 import com.relic.databinding.PostItemBinding;
 import com.relic.presentation.displaysub.DisplaySubContract;
-import com.relic.presentation.displaysub.DisplaySubView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -24,13 +23,13 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
   private final String TAG = "POST_ADAPTER";
   private List<PostModel> postList;
 
-  private DisplaySubContract.ViewModel viewModel;
+  private DisplaySubContract.PostAdapterDelegate postAdapterDelegate;
   private PostItemOnclick onClick;
   private ImageOnClick onClickImage;
 
-  public PostItemAdapter(DisplaySubContract.ViewModel viewModel, PostItemOnclick onClick, ImageOnClick onClickImage) {
+  public PostItemAdapter(DisplaySubContract.PostAdapterDelegate delegate, PostItemOnclick onClick, ImageOnClick onClickImage) {
     super();
-    this.viewModel = viewModel;
+    this.postAdapterDelegate = delegate;
     this.onClick = onClick;
     this.onClickImage = onClickImage;
   }
@@ -128,7 +127,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
   }
 
   public void voteOnTask(int itemPosition, String fullname, int vote) {
-    viewModel.voteOnPost(fullname, vote);
+    postAdapterDelegate.voteOnPost(fullname, vote);
     notifyItemChanged(itemPosition);
   }
 
@@ -159,7 +158,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         // optimistic, update copy cached in adapter and make request to api to update in server
         postModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        viewModel.voteOnPost(postModel.getId(), newStatus);
+        postAdapterDelegate.voteOnPost(postModel.getId(), newStatus);
       });
 
       // initialize onclick for the downvote button
@@ -172,7 +171,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         // optimistic, update copy cached in adapter and make request to api to update in server
         postModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        viewModel.voteOnPost(postModel.getId(), newStatus);
+        postAdapterDelegate.voteOnPost(postModel.getId(), newStatus);
       });
 
       // initialize onclick for post item
@@ -191,7 +190,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
         // calculate new save value based on the previous one and tell vm to update appropriately
         boolean newStatus = !postModel.isSaved();
-        viewModel.savePost(postModel.getId(), newStatus);
+        postAdapterDelegate.savePost(postModel.getId(), newStatus);
 
         // update the view and local model to reflect onclick
         postModel.setSaved(newStatus);

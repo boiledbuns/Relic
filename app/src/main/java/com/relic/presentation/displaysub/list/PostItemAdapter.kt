@@ -8,8 +8,7 @@ import com.relic.presentation.customview.RelicPostItem
 import com.relic.presentation.displaysub.DisplaySubContract
 
 class PostItemAdapter (
-        private val subViewDelegate : DisplaySubContract.SubViewDelegate
-
+        private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
 ) : RecyclerView.Adapter <PostItemVH> () {
     private var postList: MutableList<PostModel> = ArrayList()
 
@@ -18,13 +17,14 @@ class PostItemAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
-        return PostItemVH(RelicPostItem(parent.context)).apply {
-            bindPost(postList[position])
+        return PostItemVH(postAdapterDelegate, RelicPostItem(parent.context)).apply {
+            bindPost(postList[position], position)
+            initializeOnClicks(this@PostItemAdapter)
         }
     }
 
     override fun onBindViewHolder(viewholder: PostItemVH, position: Int) {
-        viewholder.bindPost(postList[position])
+        viewholder.bindPost(postList[position], position)
     }
 
     fun clear() {
@@ -65,4 +65,60 @@ class PostItemAdapter (
             diffResult.dispatchUpdatesTo(this)
         }
     }
+
+    // start region for onclick handlers
+
+    fun onPostPressed (itemPosition : Int) {
+        postList[itemPosition].also {
+            // update the view and local model to reflect onclick
+            it.isVisited = true
+            notifyItemChanged(itemPosition)
+
+            // update post to show that it has been visited
+            postAdapterDelegate.visitPost(it.id)
+        }
+    }
+
+    // initialize onclick for the upvote button
+    fun onPostUpvotePressed(itemPosition : Int) {
+        postList[itemPosition].also {
+            // determine the new vote value based on the current one and change the vote accordingly
+            val newStatus = if (it.userUpvoted <= 0) 1 else 0
+
+            // optimistic, update copy cached in adapter and make request to api to update in server
+            it.userUpvoted = newStatus
+            notifyItemChanged(itemPosition)
+            postAdapterDelegate.voteOnPost(it.id, newStatus)
+        }
+    }
+
+    // initialize onclick for the downvote button
+    fun onPostDownvotePressed(itemPosition : Int) {
+        postList[itemPosition].also {
+            // determine the new vote value based on the current one and change the vote accordingly
+            val newStatus = if (it.userUpvoted >= 0) -1 else 0
+
+            // optimistic, update copy cached in adapter and make request to api to update in server
+            it.userUpvoted = newStatus
+            notifyItemChanged(itemPosition)
+            postAdapterDelegate.voteOnPost(it.id, newStatus)
+        }
+    }
+
+    fun onPostSavePressed (itemPosition : Int) {
+
+    }
+
+    fun onPostLinkPressed (itemPosition : Int) {
+        val postModel = postList[itemPosition]
+
+        // calculate new save value based on the previous one and tell vm to update appropriately
+        val newStatus = !postModel.isSaved
+        postAdapterDelegate.savePost(postModel.id, newStatus)
+
+        // update the view and local model to reflect onclick
+        postModel.isSaved = newStatus
+        notifyItemChanged(itemPosition)
+    }
+    // end region for onclick handlers
 }

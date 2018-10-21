@@ -37,15 +37,14 @@ public class DisplaySubContract {
     void retrieveMorePosts(boolean resetPosts);
 
     void updateSubStatus(boolean subscribe);
+  }
+
+  public interface PostAdapterDelegate {
 
     void visitPost(String postFullname);
 
     void voteOnPost(String postFullname, int voteValue);
 
     void savePost(String postFullname, boolean save);
-  }
-
-  public interface SubViewDelegate {
-
   }
 }

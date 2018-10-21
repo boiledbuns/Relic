@@ -2,6 +2,7 @@ package com.relic.presentation.displaysub;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
@@ -12,12 +13,13 @@ import com.relic.data.SubRepository;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
+import com.shopify.livedataktx.SingleLiveData;
 
 import java.util.List;
 
 
 public class DisplaySubVM extends ViewModel
-        implements DisplaySubContract.ViewModel, DisplaySubContract.SubViewDelegate, RetrieveNextListingCallback {
+        implements DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback {
 
   private final String TAG = "DISPLAY_SUB_VM";
   private boolean isInitialized = false;
@@ -30,6 +32,7 @@ public class DisplaySubVM extends ViewModel
 
   private MediatorLiveData<List<PostModel>> postListMediator;
   private MediatorLiveData<SubredditModel> subMediator;
+  private MutableLiveData<String> navigationLiveData;
 
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is reinitialized when the subreddit changes
@@ -42,6 +45,7 @@ public class DisplaySubVM extends ViewModel
       // initialize observables
       postListMediator = new MediatorLiveData<>();
       subMediator = new MediatorLiveData<>();
+      navigationLiveData = new MutableLiveData<>();
 
       // observe the list of posts stored locally
       postListMediator.addSource(postRepo.getPosts(subName), new Observer<List<PostModel>>() {
@@ -110,6 +114,10 @@ public class DisplaySubVM extends ViewModel
     return postListMediator;
   }
 
+  public LiveData<String> getNavigation() {
+    return navigationLiveData;
+  }
+
 
   /**
    * Method that allows views aware of the VM to request the VM retrieve more posts
@@ -125,8 +133,6 @@ public class DisplaySubVM extends ViewModel
       postRepo.getNextPostingVal(this, subName);
     }
   }
-
-
 
   @Override
   public void changeSortingMethod(int sortingCode, int sortScope) {
@@ -180,6 +186,9 @@ public class DisplaySubVM extends ViewModel
   @Override
   public void visitPost(String postFullname) {
     postRepo.getPostGateway().visitPost(postFullname);
+
+    navigationLiveData.setValue(postFullname);
+    navigationLiveData.setValue(null);
   }
 
   @Override

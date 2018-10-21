@@ -230,6 +230,12 @@ public class DisplaySubView extends Fragment {
         }
     });
 
+    displaySubVM.getNavigation().observe(this, postId -> {
+      if (postId != null) {
+        new PostItemOnClick().onClick(postId, subName);
+      }
+    });
+
   }
 
 

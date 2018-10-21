@@ -20,17 +20,20 @@
         android:layout_marginEnd="@dimen/title_margin"/>
 
     <ImageView
-        android:id="@+id/postitem_saved"
+        android:id="@+id/savedPostIconView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
+        android:src="@drawable/ic_save"
+        android:visibility="gone"
         android:layout_alignParentEnd="true"/>
 
     <ImageView
-        android:id="@+id/postitem_stickied"
+        android:id="@+id/pinnedIconView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@id/postitem_saved"
         android:src="@drawable/ic_pinned"
+        android:visibility="gone"
         android:layout_marginEnd="@dimen/padding_s"/>
 
     <LinearLayout
