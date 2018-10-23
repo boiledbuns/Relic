@@ -161,11 +161,11 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
             if (it) handleOnAllSubsLoaded()
         }
 
-        viewModel.searchResults.nonNull().observe { results ->
+        viewModel.searchResults.nonNull().observe(this) { results ->
             searchItemAdapter.handleSearchResultsPayload(results)
         }
 
-        viewModel.pinnedSubs.nonNull().observe { pinnedSubs ->
+        viewModel.pinnedSubs.nonNull().observe(this) { pinnedSubs ->
             displaySubsBinding.pinnedSubsView.setPinnedSubreddits(pinnedSubs)
         }
     }

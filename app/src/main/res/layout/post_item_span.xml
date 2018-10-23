@@ -2,14 +2,15 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardRootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/backgroundSecondary"
     android:layout_marginTop="@dimen/postitem_margin"
-    android:paddingTop="@dimen/padding_m"
+    android:paddingTop="@dimen/padding_s"
     android:paddingBottom="@dimen/padding_m"
-    android:paddingStart="@dimen/padding_s"
-    android:paddingEnd="@dimen/padding_s">
+    android:paddingStart="@dimen/padding_m"
+    android:paddingEnd="@dimen/padding_m">
 
     <!-- top row of values -->
     <TextView
@@ -49,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/postSubNameView"
-        android:layout_marginBottom="@dimen/padding_s">
+        android:layout_marginBottom="@dimen/padding_m">
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -85,9 +86,9 @@
         <android.support.v7.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_s"
+            android:layout_marginTop="@dimen/padding_xs"
             android:layout_marginStart="@dimen/postitem_selftext_margin"
-            app:cardCornerRadius="3dp">
+            app:cardCornerRadius="2dp">
 
             <ImageView
                 android:id="@+id/postThumbnailView"
@@ -103,11 +104,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/titleGroupView"
+        android:layout_marginBottom="@dimen/padding_m"
         android:textSize="@dimen/text_m"
         android:visibility="gone"
         android:maxLines="3"
-        android:ellipsize="end"
-        android:layout_marginBottom="@dimen/padding_s"/>
+        android:ellipsize="end"/>
 
     <!-- buttons and options -->
     <ImageView
@@ -115,6 +116,7 @@
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
+        android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_upvote"/>
 
     <ImageView
@@ -123,6 +125,7 @@
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
         android:layout_toRightOf="@id/postUpvoteView"
+        android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_downvote"/>
 
     <ImageView
@@ -131,6 +134,7 @@
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
         android:layout_toRightOf="@id/postDownvoteView"
+        android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_comment"/>
 
 </RelativeLayout>

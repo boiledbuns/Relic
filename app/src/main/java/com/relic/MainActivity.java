@@ -1,41 +1,39 @@
 package com.relic;
 
-import android.content.Context;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.relic.dagger.DaggerAppComponent;
-import com.relic.dagger.modules.AppModule;
+import android.util.Log;
+import android.widget.TextView;
+
 import com.relic.data.Authenticator;
 import com.relic.data.VolleyQueue;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.presentation.displaysubs.DisplaySubsView;
 
+import javax.inject.Inject;
+
 public class MainActivity extends AppCompatActivity implements AuthenticationCallback {
   final String TAG = "MAIN_ACTIVITY";
-  private Authenticator auth;
 
   private TextView titleTW;
   private TextView subtitleTW;
+
+  @Inject
+  Authenticator auth;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    ((RelicApp) getApplication()).getAppComponent().inject(this);
+
     // initialize the request queue and authenticator instance
-    VolleyQueue.init(getApplicationContext());
-    //auth = Authenticator.getAuthenticator(this);
-    auth = new Authenticator(this);
-    initializeDefaultView();
+    VolleyQueue.get(getApplicationContext());
+    auth.refreshToken(this::initializeDefaultView);
 
     if (!auth.isAuthenticated()) {
       // create the login fragment for the user if not authenticated

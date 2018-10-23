@@ -5,6 +5,7 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -39,7 +40,6 @@ public class DisplaySubVM extends ViewModel
   public void init(String subredditName, SubRepository subRepo, PostRepository postRepo) {
     // ensure that the subreddit model is reinitialized when the subreddit changes
     if (!subredditName.equals(subName)) {
-      Log.d(TAG, "VM to display " + subredditName + " initialized");
       subName = subredditName;
       this.postRepo = postRepo;
       this.subRepo = subRepo;
@@ -186,7 +186,7 @@ public class DisplaySubVM extends ViewModel
   }
 
   @Override
-  public void visitPost(String postFullname) {
+  public void visitPost(@NonNull String postFullname) {
     postRepo.getPostGateway().visitPost(postFullname);
 
     navigationLiveData.setValue(
@@ -196,13 +196,13 @@ public class DisplaySubVM extends ViewModel
   }
 
   @Override
-  public void voteOnPost(String postFullname, int voteValue) {
+  public void voteOnPost(@NonNull String postFullname, int voteValue) {
     Log.d(TAG, "Voting on post " + postFullname + "value = " + voteValue);
     postRepo.getPostGateway().voteOnPost(postFullname, voteValue);
   }
 
   @Override
-  public void savePost(String postFullname, boolean save) {
+  public void savePost(@NonNull String postFullname, boolean save) {
     Log.d(TAG, "Saving on post " + postFullname + "save = " + save);
     postRepo.getPostGateway().savePost(postFullname, save);
   }

@@ -1,9 +1,8 @@
 package com.relic.data;
 
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.provider.Settings;
+import android.content.res.Resources;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -50,21 +49,21 @@ public class Authenticator {
   private RequestQueue requestQueue;
   private Date lastRefresh;
 
-  //private static Authenticator INSTANCE;
 
   /**
    * Private constructor to initialize the single instance of the Authenticator
-   * @param context
+   * @param applicationContext application context
    */
-  public Authenticator(Context context) {
-    appContext = context;
-    requestQueue = VolleyQueue.getQueue();
-    // retrieve the strings from res
-    preference = context.getResources().getString(R.string.AUTH_PREF);
-    tokenKey = context.getResources().getString(R.string.TOKEN_KEY);
-    refreshTokenKey = context.getResources().getString(R.string.REFRESH_TOKEN_KEY);
-    redirectCode = context.getString(R.string.REDIRECT_CODE);
+  public Authenticator(Context applicationContext) {
+    appContext = applicationContext;
+    requestQueue = VolleyQueue.get(applicationContext);
 
+    Resources resources = appContext.getResources();
+    // retrieve the strings from res
+    preference = resources.getString(R.string.AUTH_PREF);
+    tokenKey = resources.getString(R.string.TOKEN_KEY);
+    refreshTokenKey = resources.getString(R.string.REFRESH_TOKEN_KEY);
+    redirectCode = resources.getString(R.string.REDIRECT_CODE);
 
     if (isAuthenticated()) {
       // refresh the auth token
@@ -73,16 +72,6 @@ public class Authenticator {
       lastRefresh = Calendar.getInstance().getTime();
     }
   }
-
-
-//  public static Authenticator getAuthenticator(Context context) {
-//    if (INSTANCE == null) {
-//      // initialize the instance of the authenticator if it's null
-//      INSTANCE = new Authenticator(context);
-//    }
-//    return INSTANCE;
-//  }
-
 
   public String getUrl() {
     return BASE + "client_id=" + appContext.getString(R.string.client_id)

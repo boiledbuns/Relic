@@ -28,20 +28,32 @@ class PostItemVH (
 
     fun bindPost(postModel : PostModel, position: Int) {
         itemView.apply {
-            postModel.thumbnail?.let { setThumbnail(it) }
+            if (postModel.thumbnail == null) {
+                postThumbnailView.visibility = View.GONE
+
+            } else {
+                postThumbnailView.visibility = View.VISIBLE
+                postModel.thumbnail?.let { setThumbnail(it) }
+            }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
             postDateView.text = postModel.created
             titleView.text = postModel.title
             secondaryMetaTextview.text = postModel.author + " " + postModel.domain
 
-            postModel.htmlSelfText?.let {
+            if (postModel.htmlSelfText.isNullOrEmpty()) {
+                postBodyView.visibility = View.GONE
+            }
+            else {
                 postBodyView.visibility = View.VISIBLE
-                postBodyView.text = it
+                postBodyView.text = postModel.htmlSelfText
             }
 
             if (postModel.isVisited) {
-                setBackgroundColor(resources.getColor(R.color.backgroundSecondaryB))
+                cardRootView.setBackgroundResource(R.color.backgroundSecondaryB)
+            }
+            else {
+                cardRootView.setBackgroundResource(R.color.backgroundSecondary)
             }
 
             when (postModel.userUpvoted) {

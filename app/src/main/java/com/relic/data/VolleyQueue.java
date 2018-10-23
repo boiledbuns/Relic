@@ -19,11 +19,12 @@ public class VolleyQueue {
    * The request queue should only be called once in the application
    * @param context application context
    */
-  public static void init(Context context) {
+  public static RequestQueue get(Context context) {
     // initializes the instance of the request queue once!
     if (INSTANCE == null) {
       INSTANCE = Volley.newRequestQueue(context);
       Log.d(TAG, "Request queue initialized");
     }
+    return INSTANCE;
   }
 }
