@@ -25,8 +25,8 @@ public class PostEntity {
   public String selftext;
   @ColumnInfo(name = "authorFlair")
   public String author_flair_text;
-//  @ColumnInfo(name = "linkFlair")
-//  public String link_flair_richtext;
+  @ColumnInfo(name = "linkFlair")
+  public String link_flair_text;
   //public String media_embed;
   public int score;
   //public int likes;

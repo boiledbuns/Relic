@@ -119,12 +119,20 @@
         android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_upvote"/>
 
+    <TextView
+        android:id="@+id/postScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/postBodyView"
+        android:layout_toRightOf="@id/postUpvoteView"
+        android:layout_marginEnd="@dimen/padding_m"/>
+
     <ImageView
         android:id="@+id/postDownvoteView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postUpvoteView"
+        android:layout_toRightOf="@id/postScore"
         android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_downvote"/>
 
@@ -136,6 +144,13 @@
         android:layout_toRightOf="@id/postDownvoteView"
         android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_comment"/>
+
+    <TextView
+        android:id="@+id/postCommentCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/postBodyView"
+        android:layout_toRightOf="@id/postCommentView"/>
 
 </RelativeLayout>
 

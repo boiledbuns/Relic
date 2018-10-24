@@ -11,6 +11,7 @@ public class PostModel implements Post {
   private String author;
   private String selftext;
   private String created;
+  private String linkFlair;
   private int score;
   public String title;
   private int commentCount;
@@ -215,5 +216,13 @@ public class PostModel implements Post {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  public String getLinkFlair() {
+    return linkFlair;
+  }
+
+  public void setLinkFlair(String linkFlair) {
+    this.linkFlair = linkFlair;
   }
 }

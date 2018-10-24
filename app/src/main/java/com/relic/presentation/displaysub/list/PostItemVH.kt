@@ -39,7 +39,8 @@ class PostItemVH (
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
             postDateView.text = postModel.created
             titleView.text = postModel.title
-            secondaryMetaTextview.text = postModel.author + " " + postModel.domain
+            secondaryMetaTextview.text = resources
+                    .getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
 
             if (postModel.htmlSelfText.isNullOrEmpty()) {
                 postBodyView.visibility = View.GONE
@@ -70,6 +71,9 @@ class PostItemVH (
                     postDownvoteView.setImageResource(R.drawable.ic_downvote_active)
                 }
             }
+
+            postScore.text = postModel.score.toString()
+            postCommentCount.text = postModel.commentCount.toString()
         }
 
         itemPosition = position
