@@ -26,6 +26,7 @@ import com.relic.dagger.modules.RepoModule
 import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.PostModel
 import com.relic.databinding.DisplayPostBinding
+import com.relic.network.NetworkRequestManager
 import com.relic.presentation.adapter.CommentAdapter
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
@@ -154,7 +155,7 @@ class DisplayPostView : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         // TODO: Testing user gateway using user "reddit"
-        val userGateway = UserGatewayImpl(context!!)
+        val userGateway = UserGatewayImpl(context!!, NetworkRequestManager(activity!!.applicationContext))
         userGateway.getUser("reddit")
 
         setHasOptionsMenu(true)

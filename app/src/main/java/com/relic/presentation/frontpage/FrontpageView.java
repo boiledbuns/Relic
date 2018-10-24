@@ -13,6 +13,7 @@ import com.relic.R;
 import com.relic.data.Authenticator;
 import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
+import com.relic.network.NetworkRequestManager;
 
 public class FrontpageView extends Fragment {
   FrontpageContract.VM viewModel;
@@ -28,7 +29,7 @@ public class FrontpageView extends Fragment {
     super.onCreate(savedInstanceState);
 
     // initializes the instance of the post repo and injects it into the VM
-    PostRepository postRepo = new PostRepositoryImpl(getContext());
+    PostRepository postRepo = new PostRepositoryImpl(getContext(), new NetworkRequestManager(getContext()));
     Authenticator auth = new Authenticator(getContext());
 
     viewModel = ViewModelProviders.of(this).get(FrontpageVM.class);

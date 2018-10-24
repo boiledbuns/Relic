@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.relic.data.Authenticator;
-import com.relic.data.VolleyQueue;
+import com.relic.network.VolleyQueue;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.presentation.displaysubs.DisplaySubsView;
 

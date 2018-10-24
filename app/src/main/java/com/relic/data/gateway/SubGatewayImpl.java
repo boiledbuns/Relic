@@ -7,17 +7,11 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.google.gson.JsonParser;
 import com.relic.R;
 import com.relic.data.ApplicationDB;
-import com.relic.data.Request.RedditOauthRequest;
-import com.relic.data.VolleyAccessor;
+import com.relic.network.NetworkRequestManager;
+import com.relic.network.request.RelicOAuthRequest;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,19 +27,20 @@ public class SubGatewayImpl implements SubGateway {
   public final int SUBSCRIBE = 2;
   public final int UNSUBSCRIBE = 3;
 
-  RequestQueue requestQueue;
+  private NetworkRequestManager requestManager;
 
-  public SubGatewayImpl(Context context) {
+  public SubGatewayImpl(Context context, NetworkRequestManager networkRequestManager) {
     appDb = ApplicationDB.getDatabase(context);
     // Get the key values needed to get the actual authtoken from shared preferences
     String authKey = context.getString(R.string.AUTH_PREF);
     String tokenKey = context.getString(R.string.TOKEN_KEY);
 
+    requestManager = networkRequestManager;
+
     // retrieve the authtoken for use
     authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
 
-    requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
   }
 
 
@@ -54,36 +49,39 @@ public class SubGatewayImpl implements SubGateway {
     // get sub info
     String end = ENDPOINT + "r/" + subredditName + "/about";
     Log.d(TAG, "from " + end);
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
-        (response) -> {
-          JSONParser parser = new JSONParser();
-          try {
-            Log.d(TAG, response);
-            JSONObject subInfoObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
-            Log.d(TAG, subInfoObject.keySet().toString());
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            end,
+            response -> {
+              JSONParser parser = new JSONParser();
+              try {
+                Log.d(TAG, response);
+                JSONObject subInfoObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+                Log.d(TAG, subInfoObject.keySet().toString());
 
-            // user_is_moderator, header_title, subreddit_type, submit_text, display_name, accounts_active, submit_text_html, description_html
-            // user_has_favorited, user_is_contributor, user_is_moderator, public_description, active_user_count, user_is_banned
-            // public_traffic
+                // user_is_moderator, header_title, subreddit_type, submit_text, display_name, accounts_active, submit_text_html, description_html
+                // user_has_favorited, user_is_contributor, user_is_moderator, public_description, active_user_count, user_is_banned
+                // public_traffic
 
-            String info = subInfoObject.get("header_title") +
-                "---- accounts active " + subInfoObject.get("active_user_count").toString() +
-                "---- description html " + Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()) +
-                "---- submit text " + subInfoObject.get("submit_text");
-            Log.d(TAG, info);
+                String info = subInfoObject.get("header_title") +
+                    "---- accounts active " + subInfoObject.get("active_user_count").toString() +
+                    "---- description html " + Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()) +
+                    "---- submit text " + subInfoObject.get("submit_text");
+                Log.d(TAG, info);
 
-            // update the subreddit model with the new info
-            new InsertSubInfoTask().execute(appDb, subredditName,
-                subInfoObject.get("header_title"),
-                Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()).toString(),
-                subInfoObject.get("submit_text"));
+                // update the subreddit model with the new info
+                new InsertSubInfoTask().execute(appDb, subredditName,
+                    subInfoObject.get("header_title"),
+                    Html.fromHtml(Html.fromHtml((String) subInfoObject.get("description_html")).toString()).toString(),
+                    subInfoObject.get("submit_text"));
 
-          } catch (ParseException e) {
-            Log.d(TAG, "Error parsing the response");
-          }
-        }, (error) -> {
-          Log.d(TAG, "Error retrieving the response from the server");
-        }, authToken));
+              } catch (ParseException e) {
+                Log.d(TAG, "Error parsing the response");
+              }
+            },
+            error -> Log.d(TAG, "Error retrieving the response from the server"),
+            authToken
+    ));
 
     return subinfo;
   }
@@ -115,13 +113,16 @@ public class SubGatewayImpl implements SubGateway {
     // get sub sidebar
     String end = ENDPOINT + "r/" + subredditName + "/about/sidebar";
     Log.d(TAG, "from " + end);
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
-        (response) -> {
-          Log.d(TAG, "sidebar : " + response);
-          sidebar.setValue("test");
-        }, (error) -> {
-      Log.d(TAG, "Error retrieving the response from the server");
-    }, authToken));
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            end,
+            response -> {
+              Log.d(TAG, "sidebar : " + response);
+              sidebar.setValue("test");
+            },
+            error -> Log.d(TAG, "Error retrieving the response from the server"),
+            authToken
+    ));
 
     sidebar.setValue("yeet");
     return sidebar;
@@ -145,17 +146,18 @@ public class SubGatewayImpl implements SubGateway {
 
     // delay response request a bit to ensure it doesn't occur until the livedata has been subscribed to
     new Handler().postDelayed(()-> {
-        requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
-            (response -> {
-              Log.d(TAG, "Subscribed to " + subName);
-              success.setValue(true);
-              // update local entity to reflect the changes once successfully subscribed
-              new UpdateLocalSubSubscription().execute(appDb, subName, true);
-            }),
-            (VolleyError error) -> {
-              Log.d(TAG, "Error subscribing to subreddit " + error.networkResponse.headers);
-              success.setValue(false);
-            }, authToken));
+        requestManager.processRequest(new RelicOAuthRequest(
+                RelicOAuthRequest.POST, end,
+                response -> {
+                  Log.d(TAG, "Subscribed to " + subName);
+                  success.setValue(true);
+                  // update local entity to reflect the changes once successfully subscribed
+                  new UpdateLocalSubSubscription().execute(appDb, subName, true);
+                },
+                error -> {
+                  Log.d(TAG, "Error subscribing to subreddit " + error.networkResponse.headers);
+                  success.setValue(false);
+                }, authToken));
       }, 500);
 
     return success;
@@ -169,17 +171,21 @@ public class SubGatewayImpl implements SubGateway {
     MutableLiveData<Boolean> success = new MutableLiveData<>();
 
     new Handler().postDelayed(() -> {
-      requestQueue.add(new RedditOauthRequest(Request.Method.POST, end,
-          (response -> {
-            Log.d(TAG, "Unsubscribed to " + subName);
-            success.setValue(true);
-            // update local entity to reflect the changes once successfully subscribed
-            new UpdateLocalSubSubscription().execute(appDb, subName, false);
-          }),
-          (VolleyError error) -> {
-            Log.d(TAG, "Error unsubscribing to subreddit " + error.networkResponse.headers);
-            success.setValue(false);
-          }, authToken));
+      requestManager.processRequest(new RelicOAuthRequest(
+              RelicOAuthRequest.POST,
+              end,
+              response -> {
+                Log.d(TAG, "Unsubscribed to " + subName);
+                success.setValue(true);
+                // update local entity to reflect the changes once successfully subscribed
+                new UpdateLocalSubSubscription().execute(appDb, subName, false);
+              },
+              error -> {
+                Log.d(TAG, "Error unsubscribing to subreddit " + error.networkResponse.headers);
+                success.setValue(false);
+              },
+              authToken
+      ));
     }, 500);
 
     return success;
@@ -221,40 +227,43 @@ public class SubGatewayImpl implements SubGateway {
   @Override
   public void retrieveSubBanner(String subName) {
     String end = ENDPOINT + "r/" + subName + "/stylesheet.css";
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, end,
-      (String response) -> {
-        Log.d(TAG, "subname css : " + response);
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET, end,
+            (String response) -> {
+              Log.d(TAG, "subname css : " + response);
 
-        int position = response.indexOf("#header");
-        response = response.substring(position);
+              int position = response.indexOf("#header");
+              response = response.substring(position);
 
-        // jump to the position of the css property for the banner image
-        String backgroundProp = "background-image:url(";
-        int bannerUrlPosition = response.indexOf(backgroundProp) + backgroundProp.length() + 1 ;
+              // jump to the position of the css property for the banner image
+              String backgroundProp = "background-image:url(";
+              int bannerUrlPosition = response.indexOf(backgroundProp) + backgroundProp.length() + 1 ;
 
-        // proceed if a background image was found at all
-        if (bannerUrlPosition == backgroundProp.length() + 1) {
-          Log.d(TAG, " position of banner URL " + bannerUrlPosition);
+              // proceed if a background image was found at all
+              if (bannerUrlPosition == backgroundProp.length() + 1) {
+                Log.d(TAG, " position of banner URL " + bannerUrlPosition);
 
-          boolean complete = false;
-          StringBuilder stringBuilder = new StringBuilder();
-          // iterate through the response from that position until the full banner image url is parsed
-          while (!complete) {
-            char charAtPosition = response.charAt(bannerUrlPosition);
-            // set loop flag to false if the end of the url is found
-            if (charAtPosition == '"') {
-              complete = true;
-            } else {
-              stringBuilder.append(charAtPosition);
-              bannerUrlPosition++;
-            }
-          }
-          Log.d(TAG, " banner url = " + stringBuilder.toString());
-        }
-
-      }, (VolleyError error) -> {
-        Log.d(TAG, "Error retrieving response from server " + error.toString());
-      }, authToken));
+                boolean complete = false;
+                StringBuilder stringBuilder = new StringBuilder();
+                // iterate through the response from that position until the full banner image url is parsed
+                while (!complete) {
+                  char charAtPosition = response.charAt(bannerUrlPosition);
+                  // set loop flag to false if the end of the url is found
+                  if (charAtPosition == '"') {
+                    complete = true;
+                  } else {
+                    stringBuilder.append(charAtPosition);
+                    bannerUrlPosition++;
+                  }
+                }
+                Log.d(TAG, " banner url = " + stringBuilder.toString());
+              }
+            },
+            error -> {
+              Log.d(TAG, "Error retrieving response from server " + error.toString());
+            },
+            authToken
+    ));
   }
 
   private static class UpdateLocalSubSubscription extends AsyncTask {

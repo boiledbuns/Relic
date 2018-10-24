@@ -36,6 +36,7 @@ import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.PostModel;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubBinding;
+import com.relic.network.NetworkRequestManager;
 import com.relic.presentation.DisplayImageFragment;
 import com.relic.presentation.adapter.ImageOnClick;
 import com.relic.presentation.adapter.PostItemOnclick;
@@ -81,7 +82,12 @@ public class DisplaySubView extends Fragment {
         // get the viewmodel and inject the dependencies into it
         displaySubVM = ViewModelProviders.of(getActivity()).get(DisplaySubVM.class);
         vmAlreadyInitialized = displaySubVM.isInitialized();
-        displaySubVM.init(subredditName, new SubRepositoryImpl(this.getContext()), new PostRepositoryImpl(this.getContext()));
+        NetworkRequestManager requestManager = new NetworkRequestManager(getActivity().getApplicationContext());
+        displaySubVM.init(
+                subredditName,
+                new SubRepositoryImpl(this.getContext(), requestManager),
+                new PostRepositoryImpl(this.getContext(),requestManager)
+        );
       }
     } else {
       Toast.makeText(this.getContext(), "There was an issue loading this sub", Toast.LENGTH_SHORT).show();

@@ -7,16 +7,13 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
-import com.relic.data.Request.RedditOauthRequest;
+import com.relic.network.NetworkRequestManager;
 import com.relic.data.gateway.PostGateway;
 import com.relic.data.gateway.PostGatewayImpl;
+import com.relic.network.request.RelicOAuthRequest;
 import com.relic.presentation.callbacks.RetrieveNextListingCallback;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -28,14 +25,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -51,14 +44,15 @@ public class PostRepositoryImpl implements PostRepository {
   private JSONParser JSONParser;
   private ApplicationDB appDB;
 
-  private RequestQueue requestQueue;
+  private NetworkRequestManager requestManager;
   private int currentSortingCode = PostRepository.SORT_HOT;
 
 
   @Inject
-  public PostRepositoryImpl(Context context) {
+  public PostRepositoryImpl(Context context, NetworkRequestManager networkRequestManager) {
     currentContext = context;
-    requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
+    requestManager = networkRequestManager;
+
     JSONParser = new JSONParser();
 
     // initialize reference to the database
@@ -95,28 +89,22 @@ public class PostRepositoryImpl implements PostRepository {
     String ending = "r/" + subredditName + "?after=" + after;
 
     // create the new request and submit it
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
-        new Response.Listener<String>() {
-          @Override
-          public void onResponse(String response) {
-            //Log.d(TAG, "Loaded response ");
-            try {
-              parsePosts(response, subredditName);
-              //new InsertPostsTask(appDB, parsePosts(response, subredditName)).execute();
-            }
-            catch (ParseException error) {
-              Log.d(TAG, "Error: " + error.getMessage());
-            }
-          }
-        }, new Response.ErrorListener() {
-      @Override
-      public void onErrorResponse(VolleyError error) {
-        Log.d(TAG, "Error: " + error.getMessage());
-      }
-    }, checkToken()));
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            ENDPOINT + ending,
+            response -> {
+              try {
+                parsePosts(response, subredditName);
+                //new InsertPostsTask(appDB, parsePosts(response, subredditName)).execute();
+              }
+              catch (ParseException error) {
+                Log.d(TAG, "Error: " + error.getMessage());
+              }
+            },
+            error -> Log.d(TAG, "Error: " + error.getMessage()),
+            checkToken()
+    ));
   }
-
-
 
   public void retrieveSortedPosts(String subredditName, int sortByCode) {
     retrieveSortedPosts(subredditName, sortByCode, 0);
@@ -147,19 +135,23 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     Log.d(TAG, ending);
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ending,
-        (String response) -> {
-          Log.d(TAG, response);
-          try {
-            parsePosts(response, subredditName);
-          } catch (ParseException e) {
-            e.printStackTrace();
-          }
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            ending,
+            (String response) -> {
+              Log.d(TAG, response);
+              try {
+                parsePosts(response, subredditName);
+              } catch (ParseException e) {
+                e.printStackTrace();
+              }
 
-        },
-        (VolleyError volleyError) -> {
-          Log.d(TAG, "Error retrieving sorted posts " + volleyError.networkResponse);
-        }, checkToken()));
+            },
+            error -> {
+              Log.d(TAG, "Error retrieving sorted posts " + error);
+            },
+            checkToken()
+    ));
   }
 
 
@@ -305,10 +297,10 @@ public class PostRepositoryImpl implements PostRepository {
     Log.d(TAG, ending);
 
     // create the new request and submit it
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, ending,
-            new Response.Listener<String>() {
-              @Override
-              public void onResponse(String response) {
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            ending,
+            response -> {
                 Log.d(TAG, "Loaded response " + response);
                 try {
                   PostEntity post = parsePost(response);
@@ -317,15 +309,14 @@ public class PostRepositoryImpl implements PostRepository {
                 catch (ParseException error) {
                   Log.d(TAG, "Error: " + error.getMessage());
                 }
-              }
-            }, new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "Error: "   + error.networkResponse);
-            // TODO add livedata for error
-            // TODO maybe retry if not an internet connection issue
-          }
-        }, checkToken()));
+            },
+            error -> {
+              Log.d(TAG, "Error: "   + error.networkResponse);
+              // TODO add livedata for error
+              // TODO maybe retry if not an internet connection issue
+            },
+            checkToken()
+    ));
   }
 
 
@@ -364,6 +355,6 @@ public class PostRepositoryImpl implements PostRepository {
 
   @Override
   public PostGateway getPostGateway() {
-    return new PostGatewayImpl(currentContext);
+    return new PostGatewayImpl(currentContext, requestManager);
   }
 }

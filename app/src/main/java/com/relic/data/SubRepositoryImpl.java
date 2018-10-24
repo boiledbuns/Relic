@@ -6,17 +6,15 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
-import com.relic.data.Request.RedditOauthRequest;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
 import com.relic.data.models.SubredditModel;
+import com.relic.network.NetworkRequestManager;
+import com.relic.network.request.RelicOAuthRequest;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class SubRepositoryImpl implements SubRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String KEY = "SUBSCRIBED";
@@ -35,18 +32,18 @@ public class SubRepositoryImpl implements SubRepository {
   private final String TAG = "SUB_REPO";
 
   private ApplicationDB appDb;
+  private NetworkRequestManager requestManager;
   private Context context;
-  private RequestQueue volleyQueue;
   private String authToken;
   private JSONParser parser;
   private Gson gson;
 
   private MutableLiveData <Boolean> allSubscribedSubsLoaded;
 
-  public SubRepositoryImpl(Context context) {
+  public SubRepositoryImpl(Context context, NetworkRequestManager networkRequestManager) {
     Authenticator auth = new Authenticator(context);
+    requestManager = networkRequestManager;
     this.context = context;
-    volleyQueue = VolleyAccessor.getInstance(context).getRequestQueue();
     parser = new JSONParser();
     gson = new GsonBuilder().create();
 
@@ -113,31 +110,34 @@ public class SubRepositoryImpl implements SubRepository {
 
     String ending = "subreddits/mine/subscriber?limit=30&after=" + after;
     // create the new request to reddit servers and store the data in persistence layer
-    volleyQueue.add(new RedditOauthRequest(
-        Request.Method.GET, ENDPOINT + ending,
-        response -> {
-          try {
-            String newAfter = (String) ((JSONObject) ((JSONObject) parser.parse(response)).get("data")).get("after");
-            Log.d(TAG, "after = " + newAfter);
-            // insert the subs and listing into the room instance
-            InsertSubsTask insertSubsTask = new InsertSubsTask();
-            insertSubsTask.subRepo = this;
-            insertSubsTask.subDB = appDb;
-            insertSubsTask.subs = parseSubreddits(response);
-            insertSubsTask.after = newAfter;
-            insertSubsTask.allSubbedSubsLoaded = allSubscribedSubsLoaded;
-            insertSubsTask.execute();
-          } catch (ParseException e) {
-            Log.e(TAG, "Error parsing the response: " + e.toString());
-          }
-        },
-        (VolleyError error) -> {
-          Log.d(TAG, "Error retrieving the response for " + after + " : " + error.networkResponse);
-          Log.d(TAG, "Trying again");
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            ENDPOINT + ending,
+            response -> {
+              try {
+                String newAfter = (String) ((JSONObject) ((JSONObject) parser.parse(response)).get("data")).get("after");
+                Log.d(TAG, "after = " + newAfter);
+                // insert the subs and listing into the room instance
+                InsertSubsTask insertSubsTask = new InsertSubsTask();
+                insertSubsTask.subRepo = this;
+                insertSubsTask.subDB = appDb;
+                insertSubsTask.subs = parseSubreddits(response);
+                insertSubsTask.after = newAfter;
+                insertSubsTask.allSubbedSubsLoaded = allSubscribedSubsLoaded;
+                insertSubsTask.execute();
+              } catch (ParseException e) {
+                Log.e(TAG, "Error parsing the response: " + e.toString());
+              }
+            },
+            error -> {
+              Log.d(TAG, "Error retrieving the response for " + after + " : " + error);
+              Log.d(TAG, "Trying again");
 
-          // try to retrieve the subs again
-          retrieveMoreSubscribedSubs(after);
-        }, checkToken()));
+              // try to retrieve the subs again
+              retrieveMoreSubscribedSubs(after);
+            },
+            checkToken()
+    ));
   }
 
 //  /**
@@ -186,25 +186,29 @@ public class SubRepositoryImpl implements SubRepository {
 
   @Override
   public void retrieveSingleSub(String subName) {
-    volleyQueue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + "r/" + subName  +"/about",
-        (String response) -> {
-          Log.d(TAG, response);
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            ENDPOINT + "r/" + subName  +"/about",
+            (String response) -> {
+              Log.d(TAG, response);
 
-          try {
-            // parse the response and add it to an arraylist to be inserted in the db
-            JSONObject subredditObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
-            SubredditEntity subreddit = gson.fromJson(subredditObject.toJSONString(), SubredditEntity.class);
+              try {
+                // parse the response and add it to an arraylist to be inserted in the db
+                JSONObject subredditObject = (JSONObject) ((JSONObject) parser.parse(response)).get("data");
+                SubredditEntity subreddit = gson.fromJson(subredditObject.toJSONString(), SubredditEntity.class);
 
-            // create a new task to insert the subreddits on parse success
-            new InsertSubTask().execute(appDb, subreddit);
+                // create a new task to insert the subreddits on parse success
+                new InsertSubTask().execute(appDb, subreddit);
 
-          } catch (ParseException e) {
-            e.printStackTrace();
-          }
-
-        }, (VolleyError e) -> {
-      Log.d(TAG, "There was an error retrieving the response from the server " + e.getMessage());
-    }, checkToken()));
+              } catch (ParseException e) {
+                e.printStackTrace();
+              }
+            },
+            error -> {
+              Log.d(TAG, "There was an error retrieving the response from the server " + error.getMessage());
+            },
+            checkToken()
+    ));
   }
 
 
@@ -241,19 +245,23 @@ public class SubRepositoryImpl implements SubRepository {
   @Override
   public void searchSubreddits(MutableLiveData<List<String>> liveResults, String query) {
     String end = ENDPOINT + "api/search_subreddits?query=" + query;
-      volleyQueue.add(new RedditOauthRequest(Request.Method.POST, end,
-          response -> {
-            Log.d(TAG, response);
+      requestManager.processRequest(new RelicOAuthRequest(
+              RelicOAuthRequest.POST,
+              end,
+              response -> {
+                Log.d(TAG, response);
 
-//            List<String> livedataResults = liveResults.getValue();
-//            livedataResults.addAll(parseSearchedSubs(response));
-//            liveResults.setValue(livedataResults);
+    //            List<String> livedataResults = liveResults.getValue();
+    //            livedataResults.addAll(parseSearchedSubs(response));
+    //            liveResults.setValue(livedataResults);
 
-            liveResults.setValue(parseSearchedSubs(response));
-          },
-          error -> {
-            Log.d(TAG, "error retrieving this search results");
-          }, checkToken()));
+                liveResults.setValue(parseSearchedSubs(response));
+              },
+              error -> {
+                Log.d(TAG, "error retrieving this search results");
+              },
+              checkToken()
+      ));
   }
 
   /**
@@ -280,7 +288,7 @@ public class SubRepositoryImpl implements SubRepository {
 
   @Override
   public SubGateway getSubGateway() {
-    return new SubGatewayImpl(context);
+    return new SubGatewayImpl(context, requestManager);
   }
 
 

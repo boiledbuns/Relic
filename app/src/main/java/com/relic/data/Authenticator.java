@@ -14,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.relic.R;
+import com.relic.network.VolleyQueue;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 
 import org.json.simple.JSONObject;
@@ -150,6 +151,13 @@ public class Authenticator {
     );
   }
 
+  public String getTokenKey() {
+    // retrieve the auth token shared preferences
+    String authKey = appContext.getResources().getString(R.string.AUTH_PREF);
+    String tokenKey = appContext.getResources().getString(R.string.TOKEN_KEY);
+    return appContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+            .getString(tokenKey, "DEFAULT");
+  }
 
   /**
    * checks if the user is currently signed in by checking shared preferences

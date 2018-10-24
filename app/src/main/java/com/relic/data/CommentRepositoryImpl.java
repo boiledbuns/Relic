@@ -5,20 +5,14 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
-import com.relic.data.Request.RedditOauthRequest;
+import com.relic.network.NetworkRequestManager;
 import com.relic.data.entities.CommentEntity;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.models.CommentModel;
-import com.relic.domain.Listing;
+import com.relic.network.request.RelicOAuthRequest;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,11 +22,8 @@ import org.json.simple.parser.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class CommentRepositoryImpl implements CommentRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -40,17 +31,17 @@ public class CommentRepositoryImpl implements CommentRepository {
   private final String TAG = "COMMENT_REPO";
 
   private ApplicationDB appDB;
+  private NetworkRequestManager requestManager;
   private Context viewContext;
-  private RequestQueue queue;
   private JSONParser JSONParser;
 
   private String authToken;
 
-  public CommentRepositoryImpl (Context context) {
+  public CommentRepositoryImpl (Context context, NetworkRequestManager networkRequestManager) {
     //TODO convert VolleyQueue into a singleton
     appDB = ApplicationDB.getDatabase(context);
-    queue = VolleyAccessor.getInstance(context).getRequestQueue();
     JSONParser = new JSONParser();
+    requestManager = networkRequestManager;
 
     // TODO convert this to a authenticator method
     // retrieve the auth token shared preferences
@@ -81,24 +72,21 @@ public class CommentRepositoryImpl implements CommentRepository {
     if (after != null) {
       ending += "&after=" + after;
     }
-    queue.add(new RedditOauthRequest(Request.Method.GET, ENDPOINT + ending,
-        new Response.Listener<String>() {
-          @Override
-          public void onResponse(String response) {
+    requestManager.processRequest(new RelicOAuthRequest(
+        RelicOAuthRequest.GET,
+        ENDPOINT + ending,
+        response -> {
             Log.d(TAG, response);
             try {
               parseComments(postFullName, response);
             } catch (Exception e) {
               Log.d(TAG, "Error parsing JSON return " + e.getMessage());
             }
-          }
-        }, new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "Error with request : " +  error.getMessage());
-          }
-        }, authToken));
-    }
+        },
+        error -> Log.d(TAG, "Error with request : " +  error.getMessage()),
+        authToken
+    ));
+  }
 
 
   @Override

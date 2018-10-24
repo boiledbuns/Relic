@@ -6,13 +6,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 import com.relic.R;
 import com.relic.data.ApplicationDB;
-import com.relic.data.Request.RedditOauthRequest;
-import com.relic.data.VolleyAccessor;
+import com.relic.network.NetworkRequestManager;
+import com.relic.network.request.RelicOAuthRequest;
 
 public class PostGatewayImpl implements  PostGateway {
   private final String ENDPOINT = "https://oauth.reddit.com/";
@@ -21,10 +18,10 @@ public class PostGatewayImpl implements  PostGateway {
 
   private ApplicationDB appDb;
 
-  RequestQueue requestQueue;
+  private NetworkRequestManager requestManager;
 
 
-  public PostGatewayImpl(Context context) {
+  public PostGatewayImpl(Context context, NetworkRequestManager networkRequestManager) {
     appDb = ApplicationDB.getDatabase(context);
     // Get the key values needed to get the actual authtoken from shared preferences
     String authKey = context.getString(R.string.AUTH_PREF);
@@ -34,7 +31,7 @@ public class PostGatewayImpl implements  PostGateway {
     authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
 
-    requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
+    requestManager = networkRequestManager;
   }
 
   @Override
@@ -45,18 +42,22 @@ public class PostGatewayImpl implements  PostGateway {
 
     MutableLiveData<Boolean> success = new MutableLiveData<>();
 
-    requestQueue.add(new RedditOauthRequest(Request.Method.POST, ending,
-        response -> {
-          Log.d(TAG, "Success voting on post : " + fullname + " to " + voteStatus);
-          success.setValue(true);
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.POST,
+            ending,
+            response -> {
+              Log.d(TAG, "Success voting on post : " + fullname + " to " + voteStatus);
+              success.setValue(true);
 
-          // update the local model appropriately
-          new UpdateVoteStatus().execute(appDb, fullname, voteStatus);
-        },
-        (VolleyError error) -> {
-          Log.d(TAG, "Sorry, there was an error voting on the post " + fullname + " to " + voteStatus);
-          success.setValue(false);
-        }, authToken));
+              // update the local model appropriately
+              new UpdateVoteStatus().execute(appDb, fullname, voteStatus);
+            },
+            error -> {
+              Log.d(TAG, "Sorry, there was an error voting on the post " + fullname + " to " + voteStatus);
+              success.setValue(false);
+            },
+            authToken
+    ));
 
     return success;
   }
@@ -70,18 +71,22 @@ public class PostGatewayImpl implements  PostGateway {
     String saveString = save ? "save" : "unsave";
     String ending = ENDPOINT + "api/" + saveString + "?id=" + fullname;
 
-    requestQueue.add(new RedditOauthRequest(Request.Method.POST, ending,
-        response -> {
-          Log.d(TAG, "Success post saved status for " + fullname + " to " + save);
-          success.setValue(true);
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.POST,
+            ending,
+            response -> {
+              Log.d(TAG, "Success post saved status for " + fullname + " to " + save);
+              success.setValue(true);
 
-          // update the local model appropriately
-          new UpdateSaveStatus().execute(appDb, fullname, save);
-        },
-        (VolleyError error) -> {
-          Log.d(TAG, "Sorry, there was an error saving the post " + fullname);
-          success.setValue(false);
-        }, authToken));
+              // update the local model appropriately
+              new UpdateSaveStatus().execute(appDb, fullname, save);
+            },
+            error -> {
+              Log.d(TAG, "Sorry, there was an error saving the post " + fullname);
+              success.setValue(false);
+            },
+            authToken
+    ));
 
     return success;
   }

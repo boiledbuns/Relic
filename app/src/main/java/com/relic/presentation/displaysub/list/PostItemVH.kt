@@ -28,12 +28,12 @@ class PostItemVH (
 
     fun bindPost(postModel : PostModel, position: Int) {
         itemView.apply {
-            if (postModel.thumbnail == null) {
+            if (postModel.thumbnail.isNullOrBlank()) {
                 postThumbnailView.visibility = View.GONE
 
             } else {
                 postThumbnailView.visibility = View.VISIBLE
-                postModel.thumbnail?.let { setThumbnail(it) }
+                postModel.thumbnail?.let{ setThumbnail(it) }
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)

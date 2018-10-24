@@ -1,4 +1,4 @@
-package com.relic.data;
+package com.relic.network;
 
 import android.content.Context;
 

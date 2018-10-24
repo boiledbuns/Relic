@@ -4,14 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import com.relic.R;
-import com.relic.data.Request.RedditOauthRequest;
-import com.relic.data.VolleyAccessor;
+import com.relic.network.NetworkRequestManager;
+import com.relic.network.request.RelicOAuthRequest;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,9 +17,9 @@ public class UserGatewayImpl implements UserGateway{
   public static String TAG = "USER_GATEWAY";
   private String authToken;
 
-  RequestQueue requestQueue;
+  private NetworkRequestManager requestManager;
 
-  public UserGatewayImpl(Context context) {
+  public UserGatewayImpl(Context context, NetworkRequestManager networkRequestManager) {
     // Get the key values needed to get the actual authtoken from shared preferences
     String authKey = context.getString(R.string.AUTH_PREF);
     String tokenKey = context.getString(R.string.TOKEN_KEY);
@@ -33,28 +28,22 @@ public class UserGatewayImpl implements UserGateway{
     authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
         .getString(tokenKey, "DEFAULT");
 
-    requestQueue = VolleyAccessor.getInstance(context).getRequestQueue();
-  }
-
-  public void getSelf () {
-
+    requestManager = networkRequestManager;
   }
 
   public void getUser(String username) {
     String endpoint = ENDPOINT + "/user/" + username + "/about";
-    requestQueue.add(new RedditOauthRequest(Request.Method.GET, endpoint,
-        new Response.Listener<String>() {
-          @Override
-          public void onResponse(String response) {
-            parseUser(response);
-          }
-        },
-        new Response.ErrorListener() {
-          @Override
-          public void onErrorResponse(VolleyError error) {
-            Log.d(TAG, "Error getting user overview");
-          }
-        }, authToken));
+    requestManager.processRequest(new RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            endpoint,
+            response ->  {
+              parseUser(response);
+            },
+            error -> {
+                Log.d(TAG, "Error getting user overview");
+            },
+            authToken
+    ));
   }
 
   private void parseUser(String response) {
