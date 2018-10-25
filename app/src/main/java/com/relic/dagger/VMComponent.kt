@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProvider
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.presentation.displaypost.DisplayPostVM
+import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.displaysubs.DisplaySubsVM
 import com.relic.presentation.editor.EditorVM
 import com.relic.presentation.subinfodialog.SubInfoDialogVM
@@ -23,4 +24,6 @@ interface VMComponent {
     fun injectEditor(factory: ViewModelProvider.Factory)
 
     fun getDisplaySubsVM() : DisplaySubsVM.Factory
+
+    fun getDisplaySubVM() : DisplaySubVM.Factory
 }

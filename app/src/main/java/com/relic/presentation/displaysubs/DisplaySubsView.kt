@@ -45,7 +45,9 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
                 return DaggerVMComponent.builder()
                         .authModule(AuthModule(activity!!.applicationContext))
                         .repoModule(RepoModule(activity!!.applicationContext))
-                        .build().getDisplaySubsVM().create() as T
+                        .build()
+                        .getDisplaySubsVM()
+                        .create() as T
             }
         }).get(DisplaySubsVM::class.java)
     }

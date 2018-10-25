@@ -10,22 +10,6 @@ import com.relic.data.models.SubredditModel
 
 interface DisplaySubContract {
     interface ViewModel {
-
-        /**
-         * Used to check if the viewmodel has already been initialized
-         * @return
-         */
-        val isInitialized: Boolean
-
-        val subModel: LiveData<SubredditModel>
-
-        val posts: LiveData<List<PostModel>>
-
-        // LiveData<Boolean> getIsSubscribed();
-
-        val subName: String
-        fun init(subredditName: String, subRepo: SubRepository, postRepo: PostRepository)
-
         fun changeSortingMethod(sortingCode: Int, sortScope: Int)
 
         fun retrieveMorePosts(resetPosts: Boolean)

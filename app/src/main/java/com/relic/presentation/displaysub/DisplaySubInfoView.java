@@ -24,7 +24,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
   private String TAG = "DISPLAYSUBINFO_VIEW";
 
   private DisplaySubInfoContract.ViewModel displaySubInfoVM;
-  private DisplaySubContract.ViewModel displaySubVM;
+  private DisplaySubVM displaySubVM;
 
   private View displaySubInfoView;
   private DisplaySubInfoBinding displaySubInfoBinding;
@@ -55,7 +55,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
 
   private void loadSubIcon() {
     // observe the livedata for sub model and load the image once it loads
-    displaySubVM.getSubModel().observe(this, (SubredditModel subModel) -> {
+    displaySubVM.getSubredditLivedata().observe(this, (SubredditModel subModel) -> {
 
       ImageView icon = displaySubInfoBinding.getRoot().findViewById(R.id.display_subinfo_icon);
       String iconUrl = subModel.getSubIcon();
@@ -97,7 +97,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
    * Add observers and onchange actions to all appropriate live data
    */
   private void subscribeToVM() {
-    displaySubVM.getSubModel().observe(this, (@NonNull SubredditModel subModel) -> {
+    displaySubVM.getSubredditLivedata().observe(this, (@NonNull SubredditModel subModel) -> {
       // updates the submodel bound to the view
       displaySubInfoBinding.setSubModel(subModel);
     });
