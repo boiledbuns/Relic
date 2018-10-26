@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
+import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.nonNull
@@ -85,6 +86,7 @@ class EditorView : RelicFragment() {
                 // construct & inject editor VM
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
+                        .authModule(AuthModule(context!!))
                         .build()
                         .getEditorVM().create() as T
             }

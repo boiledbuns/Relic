@@ -1,101 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
-    <data>
-        <variable
-            name="displaySubVM"
-            type="com.relic.presentation.displaysub.DisplaySubContract.ViewModel"/>
-
-        <variable
-            name="subModel"
-            type="com.relic.data.models.SubredditModel"/>
-    </data>
-
-    <android.support.design.widget.CoordinatorLayout
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/subAppBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/display_sub_appbarlayout"
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/subCollapsingToolbarLlyout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="170dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snapMargins"
+            app:expandedTitleTextAppearance="@style/collapsingTitleAppearance"
+            app:expandedTitleMarginBottom="@dimen/appbarlayout_title_margin_bottom"
+            app:contentScrim="@color/backgroundSecondary"
+            app:scrimAnimationDuration="6">
 
-            <android.support.design.widget.CollapsingToolbarLayout
-                android:id="@+id/display_sub_collapsingtoolbarlayout"
-                android:layout_width="match_parent"
-                android:layout_height="170dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|snapMargins"
-                app:expandedTitleTextAppearance="@style/collapsingTitleAppearance"
-                app:expandedTitleMarginBottom="@dimen/appbarlayout_title_margin_bottom"
-                app:contentScrim="@color/backgroundSecondary"
-                app:scrimAnimationDuration="6">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_collapseMode="parallax"
-                    app:layout_collapseParallaxMultiplier="0.4">
-
-                    <ImageView
-                        android:id="@+id/display_sub_banner"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_gravity="bottom"
-                        android:layout_marginStart="@dimen/toolbar_subtitle_margin_side"
-                        android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"
-                        android:text="sorting by hot"/>
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_margin="@dimen/postitem_margin"
-                        android:textAllCaps="false"
-                        android:textSize="15sp"
-                        android:minWidth="82dp"
-                        android:text="@{subModel.isSubscribed ? `subbed` : `subscribe`}"
-                        android:onClick="@{() -> displaySubVM.updateSubStatus(!subModel.isSubscribed)}"/>
-
-                </RelativeLayout>
-
-                <include layout="@layout/relic_toolbar"
-                    android:id="@+id/display_sub_toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/toolbar_height"
-                    app:layout_collapseMode="pin"/>
-
-            </android.support.design.widget.CollapsingToolbarLayout>
-
-        </android.support.design.widget.AppBarLayout>
-
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/display_posts_swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/display_posts_recyclerview"
-                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                android:scrollbarStyle="outsideOverlay"
-                android:clipToPadding="false"
-                android:paddingBottom="@dimen/postitem_margin"/>
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.4">
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+                <ImageView
+                    android:id="@+id/subBannerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
 
-    </android.support.design.widget.CoordinatorLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="@dimen/toolbar_subtitle_margin_side"
+                    android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"
+                    android:text="sorting by hot"/>
 
-</layout>
+                <Button
+                    android:id="@+id/subscribeButtonView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_margin="@dimen/postitem_margin"
+                    android:textAllCaps="false"
+                    android:textSize="15sp"
+                    android:minWidth="82dp"/>
+
+            </RelativeLayout>
+
+            <include layout="@layout/relic_toolbar"
+                android:id="@+id/subToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_height"
+                app:layout_collapseMode="pin"/>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/subSwipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/subPostsRecyclerView"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/postitem_margin"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</android.support.design.widget.CoordinatorLayout>
