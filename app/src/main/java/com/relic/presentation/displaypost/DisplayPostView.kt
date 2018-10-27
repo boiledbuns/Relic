@@ -3,7 +3,6 @@ package com.relic.presentation.displaypost
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -43,24 +42,24 @@ class DisplayPostView : Fragment() {
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
                         .build()
-                        .getDisplayPostVM().create(subredditName, postFullname!!) as T
+                        .getDisplayPostVM().create(subredditName, postFullName!!) as T
             }
         }).get(DisplayPostVM::class.java)
     }
 
-    private lateinit var rootView : View
-    private var myToolbar: Toolbar? = null
-    private lateinit var commentAdapter: CommentAdapter
-
-    private lateinit var postFullname: String
+    private lateinit var postFullName: String
     private lateinit var subredditName: String
+
+    private lateinit var rootView : View
+    private lateinit var myToolbar: Toolbar
+    private lateinit var commentAdapter: CommentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.apply {
             getString("full_name")?.let {
-                postFullname = it
+                postFullName = it
             }
             getString("subreddit")?.let {
                 subredditName = it
@@ -68,7 +67,7 @@ class DisplayPostView : Fragment() {
         }
 
         // parse the full name of the post to be displayed
-        Log.d(TAG, "Post fullname : " + postFullname!!)
+        Log.d(TAG, "Post fullname : " + postFullName!!)
         bindViewModel()
     }
 
@@ -111,17 +110,14 @@ class DisplayPostView : Fragment() {
      * subscribes the view to the data exposed by the viewmodel
      */
     private fun bindViewModel() {
-        // Observe the post exposed by the VM
         displayPostVM.post.nonNull().observe(this) { displayPost(it) }
-
-        // Observe the list of comments exposed by the VM
         displayPostVM.commentList.nonNull().observe(this) { displayComments(it) }
     }
 
     private fun displayPost (postModel : PostModel) {
-        fullPostView.setPost(postModel, displayPostVM)
+        fullPostView.setPost(postModel, displayPostVM.isImage(), displayPostVM)
 
-        if (postModel.commentCount > 0) {
+        if (postModel.commentCount == 0) {
             // TODO show the no comment image if this sub has no comments
             // hide the loading icon if some comments have been loaded
             Snackbar.make(displayPostRootView, "No comments for this post", Snackbar.LENGTH_SHORT).show()
@@ -132,8 +128,6 @@ class DisplayPostView : Fragment() {
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList)
         displayPostSwipeRefresh.isRefreshing = false
-
-        // hide the loading icon if some comments have been loaded
     }
 
     /**
@@ -169,7 +163,7 @@ class DisplayPostView : Fragment() {
 
         Log.d(TAG, "PLEASE " + item!!.itemId)
         when (item.itemId) {
-            R.id.post_menu_reply -> openPostReplyEditor(postFullname)
+            R.id.post_menu_reply -> openPostReplyEditor(postFullName)
             else -> override = super.onOptionsItemSelected(item)
         }
 

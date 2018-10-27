@@ -37,7 +37,6 @@ public interface DisplayPostContract {
   }
 
   interface PostViewDelegate {
-
   }
 }
 

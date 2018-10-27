@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_m"
         android:layout_marginBottom="@dimen/displaypost_bottommargin"
+        android:layout_below="@id/postImageView"
         android:background="@color/backgroundSecondary">
 
         <TextView
@@ -39,11 +40,12 @@
 
         <!-- card link displayed if the post is a link to another site -->
         <android.support.v7.widget.CardView
-            android:id="@+id/display_post_linkcard"
+            android:id="@+id/postLinkCard"
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_thumbnail_size"
             android:layout_marginBottom="@dimen/padding_m"
-            android:layout_below="@id/postInfoView">
+            android:layout_below="@id/postInfoView"
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -51,6 +53,7 @@
                 android:paddingStart="@dimen/padding_m">
 
                 <TextView
+                    android:id="@+id/postLinkUrl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -59,7 +62,7 @@
                     android:textSize="@dimen/title_size_s"/>
 
                 <ImageView
-                    android:id="@+id/display_post_card_thumbnail"
+                    android:id="@+id/postLinkThumbnail"
                     android:layout_width="@dimen/card_thumbnail_size"
                     android:layout_height="@dimen/card_thumbnail_size"
                     android:layout_alignParentEnd="true"/>
@@ -67,6 +70,7 @@
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>
+        <!-- card link displayed if the post is a link to another site -->
 
         <TextView
             android:id="@+id/postSelfText"
@@ -74,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/padding_m"
             android:lineSpacingMultiplier="@dimen/line_spacing_s"
-            android:layout_below="@id/display_post_linkcard"
+            android:layout_below="@id/postLinkCard"
             android:textSize="@dimen/title_size_s"/>
 
         <ImageView

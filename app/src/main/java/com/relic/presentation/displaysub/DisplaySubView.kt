@@ -58,30 +58,23 @@ class DisplaySubView : Fragment() {
     private lateinit var subName: String
 
     private var searchView: SearchView? = null
-    private var searchMenuItem: MenuItem? = null
 
     private lateinit var postAdapter: PostItemAdapter
+
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
     private var sortType : Int = PostRepository.SORT_DEFAULT
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        arguments?.let {
-            val argSubName = it.getString("SubredditName")
-            if (argSubName == null) {
-                childFragmentManager.popBackStackImmediate()
-            }
-            else {
-                subName = argSubName
-                bindViewModel()
-            }
+        arguments?.getString("SubredditName")?.let {
+            subName = it
         }
-        savedInstanceState?.getParcelable<Parcelable>(SCROLL_POSITION)?.also {
-            (subPostsRecyclerView.layoutManager as LinearLayoutManager).onRestoreInstanceState(it)
-        }
+
+        bindViewModel()
     }
 
 

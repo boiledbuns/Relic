@@ -11,6 +11,10 @@ open class RelicFragment: Fragment() {
         Log.d(TAG, message)
     }
 
+    protected fun dismiss() {
+        childFragmentManager.popBackStackImmediate()
+    }
+
     protected fun transitionToFragment(fragment : Fragment, replace : Boolean = false) {
         activity!!.supportFragmentManager
                 .beginTransaction()

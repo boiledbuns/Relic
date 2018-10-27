@@ -33,9 +33,12 @@ class DisplayPostVM (
     }
 
     private val TAG = "DISPLAYPOST_VM"
+    private val validImageEndings = listOf("jpg", "png")
 
-    private val currentPost = MediatorLiveData<PostModel> ()
-    private val commentList = MediatorLiveData<List<CommentModel>> ()
+    private val postLiveData = MediatorLiveData<PostModel> ()
+    private val commentListLiveData = MediatorLiveData<List<CommentModel>> ()
+    private val _imageUrl = MutableLiveData<String> ()
+
     private val commentListingKey = MediatorLiveData<String> ()
     private val error = MutableLiveData<RelicError>()
 
@@ -50,7 +53,7 @@ class DisplayPostVM (
      * @return post as livedata
      */
     override fun getPost(): LiveData<PostModel> {
-        return currentPost
+        return postLiveData
     }
 
     /**
@@ -58,7 +61,7 @@ class DisplayPostVM (
      * @return comment list as livedata
      */
     override fun getCommentList(): LiveData<List<CommentModel>> {
-        return commentList
+        return commentListLiveData
     }
 
     /**
@@ -66,19 +69,19 @@ class DisplayPostVM (
      */
     private fun observeLivedata() {
         // retrieves the livedata post to be exposed to the view
-        currentPost.addSource <PostModel>(postRepo.getPost(postFullname)) {
-            currentPost.postValue(it)
+        postLiveData.addSource <PostModel>(postRepo.getPost(postFullname)) {
+            postLiveData.postValue(it)
         }
 
         // retrieve the comment list as livedata so that we can expose it to the view first
-        commentList.addSource(commentRepo.getComments(postFullname)) { comments ->
+        commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
             comments?.let {
                 if (it.isEmpty()) {
                     // retrieve more comments if we detect that none are stored locally
                     commentRepo.retrieveComments(subName, postFullname, null)
                 } else {
                     // TODO add additional actions to trigger when comments loaded
-                    commentList.postValue(comments)
+                    commentListLiveData.postValue(comments)
                 }
             }
         }
@@ -114,5 +117,16 @@ class DisplayPostVM (
     override fun voteOnPost(postFullname: String, voteValue: Int) {
         Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue)
         postRepo.postGateway.voteOnPost(postFullname, voteValue)
+    }
+
+    fun isImage(): Boolean {
+        var isImage = false
+
+        postLiveData.value?.url?.let {
+            val lastThree = it.substring(it.length - 3)
+            if (validImageEndings.contains(lastThree)) isImage = true
+        }
+
+        return isImage
     }
 }
