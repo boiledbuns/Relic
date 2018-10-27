@@ -30,8 +30,8 @@ class DisplaySubVM (
     }
 
     private val TAG = "DISPLAY_SUB_VM"
-    private var currentSortingCode = PostRepository.SORT_DEFAULT
-    private var currentSortingScope = PostRepository.SCOPE_ALL
+    private var currentSortingType = PostRepository.SORT_DEFAULT
+    private var currentSortingScope = PostRepository.SCOPE_NONE
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     val subredditLivedata : LiveData<SubredditModel> = _subredditMediator
@@ -49,7 +49,7 @@ class DisplaySubVM (
             if (postModels != null && postModels.isEmpty()) {
                 Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
                 // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
-                postRepo.retrieveSortedPosts(subName, currentSortingCode, currentSortingScope)
+                postRepo.retrieveSortedPosts(subName, currentSortingType, currentSortingScope)
                 // TODO add a livedata boolean success listener
                 // TODO add a flag for the to check if retrieval occured
             } else {
@@ -92,7 +92,7 @@ class DisplaySubVM (
 
     override fun changeSortingMethod(sortingCode: Int, sortScope: Int) {
         // update the current sorting method and scope
-        currentSortingCode = sortingCode
+        currentSortingType = sortingCode
         currentSortingScope = sortScope
 
         // remove all posts from current db for this subreddit (triggers retrieval)
@@ -110,7 +110,7 @@ class DisplaySubVM (
 
         if (toSubscribe) {
             // subscribe if not currently subscribed
-            val successObservable = subRepo!!.subGateway.subscribe(subName)
+            val successObservable = subRepo.subGateway.subscribe(subName)
             _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
                 if (success != null && success) {
@@ -121,7 +121,7 @@ class DisplaySubVM (
             }
         } else {
             // unsubscribe if already subscribed
-            val successObservable = subRepo!!.subGateway.unsubscribe(subName)
+            val successObservable = subRepo.subGateway.unsubscribe(subName)
             _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
                 if (success != null && success) {

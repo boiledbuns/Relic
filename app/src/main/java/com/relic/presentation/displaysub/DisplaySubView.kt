@@ -35,6 +35,7 @@ import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
+import java.lang.Error
 
 class DisplaySubView : Fragment() {
     private val TAG = "DISPLAYSUB_VIEW"
@@ -62,6 +63,7 @@ class DisplaySubView : Fragment() {
     private lateinit var postAdapter: PostItemAdapter
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
+    private var sortType : Int = PostRepository.SORT_DEFAULT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,92 +153,69 @@ class DisplaySubView : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
-        //inflater.inflate(R.menu.search_menu, menu);
-        inflater!!.inflate(R.menu.display_sub_menu, menu)
-        //menu.findItem(R.id.display_sub_hot).getSubMenu().addSubMenu(R.menu.order_scope_menu);
 
-        searchMenuItem = menu!!.findItem(R.id.display_sub_searchitem)
+        inflater?.apply {
+            inflate(R.menu.display_sub_menu, menu)
 
-        // get ref to searchview, then adjust the padding on the searchview (when it's expanded)
-        searchView = searchMenuItem!!.actionView as SearchView
-        val padding = resources.getDimension(R.dimen.search_padding).toInt()
-        searchView!!.setPadding(0, 0, padding, padding)
+            val sortTypeMenu = menu?.getItem(1)?.subMenu
 
-        val sortOptionsMenu = menu.findItem(R.id.display_sub_sort).subMenu
-
-        // create submenu for sorting methods
-        //    for (int i = 0 ; i < sortOptionsMenu.size(); i++) {
-        //      SubMenu sortOptionSubmenu = sortOptionsMenu.getItem(i).getSubMenu();
-        //      for (int j = 0; j < SORT_SCOPES.length; j ++) {
-        //        sortOptionSubmenu.add(SORT_SCOPES[j]);
-        //      }
-        //    }
-
-        // Add query listeners to the searchview
-        searchView!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(s: String): Boolean {
-                Toast.makeText(context, "Display sub view $s", Toast.LENGTH_SHORT).show()
-                return false
+            // inflate only sorting types that have a sub scope menu
+            val menuWithSubMenu = listOf(1, 2, 3, 4)
+            for (i in menuWithSubMenu) {
+                inflate(R.menu.order_scope_menu, sortTypeMenu?.getItem(i)?.subMenu)
             }
+        }
 
-            override fun onQueryTextChange(s: String): Boolean {
-                Toast.makeText(context, "Display sub view $s", Toast.LENGTH_SHORT).show()
-                return false
+        menu?.findItem(R.id.display_sub_searchitem)?.let {
+            searchView = (it.actionView as SearchView).apply {
+                val padding = resources.getDimension(R.dimen.search_padding).toInt()
+                setPadding(0, 0, padding, padding)
+
+                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(s: String): Boolean {
+                        Toast.makeText(context, "Display sub view $s", Toast.LENGTH_SHORT).show()
+                        return false
+                    }
+
+                    override fun onQueryTextChange(s: String): Boolean {
+                        Toast.makeText(context, "Display sub view $s", Toast.LENGTH_SHORT).show()
+                        return false
+                    }
+                })
             }
-        })
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
-        var validOption = false
+        when (item?.itemId) {
+            R.id.display_sub_searchitem -> { }
+            // when the sorting type is changed
+            R.id.post_sort_best, R.id.post_sort_hot, R.id.post_sort_new, R.id.post_sort_rising,
+            R.id.post_sort_top, R.id.post_sort_controversial -> {
+                sortType = convertSortType(item.itemId)
+            }
+            // when the sorting scope is changed
+            R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
+            R.id.order_scope_month, R.id.order_scope_year, R.id.order_scope_all -> {
 
-        var actionCode = PostRepository.SORT_DEFAULT
-        val scopeCode = PostRepository.SCOPE_NONE
+                displaySubVM.changeSortingMethod(sortType, convertSortScope(item.itemId))
 
-        when (item!!.itemId) {
-            R.id.display_sub_best -> {
-                actionCode = PostRepository.SORT_BEST
-                validOption = true
+                subAppBarLayout.setExpanded(true)
+                subSwipeRefreshLayout.isRefreshing = true
+                postAdapter.clear()
+
+                Toast.makeText(context, "Sorting option selected $sortType", Toast.LENGTH_SHORT).show()
             }
-            R.id.display_sub_controversial -> {
-                actionCode = PostRepository.SORT_CONTROVERSIAL
-                validOption = true
+            else -> {
+                override = super.onOptionsItemSelected(item)
             }
-            R.id.display_sub_hot -> {
-                actionCode = PostRepository.SORT_HOT
-                validOption = true
-            }
-            R.id.display_sub_new -> {
-                actionCode = PostRepository.SORT_NEW
-                validOption = true
-            }
-            R.id.display_sub_rising -> {
-                actionCode = PostRepository.SORT_RISING
-                validOption = true
-            }
-            R.id.display_sub_top -> {
-                actionCode = PostRepository.SORT_TOP
-                validOption = true
-            }
-            else -> override = super.onOptionsItemSelected(item)
         }
 
-        // perform the sort if anything one of the valid sorting options have been selected
-        if (validOption) {
-            Toast.makeText(context, "Sorting option selected $actionCode", Toast.LENGTH_SHORT)
-                    .show()
-            // update the view to reflect the refresh action
-            subAppBarLayout.setExpanded(true)
-            subSwipeRefreshLayout.isRefreshing = true
-
-            // delete current items in the adapter
-            postAdapter.clear()
-
-            // tell vm to coordinate the change
-            displaySubVM.changeSortingMethod(actionCode, scopeCode)
-        }
         return override
     }
+
+
 
     /**
      * Observe all the livedata exposed by the viewmodel and attach the appropriate event listeners
@@ -321,7 +300,7 @@ class DisplaySubView : Fragment() {
             try {
                 Log.d("DISPLAY_SUB_VIEW", "URL = $bannerUrl")
                 //        Picasso.get().load(bannerUrl).fit().centerCrop().into(bannerImageView);
-            } catch (e: Error) {
+            } catch (e : Error) {
                 Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString())
             }
         }
@@ -389,6 +368,32 @@ class DisplaySubView : Fragment() {
                 // open the url in the browser
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(openInBrowser)
+            }
+        }
+    }
+
+    companion object {
+        fun convertSortType(optionId : Int) : Int {
+            return when(optionId) {
+                R.id.post_sort_best -> PostRepository.SORT_BEST
+                R.id.post_sort_hot -> PostRepository.SORT_HOT
+                R.id.post_sort_new -> PostRepository.SORT_NEW
+                R.id.post_sort_rising -> PostRepository.SORT_RISING
+                R.id.post_sort_top -> PostRepository.SORT_TOP
+                R.id.post_sort_controversial -> PostRepository.SORT_CONTROVERSIAL
+                else -> PostRepository.SORT_DEFAULT
+            }
+        }
+
+        fun convertSortScope(optionId : Int) : Int{
+            return when(optionId) {
+                R.id.order_scope_hour -> PostRepository.SCOPE_HOUR
+                R.id.order_scope_day -> PostRepository.SCOPE_DAY
+                R.id.order_scope_week -> PostRepository.SCOPE_WEEK
+                R.id.order_scope_month -> PostRepository.SCOPE_MONTH
+                R.id.order_scope_year -> PostRepository.SCOPE_YEAR
+                R.id.order_scope_all -> PostRepository.SCOPE_ALL
+                else -> PostRepository.SCOPE_NONE
             }
         }
     }

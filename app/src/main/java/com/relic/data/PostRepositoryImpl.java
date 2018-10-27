@@ -45,7 +45,7 @@ public class PostRepositoryImpl implements PostRepository {
   private ApplicationDB appDB;
 
   private NetworkRequestManager requestManager;
-  private int currentSortingCode = PostRepository.SORT_HOT;
+  private int currentSortingCode = PostRepository.Companion.getSORT_HOT();
 
 
   @Inject
@@ -106,8 +106,8 @@ public class PostRepositoryImpl implements PostRepository {
     ));
   }
 
-  public void retrieveSortedPosts(String subredditName, int sortByCode) {
-    retrieveSortedPosts(subredditName, sortByCode, 0);
+  public void retrieveSortedPosts(String subredditName, int sortType) {
+    retrieveSortedPosts(subredditName, sortType, 0);
   }
 
 
@@ -115,22 +115,22 @@ public class PostRepositoryImpl implements PostRepository {
    * Deletes all locally stored posts and retrieves a new set based on the sorting method specified
    * by the caller
    * @param subredditName name of the subreddit for the posts to be retrieved
-   * @param sortByCode code for the associated sort by method
-   * @param sortScopeCode  code for the associate time span to sort by
+   * @param sortType code for the associated sort by method
+   * @param sortScope  code for the associate time span to sort by
    */
   @Override
-  public void retrieveSortedPosts(String subredditName, int sortByCode, int sortScopeCode) {
+  public void retrieveSortedPosts(String subredditName, int sortType, int sortScope) {
     // generate the ending of the request url based on sorting mzethod specified by the used
     String ending = ENDPOINT + "r/" + subredditName;
 
     // change the endpoint based on which sorting option the user has selected
-    if (sortByCode != SORT_DEFAULT && sortByCode <= sortByMethods.length) {
+    if (sortType != Companion.getSORT_DEFAULT() && sortType <= sortByMethods.length) {
       // build the appropriate endpoint based on the "sort by" code and time scope
-      ending += "/" + sortByMethods[sortByCode - 1];
+      ending += "/" + sortByMethods[sortType - 1];
 
       // add the scope to the query string if it has been selected
-      if (sortScopeCode != PostRepository.SCOPE_NONE) {
-        ending += "?t=" + sortScopes[sortScopeCode - 1];
+      if (sortScope != PostRepository.Companion.getSCOPE_NONE()) {
+        ending += "?t=" + sortScopes[sortScope - 1];
       }
     }
 
