@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- image displayed if the post is an image link -->
+    <ImageView
+        android:id="@+id/displaypost_preview"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/displaypost_image_height"/>
+
+    <!-- groups post data together -->
+    <RelativeLayout
+        android:theme="@style/ItemTheme"
+        android:id="@+id/display_post_postitem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_m"
+        android:layout_marginBottom="@dimen/displaypost_bottommargin"
+        android:background="@color/backgroundSecondary">
+
+        <TextView
+            android:id="@+id/postTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/title_size_m"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/postInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_spacing_s"
+            android:layout_marginBottom="@dimen/padding_m"
+            android:layout_below="@id/display_post_title"
+            android:textSize="@dimen/title_size_s"/>
+
+        <!-- card link displayed if the post is a link to another site -->
+        <android.support.v7.widget.CardView
+            android:id="@+id/display_post_linkcard"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/card_thumbnail_size"
+            android:layout_marginBottom="@dimen/padding_m"
+            android:layout_below="@id/display_post_info">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/padding_m">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/card_thumbnail_size"
+                    android:padding="@dimen/card_padding_small"
+                    android:textSize="@dimen/title_size_s"/>
+
+                <ImageView
+                    android:id="@+id/display_post_card_thumbnail"
+                    android:layout_width="@dimen/card_thumbnail_size"
+                    android:layout_height="@dimen/card_thumbnail_size"
+                    android:layout_alignParentEnd="true"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/postSelfText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/padding_m"
+            android:lineSpacingMultiplier="@dimen/line_spacing_s"
+            android:layout_below="@id/display_post_linkcard"
+            android:textSize="@dimen/title_size_s"/>
+
+        <ImageView
+            android:id="@+id/postUpvote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postSelfText"/>
+
+        <android.support.design.chip.Chip
+            android:id="@+id/postVoteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postSelfText"
+            android:layout_toEndOf="@id/postUpvote"/>
+
+        <ImageView
+            android:id="@+id/postDownvote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postSelfText"
+            android:layout_toEndOf="@id/postVoteCount"/>
+
+        <TextView
+            android:id="@+id/postCommentCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postSelfText"
+            android:layout_toEndOf="@id/postDownvote"/>
+
+        <TextView
+            android:id="@+id/postReply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postSelfText"
+            android:layout_alignParentEnd="true"
+            android:text="@string/reply"/>
+
+    </RelativeLayout>
+</RelativeLayout>

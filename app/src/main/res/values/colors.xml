@@ -7,10 +7,10 @@
     <color name="pastel">#C1E0F7</color>
 
     <color name="primaryText">#b4bbc6</color>
-    <color name="background">#35373a</color>
+    <color name="background">#2c333d</color>
 
-    <color name="backgroundSecondary">#414f66</color>
-    <color name="backgroundSecondaryB">#334154</color>
+    <color name="backgroundSecondary">#304c72</color>
+    <color name="backgroundSecondaryB">#2a3e5b</color>
 
 
     <color name="darkGray">#384559</color>
@@ -18,7 +18,7 @@
 
     <color name="paleGray">#afafaf</color>
     <color name="paleBlueGray">#717375</color>
-    <color name="paleDarkGray">#313947</color>
+    <color name="paleDarkGray">#2c333d</color>
 
     <color name="lightGray">#6c7584</color>
     <color name="icon_color">@color/lightGray</color>

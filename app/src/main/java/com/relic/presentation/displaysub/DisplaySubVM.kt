@@ -53,17 +53,16 @@ class DisplaySubVM (
                 // TODO add a livedata boolean success listener
                 // TODO add a flag for the to check if retrieval occured
             } else {
-                Log.d(
-                        TAG,
-                        postModels!!.size.toString() + " posts retrieved were from the network"
-                )
+                Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")
                 _postListMediator.setValue(postModels)
             }
         }
 
         // TODO: STILL TESTING retrieve the banner image from the subredddit css
-        subRepo.subGateway.getAdditionalSubInfo(subName)
-        subRepo.subGateway.getSidebar(subName)
+        subRepo.subGateway.apply {
+            getAdditionalSubInfo(subName)
+            getSidebar(subName)
+        }
 
         //subRepo.getSubGateway().retrieveSubBanner(subName);
         _subredditMediator.addSource(subRepo.getSingleSub(subName)) { newModel ->
@@ -136,6 +135,9 @@ class DisplaySubVM (
         }
     }
 
+
+    // region view action delegate
+
     override fun visitPost(postFullname: String) {
         postRepo.postGateway.visitPost(postFullname)
 
@@ -161,4 +163,6 @@ class DisplaySubVM (
             value = null
         }
     }
+
+    // end region view action delegate
 }

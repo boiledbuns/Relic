@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/card_thumbnail_size"
+    android:layout_marginBottom="@dimen/padding_m"
+    android:layout_below="@id/display_post_info">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/padding_m">
+
+        <TextView
+            android:id="@+id/postLinkUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/card_thumbnail_size"
+            android:padding="@dimen/card_padding_small"
+            android:textSize="@dimen/title_size_s"/>
+
+        <ImageView
+            android:id="@+id/postLinkThumbnail"
+            android:layout_width="@dimen/card_thumbnail_size"
+            android:layout_height="@dimen/card_thumbnail_size"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

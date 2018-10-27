@@ -37,61 +37,18 @@ import java.util.Arrays
 
 class DisplayPostView : Fragment() {
 
-    companion object {
-        private val picEndings = Arrays.asList("jpg", "png")
-
-        /**
-         * Bind this method to the preview image to automatically load the image into it
-         * @param imgView imageview to hold the preview image
-         * @param previewThumbnail url of the thumbnail image
-         * @param previewFullImage url of the full image
-         */
-        @JvmStatic
-        @BindingAdapter("bind:previewThumbnail", "bind:previewFullImage")
-        fun LoadPreviewImage(
-                imgView: ImageView,
-                previewThumbnail: String?,
-                previewFullImage: String?
-        ) {
-            //    String linkUrl = postModel.getDomain();
-            //    boolean notEmpty = !linkUrl.isEmpty();
-            //    List <String> validUrls = Arrays.asList("self", "i.re");
-            //
-            //    if (notEmpty && !validUrls.contains(linkUrl.substring(0, 4))) {
-            //      // loads the card image
-            //      Log.d(TAG, linkUrl.substring(0, 4) + "");
-            //      Picasso.get().load(postModel.getThumbnail()).fit().centerCrop().into(displayPostBinding.displayPostCardThumbnail);
-            //    }
-            //    else {
-            //      String fullUrl = postModel.getUrl();
-            //      // load the full image for the image
-            //      if (picEndings.contains(fullUrl.substring(fullUrl.length() - 3))) {
-            //        try {
-            //          Picasso.get().load(fullUrl).fit().centerCrop().into(displayPostBinding.displaypostPreview);
-            //        }
-            //        catch (Error error) {
-            //          Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString());
-            //        }
-            //      }
-            //    }
-        }
-    }
-
+    private val picEndings = Arrays.asList("jpg", "png")
     private val TAG = "DISPLAYPOST_VIEW"
 
     private val displayPostVM : DisplayPostVM by lazy {
-        initializeVM()
-    }
-
-    private fun initializeVM() : DisplayPostVM {
-        return ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 // construct & inject editor VM
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
                         .build()
-                        .getDisplayPostVM().create(subredditName!!, postFullname!!) as T
+                        .getDisplayPostVM().create(subredditName, postFullname!!) as T
             }
         }).get(DisplayPostVM::class.java)
     }
@@ -222,6 +179,7 @@ class DisplayPostView : Fragment() {
         swipeRefreshLayout!!.setOnRefreshListener { displayPostVM!!.refresh() }
     }
 
+    // TODO move concern into vm
     private fun loadLinkPreview(postModel: PostModel) {
         val linkUrl = postModel.domain
         val notEmpty = !linkUrl.isEmpty()
@@ -232,7 +190,7 @@ class DisplayPostView : Fragment() {
         if (notEmpty && !validUrls.contains(linkUrl.substring(0, 4))) {
             // loads the card image
             Picasso.get().load(postModel.thumbnail).fit().centerCrop()
-                    .into(displayPostBinding!!.displayPostCardThumbnail)
+                    .into(displayPostBinding.displayPostCardThumbnail)
         } else {
             val fullUrl = postModel.url
             // load the full image for the image

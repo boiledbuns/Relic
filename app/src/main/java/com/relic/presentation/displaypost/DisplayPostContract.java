@@ -35,4 +35,9 @@ public interface DisplayPostContract {
 
     void voteOnPost(String postFullname, int voteValue);
   }
+
+  interface PostViewDelegate {
+
+  }
 }
+

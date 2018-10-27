@@ -1,13 +1,5 @@
 package com.relic.presentation.displaysub
 
-import android.arch.lifecycle.LiveData
-import android.view.View
-
-import com.relic.data.PostRepository
-import com.relic.data.SubRepository
-import com.relic.data.models.PostModel
-import com.relic.data.models.SubredditModel
-
 interface DisplaySubContract {
     interface ViewModel {
         fun changeSortingMethod(sortingCode: Int, sortScope: Int)
