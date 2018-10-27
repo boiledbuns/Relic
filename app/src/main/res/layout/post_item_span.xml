@@ -146,7 +146,7 @@
         android:src="@drawable/ic_comment"/>
 
     <TextView
-        android:id="@+id/postCommentCount"
+        android:id="@+id/postCommentCountView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/postBodyView"

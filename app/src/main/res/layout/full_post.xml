@@ -6,7 +6,7 @@
 
     <!-- image displayed if the post is an image link -->
     <ImageView
-        android:id="@+id/displaypost_preview"
+        android:id="@+id/postImageView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/displaypost_image_height"/>
 
@@ -21,7 +21,7 @@
         android:background="@color/backgroundSecondary">
 
         <TextView
-            android:id="@+id/postTitle"
+            android:id="@+id/postTitleView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/title_size_m"
@@ -29,12 +29,12 @@
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/postInfo"
+            android:id="@+id/postInfoView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_spacing_s"
             android:layout_marginBottom="@dimen/padding_m"
-            android:layout_below="@id/display_post_title"
+            android:layout_below="@id/postTitleView"
             android:textSize="@dimen/title_size_s"/>
 
         <!-- card link displayed if the post is a link to another site -->
@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_thumbnail_size"
             android:layout_marginBottom="@dimen/padding_m"
-            android:layout_below="@id/display_post_info">
+            android:layout_below="@id/postInfoView">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -78,34 +78,34 @@
             android:textSize="@dimen/title_size_s"/>
 
         <ImageView
-            android:id="@+id/postUpvote"
+            android:id="@+id/postUpvoteView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/postSelfText"/>
 
         <android.support.design.chip.Chip
-            android:id="@+id/postVoteCount"
+            android:id="@+id/postVoteCountView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/postSelfText"
-            android:layout_toEndOf="@id/postUpvote"/>
+            android:layout_toEndOf="@id/postUpvoteView"/>
 
         <ImageView
-            android:id="@+id/postDownvote"
+            android:id="@+id/postDownvoteView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/postSelfText"
-            android:layout_toEndOf="@id/postVoteCount"/>
+            android:layout_toEndOf="@id/postVoteCountView"/>
 
         <TextView
-            android:id="@+id/postCommentCount"
+            android:id="@+id/postCommentCountView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/postSelfText"
-            android:layout_toEndOf="@id/postDownvote"/>
+            android:layout_toEndOf="@id/postDownvoteView"/>
 
         <TextView
-            android:id="@+id/postReply"
+            android:id="@+id/postReplyView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/postSelfText"

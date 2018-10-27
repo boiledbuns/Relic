@@ -3,7 +3,6 @@ package com.relic.presentation.displaypost
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.databinding.BindingAdapter
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -18,26 +17,22 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.data.gateway.UserGatewayImpl
+import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
-import com.relic.databinding.DisplayPostBinding
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.adapter.CommentAdapter
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
+import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
-import com.squareup.picasso.Picasso
-
-import java.util.Arrays
+import kotlinx.android.synthetic.main.display_post.*
 
 class DisplayPostView : Fragment() {
-
-    private val picEndings = Arrays.asList("jpg", "png")
     private val TAG = "DISPLAYPOST_VIEW"
 
     private val displayPostVM : DisplayPostVM by lazy {
@@ -53,12 +48,9 @@ class DisplayPostView : Fragment() {
         }).get(DisplayPostVM::class.java)
     }
 
-    private lateinit var displayPostBinding: DisplayPostBinding
-
-    private var contentView: View? = null
+    private lateinit var rootView : View
     private var myToolbar: Toolbar? = null
-    private var commentAdapter: CommentAdapter? = null
-    private var swipeRefreshLayout: SwipeRefreshLayout? = null
+    private lateinit var commentAdapter: CommentAdapter
 
     private lateinit var postFullname: String
     private lateinit var subredditName: String
@@ -85,27 +77,24 @@ class DisplayPostView : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        displayPostBinding = DataBindingUtil.inflate(inflater, R.layout.display_post, container, false)
 
-        contentView = displayPostBinding.root
+        rootView = inflater.inflate(R.layout.display_post, container, false).apply {
 
-        displayPostBinding.root.findViewById <Toolbar> (R.id.display_post_toolbar).apply {
-            myToolbar = this
-            title = subredditName
-            inflateMenu(R.menu.display_post_menu)
+            findViewById<Toolbar>(R.id.display_post_toolbar).apply {
+                myToolbar = this
+                title = subredditName
+                inflateMenu(R.menu.display_post_menu)
+            }
+
+            findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
+                commentAdapter = CommentAdapter(displayPostVM)
+                adapter = commentAdapter
+            }
         }
 
-        commentAdapter = CommentAdapter(displayPostVM)
-        displayPostBinding.displayCommentsRecyclerview.adapter = commentAdapter
-        displayPostBinding.displayCommentsRecyclerview.itemAnimator = null
-
-        // get a reference to the swipe refresh layout and attach the scroll listeners
-        swipeRefreshLayout = displayPostBinding.root.findViewById(R.id.postitem_swiperefresh)
         attachScrollListeners()
 
-        initializeOnClicks()
-
-        return displayPostBinding.root
+        return rootView
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -123,39 +112,28 @@ class DisplayPostView : Fragment() {
      */
     private fun bindViewModel() {
         // Observe the post exposed by the VM
-        displayPostVM.post.observe(this) { postModel ->
-            if (postModel != null) {
-                displayPostBinding.postItem = postModel
-
-                // load the image or link card based on the type of link
-                loadLinkPreview(postModel)
-
-                if (postModel.commentCount == 0) {
-                    // hide the loading icon if some comments have been loaded
-                    displayPostBinding!!.displayPostLoadingComments.visibility = View.GONE
-
-                    // TODO show the no comment image if this sub has no comments
-                    Snackbar.make(
-                            displayPostBinding!!.root,
-                            "No comments for this post",
-                            Snackbar.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
+        displayPostVM.post.nonNull().observe(this) { displayPost(it) }
 
         // Observe the list of comments exposed by the VM
-        displayPostVM.commentList.observe(this) { commentModels ->
-            // notify the adapter and set the new list
-            if (commentModels != null) {
-                commentAdapter!!.setComments(commentModels)
-                Log.d(TAG, "Comments " + commentModels.size)
-                swipeRefreshLayout!!.isRefreshing = false
+        displayPostVM.commentList.nonNull().observe(this) { displayComments(it) }
+    }
 
-                // hide the loading icon if some comments have been loaded
-                displayPostBinding.displayPostLoadingComments.visibility = View.GONE
-            }
+    private fun displayPost (postModel : PostModel) {
+        fullPostView.setPost(postModel, displayPostVM)
+
+        if (postModel.commentCount > 0) {
+            // TODO show the no comment image if this sub has no comments
+            // hide the loading icon if some comments have been loaded
+            Snackbar.make(displayPostRootView, "No comments for this post", Snackbar.LENGTH_SHORT).show()
         }
+    }
+
+    private fun displayComments(commentList : List<CommentModel>) {
+        // notify the adapter and set the new list
+        commentAdapter.setComments(commentList)
+        displayPostSwipeRefresh.isRefreshing = false
+
+        // hide the loading icon if some comments have been loaded
     }
 
     /**
@@ -163,55 +141,27 @@ class DisplayPostView : Fragment() {
      * is scrolled all the way to the bottom
      */
     private fun attachScrollListeners() {
-        displayPostBinding.displayCommentsRecyclerview.addOnScrollListener(object :
-                RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
+        rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView)
+                .addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
 
-                // if recyclerview reaches bottom
-                if (!recyclerView.canScrollVertically(1)) {
-                    Log.d(TAG, "Bottom reached")
-                    displayPostVM.retrieveMoreComments(false)
-                }
-            }
-        })
+                        // if recyclerview reaches bottom
+                        if (!recyclerView.canScrollVertically(1)) {
+                            Log.d(TAG, "Bottom reached")
+                            displayPostVM.retrieveMoreComments(false)
+                        }
+                    }
+                })
 
-        swipeRefreshLayout!!.setOnRefreshListener { displayPostVM!!.refresh() }
-    }
-
-    // TODO move concern into vm
-    private fun loadLinkPreview(postModel: PostModel) {
-        val linkUrl = postModel.domain
-        val notEmpty = !linkUrl.isEmpty()
-        var isImage = false
-        val validUrls = Arrays.asList("self", "i.re")
-        Log.d(TAG, linkUrl.substring(0, 4))
-
-        if (notEmpty && !validUrls.contains(linkUrl.substring(0, 4))) {
-            // loads the card image
-            Picasso.get().load(postModel.thumbnail).fit().centerCrop()
-                    .into(displayPostBinding.displayPostCardThumbnail)
-        } else {
-            val fullUrl = postModel.url
-            // load the full image for the image
-            if (picEndings.contains(fullUrl.substring(fullUrl.length - 3))) {
-                try {
-                    Picasso.get().load(fullUrl).fit().centerCrop()
-                            .into(displayPostBinding!!.displaypostPreview)
-                    isImage = true
-                } catch (error: Error) {
-                    Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString())
-                }
-            }
-        }
-
-        displayPostBinding.isImage = isImage
+        rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh)
+                .setOnRefreshListener { displayPostVM.refresh() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater!!.inflate(R.menu.display_post_menu, menu)
+        inflater?.inflate(R.menu.display_post_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -229,25 +179,17 @@ class DisplayPostView : Fragment() {
     private fun openPostReplyEditor(fullname: String?) {
         Log.d(TAG, "reply button pressed")
 
-        // add the subreddit object to the bundle
-        val bundle = Bundle()
-        bundle.putString(EditorView.SUBNAME_ARG, subredditName)
-        bundle.putString(EditorView.FULLNAME_ARG, fullname)
-        bundle.putInt(EditorView.PARENT_TYPE_KEY, EditorContract.VM.POST_PARENT)
-
         val subFrag = EditorView()
-        subFrag.arguments = bundle
+
+        // add the subreddit object to the bundle
+        subFrag.arguments = Bundle().apply {
+            putString(EditorView.SUBNAME_ARG, subredditName)
+            putString(EditorView.FULLNAME_ARG, fullname)
+            putInt(EditorView.PARENT_TYPE_KEY, EditorContract.VM.POST_PARENT)
+        }
 
         // replace the current screen with the newly created fragment
         activity!!.supportFragmentManager.beginTransaction()
                 .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit()
-    }
-
-    /**
-     * initialize main onclicks for the post
-     */
-    private fun initializeOnClicks() {
-        contentView!!.findViewById<View>(R.id.display_post_reply)
-                .setOnClickListener { view: View -> openPostReplyEditor(postFullname) }
     }
 }

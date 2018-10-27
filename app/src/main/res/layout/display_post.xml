@@ -1,195 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/displayPostRootView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <data>
-        <import type="android.view.View"/>
-        <import type="android.text.Html"/>
-
-        <variable
-            name="isImage"
-            type="Boolean"/>
-        <variable
-            name="postItem"
-            type="com.relic.data.models.PostModel"/>
-    </data>
-
-    <android.support.design.widget.CoordinatorLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <include layout="@layout/relic_toolbar"
+                 android:id="@+id/display_post_toolbar"
+                 android:layout_width="match_parent"
+                 android:layout_height="@dimen/toolbar_height"
+                 android:elevation="8dp"/>
 
-            <include layout="@layout/relic_toolbar"
-                     android:id="@+id/display_post_toolbar"
-                     android:layout_width="match_parent"
-                     android:layout_height="@dimen/toolbar_height"
-                     android:elevation="8dp"/>
+    </android.support.design.widget.AppBarLayout>
 
-        </android.support.design.widget.AppBarLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/displayPostSwipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/postitem_swiperefresh"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/displaypost_nestedscroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:scrollbars="none">
 
-            <android.support.v4.widget.NestedScrollView
-                android:id="@+id/displaypost_nestedscroll"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                android:scrollbars="none">
+                android:orientation="vertical"
+                android:fitsSystemWindows="true">
 
-                <LinearLayout
+                <com.relic.presentation.displaypost.FullPostView
+                    android:id="@+id/fullPostView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <!-- recyclerview for the comments -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/postCommentRecyclerView"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:fitsSystemWindows="true">
+                    android:layout_height="wrap_content"/>
 
-                    <!-- image displayed if the post is an image link -->
-                    <ImageView
-                        android:id="@+id/displaypost_preview"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/displaypost_image_height"
-                        android:visibility="@{isImage ? View.VISIBLE : View.GONE}"/>
+            </LinearLayout>
 
-                    <!-- groups post data together -->
-                    <RelativeLayout
-                        android:theme="@style/ItemTheme"
-                        android:id="@+id/display_post_postitem"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/padding_m"
-                        android:layout_marginBottom="@dimen/displaypost_bottommargin"
-                        android:background="@color/backgroundSecondary">
+        </android.support.v4.widget.NestedScrollView>
 
-                        <TextView
-                            android:id="@+id/display_post_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/title_size_m"
-                            android:fontFamily="sans-serif"
-                            android:textStyle="bold"
-                            android:text="@{postItem.title}"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
-                        <TextView
-                            android:id="@+id/display_post_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/text_spacing_s"
-                            android:layout_marginBottom="@dimen/padding_m"
-                            android:layout_below="@id/display_post_title"
-                            android:textSize="@dimen/title_size_s"
-                            android:text="@{postItem.author + `   ` +  postItem.created}"/>
-
-                        <!-- card link displayed if the post is a link to another site -->
-                        <android.support.v7.widget.CardView
-                            android:id="@+id/display_post_linkcard"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/card_thumbnail_size"
-                            android:layout_marginBottom="@dimen/padding_m"
-                            android:layout_below="@id/display_post_info"
-                            android:visibility="@{isImage ? View.GONE : View.VISIBLE}">
-
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:paddingStart="@dimen/padding_m">
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_centerVertical="true"
-                                    android:layout_marginEnd="@dimen/card_thumbnail_size"
-                                    android:padding="@dimen/card_padding_small"
-                                    android:textSize="@dimen/title_size_s"
-                                    android:text="@{postItem.url}"/>
-
-                                <ImageView
-                                    android:id="@+id/display_post_card_thumbnail"
-                                    android:layout_width="@dimen/card_thumbnail_size"
-                                    android:layout_height="@dimen/card_thumbnail_size"
-                                    android:layout_alignParentEnd="true"/>
-
-                            </RelativeLayout>
-
-                        </android.support.v7.widget.CardView>
-
-                        <TextView
-                            android:id="@+id/display_post_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="@dimen/padding_m"
-                            android:lineSpacingMultiplier="@dimen/line_spacing_s"
-                            android:layout_below="@id/display_post_linkcard"
-                            android:textSize="@dimen/title_size_s"
-                            android:text="@{postItem.htmlSelfText}"/>
-
-                        <ImageView
-                            android:id="@+id/display_post_upvote"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_text"
-                            android:src="@{(postItem.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
-
-                        <android.support.design.chip.Chip
-                            android:id="@+id/display_post_votes"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_text"
-                            android:layout_toEndOf="@id/display_post_upvote"
-                            app:chipText="@{Integer.toString(postItem.score)}"
-                            app:chipBackgroundColor="?attr/colorAccent"/>
-
-                        <ImageView
-                            android:id="@+id/display_post_downvote"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_text"
-                            android:layout_toEndOf="@id/display_post_votes"
-                            android:src="@{(postItem.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_text"
-                            android:layout_toEndOf="@id/display_post_downvote"
-                            android:text="@{postItem.commentCount + ` comments`}"/>
-
-                        <TextView
-                            android:id="@+id/display_post_reply"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/display_post_text"
-                            android:layout_alignParentEnd="true"
-                            android:text="@string/reply"/>
-
-                    </RelativeLayout>
-
-                    <ProgressBar
-                        android:id="@+id/display_post_loadingComments"
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"/>
-
-                    <!-- recyclerview for the comments -->
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/display_comments_recyclerview"
-                        android:nestedScrollingEnabled="false"
-                        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-            </android.support.v4.widget.NestedScrollView>
-
-        </android.support.v4.widget.SwipeRefreshLayout>
-
-    </android.support.design.widget.CoordinatorLayout>
-
-</layout>
+</android.support.design.widget.CoordinatorLayout>

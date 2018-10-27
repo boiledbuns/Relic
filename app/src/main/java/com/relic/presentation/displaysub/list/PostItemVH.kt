@@ -73,7 +73,7 @@ class PostItemVH (
             }
 
             postScore.text = postModel.score.toString()
-            postCommentCount.text = postModel.commentCount.toString()
+            postCommentCountView.text = postModel.commentCount.toString()
         }
 
         itemPosition = position

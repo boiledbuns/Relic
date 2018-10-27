@@ -20,7 +20,7 @@ class DisplayPostVM (
         private val listingRepo: ListingRepository,
         private val subName: String,
         private val postFullname: String
-): ViewModel(), DisplayPostContract.ViewModel {
+): ViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,

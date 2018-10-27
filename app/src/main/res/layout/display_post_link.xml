@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/card_thumbnail_size"
-    android:layout_marginBottom="@dimen/padding_m"
-    android:layout_below="@id/display_post_info">
+    android:layout_marginBottom="@dimen/padding_m">
 
     <RelativeLayout
         android:layout_width="match_parent"
