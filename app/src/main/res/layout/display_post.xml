@@ -11,10 +11,10 @@
         android:layout_height="wrap_content">
 
         <include layout="@layout/relic_toolbar"
-                 android:id="@+id/display_post_toolbar"
-                 android:layout_width="match_parent"
-                 android:layout_height="@dimen/toolbar_height"
-                 android:elevation="8dp"/>
+             android:id="@+id/display_post_toolbar"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/toolbar_height"
+             android:elevation="8dp"/>
 
     </android.support.design.widget.AppBarLayout>
 

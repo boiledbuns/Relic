@@ -99,10 +99,12 @@ class DisplaySubVM (
         postRepo.clearAllSubPosts(subName)
     }
 
-    override fun onNextListing(nextVal: String) {
+    override fun onNextListing(nextVal: String?) {
         Log.d(TAG, "Retrieving next posts with $nextVal")
         // retrieve the "after" value for the next posting
-        postRepo.retrieveMorePosts(subName, nextVal)
+        nextVal?.let {
+            postRepo.retrieveMorePosts(subName, it)
+        }
     }
 
     override fun updateSubStatus(toSubscribe: Boolean) {

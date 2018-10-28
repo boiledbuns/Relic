@@ -24,5 +24,7 @@
     <color name="icon_color">@color/lightGray</color>
 
     <color name="warning">#9c0436</color>
+    <color name="darken_background">#000000</color>
+
 
 </resources>

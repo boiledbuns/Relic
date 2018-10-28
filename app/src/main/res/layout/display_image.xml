@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@style/AlertDialog.AppCompat"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
     <RelativeLayout
-        android:theme="@style/AlertDialog.AppCompat"
+        android:id="@+id/fullImageBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:background="@color/darken_background"
+        android:alpha="0.5"/>
 
-        <ImageView
-            android:id="@+id/displayimage_imageview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/displayimage_margin"
-            android:layout_centerVertical="true"/>
-    </RelativeLayout>
-</layout>
+    <!--<ImageView-->
+        <!--android:id="@+id/fullImage"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/displayimage_margin"-->
+        <!--android:layout_centerVertical="true"/>-->
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/fullImage"
+        android:fitsSystemWindows="true"
+        android:padding="@dimen/displayimage_margin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"/>
+</RelativeLayout>

@@ -15,10 +15,10 @@
           app:showAsAction="always">
 
         <menu>
+            <item android:id="@+id/post_sort_new" android:title="@string/sortby_new" app:showAsAction="withText"/>
             <item android:id="@+id/post_sort_best" android:title="@string/sortby_best" app:showAsAction="withText"/>
             <!-- has submenu -->
             <item android:id="@+id/post_sort_hot" android:title="@string/sortby_hot" app:showAsAction="withText"><menu/></item>
-            <item android:id="@+id/post_sort_new" android:title="@string/sortby_new" app:showAsAction="withText"><menu/></item>
             <item android:id="@+id/post_sort_rising" android:title="@string/sortby_rising" app:showAsAction="withText"><menu/></item>
             <item android:id="@+id/post_sort_top" android:title="@string/sortby_top" app:showAsAction="withText"><menu/></item>
             <!-- end of has submenu -->

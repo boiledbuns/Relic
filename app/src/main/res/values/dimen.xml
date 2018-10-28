@@ -98,4 +98,7 @@
     <dimen name="text_m">15sp</dimen>
     <dimen name="text_l">18sp</dimen>
 
+    <dimen name="darken_background">0.5</dimen>
+
+
 </resources>

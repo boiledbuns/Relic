@@ -47,7 +47,6 @@ public class PostRepositoryImpl implements PostRepository {
   private NetworkRequestManager requestManager;
   private int currentSortingCode = PostRepository.Companion.getSORT_HOT();
 
-
   @Inject
   public PostRepositoryImpl(Context context, NetworkRequestManager networkRequestManager) {
     currentContext = context;
@@ -126,11 +125,10 @@ public class PostRepositoryImpl implements PostRepository {
     // change the endpoint based on which sorting option the user has selected
     if (sortType != Companion.getSORT_DEFAULT() && sortType <= sortByMethods.length) {
       // build the appropriate endpoint based on the "sort by" code and time scope
-      ending += "/" + sortByMethods[sortType - 1];
-
+      ending += "/" + sortByMethods[sortType - 1] + "/?sort=" + sortByMethods[sortType - 1];
       // add the scope to the query string if it has been selected
       if (sortScope != PostRepository.Companion.getSCOPE_NONE()) {
-        ending += "?t=" + sortScopes[sortScope - 1];
+        ending += "&t=" + sortScopes[sortScope - 1];
       }
     }
 

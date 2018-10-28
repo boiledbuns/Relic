@@ -93,7 +93,6 @@ class DisplaySubView : Fragment() {
             adapter = postAdapter
             itemAnimator = null
             layoutManager = LinearLayoutManager(context)
-//            (layoutManager as LinearLayoutManager).onRestoreInstanceState(listManagerState)
         }
 
         toolbar.apply {
@@ -153,7 +152,7 @@ class DisplaySubView : Fragment() {
             val sortTypeMenu = menu?.getItem(1)?.subMenu
 
             // inflate only sorting types that have a sub scope menu
-            val menuWithSubMenu = listOf(1, 2, 3, 4)
+            val menuWithSubMenu = listOf(2, 3, 4)
             for (i in menuWithSubMenu) {
                 inflate(R.menu.order_scope_menu, sortTypeMenu?.getItem(i)?.subMenu)
             }
