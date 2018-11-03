@@ -24,6 +24,7 @@ import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
+import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.adapter.CommentAdapter
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
@@ -42,7 +43,7 @@ class DisplayPostView : Fragment() {
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
                         .build()
-                        .getDisplayPostVM().create(subredditName, postFullName!!) as T
+                        .getDisplayPostVM().create(subredditName, postFullName) as T
             }
         }).get(DisplayPostVM::class.java)
     }
@@ -58,16 +59,9 @@ class DisplayPostView : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.apply {
-            getString("full_name")?.let {
-                postFullName = it
-            }
-            getString("subreddit")?.let {
-                subredditName = it
-            }
+            getString("full_name")?.let { postFullName = it }
+            getString("subreddit")?.let { subredditName = it }
         }
-
-        // parse the full name of the post to be displayed
-        Log.d(TAG, "Post fullname : " + postFullName!!)
         bindViewModel()
     }
 
@@ -89,10 +83,11 @@ class DisplayPostView : Fragment() {
                 commentAdapter = CommentAdapter(displayPostVM)
                 adapter = commentAdapter
             }
+
+            findViewById<FullPostView>(R.id.fullPostView).initializeOnClicks(displayPostVM)
         }
 
         attachScrollListeners()
-
         return rootView
     }
 
@@ -110,8 +105,9 @@ class DisplayPostView : Fragment() {
      * subscribes the view to the data exposed by the viewmodel
      */
     private fun bindViewModel() {
-        displayPostVM.post.nonNull().observe(this) { displayPost(it) }
-        displayPostVM.commentList.nonNull().observe(this) { displayComments(it) }
+        displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
+        displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
+        displayPostVM.postNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
     }
 
     private fun displayPost (postModel : PostModel) {
@@ -168,6 +164,27 @@ class DisplayPostView : Fragment() {
         }
 
         return override
+    }
+
+    private fun handleNavigation(navigationData : PostNavigationData) {
+        when (navigationData) {
+            is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
+        }
+    }
+
+    private fun openImage(imageUrl : String) {
+        val displayImageFragment = DisplayImageFragment()
+
+        Bundle().apply {
+            putString("image_url", imageUrl)
+            displayImageFragment.arguments = this
+        }
+
+        activity!!.supportFragmentManager
+                .beginTransaction()
+                .add(R.id.main_content_frame, displayImageFragment)
+                .addToBackStack(TAG)
+                .commit()
     }
 
     private fun openPostReplyEditor(fullname: String?) {

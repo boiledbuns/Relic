@@ -2,7 +2,6 @@ package com.relic.presentation.displaypost
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
@@ -10,7 +9,6 @@ import com.relic.R
 import com.relic.data.models.PostModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
-import java.util.Arrays
 
 class FullPostView @JvmOverloads constructor(
         context : Context,
@@ -26,6 +24,12 @@ class FullPostView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
+    fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
+        postImageView.setOnClickListener { viewDelegate.onImagePressed() }
+        postUpvoteView.setOnClickListener { viewDelegate.onPostVoted(1) }
+        postDownvoteView.setOnClickListener { viewDelegate.onPostVoted(-1) }
+    }
+
     fun setPost(postModel : PostModel, isImage : Boolean, delegate : DisplayPostContract.PostViewDelegate) {
         viewDelegate = delegate
         displayImage = isImage
@@ -33,7 +37,10 @@ class FullPostView @JvmOverloads constructor(
         postModel.apply {
             postTitleView.text = title
             postInfoView.text = author
-            postSelfText.text = selftext
+            if (!selftext.isNullOrEmpty()) {
+                postSelfText.text = selftext
+                postSelfText.visibility = View.VISIBLE
+            }
 
             when (userUpvoted) {
                 1 -> {
@@ -66,9 +73,8 @@ class FullPostView @JvmOverloads constructor(
     private fun loadLinks(postModel : PostModel) {
         if (displayImage) {
             Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
+            postImageView.visibility = View.VISIBLE
         } else {
-            postImageView.visibility = View.GONE
-
             if (!postModel.thumbnail.isNullOrEmpty())  {
                 Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
                 postLinkUrl.text = postModel.url

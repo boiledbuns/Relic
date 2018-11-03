@@ -21,11 +21,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
   private final String TAG = "COMMENT_ADAPTER";
   private List<CommentModel> commentList;
 
-  private DisplayPostContract.ViewModel  displayPostVM;
+  private DisplayPostContract.PostViewDelegate delegate;
 
-  public CommentAdapter(DisplayPostContract.ViewModel viewmodel) {
+  public CommentAdapter(DisplayPostContract.PostViewDelegate postViewDelegate) {
     super();
-    displayPostVM = viewmodel;
+    delegate = postViewDelegate;
   }
 
   @NonNull
@@ -115,6 +115,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
     }
 
     /**
+     * TODO remove logic from these methods, bubble up to viewmodel
      * initializes databinding with onclicks to prevent polluting binding with unnecessary handler
      * objects for handling onclicks
      */
@@ -128,7 +129,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
         // optimistic, update copy cached in adapter and make request to api to update in server
         commentModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
+        delegate.onCommentVoted(commentModel.getId(), newStatus);
       });
 
       commentItemBinding.commentitemDownvote.setOnClickListener((View view) -> {
@@ -139,7 +140,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
         // optimistic, update copy cached in adapter and make request to api to update in server
         commentModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        displayPostVM.voteOnPost(commentModel.getId(), newStatus);
+        delegate.onCommentVoted(commentModel.getId(), newStatus);
       });
     }
   }

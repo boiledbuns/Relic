@@ -235,12 +235,13 @@ class DisplaySubView : Fragment() {
         }
 
         displaySubVM.navigationLivedata.nonNull().observe(this) { navigationData ->
-            if (navigationData is NavigationData.ToPost) {
-                val (postId, subredditName) = navigationData
-                PostItemOnClick().onClick(postId, subredditName)
-            } else if (navigationData is NavigationData.ToImage) {
-                val (thumbnail) = navigationData
-                OnClickImage().onClick(thumbnail)
+            when (navigationData) {
+                is NavigationData.ToPost -> {
+                    PostItemOnClick().onClick(navigationData.postId, navigationData.subredditName)
+                }
+                is NavigationData.ToImage -> {
+                    OnClickImage().onClick(navigationData.thumbnail)
+                }
             }
         }
     }

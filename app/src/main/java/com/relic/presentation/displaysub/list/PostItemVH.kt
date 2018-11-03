@@ -17,45 +17,31 @@ class PostItemVH (
 
     fun initializeOnClicks(adapter : PostItemAdapter) {
         itemView.apply {
-            itemView.setOnClickListener { adapter.onPostPressed(itemPosition) }
-            itemView.savedPostIconView.setOnClickListener { adapter.onPostSavePressed(itemPosition) }
-            itemView.postUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(itemPosition) }
-            itemView.postDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(itemPosition) }
-            itemView.postThumbnailView.setOnClickListener { adapter.onPostLinkPressed(itemPosition) }
-            itemView.postCommentView.setOnClickListener { }
+            setOnClickListener { adapter.onPostPressed(itemPosition) }
+            savedPostIconView.setOnClickListener { adapter.onPostSavePressed(itemPosition) }
+            postUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(itemPosition) }
+            postDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(itemPosition) }
+            postThumbnailView.setOnClickListener { adapter.onPostLinkPressed(itemPosition) }
+            postCommentView.setOnClickListener { }
         }
     }
 
     fun bindPost(postModel : PostModel, position: Int) {
         itemView.apply {
-            if (postModel.thumbnail.isNullOrBlank()) {
-                postThumbnailView.visibility = View.GONE
-
-            } else {
-                postThumbnailView.visibility = View.VISIBLE
-                postModel.thumbnail?.let{ setThumbnail(it) }
-            }
+            if (!postModel.thumbnail.isNullOrBlank()) setThumbnail(postModel.thumbnail)
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
             postDateView.text = postModel.created
             titleView.text = postModel.title
-            secondaryMetaTextview.text = resources
-                    .getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
+            setPostTags(postModel)
 
-            if (postModel.htmlSelfText.isNullOrEmpty()) {
-                postBodyView.visibility = View.GONE
-            }
-            else {
-                postBodyView.visibility = View.VISIBLE
+            if (!postModel.htmlSelfText.isNullOrEmpty()) {
                 postBodyView.text = postModel.htmlSelfText
+                postBodyView.visibility = View.VISIBLE
             }
 
-            if (postModel.isVisited) {
-                cardRootView.setBackgroundResource(R.color.backgroundSecondaryB)
-            }
-            else {
-                cardRootView.setBackgroundResource(R.color.backgroundSecondary)
-            }
+            cardRootView.setBackgroundResource(if (postModel.isVisited)
+                R.color.backgroundSecondary else R.color.backgroundSecondary)
 
             when (postModel.userUpvoted) {
                 1 -> {
@@ -75,7 +61,6 @@ class PostItemVH (
             postScore.text = postModel.score.toString()
             postCommentCountView.text = postModel.commentCount.toString()
         }
-
         itemPosition = position
     }
 
@@ -83,8 +68,20 @@ class PostItemVH (
         try {
             Log.d("POSTITEM_ADAPTER", "URL = $thumbnailUrl")
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(itemView.postThumbnailView)
+            itemView.postThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
             Log.d("POSTITEM_ADAPTER", "Issue loading image " + e.toString())
+        }
+    }
+
+    private fun setPostTags(postModel: PostModel) {
+        //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
+        itemView.secondaryMetaTextview.apply {
+            postModel.linkFlair?.let {
+                text = it
+                background?.setTint(resources.getColor(R.color.discussion_tag))
+                visibility = View.VISIBLE
+            }
         }
     }
 }

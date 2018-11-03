@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    android:id="@+id/fullPostRootView"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,7 +9,8 @@
     <ImageView
         android:id="@+id/postImageView"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/displaypost_image_height"/>
+        android:layout_height="@dimen/displaypost_image_height"
+        android:visibility="gone"/>
 
     <!-- groups post data together -->
     <RelativeLayout
@@ -79,6 +81,7 @@
             android:layout_marginBottom="@dimen/padding_m"
             android:lineSpacingMultiplier="@dimen/line_spacing_s"
             android:layout_below="@id/postLinkCard"
+            android:visibility="gone"
             android:textSize="@dimen/title_size_s"/>
 
         <ImageView

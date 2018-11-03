@@ -12,6 +12,7 @@ import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.util.RelicError
+import com.shopify.livedataktx.SingleLiveData
 import javax.inject.Inject
 
 class DisplayPostVM (
@@ -35,12 +36,16 @@ class DisplayPostVM (
     private val TAG = "DISPLAYPOST_VM"
     private val validImageEndings = listOf("jpg", "png")
 
-    private val postLiveData = MediatorLiveData<PostModel> ()
-    private val commentListLiveData = MediatorLiveData<List<CommentModel>> ()
-    private val _imageUrl = MutableLiveData<String> ()
+    private val _postLiveData = MediatorLiveData<PostModel> ()
+    private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()
+    private val _navigationLiveData = SingleLiveData<PostNavigationData>()
 
     private val commentListingKey = MediatorLiveData<String> ()
     private val error = MutableLiveData<RelicError>()
+
+    val postLiveData : LiveData<PostModel> =_postLiveData
+    val commentListLiveData : LiveData<List<CommentModel>> = _commentListLiveData
+    val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
 
     init {
         refresh()
@@ -49,39 +54,23 @@ class DisplayPostVM (
     }
 
     /**
-     * Exposes the post to the view
-     * @return post as livedata
-     */
-    override fun getPost(): LiveData<PostModel> {
-        return postLiveData
-    }
-
-    /**
-     * Exposes the list of comments to the view
-     * @return comment list as livedata
-     */
-    override fun getCommentList(): LiveData<List<CommentModel>> {
-        return commentListLiveData
-    }
-
-    /**
      * Add sources and listeners to all local livedata
      */
     private fun observeLivedata() {
         // retrieves the livedata post to be exposed to the view
-        postLiveData.addSource <PostModel>(postRepo.getPost(postFullname)) {
-            postLiveData.postValue(it)
+        _postLiveData.addSource <PostModel>(postRepo.getPost(postFullname)) {
+            _postLiveData.postValue(it)
         }
 
         // retrieve the comment list as livedata so that we can expose it to the view first
-        commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
+        _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
             comments?.let {
                 if (it.isEmpty()) {
                     // retrieve more comments if we detect that none are stored locally
                     commentRepo.retrieveComments(subName, postFullname, null)
                 } else {
                     // TODO add additional actions to trigger when comments loaded
-                    commentListLiveData.postValue(comments)
+                    _commentListLiveData.postValue(comments)
                 }
             }
         }
@@ -114,15 +103,27 @@ class DisplayPostVM (
         }
     }
 
-    override fun voteOnPost(postFullname: String, voteValue: Int) {
+    // -- region view action delegate --
+
+    override fun onPostVoted(voteValue: Int) {
         Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue)
         postRepo.postGateway.voteOnPost(postFullname, voteValue)
     }
 
+    override fun onCommentVoted(commentFullName: String, voteValue: Int) {
+
+    }
+
+    override fun onImagePressed() {
+        _navigationLiveData.value = PostNavigationData.ToImage(_postLiveData.value!!.thumbnail)
+    }
+
+    // -- end region view action delegate --
+
     fun isImage(): Boolean {
         var isImage = false
 
-        postLiveData.value?.url?.let {
+        _postLiveData.value?.url?.let {
             val lastThree = it.substring(it.length - 3)
             if (validImageEndings.contains(lastThree)) isImage = true
         }

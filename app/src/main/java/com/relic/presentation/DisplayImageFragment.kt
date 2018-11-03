@@ -9,6 +9,7 @@ import android.widget.ImageView
 
 import com.relic.R
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.display_image.view.*
 
 class DisplayImageFragment : Fragment() {
     private val IMAGE_KEY = "image_url"
