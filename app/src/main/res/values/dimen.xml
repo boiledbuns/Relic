@@ -81,6 +81,7 @@
     <dimen name="padding_xs">6dp</dimen>
     <dimen name="padding_s">8dp</dimen>
     <dimen name="padding_m">12dp</dimen>
+    <dimen name="padding_l">15dp</dimen>
 
     <dimen name="card_padding_small">6dp</dimen>
     <dimen name="card_thumbnail_size">80dp</dimen>
@@ -98,6 +99,8 @@
     <dimen name="text_m">15sp</dimen>
     <dimen name="text_m2">16sp</dimen>
     <dimen name="text_l">18sp</dimen>
+    <dimen name="title_text_l">23sp</dimen>
+    <dimen name="title_text_m">18sp</dimen>
 
     <dimen name="darken_background">0.5</dimen>
 

@@ -19,14 +19,14 @@ class SubInfoDialogVM (
     }
 
     private val _subredditLiveData = subRepo.getSingleSub(subredditName)
-    private val subredditLiveData : LiveData<SubredditModel> = _subredditLiveData
+    val subredditLiveData : LiveData<SubredditModel> = _subredditLiveData
 
     init {
-        //
+        subRepo.subGateway.getAdditionalSubInfo(subredditName)
     }
 
     fun updateSubscriptionStatus(subscribed: Boolean) {
-        // check if subreddit is currentylu pinned
+        // check if subreddit is currently pinned
     }
 
     fun pinSubreddit(pinned : Boolean) {

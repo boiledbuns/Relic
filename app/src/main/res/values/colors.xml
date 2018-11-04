@@ -29,4 +29,7 @@
     <color name="discussion_tag">#1A8B0C</color>
     <color name="negative_text">#ffffff</color>
 
+    <color name="positive">#1A8B0C</color>
+    <color name="negative">#be4345</color>
+
 </resources>

@@ -56,7 +56,14 @@ class CommentItemAdapter (
     // region onclick handler
 
     fun voteOnComment(itemPosition : Int, voteValue : Int) {
-        actionDelegate.onCommentVoted(commentList[itemPosition], voteValue)
+        commentList[itemPosition].also {
+            // determine the new vote value based on the current one and change the vote accordingly
+            val newStatus = actionDelegate.onCommentVoted(it, voteValue)
+
+            // optimistic, update copy cached in adapter and make request to api to update in server
+            it.userUpvoted = newStatus
+            notifyItemChanged(itemPosition)
+        }
     }
 
     fun replyToComment(itemPosition : Int) {

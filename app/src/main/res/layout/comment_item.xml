@@ -34,7 +34,8 @@
         android:layout_below="@id/commentAuthorView"
         android:paddingBottom="0dp"
         android:layout_marginTop="@dimen/text_spacing_s"
-        android:layout_marginBottom="0dp"/>
+        android:layout_marginBottom="0dp"
+        android:textSize="@dimen/text_m"/>
 
     <ImageView
         android:id="@+id/commentUpvoteView"

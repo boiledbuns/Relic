@@ -25,7 +25,6 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.DisplayImageFragment
-import com.relic.presentation.adapter.CommentAdapter
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView

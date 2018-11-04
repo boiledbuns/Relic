@@ -1,6 +1,8 @@
 package com.relic.presentation.displaypost.commentlist
 
+import android.os.Build
 import android.support.v7.widget.RecyclerView
+import android.text.Html
 import android.view.View
 import com.relic.R
 import com.relic.data.models.CommentModel
@@ -27,8 +29,18 @@ class CommentItemVH (
         commentItem.apply {
             commentScoreView.text = commentModel.score.toString()
             commentAuthorView.text = commentModel.author
-            commentBodyView.text = commentModel.body
             commentCreatedView.text = commentModel.created
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
+            } else {
+                commentBodyView.text = Html.fromHtml(commentModel.body)
+            }
+
+            if (commentModel.isSubmitter) {
+                commentAuthorView.setBackgroundResource(R.drawable.tag)
+                commentAuthorView.background?.setTint(resources.getColor(R.color.discussion_tag))
+            }
 
             when (commentModel.userUpvoted) {
                 1 -> {
