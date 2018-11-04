@@ -110,12 +110,26 @@ class DisplayPostVM (
         postRepo.postGateway.voteOnPost(postFullname, voteValue)
     }
 
-    override fun onCommentVoted(commentFullName: String, voteValue: Int) {
+    override fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int{
+        var newUserUpvoteValue = 0
+        when (voteValue) {
+            UPVOTE_PRESSED -> {
+                if (commentModel.userUpvoted != CommentModel.UPVOTE) newUserUpvoteValue = CommentModel.UPVOTE
+            }
+            DOWNVOTE_PRESSED -> {
+                if (commentModel.userUpvoted != CommentModel.DOWNVOTE) newUserUpvoteValue = CommentModel.DOWNVOTE
+            }
+        }
 
+        // send request only if value changed
+        if (newUserUpvoteValue != commentModel.userUpvoted) {
+            postRepo.postGateway.voteOnPost(commentModel.id, voteValue)
+        }
+        return newUserUpvoteValue
     }
 
     override fun onImagePressed() {
-        _navigationLiveData.value = PostNavigationData.ToImage(_postLiveData.value!!.thumbnail)
+        _navigationLiveData.value = PostNavigationData.ToImage(_postLiveData.value!!.url)
     }
 
     // -- end region view action delegate --

@@ -1,6 +1,10 @@
 package com.relic.data.models;
 
 public class CommentModel {
+  public static int UPVOTE = 1;
+  public static int DOWNVOTE = -1;
+  public static int NOVOTE = 0;
+
   private String id;
 
   public String author;

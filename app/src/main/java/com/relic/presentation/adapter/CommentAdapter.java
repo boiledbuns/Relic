@@ -129,7 +129,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
         // optimistic, update copy cached in adapter and make request to api to update in server
         commentModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        delegate.onCommentVoted(commentModel.getId(), newStatus);
+        delegate.onCommentVoted(commentModel, newStatus);
       });
 
       commentItemBinding.commentitemDownvote.setOnClickListener((View view) -> {
@@ -140,7 +140,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentI
         // optimistic, update copy cached in adapter and make request to api to update in server
         commentModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        delegate.onCommentVoted(commentModel.getId(), newStatus);
+        delegate.onCommentVoted(commentModel, newStatus);
       });
     }
   }

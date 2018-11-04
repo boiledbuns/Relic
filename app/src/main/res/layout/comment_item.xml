@@ -1,68 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-        <import type="android.text.Html"/>
-        <variable
-            name="commentModel"
-            type="com.relic.data.models.CommentModel"/>
-    </data>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp"
+    android:padding="@dimen/displaypost_rvpadding"
+    android:background="@color/backgroundSecondary">
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/commentScoreView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/displaypost_paddingside"/>
+
+    <TextView
+        android:id="@+id/commentAuthorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/displaypost_paddingside"
+        android:layout_toEndOf="@id/commentScoreView"/>
+
+    <TextView
+        android:id="@+id/commentCreatedView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/commentAuthorView"/>
+
+    <TextView
+        android:id="@+id/commentBodyView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="1dp"
-        android:padding="@dimen/displaypost_rvpadding"
-        android:background="@{@color/backgroundSecondary}">
+        android:layout_below="@id/commentAuthorView"
+        android:paddingBottom="0dp"
+        android:layout_marginTop="@dimen/text_spacing_s"
+        android:layout_marginBottom="0dp"/>
 
-        <TextView
-            android:id="@+id/commentitem_score"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/displaypost_paddingside"
-            android:text="@{`` + commentModel.score}"/>
+    <ImageView
+        android:id="@+id/commentUpvoteView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/commentBodyView"/>
 
-        <TextView
-            android:id="@+id/commentitem_author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/displaypost_paddingside"
-            android:layout_toEndOf="@id/commentitem_score"
-            android:text="@{commentModel.author}"/>
+    <ImageView
+        android:id="@+id/commentDownvoteView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/commentBodyView"
+        android:layout_toEndOf="@id/commentUpvoteView"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{commentModel.created}"
-            android:layout_toEndOf="@+id/commentitem_author"/>
-
-        <TextView
-            android:id="@+id/commentitem_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/commentitem_author"
-            android:text="@{Html.fromHtml(Html.fromHtml(commentModel.body).toString()).toString()}"
-            android:paddingBottom="0dp"
-            android:layout_marginTop="@dimen/text_spacing_s"
-            android:layout_marginBottom="0dp"/>
-
-        <ImageView
-            android:id="@+id/commentitem_upvote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/commentitem_body"
-            android:src="@{(commentModel.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
-
-        <ImageView
-            android:id="@+id/commentitem_downvote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/commentitem_body"
-            android:layout_toEndOf="@id/commentitem_upvote"
-            android:src="@{(commentModel.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
-
-    </RelativeLayout>
-
-</layout>
+</RelativeLayout>

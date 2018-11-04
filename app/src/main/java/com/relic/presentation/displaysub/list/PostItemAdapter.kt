@@ -12,13 +12,10 @@ class PostItemAdapter (
 ) : RecyclerView.Adapter <PostItemVH> () {
     private var postList: MutableList<PostModel> = ArrayList()
 
-    override fun getItemCount(): Int {
-        return postList.size
-    }
+    override fun getItemCount() = postList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
         return PostItemVH(RelicPostItem(parent.context)).apply {
-            bindPost(postList[position], position)
             initializeOnClicks(this@PostItemAdapter)
         }
     }
@@ -32,38 +29,32 @@ class PostItemAdapter (
     }
 
     fun setPostList(newPostList: MutableList<PostModel>) {
-        if (postList.size == 0) {
-            postList = newPostList
-            notifyItemRangeRemoved(0, newPostList.size)
-        } else {
-            // used to tell list what has changed
-            val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun getOldListSize(): Int {
-                    return postList.size
-                }
+        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int {
+                return postList.size
+            }
 
-                override fun getNewListSize(): Int {
-                    return newPostList.size
-                }
+            override fun getNewListSize(): Int {
+                return newPostList.size
+            }
 
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return postList[oldItemPosition].id == newPostList[newItemPosition].id
-                }
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return postList[oldItemPosition].id == newPostList[newItemPosition].id
+            }
 
-                override fun areContentsTheSame(
-                        oldItemPosition: Int,
-                        newItemPosition: Int
-                ): Boolean {
-                    val oldPost = postList[oldItemPosition]
-                    val newPost = newPostList[newItemPosition]
+            override fun areContentsTheSame(
+                    oldItemPosition: Int,
+                    newItemPosition: Int
+            ): Boolean {
+                val oldPost = postList[oldItemPosition]
+                val newPost = newPostList[newItemPosition]
 
-                    return oldPost.id == newPost.id && oldPost.isVisited == newPost.isVisited
-                }
-            })
-            // sets the new list as the current one
-            postList = newPostList
-            diffResult.dispatchUpdatesTo(this)
-        }
+                return oldPost.id == newPost.id && oldPost.isVisited == newPost.isVisited
+            }
+        }).dispatchUpdatesTo(this)
+
+        postList.clear()
+        postList.addAll(newPostList)
     }
 
     // start region for onclick handlers

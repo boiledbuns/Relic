@@ -1,9 +1,9 @@
 package com.relic.presentation.displaypost
 
-import android.arch.lifecycle.LiveData
-
 import com.relic.data.models.CommentModel
-import com.relic.data.models.PostModel
+
+const val UPVOTE_PRESSED = 1
+const val DOWNVOTE_PRESSED = -1
 
 interface DisplayPostContract {
 
@@ -18,13 +18,8 @@ interface DisplayPostContract {
 
     interface PostViewDelegate {
         fun onPostVoted(voteValue: Int)
-        fun onCommentVoted(commentFullName : String, voteValue: Int)
+        fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onImagePressed()
-    }
-
-    companion object {
-        val UPVOTE = 1
-        val DOWNVOTE = -1
     }
 }
 

@@ -24,12 +24,6 @@ class FullPostView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
-    fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
-        postImageView.setOnClickListener { viewDelegate.onImagePressed() }
-        postUpvoteView.setOnClickListener { viewDelegate.onPostVoted(1) }
-        postDownvoteView.setOnClickListener { viewDelegate.onPostVoted(-1) }
-    }
-
     fun setPost(postModel : PostModel, isImage : Boolean, delegate : DisplayPostContract.PostViewDelegate) {
         viewDelegate = delegate
         displayImage = isImage
@@ -59,16 +53,17 @@ class FullPostView @JvmOverloads constructor(
 
             postVoteCountView.text = score.toString()
             postCommentCountView.text = commentCount.toString()
-
-            postReplyView.setOnClickListener {
-                // TODO
-            }
-
         }
 
+        initializeOnClicks(delegate)
         loadLinks(postModel)
     }
 
+    private fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
+        postImageView.setOnClickListener { viewDelegate.onImagePressed() }
+        postUpvoteView.setOnClickListener { viewDelegate.onPostVoted(1) }
+        postDownvoteView.setOnClickListener { viewDelegate.onPostVoted(-1) }
+    }
 
     private fun loadLinks(postModel : PostModel) {
         if (displayImage) {

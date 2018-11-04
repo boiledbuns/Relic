@@ -26,6 +26,7 @@ import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.adapter.CommentAdapter
+import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
 import com.shopify.livedataktx.nonNull
@@ -53,7 +54,7 @@ class DisplayPostView : Fragment() {
 
     private lateinit var rootView : View
     private lateinit var myToolbar: Toolbar
-    private lateinit var commentAdapter: CommentAdapter
+    private lateinit var commentAdapter: CommentItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +81,9 @@ class DisplayPostView : Fragment() {
             }
 
             findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
-                commentAdapter = CommentAdapter(displayPostVM)
+                commentAdapter = CommentItemAdapter(displayPostVM)
                 adapter = commentAdapter
             }
-
-            findViewById<FullPostView>(R.id.fullPostView).initializeOnClicks(displayPostVM)
         }
 
         attachScrollListeners()

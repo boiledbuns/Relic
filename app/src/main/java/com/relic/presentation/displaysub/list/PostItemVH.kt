@@ -39,6 +39,9 @@ class PostItemVH (
                 postBodyView.text = postModel.htmlSelfText
                 postBodyView.visibility = View.VISIBLE
             }
+            else {
+                postBodyView.visibility = View.GONE
+            }
 
             cardRootView.setBackgroundResource(if (postModel.isVisited)
                 R.color.backgroundSecondary else R.color.backgroundSecondary)
