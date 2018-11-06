@@ -30,11 +30,23 @@ class FullPostView @JvmOverloads constructor(
 
         postModel.apply {
             postTitleView.text = title
-            postInfoView.text = author
+            postAuthorView.text = resources.getString(R.string.user_and_time, author, created)
+
+            if (!linkFlair.isNullOrEmpty()) {
+                postTagView.text = linkFlair
+                postTagView.visibility = View.VISIBLE
+            }
+
+            if (!authorFlair.isNullOrEmpty()) {
+                postAuthorFlairView.text = authorFlair
+                postAuthorFlairView.visibility = View.VISIBLE
+            }
+
             if (!selftext.isNullOrEmpty()) {
                 postSelfText.text = selftext
                 postSelfText.visibility = View.VISIBLE
             }
+
 
             when (userUpvoted) {
                 1 -> {

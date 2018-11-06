@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.text.Html;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -32,6 +33,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+// TODO convert to KOTLIN
 public class PostRepositoryImpl implements PostRepository {
   private final String ENDPOINT = "https://oauth.reddit.com/";
   private final String userAgent = "android:com.relic.Relic (by /u/boiledbuns)";
@@ -193,6 +195,11 @@ public class PostRepositoryImpl implements PostRepository {
       Boolean likes = (Boolean) post.get("likes");
       postEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
 
+      // TODO create parse class/switch to a more efficient method of removing html
+      String authorFlair = (String) post.get("author_flair_text");
+      if (authorFlair != null) {
+        postEntity.author_flair_text = Html.fromHtml(authorFlair).toString();
+      }
       Log.d(TAG, "epoch = " + post.get("created"));
 
       // add year to stamp if the post year doesn't match the current one

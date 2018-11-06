@@ -24,21 +24,45 @@
         android:background="@color/backgroundSecondary">
 
         <TextView
+            android:id="@+id/postAuthorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_spacing_s"
+            android:textSize="@dimen/title_size_s"/>
+
+        <TextView
             android:id="@+id/postTitleView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/postAuthorView"
+            android:layout_marginTop="@dimen/padding_xs"
+            android:layout_marginBottom="@dimen/padding_m"
             android:textSize="@dimen/title_size_m"
             android:fontFamily="sans-serif"
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/postInfoView"
+            android:id="@+id/postTagView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/text_spacing_s"
-            android:layout_marginBottom="@dimen/padding_m"
             android:layout_below="@id/postTitleView"
-            android:textSize="@dimen/title_size_s"/>
+            android:layout_marginBottom="@dimen/padding_xs"
+            android:background="@drawable/tag"
+            android:textSize="@dimen/text_m2"
+            android:textColor="@color/negative_text"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/postAuthorFlairView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postTitleView"
+            android:layout_toEndOf="@id/postTagView"
+            android:layout_marginStart="@dimen/padding_m"
+            android:background="@drawable/tag"
+            android:textSize="@dimen/text_m2"
+            android:textColor="@color/negative_text"
+            android:visibility="gone"/>
 
         <!-- card link displayed if the post is a link to another site -->
         <android.support.v7.widget.CardView
@@ -46,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_thumbnail_size"
             android:layout_marginBottom="@dimen/padding_m"
-            android:layout_below="@id/postInfoView"
+            android:layout_below="@id/postTagView"
             android:visibility="gone">
 
             <RelativeLayout
@@ -78,7 +102,7 @@
             android:id="@+id/postSelfText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_m"
+            android:layout_marginTop="@dimen/padding_xs"
             android:lineSpacingMultiplier="@dimen/line_spacing_s"
             android:layout_below="@id/postLinkCard"
             android:visibility="gone"
@@ -88,7 +112,8 @@
             android:id="@+id/postUpvoteView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/postSelfText"/>
+            android:layout_below="@id/postSelfText"
+            android:layout_marginTop="@dimen/padding_m"/>
 
         <android.support.design.chip.Chip
             android:id="@+id/postVoteCountView"
@@ -120,4 +145,5 @@
             android:text="@string/reply"/>
 
     </RelativeLayout>
+
 </RelativeLayout>
