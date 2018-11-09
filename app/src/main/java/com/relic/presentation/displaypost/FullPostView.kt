@@ -47,7 +47,6 @@ class FullPostView @JvmOverloads constructor(
                 postSelfText.visibility = View.VISIBLE
             }
 
-
             when (userUpvoted) {
                 1 -> {
                     postUpvoteView.setImageResource(R.drawable.ic_upvote_active)

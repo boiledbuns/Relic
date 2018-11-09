@@ -12,8 +12,7 @@ interface DisplayPostContract {
          * Hook for view to tell the VM to retrieve more comments
          * @param refresh whether the comments should be refreshed or not
          */
-        fun retrieveMoreComments(refresh: Boolean)
-        fun refresh()
+        fun retrieveMoreComments(refresh: Boolean = false)
     }
 
     interface PostViewDelegate {

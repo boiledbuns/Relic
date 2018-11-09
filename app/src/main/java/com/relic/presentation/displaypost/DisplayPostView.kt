@@ -106,6 +106,9 @@ class DisplayPostView : Fragment() {
         displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
         displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
         displayPostVM.postNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
+        displayPostVM.refreshingLiveData.nonNull().observe(this) {
+            displayPostSwipeRefresh.isRefreshing = it
+        }
     }
 
     private fun displayPost (postModel : PostModel) {
@@ -143,7 +146,7 @@ class DisplayPostView : Fragment() {
                 })
 
         rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh)
-                .setOnRefreshListener { displayPostVM.refresh() }
+                .setOnRefreshListener { displayPostVM.retrieveMoreComments(refresh = true) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

@@ -37,7 +37,7 @@ class RepoModule @Inject constructor(
     @Provides
     @Singleton
     fun provideCommentRepository() : CommentRepository {
-        return CommentRepositoryImpl(applicationContext, networkRequestManager)
+        return CommentRepositoryImpl(applicationContext, networkRequestManager, provideListingRepository())
     }
 
     @Provides

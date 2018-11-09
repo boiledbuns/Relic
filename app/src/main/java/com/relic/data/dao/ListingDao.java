@@ -1,5 +1,6 @@
 package com.relic.data.dao;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -15,4 +16,7 @@ public abstract class ListingDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertListing(ListingEntity listing);
+
+  @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :fullName")
+  public abstract LiveData<String> getAfter(String fullName);
 }

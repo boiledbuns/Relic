@@ -41,7 +41,6 @@ public class ListingRepositoryImpl implements ListingRepository {
     }
   }
 
-
   static class RetrieveListingAfterTask extends AsyncTask<String, Integer, Integer> {
     ApplicationDB appDB;
     MutableLiveData<String> listingKey;
@@ -67,4 +66,7 @@ public class ListingRepositoryImpl implements ListingRepository {
     }
   }
 
+  public LiveData<String> getAfter(String fullName) {
+    return appDB.getListingDAO().getAfter(fullName);
+  }
 }

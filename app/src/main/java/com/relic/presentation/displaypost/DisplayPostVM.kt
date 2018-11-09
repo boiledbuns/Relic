@@ -13,6 +13,7 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class DisplayPostVM (
@@ -38,7 +39,8 @@ class DisplayPostVM (
 
     private val _postLiveData = MediatorLiveData<PostModel> ()
     private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()
-    private val _navigationLiveData = SingleLiveData<PostNavigationData>()
+    private val _navigationLiveData = SingleLiveData<PostNavigationData> ()
+    private val _refreshingLiveData = MutableLiveData<Boolean> ()
 
     private val commentListingKey = MediatorLiveData<String> ()
     private val error = MutableLiveData<RelicError>()
@@ -46,11 +48,11 @@ class DisplayPostVM (
     val postLiveData : LiveData<PostModel> =_postLiveData
     val commentListLiveData : LiveData<List<CommentModel>> = _commentListLiveData
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
+    val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
 
     init {
-        refresh()
         observeLivedata()
-        //retrieveMoreComments(true)
+        retrieveMoreComments(true)
     }
 
     /**
@@ -67,40 +69,25 @@ class DisplayPostVM (
             comments?.let {
                 if (it.isEmpty()) {
                     // retrieve more comments if we detect that none are stored locally
-                    commentRepo.retrieveComments(subName, postFullname, null)
+                    //commentRepo.retrieveComments(subName, postFullname, null)
                 } else {
                     // TODO add additional actions to trigger when comments loaded
+                    _refreshingLiveData.postValue(true)
                     _commentListLiveData.postValue(comments)
                 }
             }
         }
-
-        commentListingKey.addSource(listingRepo.key) { nextListingKey ->
-            nextListingKey?.let {
-                // retrieve the next listing using its key
-                commentRepo.retrieveComments(subName, postFullname, it)
-            }
-        }
-    }
-
-    /**
-     * Refreshes the post and comment data from network
-     */
-    override fun refresh() {
-        // retrieves post from network
-        postRepo.retrievePost(subName, postFullname)
-        // retrieves comments form network
-        retrieveMoreComments(true)
     }
 
     override fun retrieveMoreComments(refresh: Boolean) {
+        // TODO check if there is connection
+        // retrieves post and comments from network
         if (refresh) {
-            // delete comments stored locally, let observer retrieve more once it registers the change
+            _refreshingLiveData.postValue(true)
             commentRepo.clearComments(postFullname)
-        } else {
-            // retrieve the next listing for the comments on this post
-            listingRepo.retrieveKey(postFullname)
+            postRepo.retrievePost(subName, postFullname)
         }
+        commentRepo.retrieveComments(subName, postFullname, refresh)
     }
 
     // -- region view action delegate --

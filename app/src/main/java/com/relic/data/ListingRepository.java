@@ -13,4 +13,7 @@ public interface ListingRepository {
    * @param key the key to the "after" value stored in the database
    */
   void retrieveKey(String key);
+
+  LiveData<String> getAfter(String fullName);
+
 }

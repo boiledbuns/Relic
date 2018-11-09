@@ -13,6 +13,11 @@ import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
+import com.shopify.livedataktx.nonNull
+import com.shopify.livedataktx.observe
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -26,23 +31,23 @@ import java.util.Locale
 
 class CommentRepositoryImpl(
         private val viewContext: Context,
-        private val requestManager: NetworkRequestManager
+        private val requestManager: NetworkRequestManager,
+        private val listingRepo: ListingRepository
 ) : CommentRepository {
+
     private val ENDPOINT = "https://oauth.reddit.com/"
     private val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
     private val TAG = "COMMENT_REPO"
 
-    private val appDB: ApplicationDB
-    private val JSONParser: JSONParser
+    private val appDB = ApplicationDB.getDatabase(viewContext)
 
     private val authToken: String?
+
+    private val jsonParser = JSONParser()
     private val gson = GsonBuilder().create()
+    private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
 
     init {
-        //TODO convert VolleyQueue into a singleton
-        appDB = ApplicationDB.getDatabase(viewContext)
-        JSONParser = JSONParser()
-
         // TODO convert this to a authenticator method
         // retrieve the auth token shared preferences
         val authKey = viewContext.resources.getString(R.string.AUTH_PREF)
@@ -60,43 +65,38 @@ class CommentRepositoryImpl(
         return appDB.commentDAO.getComments(postFullname)
     }
 
-    override fun retrieveComments(subName: String, postFullName: String, after: String?) {
-        var ending = "r/" + subName + "/comments/" + postFullName.substring(3) + "?count=20"
-        Log.d(TAG, ENDPOINT + ending)
-        if (after != null) {
-            ending += "&after=$after"
+    override fun retrieveComments(subName: String, postFullname: String, refresh : Boolean) {
+        if (refresh) {
+            GlobalScope.launch { createRetrieveCommentsRequest(subName, postFullname) }
         }
-        requestManager.processRequest(
-                RelicOAuthRequest(
-                        RelicOAuthRequest.GET,
-                        ENDPOINT + ending,
-                        Response.Listener { response ->
-                            Log.d(TAG, response)
-                            try {
-                                parseComments(postFullName, response)
-                            } catch (e: Exception) {
-                                Log.d(TAG, "Error parsing JSON return " + e.message)
-                            }
-                        },
-                        Response.ErrorListener{  error -> Log.d(TAG, "Error with request : " + error.message) },
-                        authToken!!
-                )
-        )
+        else {
+            listingRepo.getAfter(postFullname).observe {
+                GlobalScope.launch { createRetrieveCommentsRequest(subName, postFullname, it) }
+            }.removeObserver()
+        }
     }
 
-    override fun clearComments(postFullname: String) {
-        ClearCommentsTask().execute(appDB, postFullname)
-    }
+    private suspend fun createRetrieveCommentsRequest(
+            subName: String,
+            postFullName: String,
+            after : String? = null
+    ) = coroutineScope {
+        var ending = "r/$subName/comments/${postFullName.substring(3)}?count=20"
+        after?.let { ending += "&after=$it" }
 
-    private class ClearCommentsTask : AsyncTask<Any, Int, Int>() {
-        override fun doInBackground(vararg objects: Any): Int? {
-            val appDB = objects[0] as ApplicationDB
-            val postFullname = objects[1] as String
-
-            // delete the locally stored post comment data using the comment dao
-            appDB.commentDAO.deletePostComments(postFullname)
-            return null
-        }
+        requestManager.processRequest(RelicOAuthRequest(
+                RelicOAuthRequest.GET,
+                ENDPOINT + ending,
+                Response.Listener { response ->
+                    try {
+                        GlobalScope.launch { parseComments(postFullName, response) }
+                    } catch (e: Exception) {
+                        Log.d(TAG, "Error parsing JSON return " + e.message)
+                    }
+                },
+                Response.ErrorListener{  error -> Log.d(TAG, "Error with request : " + error.message) },
+                authToken!!
+        ))
     }
 
     /**
@@ -106,25 +106,18 @@ class CommentRepositoryImpl(
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private fun parseComments(postFullName: String, response: String) {
-        val responseElement = (JSONParser.parse(response) as JSONArray)[1] as JSONObject
+    private suspend fun parseComments(postFullName: String, response: String) = coroutineScope {
+        val responseElement = (jsonParser.parse(response) as JSONArray)[1] as JSONObject
         val commentsData = (responseElement["data"] as JSONObject)
         val listing = ListingEntity(postFullName, commentsData["after"]?.run { this as String })
-//        Log.d(TAG, "after = " + commentsData["after"]?.run { this as String })
 
         // get the list of children (comments) associated with the post
         val commentChildren = commentsData["children"] as JSONArray
         val commentEntities = ArrayList<CommentEntity>()
 
-        // initialize the date formatter and date for now
-        //  TODO optimize this
-        val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
-        val current = Date()
-
         commentChildren.forEach {
             val commentPOJO = (it as JSONObject)["data"] as JSONObject
             commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
-
                 id = commentPOJO["id"] as String
 
                 userUpvoted = commentPOJO["likes"]?.run {
@@ -133,7 +126,7 @@ class CommentRepositoryImpl(
 
                 // add year to stamp if the post year doesn't match the current one
                 Date((commentPOJO["created"] as Double).toLong() * 1000).also { commentCreated ->
-                    created = if (current.year != commentCreated.year) {
+                    created = if (Date().year != commentCreated.year) {
                         commentCreated.year.toString() + " " + formatter.format(commentCreated)
                     }
                     else {
@@ -143,19 +136,23 @@ class CommentRepositoryImpl(
             })
         }
 
-        InsertCommentsTask(appDB, commentEntities, listing).execute()
+        if (commentEntities.size > 0) {
+            appDB.commentDAO.insertComments(commentEntities)
+            appDB.listingDAO.insertListing(listing)
+        }
     }
 
-    private class InsertCommentsTask internal constructor(
-            internal var db: ApplicationDB,
-            internal var comments: List<CommentEntity>,
-            internal var listing: ListingEntity
-    ) : AsyncTask<String, Int, Int>() {
+    override fun clearComments(postFullname: String) {
+        ClearCommentsTask().execute(appDB, postFullname)
+    }
 
-        override fun doInBackground(vararg strings: String): Int? {
-            db.commentDAO.insertComments(comments)
-            db.listingDAO.insertListing(listing)
-            return null
+    private class ClearCommentsTask : AsyncTask<Any, Int, Unit>() {
+        override fun doInBackground(vararg objects: Any) {
+            val appDB = objects[0] as ApplicationDB
+            val postFullname = objects[1] as String
+
+            // delete the locally stored post comment data using the comment dao
+            appDB.commentDAO.deletePostComments(postFullname)
         }
     }
 }
