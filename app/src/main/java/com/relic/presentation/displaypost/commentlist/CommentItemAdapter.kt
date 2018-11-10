@@ -45,7 +45,11 @@ class CommentItemAdapter (
             }
 
             override fun areContentsTheSame(i: Int, i1: Int): Boolean {
-                return commentList[i].userUpvoted == newComments[i1].userUpvoted
+                return (
+                        commentList[i].userUpvoted == newComments[i1].userUpvoted &&
+                        commentList[i].body == newComments[i1].body &&
+                        commentList[i].replyCount == newComments[i1].replyCount
+                        )
             }
         }).dispatchUpdatesTo(this)
 

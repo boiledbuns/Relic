@@ -15,5 +15,4 @@ public interface ListingRepository {
   void retrieveKey(String key);
 
   LiveData<String> getAfter(String fullName);
-
 }

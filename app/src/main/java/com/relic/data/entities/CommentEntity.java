@@ -17,8 +17,10 @@ public class CommentEntity {
   public String author;
   public String subreddit;
 
+  // post id for comments in  s
   @ColumnInfo(name ="parentId")
   public String parent_id;
+
   @ColumnInfo(name = "body")
   public String body_html;
 
@@ -30,10 +32,11 @@ public class CommentEntity {
   public boolean is_submitter;
   @ColumnInfo(name = "scoreHidden")
   public boolean score_hidden;
-
-
   public int userUpvoted;
 
+  public int replyCount;
+  public int depth;
+  public String edited;
 
   //boolean edited;
 
@@ -45,6 +48,6 @@ public class CommentEntity {
   }
 
   public void setId(@NonNull String id) {
-    this.id = "t1_" + id;
+      this.id = id;
   }
 }

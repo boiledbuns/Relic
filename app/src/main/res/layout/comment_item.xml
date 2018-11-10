@@ -47,8 +47,14 @@
         android:id="@+id/commentDownvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@id/commentBodyView"
         android:layout_toEndOf="@id/commentUpvoteView"/>
+
+    <TextView
+        android:id="@+id/commentReplyCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/commentBodyView"
+        android:layout_toEndOf="@id/commentDownvoteView"/>
 
 </RelativeLayout>

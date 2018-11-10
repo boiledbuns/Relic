@@ -27,7 +27,7 @@ class CommentItemVH (
         commentPosition = position
 
         commentItem.apply {
-            commentScoreView.text = commentModel.score.toString()
+            commentScoreView.text = commentModel.score.toString() + commentModel.id
             commentAuthorView.text = commentModel.author
             commentCreatedView.text = commentModel.created
 
@@ -55,6 +55,10 @@ class CommentItemVH (
                     commentUpvoteView.setImageResource(R.drawable.ic_upvote)
                     commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
                 }
+            }
+
+            if (commentModel.replyCount > 0) {
+                commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
             }
         }
     }

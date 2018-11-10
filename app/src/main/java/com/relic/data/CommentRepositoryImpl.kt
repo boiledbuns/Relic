@@ -13,7 +13,6 @@ import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
-import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
@@ -58,20 +57,20 @@ class CommentRepositoryImpl(
 
     /**
      * Exposes the list of comments as livedata
-     * @param postFullname fullname of the post to retrieve comments for
+     * @param postId fullname of the post to retrieve comments for
      * @return list of comments as livedata
      */
-    override fun getComments(postFullname: String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getComments(postFullname)
+    override fun getComments(postId: String): LiveData<List<CommentModel>> {
+        return appDB.commentDAO.getComments(postId)
     }
 
-    override fun retrieveComments(subName: String, postFullname: String, refresh : Boolean) {
+    override fun retrieveComments(subName: String, postId: String, refresh : Boolean) {
         if (refresh) {
-            GlobalScope.launch { createRetrieveCommentsRequest(subName, postFullname) }
+            GlobalScope.launch { createRetrieveCommentsRequest(subName, postId) }
         }
         else {
-            listingRepo.getAfter(postFullname).observe {
-                GlobalScope.launch { createRetrieveCommentsRequest(subName, postFullname, it) }
+            listingRepo.getAfter(postId).observe {
+                GlobalScope.launch { createRetrieveCommentsRequest(subName, postId, it) }
             }.removeObserver()
         }
     }
@@ -89,7 +88,7 @@ class CommentRepositoryImpl(
                 ENDPOINT + ending,
                 Response.Listener { response ->
                     try {
-                        GlobalScope.launch { parseComments(postFullName, response) }
+                        GlobalScope.launch { parseCommentRequestResponse(postFullName, response) }
                     } catch (e: Exception) {
                         Log.d(TAG, "Error parsing JSON return " + e.message)
                     }
@@ -99,38 +98,53 @@ class CommentRepositoryImpl(
         ))
     }
 
+    private suspend fun parseCommentRequestResponse(postFullName: String, response: String) = coroutineScope {
+        // the comment data is nested as the first element within an array
+        val requestData = jsonParser.parse(response) as JSONArray
+        parseComments(postFullName, requestData[1] as JSONObject)
+    }
+
     /**
      * Parse the response from the api and store the comments in the room db
      * @param response json string response
-     * @param postFullName fullname of post used as a key for the "after" value
+     * @param parentId fullname of post used as a key for the "after" value
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private suspend fun parseComments(postFullName: String, response: String) = coroutineScope {
-        val responseElement = (jsonParser.parse(response) as JSONArray)[1] as JSONObject
-        val commentsData = (responseElement["data"] as JSONObject)
-        val listing = ListingEntity(postFullName, commentsData["after"]?.run { this as String })
+    private suspend fun parseComments(parentId: String, response: JSONObject) : Unit = coroutineScope {
+        val commentsData = (response["data"] as JSONObject)
+        val listing = ListingEntity(parentId, commentsData["after"]?.run { this as String })
 
         // get the list of children (comments) associated with the post
         val commentChildren = commentsData["children"] as JSONArray
         val commentEntities = ArrayList<CommentEntity>()
 
+        // updates the parent comment to show how many children there are
+        UpdateCommentReplyCountTask().execute(appDB, parentId, commentChildren.size)
+
         commentChildren.forEach {
             val commentPOJO = (it as JSONObject)["data"] as JSONObject
+            Log.d(TAG, "current id = ${commentPOJO["id"]?.toString()}")
             commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
-                id = commentPOJO["id"] as String
+
+                // start another coroutine to parse the children of this comment
+                commentPOJO["replies"]?.let { childJson ->
+                    if (childJson.toString().isNotEmpty()) parseComments(id, childJson as JSONObject)
+                }
 
                 userUpvoted = commentPOJO["likes"]?.run {
                     if (this as Boolean) 1 else -1
                 } ?: 0
 
-                // add year to stamp if the post year doesn't match the current one
-                Date((commentPOJO["created"] as Double).toLong() * 1000).also { commentCreated ->
-                    created = if (Date().year != commentCreated.year) {
-                        commentCreated.year.toString() + " " + formatter.format(commentCreated)
-                    }
-                    else {
-                        formatter.format(commentCreated)
+                commentPOJO["created"]?.apply {
+                    // add year to stamp if the post year doesn't match the current one
+                    Date((this as Double).toLong() * 1000).also { commentCreated ->
+                        created = if (Date().year != commentCreated.year) {
+                            commentCreated.year.toString() + " " + formatter.format(commentCreated)
+                        }
+                        else {
+                            formatter.format(commentCreated)
+                        }
                     }
                 }
             })
@@ -142,17 +156,36 @@ class CommentRepositoryImpl(
         }
     }
 
-    override fun clearComments(postFullname: String) {
-        ClearCommentsTask().execute(appDB, postFullname)
+    private class UpdateCommentReplyCountTask : AsyncTask<Any, Int, Unit>() {
+        override fun doInBackground(vararg objects: Any?) {
+            val appDB = objects[0] as ApplicationDB
+            val postFullName = objects[1] as String
+            val replyCount = objects[2] as Int
+            appDB.commentDAO.updateCommentChildCount(postFullName, replyCount)
+        }
+    }
+
+    override fun clearComments(postId: String) {
+        ClearCommentsTask().execute(appDB, postId)
     }
 
     private class ClearCommentsTask : AsyncTask<Any, Int, Unit>() {
         override fun doInBackground(vararg objects: Any) {
             val appDB = objects[0] as ApplicationDB
-            val postFullname = objects[1] as String
-
-            // delete the locally stored post comment data using the comment dao
-            appDB.commentDAO.deletePostComments(postFullname)
+            val postId = objects[1] as String
+            appDB.commentDAO.deletePostComments(postId)
         }
+    }
+
+    companion object {
+        private const val postPrefix = "t3"
+        private const val commentPrefix = "t1"
+
+        fun isPost(fullName : String) : Boolean = fullName.subSequence(0, 2) == postPrefix
+
+        /**
+         * removes the type associated with the comment, leaving only its id
+         */
+        fun removeType(fullName : String) : String = fullName.removeRange(0, 3)
     }
 }

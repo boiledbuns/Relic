@@ -4,6 +4,7 @@ public class CommentModel {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
   public static int NOVOTE = 0;
+  public static String TYPE = "t3";
 
   private String id;
 
@@ -16,8 +17,16 @@ public class CommentModel {
   public boolean gilded;
   public boolean isSubmitter;
 
+  public String edited;
+  public int depth;
+  public int replyCount;
 
   public CommentModel() {}
+
+  // Note that fullname = type + id
+  public String getFullName() {
+    return TYPE + id;
+  }
 
   public String getId() {
     return id;
