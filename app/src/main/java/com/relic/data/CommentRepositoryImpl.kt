@@ -14,9 +14,12 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
 import com.shopify.livedataktx.observe
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -69,39 +72,42 @@ class CommentRepositoryImpl(
             GlobalScope.launch { createRetrieveCommentsRequest(subName, postId) }
         }
         else {
+            // TODO convert this from async to promise based
             listingRepo.getAfter(postId).observe {
                 GlobalScope.launch { createRetrieveCommentsRequest(subName, postId, it) }
             }.removeObserver()
         }
     }
 
-    private suspend fun createRetrieveCommentsRequest(
-            subName: String,
-            postFullName: String,
-            after : String? = null
-    ) = coroutineScope {
+    private suspend fun createRetrieveCommentsRequest(subName: String, postFullName: String, after : String? = null) : String? {
         var ending = "r/$subName/comments/${postFullName.substring(3)}?count=20"
         after?.let { ending += "&after=$it" }
 
-        requestManager.processRequest(RelicOAuthRequest(
-                RelicOAuthRequest.GET,
-                ENDPOINT + ending,
-                Response.Listener { response ->
-                    try {
-                        GlobalScope.launch { parseCommentRequestResponse(postFullName, response) }
-                    } catch (e: Exception) {
-                        Log.d(TAG, "Error parsing JSON return " + e.message)
-                    }
-                },
-                Response.ErrorListener{  error -> Log.d(TAG, "Error with request : " + error.message) },
-                authToken!!
-        ))
+        var responseReturn : String? = null
+        runBlocking {
+            requestManager.processRequest(RelicOAuthRequest(
+                    RelicOAuthRequest.GET,
+                    ENDPOINT + ending,
+                    Response.Listener { response ->
+                        try {
+                            responseReturn = response
+                            GlobalScope.launch { parseCommentRequestResponse(postFullName, response) }
+                        } catch (e: Exception) {
+                            Log.d(TAG, "Error parsing JSON return " + e.message)
+                        }
+                    },
+                    Response.ErrorListener{  error -> Log.d(TAG, "Error with request : " + error.message) },
+                    authToken!!
+            ))
+        }
+        return responseReturn
     }
 
-    private suspend fun parseCommentRequestResponse(postFullName: String, response: String) = coroutineScope {
+    private suspend fun parseCommentRequestResponse(postFullName: String, response: String) {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
-        parseComments(postFullName, requestData[1] as JSONObject)
+        val parentId = removeType(postFullName)
+        parseComments(parentId, requestData[1] as JSONObject)
     }
 
     /**
@@ -111,7 +117,7 @@ class CommentRepositoryImpl(
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private suspend fun parseComments(parentId: String, response: JSONObject) : Unit = coroutineScope {
+    private suspend fun parseComments(parentId: String, response: JSONObject) {
         val commentsData = (response["data"] as JSONObject)
         val listing = ListingEntity(parentId, commentsData["after"]?.run { this as String })
 
@@ -119,17 +125,20 @@ class CommentRepositoryImpl(
         val commentChildren = commentsData["children"] as JSONArray
         val commentEntities = ArrayList<CommentEntity>()
 
-        // updates the parent comment to show how many children there are
-        UpdateCommentReplyCountTask().execute(appDB, parentId, commentChildren.size)
-
         commentChildren.forEach {
             val commentPOJO = (it as JSONObject)["data"] as JSONObject
-            Log.d(TAG, "current id = ${commentPOJO["id"]?.toString()}")
+            Log.d(TAG, "parent id = $parentId current id = ${commentPOJO["id"]?.toString()}")
             commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
 
-                // start another coroutine to parse the children of this comment
                 commentPOJO["replies"]?.let { childJson ->
-                    if (childJson.toString().isNotEmpty()) parseComments(id, childJson as JSONObject)
+                    if (childJson.toString().isNotEmpty()) {
+                        // start another coroutine to parse the children of this comment
+                        coroutineScope { parseComments(id, childJson as JSONObject) }
+
+                        // set reply count for this object
+                        val childJsonData = (childJson as JSONObject)["data"] as JSONObject
+                        replyCount = (childJsonData["children"] as JSONArray).size
+                    }
                 }
 
                 userUpvoted = commentPOJO["likes"]?.run {
@@ -156,15 +165,6 @@ class CommentRepositoryImpl(
         }
     }
 
-    private class UpdateCommentReplyCountTask : AsyncTask<Any, Int, Unit>() {
-        override fun doInBackground(vararg objects: Any?) {
-            val appDB = objects[0] as ApplicationDB
-            val postFullName = objects[1] as String
-            val replyCount = objects[2] as Int
-            appDB.commentDAO.updateCommentChildCount(postFullName, replyCount)
-        }
-    }
-
     override fun clearComments(postId: String) {
         ClearCommentsTask().execute(appDB, postId)
     }
@@ -180,8 +180,6 @@ class CommentRepositoryImpl(
     companion object {
         private const val postPrefix = "t3"
         private const val commentPrefix = "t1"
-
-        fun isPost(fullName : String) : Boolean = fullName.subSequence(0, 2) == postPrefix
 
         /**
          * removes the type associated with the comment, leaving only its id
