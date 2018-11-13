@@ -58,11 +58,11 @@ class CommentRepositoryImpl(
 
     /**
      * Exposes the list of comments as livedata
-     * @param postId fullname of the post to retrieve comments for
+     * @param postFullname fullname of the post to retrieve comments for
      * @return list of comments as livedata
      */
-    override fun getComments(postId : String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getChildren(postId)
+    override fun getComments(postFullname : String): LiveData<List<CommentModel>> {
+        return appDB.commentDAO.getChildren(removeTypePrefix(postFullname))
     }
 
     override fun retrieveComments(subName: String, postId: String, refresh : Boolean) {
@@ -104,7 +104,7 @@ class CommentRepositoryImpl(
     private suspend fun parseCommentRequestResponse(postFullName: String, response: String) {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
-        val parentId = removeType(postFullName)
+        val parentId = removeTypePrefix(postFullName)
         parseComments(parentId, requestData[1] as JSONObject)
     }
 
@@ -125,8 +125,8 @@ class CommentRepositoryImpl(
 
         commentChildren.forEach {
             val commentPOJO = (it as JSONObject)["data"] as JSONObject
-            //Log.d(TAG, "parent id = $parentId current id = ${commentPOJO["id"]?.toString()}")
             commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
+                Log.d(TAG, "parent id = ${this.parent_id} current id = ${commentPOJO["id"]?.toString()}")
 
                 commentPOJO["replies"]?.let { childJson ->
                     if (childJson.toString().isNotEmpty()) {
@@ -138,6 +138,8 @@ class CommentRepositoryImpl(
                         replyCount = (childJsonData["children"] as JSONArray).size
                     }
                 }
+
+                parent_id = removeTypePrefix(parent_id)
 
                 userUpvoted = commentPOJO["likes"]?.run {
                     if (this as Boolean) 1 else -1
@@ -199,7 +201,7 @@ class CommentRepositoryImpl(
         /**
          * removes the type associated with the comment, leaving only its id
          */
-        fun removeType(fullName : String) : String = fullName.removeRange(0, 3)
+        fun removeTypePrefix(fullName : String) : String = fullName.removeRange(0, 3)
 
         fun hasBeenEdited(editedString : String) : Boolean = (editedString != notEdited)
     }

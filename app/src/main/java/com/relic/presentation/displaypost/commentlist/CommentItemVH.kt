@@ -73,7 +73,8 @@ class CommentItemVH (
     }
 
     private fun handleDisplayChildren(adapter : CommentItemAdapter) {
-        adapter.displayCommentReplies(commentPosition).nonNull().observe {
+        val commentRepliesLiveData = adapter.displayCommentReplies(commentPosition).nonNull()
+        commentRepliesLiveData.observe {
             // TODO insert views
             commentItem.commentReplyCount.text = "${it.size} comments loaded"
         }
