@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class CommentEntity {
+  private static String NOT_EDITED = "false";
+
   @NonNull
   @PrimaryKey
   @ColumnInfo(name = "id")
@@ -36,7 +38,8 @@ public class CommentEntity {
 
   public int replyCount;
   public int depth;
-  public String edited;
+
+  public String editedDate;
 
   //boolean edited;
 

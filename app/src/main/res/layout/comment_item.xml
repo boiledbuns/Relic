@@ -25,7 +25,7 @@
         android:id="@+id/commentCreatedView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/commentAuthorView"/>
+        android:layout_alignParentEnd="true"/>
 
     <TextView
         android:id="@+id/commentBodyView"

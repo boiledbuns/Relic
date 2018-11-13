@@ -26,4 +26,6 @@ interface CommentRepository {
      * @param postFullname full name of the post to clear the comments for
      */
     fun clearComments(postFullname: String)
+
+    fun getReplies(parentId : String) : LiveData<List<CommentModel>>
 }

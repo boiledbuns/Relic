@@ -92,6 +92,10 @@ class DisplayPostVM (
 
     // -- region view action delegate --
 
+    override fun onExpandReply(parentCommentId: String) : LiveData<List<CommentModel>> {
+        return commentRepo.getReplies(parentCommentId)
+    }
+
     override fun onPostVoted(voteValue: Int) {
         Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue)
         postRepo.postGateway.voteOnPost(postFullname, voteValue)
@@ -110,7 +114,7 @@ class DisplayPostVM (
 
         // send request only if value changed
         if (newUserUpvoteValue != commentModel.userUpvoted) {
-            postRepo.postGateway.voteOnPost(commentModel.id, voteValue)
+            postRepo.postGateway.voteOnPost(commentModel.fullName, voteValue)
         }
         return newUserUpvoteValue
     }
@@ -128,7 +132,6 @@ class DisplayPostVM (
             val lastThree = it.substring(it.length - 3)
             if (validImageEndings.contains(lastThree)) isImage = true
         }
-
         return isImage
     }
 }

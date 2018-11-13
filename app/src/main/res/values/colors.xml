@@ -26,6 +26,8 @@
     <color name="warning">#9c0436</color>
     <color name="darken_background">#000000</color>
 
+    <color name="edited">#ff5722</color>
+
     <color name="discussion_tag">#1A8B0C</color>
     <color name="negative_text">#ffffff</color>
 

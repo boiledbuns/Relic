@@ -4,7 +4,7 @@ public class CommentModel {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
   public static int NOVOTE = 0;
-  public static String TYPE = "t3";
+  public static String TYPE = "t1_";
 
   private String id;
 

@@ -1,5 +1,6 @@
 package com.relic.presentation.displaypost.commentlist
 
+import android.arch.lifecycle.LiveData
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -58,6 +59,10 @@ class CommentItemAdapter (
     }
 
     // region onclick handler
+
+    fun displayCommentReplies(itemPosition : Int) : LiveData<List<CommentModel>>{
+        return actionDelegate.onExpandReply(commentList[itemPosition].id)
+    }
 
     fun voteOnComment(itemPosition : Int, voteValue : Int) {
         commentList[itemPosition].also {

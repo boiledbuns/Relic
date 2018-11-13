@@ -8,18 +8,21 @@ import com.relic.R
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
+import com.shopify.livedataktx.nonNull
+import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.comment_item.view.*
 
 class CommentItemVH (
         private val commentItem : View
 ): RecyclerView.ViewHolder(commentItem) {
 
-    var commentPosition = 0
+    private var commentPosition = 0
 
     fun initializeOnClicks(adapter : CommentItemAdapter) {
         commentItem.apply {
             commentUpvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, UPVOTE_PRESSED) }
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, DOWNVOTE_PRESSED) }
+            commentReplyCount.setOnClickListener { handleDisplayChildren(adapter) }
         }
     }
 
@@ -27,9 +30,11 @@ class CommentItemVH (
         commentPosition = position
 
         commentItem.apply {
-            commentScoreView.text = commentModel.score.toString() + commentModel.id
+            commentScoreView.text = commentModel.score.toString() + " " + commentModel.depth
             commentAuthorView.text = commentModel.author
             commentCreatedView.text = commentModel.created
+
+            commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
@@ -60,6 +65,17 @@ class CommentItemVH (
             if (commentModel.replyCount > 0) {
                 commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
             }
+
+            if (commentModel.depth > 0)  {
+                // display start padding
+            }
+        }
+    }
+
+    private fun handleDisplayChildren(adapter : CommentItemAdapter) {
+        adapter.displayCommentReplies(commentPosition).nonNull().observe {
+            // TODO insert views
+            commentItem.commentReplyCount.text = "${it.size} comments loaded"
         }
     }
 }

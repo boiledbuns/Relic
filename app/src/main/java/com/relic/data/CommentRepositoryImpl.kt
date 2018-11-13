@@ -14,9 +14,7 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
 import com.shopify.livedataktx.observe
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -63,8 +61,8 @@ class CommentRepositoryImpl(
      * @param postId fullname of the post to retrieve comments for
      * @return list of comments as livedata
      */
-    override fun getComments(postId: String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getComments(postId)
+    override fun getComments(postId : String): LiveData<List<CommentModel>> {
+        return appDB.commentDAO.getChildren(postId)
     }
 
     override fun retrieveComments(subName: String, postId: String, refresh : Boolean) {
@@ -127,7 +125,7 @@ class CommentRepositoryImpl(
 
         commentChildren.forEach {
             val commentPOJO = (it as JSONObject)["data"] as JSONObject
-            Log.d(TAG, "parent id = $parentId current id = ${commentPOJO["id"]?.toString()}")
+            //Log.d(TAG, "parent id = $parentId current id = ${commentPOJO["id"]?.toString()}")
             commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
 
                 commentPOJO["replies"]?.let { childJson ->
@@ -145,17 +143,12 @@ class CommentRepositoryImpl(
                     if (this as Boolean) 1 else -1
                 } ?: 0
 
-                commentPOJO["created"]?.apply {
-                    // add year to stamp if the post year doesn't match the current one
-                    Date((this as Double).toLong() * 1000).also { commentCreated ->
-                        created = if (Date().year != commentCreated.year) {
-                            commentCreated.year.toString() + " " + formatter.format(commentCreated)
-                        }
-                        else {
-                            formatter.format(commentCreated)
-                        }
-                    }
-                }
+                commentPOJO["created"]?.apply { created = formatDate(this as Double) }
+
+                // have to do this because reddit has a decided this can be boolean or string
+                try {
+                     editedDate = formatDate(commentPOJO["edited"] as Double)
+                } catch (e : Exception) { }
             })
         }
 
@@ -163,6 +156,23 @@ class CommentRepositoryImpl(
             appDB.commentDAO.insertComments(commentEntities)
             appDB.listingDAO.insertListing(listing)
         }
+    }
+
+    private fun formatDate(epochTime : Double) : String? {
+        var created: String?
+
+        // add year to stamp if the post year doesn't match the current one
+        Date(epochTime.toLong() * 1000).also { commentCreated ->
+            created = if (Date().year != commentCreated.year) {
+                commentCreated.year.toString() + " " + formatter.format(
+                        commentCreated
+                )
+            } else {
+                formatter.format(commentCreated)
+            }
+        }
+
+        return created
     }
 
     override fun clearComments(postId: String) {
@@ -177,13 +187,20 @@ class CommentRepositoryImpl(
         }
     }
 
+    override fun getReplies(parentId: String): LiveData<List<CommentModel>> {
+        return appDB.commentDAO.getChildren(parentId)
+    }
+
     companion object {
         private const val postPrefix = "t3"
         private const val commentPrefix = "t1"
+        private const val notEdited = "false"
 
         /**
          * removes the type associated with the comment, leaving only its id
          */
         fun removeType(fullName : String) : String = fullName.removeRange(0, 3)
+
+        fun hasBeenEdited(editedString : String) : Boolean = (editedString != notEdited)
     }
 }
