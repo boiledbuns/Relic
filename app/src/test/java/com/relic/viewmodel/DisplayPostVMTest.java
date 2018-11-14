@@ -48,7 +48,7 @@ public class DisplayPostVMTest {
 
     CommentRepository mockCommentRepo = new CommentRepository() {
       @Override
-      public LiveData<List<CommentModel>> getComments(String postFullname) {
+      public LiveData<List<CommentModel>> getComments(String postFullName) {
         MutableLiveData <List<CommentModel>> liveList = new MutableLiveData<>();
         liveList.setValue(test);
         return liveList;

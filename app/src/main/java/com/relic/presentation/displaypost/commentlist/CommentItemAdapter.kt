@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
+import com.shopify.livedataktx.nonNull
+import com.shopify.livedataktx.observe
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
@@ -58,10 +60,25 @@ class CommentItemAdapter (
         commentList.addAll(newComments)
     }
 
+    private fun setReplies(newReplies: List<CommentModel>, itemPosition : Int) {
+        commentList.apply {
+            addAll(itemPosition + 1, newReplies)
+            notifyItemRangeInserted(itemPosition + 1, newReplies.size)
+        }
+    }
+
     // region onclick handler
 
-    fun displayCommentReplies(itemPosition : Int) : LiveData<List<CommentModel>>{
-        return actionDelegate.onExpandReply(commentList[itemPosition].id)
+    fun displayCommentReplies(itemPosition : Int, commentExpanded : Boolean) {
+        val comment = commentList[itemPosition].id
+        if (commentExpanded) {
+            // hide the comments if comments are currently expanded
+        } else {
+            actionDelegate.onExpandReply(comment).nonNull().observe {
+                setReplies(it, itemPosition)
+            }
+        }
+
     }
 
     fun voteOnComment(itemPosition : Int, voteValue : Int) {
@@ -78,6 +95,5 @@ class CommentItemAdapter (
     fun replyToComment(itemPosition : Int) {
 
     }
-
     // end region onclick handler
 }

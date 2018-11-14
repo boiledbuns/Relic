@@ -15,14 +15,17 @@ import kotlinx.android.synthetic.main.comment_item.view.*
 class CommentItemVH (
         private val commentItem : View
 ): RecyclerView.ViewHolder(commentItem) {
-
+    private var commentsExpanded = false
     private var commentPosition = 0
 
     fun initializeOnClicks(adapter : CommentItemAdapter) {
         commentItem.apply {
             commentUpvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, UPVOTE_PRESSED) }
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, DOWNVOTE_PRESSED) }
-            commentReplyCount.setOnClickListener { handleDisplayChildren(adapter) }
+            commentReplyCount.setOnClickListener {
+                adapter.displayCommentReplies(commentPosition, commentsExpanded)
+                commentsExpanded = !commentsExpanded
+            }
         }
     }
 
@@ -69,14 +72,6 @@ class CommentItemVH (
             if (commentModel.depth > 0)  {
                 // display start padding
             }
-        }
-    }
-
-    private fun handleDisplayChildren(adapter : CommentItemAdapter) {
-        val commentRepliesLiveData = adapter.displayCommentReplies(commentPosition).nonNull()
-        commentRepliesLiveData.observe {
-            // TODO insert views
-            commentItem.commentReplyCount.text = "${it.size} comments loaded"
         }
     }
 }

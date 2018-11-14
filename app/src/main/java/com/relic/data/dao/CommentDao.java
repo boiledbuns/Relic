@@ -19,6 +19,6 @@ public abstract class CommentDao {
   @Query("SELECT * FROM CommentEntity WHERE parentId = :parentId")
   public abstract LiveData<List<CommentModel>> getChildren(String parentId);
 
-  @Query("DELETE from CommentEntity WHERE parentId = :postFullname")
-  public abstract void deletePostComments(String postFullname);
+  @Query("DELETE from CommentEntity WHERE parentId = :parentId")
+  public abstract void deletePostComments(String parentId);
 }

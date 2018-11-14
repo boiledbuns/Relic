@@ -58,11 +58,11 @@ class CommentRepositoryImpl(
 
     /**
      * Exposes the list of comments as livedata
-     * @param postFullname fullname of the post to retrieve comments for
+     * @param postFullName fullname of the post to retrieve comments for
      * @return list of comments as livedata
      */
-    override fun getComments(postFullname : String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getChildren(removeTypePrefix(postFullname))
+    override fun getComments(postFullName : String): LiveData<List<CommentModel>> {
+        return appDB.commentDAO.getChildren(removeTypePrefix(postFullName))
     }
 
     override fun retrieveComments(subName: String, postId: String, refresh : Boolean) {
@@ -177,8 +177,8 @@ class CommentRepositoryImpl(
         return created
     }
 
-    override fun clearComments(postId: String) {
-        ClearCommentsTask().execute(appDB, postId)
+    override fun clearComments(postFullName: String) {
+        ClearCommentsTask().execute(appDB, removeTypePrefix(postFullName))
     }
 
     private class ClearCommentsTask : AsyncTask<Any, Int, Unit>() {
