@@ -50,6 +50,8 @@ class DisplayPostVM (
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
     val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
 
+    var sortedCommentsList : MutableList<CommentModel> = ArrayList()
+
     init {
         observeLivedata()
         retrieveMoreComments(true)
@@ -73,6 +75,9 @@ class DisplayPostVM (
                 } else {
                     // TODO add additional actions to trigger when comments loaded
                     _refreshingLiveData.postValue(true)
+
+                    // maintain a separate list to
+
                     _commentListLiveData.postValue(comments)
                 }
             }

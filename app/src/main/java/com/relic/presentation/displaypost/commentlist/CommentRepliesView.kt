@@ -12,10 +12,6 @@ class CommentRepliesView (
         defStyleAttr : Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.comment_item, this)
-    }
-
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         // ignore for now
     }

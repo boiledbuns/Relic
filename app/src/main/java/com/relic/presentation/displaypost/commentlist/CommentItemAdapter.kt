@@ -1,6 +1,5 @@
 package com.relic.presentation.displaypost.commentlist
 
-import android.arch.lifecycle.LiveData
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -61,24 +60,43 @@ class CommentItemAdapter (
     }
 
     private fun setReplies(newReplies: List<CommentModel>, itemPosition : Int) {
-        commentList.apply {
-            addAll(itemPosition + 1, newReplies)
-            notifyItemRangeInserted(itemPosition + 1, newReplies.size)
+        if (commentList.size > 0) {
+            commentList.apply {
+                addAll(itemPosition + 1, newReplies)
+                notifyItemRangeInserted(itemPosition + 1, newReplies.size)
+            }
         }
+        else {
+            // alert user of failure
+        }
+    }
+
+    private fun hideReplies(itemPosition: Int) {
+        val parentDepth = commentList[itemPosition].depth
+        var itemsToRemove = 0
+
+        // hide anything with depth > item.depth until reaching another item of the same depth
+        var comparePosition = itemPosition + 1
+        while (comparePosition < commentList.size && commentList[comparePosition].depth > parentDepth) {
+            // add up number of items to be removed
+            itemsToRemove ++
+            comparePosition ++
+        }
+
+        commentList.subList(itemPosition + 1, itemPosition + 1 + itemsToRemove).clear()
+        notifyItemRangeRemoved(itemPosition + 1, itemPosition + 1 + itemsToRemove)
     }
 
     // region onclick handler
 
     fun displayCommentReplies(itemPosition : Int, commentExpanded : Boolean) {
-        val comment = commentList[itemPosition].id
         if (commentExpanded) {
-            // hide the comments if comments are currently expanded
+            hideReplies(itemPosition)
         } else {
-            actionDelegate.onExpandReply(comment).nonNull().observe {
+            actionDelegate.onExpandReply(commentList[itemPosition].id).nonNull().observe {
                 setReplies(it, itemPosition)
             }
         }
-
     }
 
     fun voteOnComment(itemPosition : Int, voteValue : Int) {

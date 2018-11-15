@@ -16,7 +16,7 @@ public abstract class CommentDao {
   @Insert (onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertComments(List<CommentEntity> commentEntities);
 
-  @Query("SELECT * FROM CommentEntity WHERE parentId = :parentId")
+  @Query("SELECT * FROM CommentEntity WHERE parentId = :parentId ORDER BY depth ASC")
   public abstract LiveData<List<CommentModel>> getChildren(String parentId);
 
   @Query("DELETE from CommentEntity WHERE parentId = :parentId")
