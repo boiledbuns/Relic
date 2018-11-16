@@ -1,6 +1,5 @@
 package com.relic.presentation.displaypost
 
-import android.arch.lifecycle.LiveData
 import com.relic.data.models.CommentModel
 
 const val UPVOTE_PRESSED = 1
@@ -17,7 +16,7 @@ interface DisplayPostContract {
     }
 
     interface PostViewDelegate {
-        fun onExpandReply(parentCommentId: String) : LiveData<List<CommentModel>>
+        fun onExpandReplies(position: Int, expanded : Boolean)
         fun onPostVoted(voteValue: Int)
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onImagePressed()

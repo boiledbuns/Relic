@@ -13,7 +13,6 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class DisplayPostVM (
@@ -75,9 +74,6 @@ class DisplayPostVM (
                 } else {
                     // TODO add additional actions to trigger when comments loaded
                     _refreshingLiveData.postValue(true)
-
-                    // maintain a separate list to
-
                     _commentListLiveData.postValue(comments)
                 }
             }
@@ -95,10 +91,51 @@ class DisplayPostVM (
         commentRepo.retrieveComments(subName, postFullname, refresh)
     }
 
+    private fun insertReplies (position : Int, replies : List<CommentModel>) {
+        _commentListLiveData.value?.let { commentList ->
+            _commentListLiveData.postValue(commentList.toMutableList().apply {
+                addAll(position + 1, replies)
+            })
+        }
+    }
+
+    private fun removeReplies (position : Int) {
+        _commentListLiveData.value?.toMutableList()?.let { commentList ->
+            val parentDepth = commentList[position].depth
+            var itemsToRemove = 0
+
+            // hide anything with depth > item.depth until reaching another item of the same depth
+            var comparePosition = position + 1
+            while (comparePosition < commentList.size && commentList[comparePosition].depth > parentDepth) {
+                // add up number of items to be removed
+                itemsToRemove ++
+                comparePosition ++
+            }
+
+            commentList.subList(position + 1, position + 1 + itemsToRemove).clear()
+            _commentListLiveData.postValue(commentList)
+        }
+    }
+
     // -- region view action delegate --
 
-    override fun onExpandReply(parentCommentId: String) : LiveData<List<CommentModel>> {
-        return commentRepo.getReplies(parentCommentId)
+    override fun onExpandReplies(position: Int, expanded : Boolean) {
+        val commentModel = _commentListLiveData.value!![position]
+
+        if (expanded) {
+            removeReplies(position)
+        } else {
+            _commentListLiveData.addSource(commentRepo.getReplies(commentModel.id)) { replies ->
+                replies?.let {
+                    if (it.isNotEmpty()) {
+                        insertReplies(position, it)
+                        // TODO switch to observer, which can be removed after comment retrieved
+                    } else {
+                        // TODO retrieve comments from server if replies are not loadeds
+                    }
+                }
+            }
+        }
     }
 
     override fun onPostVoted(voteValue: Int) {

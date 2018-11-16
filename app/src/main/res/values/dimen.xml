@@ -78,6 +78,8 @@
     <dimen name="text_spacing_s">4dp</dimen>
     <dimen name="text_spacing_m">12dp</dimen>
 
+    <dimen name="margin_xxxs">1dp</dimen>
+
     <dimen name="padding_xs">6dp</dimen>
     <dimen name="padding_s">8dp</dimen>
     <dimen name="padding_m">12dp</dimen>

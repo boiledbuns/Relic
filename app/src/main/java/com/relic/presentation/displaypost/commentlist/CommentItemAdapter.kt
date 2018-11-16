@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
-import com.shopify.livedataktx.nonNull
-import com.shopify.livedataktx.observe
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
@@ -24,10 +22,7 @@ class CommentItemAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): CommentItemVH {
-        return CommentItemVH(LayoutInflater
-                .from(parent.context)
-                .inflate(R.layout.comment_item, parent, false)
-        ).apply {
+        return CommentItemVH(CommentView(parent.context)).apply {
             initializeOnClicks(this@CommentItemAdapter)
         }
     }
@@ -47,11 +42,13 @@ class CommentItemAdapter (
             }
 
             override fun areContentsTheSame(i: Int, i1: Int): Boolean {
+                val oldComment = commentList[i]
+                val newComment = newComments[i1]
                 return (
-                        commentList[i].userUpvoted == newComments[i1].userUpvoted &&
-                        commentList[i].body == newComments[i1].body &&
-                        commentList[i].replyCount == newComments[i1].replyCount
-                        )
+                    oldComment.userUpvoted == newComment.userUpvoted &&
+                    oldComment.body == newComment.body &&
+                    oldComment.replyCount == newComment.replyCount
+                )
             }
         }).dispatchUpdatesTo(this)
 
@@ -59,44 +56,10 @@ class CommentItemAdapter (
         commentList.addAll(newComments)
     }
 
-    private fun setReplies(newReplies: List<CommentModel>, itemPosition : Int) {
-        if (commentList.size > 0) {
-            commentList.apply {
-                addAll(itemPosition + 1, newReplies)
-                notifyItemRangeInserted(itemPosition + 1, newReplies.size)
-            }
-        }
-        else {
-            // alert user of failure
-        }
-    }
-
-    private fun hideReplies(itemPosition: Int) {
-        val parentDepth = commentList[itemPosition].depth
-        var itemsToRemove = 0
-
-        // hide anything with depth > item.depth until reaching another item of the same depth
-        var comparePosition = itemPosition + 1
-        while (comparePosition < commentList.size && commentList[comparePosition].depth > parentDepth) {
-            // add up number of items to be removed
-            itemsToRemove ++
-            comparePosition ++
-        }
-
-        commentList.subList(itemPosition + 1, itemPosition + 1 + itemsToRemove).clear()
-        notifyItemRangeRemoved(itemPosition + 1, itemPosition + 1 + itemsToRemove)
-    }
-
     // region onclick handler
 
     fun displayCommentReplies(itemPosition : Int, commentExpanded : Boolean) {
-        if (commentExpanded) {
-            hideReplies(itemPosition)
-        } else {
-            actionDelegate.onExpandReply(commentList[itemPosition].id).nonNull().observe {
-                setReplies(it, itemPosition)
-            }
-        }
+        actionDelegate.onExpandReplies(itemPosition, commentExpanded)
     }
 
     fun voteOnComment(itemPosition : Int, voteValue : Int) {

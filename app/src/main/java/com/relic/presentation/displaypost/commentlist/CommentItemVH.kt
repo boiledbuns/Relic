@@ -13,7 +13,7 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.comment_item.view.*
 
 class CommentItemVH (
-        private val commentItem : View
+        private val commentItem : CommentView
 ): RecyclerView.ViewHolder(commentItem) {
     private var commentsExpanded = false
     private var commentPosition = 0
@@ -69,9 +69,7 @@ class CommentItemVH (
                 commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
             }
 
-            if (commentModel.depth > 0)  {
-                // display start padding
-            }
+            if (commentModel.depth > 0)  commentItem.displayReplyDepth(commentModel.depth)
         }
     }
 }
