@@ -3,6 +3,7 @@ package com.relic.presentation.displaypost
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 
@@ -126,14 +127,17 @@ class DisplayPostVM (
         if (expanded) {
             removeReplies(position)
         } else {
-            _commentListLiveData.addSource(commentRepo.getReplies(commentModel.id)) { replies ->
+            val commentSource = commentRepo.getReplies(commentModel.id)
+            _commentListLiveData.addSource(commentSource) { replies ->
                 replies?.let {
                     if (it.isNotEmpty()) {
                         insertReplies(position, it)
                         // TODO switch to observer, which can be removed after comment retrieved
                     } else {
-                        // TODO retrieve comments from server if replies are not loadeds
+                        // TODO retrieve comments from server if replies are not loaded
                     }
+                    // remove this as a source since this is a one off to retrieve replies
+                    _commentListLiveData.removeSource(commentSource)
                 }
             }
         }

@@ -61,7 +61,7 @@ class CommentItemVH (
                 commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
             }
 
-            if (commentModel.depth > 0)  commentItem.displayReplyDepth(commentModel.depth)
+            commentItem.displayReplyDepth(commentModel.depth)
         }
     }
 }
