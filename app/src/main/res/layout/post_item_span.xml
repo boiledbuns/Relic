@@ -97,8 +97,7 @@
             <ImageView
                 android:id="@+id/postThumbnailView"
                 android:layout_width="@dimen/postitem_image_width"
-                android:layout_height="@dimen/postitem_image_width"
-                android:visibility="gone"/>
+                android:layout_height="@dimen/postitem_image_width"/>
 
         </android.support.v7.widget.CardView>
 

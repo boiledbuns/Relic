@@ -28,7 +28,12 @@ class PostItemVH (
 
     fun bindPost(postModel : PostModel, position: Int) {
         itemView.apply {
-            if (!postModel.thumbnail.isNullOrBlank()) setThumbnail(postModel.thumbnail)
+            if (!postModel.thumbnail.isNullOrBlank()) {
+                postThumbnailView.visibility = View.VISIBLE
+                setThumbnail(postModel.thumbnail)
+            } else {
+                postThumbnailView.visibility = View.GONE
+            }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
             postDateView.text = postModel.created

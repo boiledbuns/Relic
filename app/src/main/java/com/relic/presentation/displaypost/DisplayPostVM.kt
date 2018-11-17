@@ -13,6 +13,8 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DisplayPostVM (
@@ -49,10 +51,9 @@ class DisplayPostVM (
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
     val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
 
-    var sortedCommentsList : MutableList<CommentModel> = ArrayList()
-
     init {
         observeLivedata()
+        // check internet connection and retrieve more comments if internet is available
         retrieveMoreComments(true)
     }
 
@@ -68,13 +69,13 @@ class DisplayPostVM (
         // retrieve the comment list as livedata so that we can expose it to the view first
         _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
             comments?.let {
+                _commentListLiveData.postValue(comments)
                 if (it.isEmpty()) {
                     // retrieve more comments if we detect that none are stored locally
                     //commentRepo.retrieveComments(subName, postFullname, null)
                 } else {
                     // TODO add additional actions to trigger when comments loaded
-                    _refreshingLiveData.postValue(true)
-                    _commentListLiveData.postValue(comments)
+                    _refreshingLiveData.postValue(false)
                 }
             }
         }

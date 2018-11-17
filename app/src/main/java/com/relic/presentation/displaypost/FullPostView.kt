@@ -77,14 +77,20 @@ class FullPostView @JvmOverloads constructor(
     }
 
     private fun loadLinks(postModel : PostModel) {
-        if (displayImage) {
-            Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
-            postImageView.visibility = View.VISIBLE
-        } else {
-            if (!postModel.thumbnail.isNullOrEmpty())  {
+        when {
+            displayImage -> {
+                Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
+                postLinkCard.visibility = View.GONE
+            }
+            !(postModel.thumbnail.isNullOrEmpty()) -> {
                 Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
                 postLinkUrl.text = postModel.url
-                postLinkCard.visibility = View.VISIBLE
+                postImageView.visibility = View.GONE
+            }
+            else -> {
+                // no link, so just hide both the image and thumbnail
+                postImageView.visibility = View.GONE
+                postLinkCard.visibility = View.GONE
             }
         }
     }

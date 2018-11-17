@@ -43,6 +43,8 @@
 
     <string name="pin"> pin </string>
 
+    <string name="author">r/%s</string>
+
     <string name="sub_prefix_name">r/%s</string>
     <string name="sub_prefix_label">[ r/%s ]</string>
     <string name="user_prefix_label">u/%s</string>

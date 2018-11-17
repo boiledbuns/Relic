@@ -16,11 +16,18 @@
         android:layout_marginEnd="@dimen/displaypost_paddingside"/>
 
     <TextView
-        android:id="@+id/commentAuthorView"
+        android:id="@+id/commentFlairView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
         android:layout_toEndOf="@id/commentScoreView"/>
+
+    <TextView
+        android:id="@+id/commentAuthorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/displaypost_paddingside"
+        android:layout_toEndOf="@id/commentFlairView"/>
 
     <TextView
         android:id="@+id/commentCreatedView"
@@ -35,7 +42,6 @@
         android:layout_below="@id/commentAuthorView"
         android:paddingBottom="0dp"
         android:layout_marginTop="@dimen/text_spacing_s"
-        android:layout_marginBottom="0dp"
         android:textSize="@dimen/text_m"/>
 
     <ImageView

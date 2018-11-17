@@ -30,6 +30,8 @@ public class CommentEntity {
   @ColumnInfo(name = "gilded")
   public int gilded;
 
+  @ColumnInfo(name = "authorFlairText")
+  public String author_flair_text;
   @ColumnInfo(name = "isSubmitter")
   public boolean is_submitter;
   @ColumnInfo(name = "scoreHidden")
@@ -40,8 +42,6 @@ public class CommentEntity {
   public int depth;
 
   public String editedDate;
-
-  //boolean edited;
 
   public CommentEntity(){}
 

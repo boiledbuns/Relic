@@ -1,15 +1,11 @@
 package com.relic.presentation.displaypost.commentlist
 
-import android.os.Build
 import android.support.v7.widget.RecyclerView
 import android.text.Html
-import android.view.View
 import com.relic.R
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
-import com.shopify.livedataktx.nonNull
-import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.comment_item.view.*
 
 class CommentItemVH (
@@ -34,16 +30,12 @@ class CommentItemVH (
 
         commentItem.apply {
             commentScoreView.text = commentModel.score.toString() + " " + commentModel.depth
+            commentFlairView.text = commentModel.authorFlairText
             commentAuthorView.text = commentModel.author
             commentCreatedView.text = commentModel.created
 
             commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
-            } else {
-                commentBodyView.text = Html.fromHtml(commentModel.body)
-            }
+            commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
 
             if (commentModel.isSubmitter) {
                 commentAuthorView.setBackgroundResource(R.drawable.tag)

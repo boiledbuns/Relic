@@ -125,9 +125,12 @@ class CommentRepositoryImpl(
 
         commentChildren.forEach {
             val commentPOJO = (it as JSONObject)["data"] as JSONObject
-            commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
-                Log.d(TAG, "parent id = ${this.parent_id} current id = ${commentPOJO["id"]?.toString()}")
+            //Log.d(TAG, "parent keys = " + commentPOJO.keys + " ")
+            Log.d(TAG, "stuff " + commentPOJO["author_flair_css_class"] + " " + commentPOJO["author_flair_text"]
+                + " " + commentPOJO["author_flair_background_color"] + " " + commentPOJO["author_flair_text_color"]
+                + " " + commentPOJO["author_flair_type"] + " " + commentPOJO["author_flair_richtext"] )
 
+            commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
                 commentPOJO["replies"]?.let { childJson ->
                     if (childJson.toString().isNotEmpty()) {
                         // start another coroutine to parse the children of this comment
@@ -140,6 +143,7 @@ class CommentRepositoryImpl(
                 }
 
                 parent_id = removeTypePrefix(parent_id)
+                Log.d(TAG, "parent id = ${this.parent_id} current id = ${this.id}")
 
                 userUpvoted = commentPOJO["likes"]?.run {
                     if (this as Boolean) 1 else -1
@@ -151,6 +155,7 @@ class CommentRepositoryImpl(
                 try {
                      editedDate = formatDate(commentPOJO["edited"] as Double)
                 } catch (e : Exception) { }
+
             })
         }
 
@@ -194,15 +199,7 @@ class CommentRepositoryImpl(
     }
 
     companion object {
-        private const val postPrefix = "t3"
-        private const val commentPrefix = "t1"
-        private const val notEdited = "false"
-
-        /**
-         * removes the type associated with the comment, leaving only its id
-         */
+        //removes the type associated with the comment, leaving only its id
         fun removeTypePrefix(fullName : String) : String = fullName.removeRange(0, 3)
-
-        fun hasBeenEdited(editedString : String) : Boolean = (editedString != notEdited)
     }
 }

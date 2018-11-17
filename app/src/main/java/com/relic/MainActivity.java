@@ -2,10 +2,12 @@ package com.relic;
 
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.relic.data.Authenticator;

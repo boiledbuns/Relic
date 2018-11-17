@@ -32,7 +32,7 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
 
-class DisplayPostView : Fragment() {
+class DisplayPostFragment : Fragment() {
     private val TAG = "DISPLAYPOST_VIEW"
 
     private val displayPostVM : DisplayPostVM by lazy {
@@ -85,7 +85,7 @@ class DisplayPostView : Fragment() {
             }
         }
 
-        attachScrollListeners()
+        attachViewListeners()
         return rootView
     }
 
@@ -124,15 +124,15 @@ class DisplayPostView : Fragment() {
     private fun displayComments(commentList : List<CommentModel>) {
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList)
-        displayPostSwipeRefresh.isRefreshing = false
     }
 
     /**
      * Attaches custom scroll listeners to allow more comments to be retrieved when the recyclerview
      * is scrolled all the way to the bottom
      */
-    private fun attachScrollListeners() {
-        rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView)
+    private fun attachViewListeners() {
+        rootView.apply {
+            findViewById<RecyclerView>(R.id.postCommentRecyclerView)
                 .addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                         super.onScrollStateChanged(recyclerView, newState)
@@ -145,8 +145,9 @@ class DisplayPostView : Fragment() {
                     }
                 })
 
-        rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh)
+            findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh)
                 .setOnRefreshListener { displayPostVM.retrieveMoreComments(refresh = true) }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -30,7 +29,7 @@ import com.relic.data.PostRepository
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.adapter.ImageOnClick
 import com.relic.presentation.adapter.PostItemOnclick
-import com.relic.presentation.displaypost.DisplayPostView
+import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -322,7 +321,7 @@ class DisplaySubView : Fragment() {
             bundle.putString("full_name", postId)
             bundle.putString("subreddit", subreddit)
 
-            val postFrag = DisplayPostView()
+            val postFrag = DisplayPostFragment()
             postFrag.arguments = bundle
 
             activity?.let {

@@ -14,6 +14,7 @@ public class CommentModel {
   private int score;
   private int userUpvoted;
 
+  public String authorFlairText;
   public boolean gilded;
   public boolean isSubmitter;
 
