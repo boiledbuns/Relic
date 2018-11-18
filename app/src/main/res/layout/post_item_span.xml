@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardRootView"
+    android:id="@+id/postItemRootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/backgroundSecondary"
@@ -65,25 +65,42 @@
                 android:textSize="@dimen/text_l"
                 android:textStyle="bold"/>
 
+            <!-- TODO add style for tags -->
             <TextView
-                android:id="@+id/postitem_nsfw"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postitem_title"
-                android:textColor="@color/warning"
-                android:textAllCaps="true"
-                android:visibility="gone"
-                android:text="@string/nsfw"/>
-
-            <TextView
-                android:id="@+id/secondaryMetaTextview"
+                android:id="@+id/postItemNSFWView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/titleView"
+                android:visibility="gone"
+                android:text="@string/nsfw"
+                android:layout_marginEnd="@dimen/padding_s"
+                android:background="@drawable/tag"
+                android:backgroundTint="@color/warning"
+                android:textSize="@dimen/text_m2"
+                android:textColor="@color/negative_text"/>
+
+            <TextView
+                android:id="@+id/postItemTagView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleView"
+                android:layout_toEndOf="@id/postItemNSFWView"
+                android:visibility="gone"
+                android:layout_marginEnd="@dimen/padding_s"
                 android:background="@drawable/tag"
                 android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"
-                android:visibility="gone"/>
+                android:textColor="@color/negative_text"/>
+
+            <TextView
+                android:id="@+id/postItemAuthorFlairView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleView"
+                android:layout_toEndOf="@id/postItemTagView"
+                android:visibility="gone"
+                android:background="@drawable/tag"
+                android:textSize="@dimen/text_m2"
+                android:textColor="@color/negative_text"/>
 
         </RelativeLayout>
 

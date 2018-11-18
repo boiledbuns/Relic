@@ -32,15 +32,13 @@ class FullPostView @JvmOverloads constructor(
             postTitleView.text = title
             postAuthorView.text = resources.getString(R.string.user_and_time, author, created)
 
-            if (!linkFlair.isNullOrEmpty()) {
-                postTagView.text = linkFlair
-                postTagView.visibility = View.VISIBLE
-            }
+            if (isNsfw) postAuthorFlairView.visibility = View.VISIBLE
 
-            if (!authorFlair.isNullOrEmpty()) {
-                postAuthorFlairView.text = authorFlair
-                postAuthorFlairView.visibility = View.VISIBLE
-            }
+            postTagView.text = linkFlair
+            if (!linkFlair.isNullOrEmpty()) postTagView.visibility = View.VISIBLE
+
+            postAuthorFlairView.text = authorFlair
+            if (!authorFlair.isNullOrEmpty()) postAuthorFlairView.visibility = View.VISIBLE
 
             if (!selftext.isNullOrEmpty()) {
                 postSelfText.text = selftext

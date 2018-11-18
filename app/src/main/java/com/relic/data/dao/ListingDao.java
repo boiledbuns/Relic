@@ -19,4 +19,7 @@ public abstract class ListingDao {
 
   @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :fullName")
   public abstract LiveData<String> getAfter(String fullName);
+
+  @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :fullName")
+  public abstract String getAfterString(String fullName);
 }

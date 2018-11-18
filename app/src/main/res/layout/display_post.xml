@@ -41,7 +41,8 @@
                 <com.relic.presentation.displaypost.FullPostView
                     android:id="@+id/fullPostView"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/displaypost_bottommargin"/>
 
                 <!-- recyclerview for the comments -->
                 <android.support.v7.widget.RecyclerView

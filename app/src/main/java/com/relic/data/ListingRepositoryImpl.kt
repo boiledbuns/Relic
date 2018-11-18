@@ -16,7 +16,7 @@ import kotlinx.coroutines.coroutineScope
 import org.json.simple.parser.JSONParser
 
 class ListingRepositoryImpl(context: Context) : ListingRepository {
-    private val TAG = "COMMENT_REPO"
+    private val TAG = "LISTING_REPO"
 
     // TODO get instance from DI
     private val appDB = ApplicationDB.getDatabase(context)
@@ -45,5 +45,9 @@ class ListingRepositoryImpl(context: Context) : ListingRepository {
 
     override fun getAfter(fullName: String): LiveData<String?> {
         return appDB.listingDAO.getAfter(fullName)
+    }
+
+    override suspend fun getAfterString(fullName: String): String? {
+        return appDB.listingDAO.getAfterString(fullName)
     }
 }

@@ -48,7 +48,7 @@ class PostItemVH (
                 postBodyView.visibility = View.GONE
             }
 
-            cardRootView.setBackgroundResource(if (postModel.isVisited)
+            postItemRootView.setBackgroundResource(if (postModel.isVisited)
                 R.color.backgroundSecondary else R.color.backgroundSecondary)
 
             when (postModel.userUpvoted) {
@@ -84,8 +84,20 @@ class PostItemVH (
 
     private fun setPostTags(postModel: PostModel) {
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        itemView.secondaryMetaTextview.apply {
-            postModel.linkFlair?.let {
+        if (postModel.isNsfw) {
+            itemView.postItemNSFWView.visibility = View.VISIBLE
+        }
+
+        postModel.linkFlair?.let {
+            itemView.postItemTagView.apply {
+                text = it
+                background?.setTint(resources.getColor(R.color.discussion_tag))
+                visibility = View.VISIBLE
+            }
+        }
+
+        postModel.authorFlair?.let {
+            itemView.postItemAuthorFlairView?.apply {
                 text = it
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE

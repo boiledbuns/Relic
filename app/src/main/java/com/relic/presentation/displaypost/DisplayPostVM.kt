@@ -15,6 +15,7 @@ import com.relic.data.models.PostModel
 import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -85,12 +86,14 @@ class DisplayPostVM (
     override fun retrieveMoreComments(refresh: Boolean) {
         // TODO check if there is connection
         // retrieves post and comments from network
-        if (refresh) {
-            _refreshingLiveData.postValue(true)
-            commentRepo.clearComments(postFullname)
-            postRepo.retrievePost(subName, postFullname)
+        GlobalScope.async {
+            if (refresh) {
+                _refreshingLiveData.postValue(true)
+                commentRepo.clearComments(postFullname)
+                postRepo.retrievePost(subName, postFullname)
+            }
+            commentRepo.retrieveComments(subName, postFullname, refresh)
         }
-        commentRepo.retrieveComments(subName, postFullname, refresh)
     }
 
     private fun insertReplies (position : Int, replies : List<CommentModel>) {

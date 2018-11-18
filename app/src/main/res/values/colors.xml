@@ -23,7 +23,7 @@
     <color name="lightGray">#6c7584</color>
     <color name="icon_color">@color/lightGray</color>
 
-    <color name="warning">#9c0436</color>
+    <color name="warning">#802c47</color>
     <color name="darken_background">#000000</color>
 
     <color name="edited">#ff5722</color>

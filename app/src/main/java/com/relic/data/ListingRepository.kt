@@ -15,4 +15,6 @@ interface ListingRepository {
     fun retrieveKey(key: String)
 
     fun getAfter(fullName: String): LiveData<String?>
+
+    suspend fun getAfterString(fullName: String): String?
 }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     android:id="@+id/fullPostRootView"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- image displayed if the post is an image link -->
     <ImageView
@@ -12,56 +13,87 @@
         android:layout_height="@dimen/displaypost_image_height"/>
 
     <!-- groups post data together -->
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:theme="@style/ItemTheme"
-        android:id="@+id/display_post_postitem"
+        android:id="@+id/postContentView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_m"
-        android:layout_marginBottom="@dimen/displaypost_bottommargin"
-        android:layout_below="@id/postImageView"
-        android:background="@color/backgroundSecondary">
+        android:background="@color/backgroundSecondary"
+        app:layout_constraintTop_toBottomOf="@id/postImageView">
 
         <TextView
             android:id="@+id/postAuthorView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_spacing_s"
-            android:textSize="@dimen/title_size_s"/>
+            android:textSize="@dimen/title_size_s"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/postTitleView"/>
 
         <TextView
             android:id="@+id/postTitleView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/postAuthorView"
             android:layout_marginTop="@dimen/padding_xs"
             android:layout_marginBottom="@dimen/padding_m"
             android:textSize="@dimen/title_size_m"
             android:fontFamily="sans-serif"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/postAuthorView"
+            app:layout_constraintBottom_toTopOf="@id/postTagsGuideline"/>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/postTagsGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/postTitleView"/>
+
+        <TextView
+            android:id="@+id/postNSFWView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_m"
+            android:background="@drawable/tag"
+            android:text="@string/nsfw"
+            android:backgroundTint="@color/warning"
+            android:textSize="@dimen/text_m2"
+            android:textColor="@color/negative_text"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/postTagsGuideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toStartOf="@id/postTagView"
+            app:layout_constraintHorizontal_chainStyle="packed"/>
 
         <TextView
             android:id="@+id/postTagView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/postTitleView"
-            android:layout_marginBottom="@dimen/padding_xs"
+            android:layout_marginEnd="@dimen/padding_m"
             android:background="@drawable/tag"
             android:textSize="@dimen/text_m2"
             android:textColor="@color/negative_text"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/postTagsGuideline"
+            app:layout_constraintStart_toEndOf="@id/postNSFWView"
+            app:layout_constraintEnd_toStartOf="@id/postAuthorFlairView"
+            app:layout_constraintHorizontal_chainStyle="packed"/>
 
         <TextView
             android:id="@+id/postAuthorFlairView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/postTitleView"
-            android:layout_toEndOf="@id/postTagView"
-            android:layout_marginStart="@dimen/padding_m"
             android:background="@drawable/tag"
             android:textSize="@dimen/text_m2"
             android:textColor="@color/negative_text"
-            android:visibility="gone"/>
+            android:text="@string/short_placeholder_text"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/postTagsGuideline"
+            app:layout_constraintStart_toEndOf="@id/postTagView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"/>
 
         <!-- card link displayed if the post is a link to another site -->
         <android.support.v7.widget.CardView
@@ -69,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_thumbnail_size"
             android:layout_marginTop="@dimen/padding_xs"
-            android:layout_below="@id/postTagView">
+            app:layout_constraintTop_toBottomOf="@id/postTagView">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -102,51 +134,60 @@
             android:id="@+id/postSelfText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_xs"
+            android:layout_marginTop="@dimen/padding_m"
+            android:layout_marginBottom="@dimen/padding_m"
             android:lineSpacingMultiplier="@dimen/line_spacing_s"
-            android:layout_below="@id/postLinkCard"
-            android:visibility="gone"
-            android:textSize="@dimen/title_size_s"/>
+            android:textSize="@dimen/title_size_s"
+            android:text="@string/placeholder_text"
+            app:layout_constraintTop_toBottomOf="@id/postLinkCard"
+            app:layout_constraintBottom_toTopOf="@id/postActionGuideline"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <android.support.constraint.Guideline
+            android:id="@+id/postActionGuideline"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/postSelfText"
-            android:layout_marginTop="@dimen/padding_m">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <ImageView
-                android:id="@+id/postUpvoteView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+        <ImageView
+            android:id="@+id/postUpvoteView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_xs"
+            android:src="@drawable/ic_upvote"
+            app:layout_constraintTop_toTopOf="@id/postActionGuideline"/>
 
-            <android.support.design.chip.Chip
-                android:id="@+id/postVoteCountView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/postUpvoteView"/>
+        <android.support.design.chip.Chip
+            android:id="@+id/postVoteCountView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/postUpvoteView"
+            app:layout_constraintTop_toTopOf="@id/postActionGuideline"/>
 
-            <ImageView
-                android:id="@+id/postDownvoteView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/postVoteCountView"/>
+        <ImageView
+            android:id="@+id/postDownvoteView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_xs"
+            android:src="@drawable/ic_downvote"
+            app:layout_constraintStart_toEndOf="@id/postVoteCountView"
+            app:layout_constraintTop_toTopOf="@id/postActionGuideline"/>
 
-            <TextView
-                android:id="@+id/postCommentCountView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/postDownvoteView"/>
+        <TextView
+            android:id="@+id/postCommentCountView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/postDownvoteView"
+            app:layout_constraintTop_toTopOf="@id/postActionGuideline"/>
 
-            <TextView
-                android:id="@+id/postReplyView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="@string/reply"/>
+        <TextView
+            android:id="@+id/postReplyView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reply"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/postActionGuideline"/>
 
-        </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
-
-    </RelativeLayout>
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

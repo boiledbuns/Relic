@@ -1,8 +1,10 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.os.AsyncTask
+import android.text.Html
 import android.util.Log
 import com.android.volley.Response
 
@@ -15,6 +17,7 @@ import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
 import com.shopify.livedataktx.observe
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -70,10 +73,21 @@ class CommentRepositoryImpl(
             GlobalScope.launch { createRetrieveCommentsRequest(subName, postId) }
         }
         else {
-            // TODO convert this from async to promise based
-            listingRepo.getAfter(postId).observe {
-                GlobalScope.launch { createRetrieveCommentsRequest(subName, postId, it) }
-            }.removeObserver()
+//            val removableObserver = listingRepo.getAfter(postId)
+//            removableObserver.observeForever(object : Observer<String?> {
+//                override fun onChanged(afterValue: String?) {
+//                    GlobalScope.launch { createRetrieveCommentsRequest(subName, postId, afterValue) }
+//                    removableObserver.removeObserver(this)
+//                }
+//            })
+            GlobalScope.launch {
+                var after : String? = null
+                async { after = listingRepo.getAfterString(postId) }.invokeOnCompletion {
+
+                }
+                after?.let { createRetrieveCommentsRequest(subName, postId, after) }
+            }
+
         }
     }
 
@@ -149,6 +163,7 @@ class CommentRepositoryImpl(
                     if (this as Boolean) 1 else -1
                 } ?: 0
 
+                author_flair_text?.let { author_flair_text = Html.fromHtml(author_flair_text).toString() }
                 commentPOJO["created"]?.apply { created = formatDate(this as Double) }
 
                 // have to do this because reddit has a decided this can be boolean or string

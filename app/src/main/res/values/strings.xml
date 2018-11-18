@@ -32,7 +32,7 @@
     <string name="sort_scope_year">year</string>
     <string name="sort_scope_all">all</string>
 
-    <string name="nsfw">nsfw</string>
+    <string name="nsfw">NSFW</string>
     <string name="reply">reply</string>
     <string name="empty_parent_body">This post has no text body</string>
 
@@ -52,4 +52,8 @@
     <string name="pinned_subs_count">%d pinned subreddits </string>
     <string name="user_and_time">u/%s, posted on %s</string>
     <string name="reply_count">%d replies</string>
+
+
+    <string name="short_placeholder_text">flair</string>
+    <string name="placeholder_text">Placeholder text</string>
 </resources>
