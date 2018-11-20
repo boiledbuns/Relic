@@ -86,7 +86,7 @@ class DisplayPostVM (
     override fun retrieveMoreComments(refresh: Boolean) {
         // TODO check if there is connection
         // retrieves post and comments from network
-        GlobalScope.async {
+        GlobalScope.launch {
             if (refresh) {
                 _refreshingLiveData.postValue(true)
                 commentRepo.clearComments(postFullname)

@@ -84,24 +84,23 @@ class PostItemVH (
 
     private fun setPostTags(postModel: PostModel) {
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        if (postModel.isNsfw) {
-            itemView.postItemNSFWView.visibility = View.VISIBLE
-        }
+        itemView.postItemNSFWView.visibility = if (postModel.isNsfw) View.VISIBLE else View.GONE
 
-        postModel.linkFlair?.let {
-            itemView.postItemTagView.apply {
-                text = it
+
+        itemView.postItemTagView.apply {
+            if (postModel.linkFlair != null) {
+                text = postModel.linkFlair
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE
-            }
+            } else { visibility = View.GONE }
         }
 
-        postModel.authorFlair?.let {
-            itemView.postItemAuthorFlairView?.apply {
-                text = it
+        itemView.postItemAuthorFlairView.apply {
+            if (postModel.authorFlair != null) {
+                text = postModel.authorFlair
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE
-            }
+            } else { visibility = View.GONE }
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
 import android.content.Context
 import android.os.AsyncTask
 import android.text.Html
@@ -15,9 +14,12 @@ import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
-import com.shopify.livedataktx.observe
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -31,6 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.ArrayList
 import java.util.Date
 import java.util.Locale
+import kotlin.coroutines.coroutineContext
 
 class CommentRepositoryImpl(
         private val viewContext: Context,
@@ -70,7 +73,9 @@ class CommentRepositoryImpl(
 
     override fun retrieveComments(subName: String, postId: String, refresh : Boolean) {
         if (refresh) {
-            GlobalScope.launch { createRetrieveCommentsRequest(subName, postId) }
+            GlobalScope.launch (Dispatchers.IO) {
+                async { createRetrieveCommentsRequest(subName, postId) }
+            }
         }
         else {
 //            val removableObserver = listingRepo.getAfter(postId)
@@ -82,16 +87,19 @@ class CommentRepositoryImpl(
 //            })
             GlobalScope.launch {
                 var after : String? = null
-                async { after = listingRepo.getAfterString(postId) }.invokeOnCompletion {
-
-                }
+                async { after = listingRepo.getAfterString(postId) ?: "empty_after"}.await()
                 after?.let { createRetrieveCommentsRequest(subName, postId, after) }
+
+                Log.d(TAG, "async check $after")
             }
 
         }
     }
 
-    private suspend fun createRetrieveCommentsRequest(subName: String, postFullName: String, after : String? = null) : String? {
+    private fun createRetrieveCommentsRequest(subName: String,
+        postFullName: String,
+        after : String? = null
+    ) : String? {
         var ending = "r/$subName/comments/${postFullName.substring(3)}?count=20"
         after?.let { ending += "&after=$it" }
 
@@ -103,7 +111,8 @@ class CommentRepositoryImpl(
                     Response.Listener { response ->
                         try {
                             responseReturn = response
-                            GlobalScope.launch { parseCommentRequestResponse(postFullName, response) }
+                            // TODO convert to promise based
+                            parseCommentRequestResponse(postFullName, response)
                         } catch (e: Exception) {
                             Log.d(TAG, "Error parsing JSON return " + e.message)
                         }
@@ -115,11 +124,11 @@ class CommentRepositoryImpl(
         return responseReturn
     }
 
-    private suspend fun parseCommentRequestResponse(postFullName: String, response: String) {
+    private fun parseCommentRequestResponse(postFullName: String, response: String) {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
         val parentId = removeTypePrefix(postFullName)
-        parseComments(parentId, requestData[1] as JSONObject)
+        GlobalScope.launch { parseComments(parentId, requestData[1] as JSONObject) }
     }
 
     /**
@@ -129,54 +138,69 @@ class CommentRepositoryImpl(
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private suspend fun parseComments(parentId: String, response: JSONObject) {
+    private suspend fun parseComments(parentId: String, response: JSONObject) = coroutineScope {
         val commentsData = (response["data"] as JSONObject)
         val listing = ListingEntity(parentId, commentsData["after"]?.run { this as String })
 
         // get the list of children (comments) associated with the post
         val commentChildren = commentsData["children"] as JSONArray
-        val commentEntities = ArrayList<CommentEntity>()
 
-        commentChildren.forEach {
-            val commentPOJO = (it as JSONObject)["data"] as JSONObject
-            //Log.d(TAG, "parent keys = " + commentPOJO.keys + " ")
-            Log.d(TAG, "stuff " + commentPOJO["author_flair_css_class"] + " " + commentPOJO["author_flair_text"]
-                + " " + commentPOJO["author_flair_background_color"] + " " + commentPOJO["author_flair_text_color"]
-                + " " + commentPOJO["author_flair_type"] + " " + commentPOJO["author_flair_richtext"] )
+        async {
+            val deferredList = ArrayList<Deferred<CommentEntity>>()
+            commentChildren.forEach { commentChild ->
+                deferredList.add(
+                    async { unmarshallComment(commentChild as JSONObject) }
+                )
+            }
 
-            commentEntities.add(gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
-                commentPOJO["replies"]?.let { childJson ->
-                    if (childJson.toString().isNotEmpty()) {
-                        // start another coroutine to parse the children of this comment
-                        coroutineScope { parseComments(id, childJson as JSONObject) }
-
-                        // set reply count for this object
-                        val childJsonData = (childJson as JSONObject)["data"] as JSONObject
-                        replyCount = (childJsonData["children"] as JSONArray).size
-                    }
-                }
-
-                parent_id = removeTypePrefix(parent_id)
-                Log.d(TAG, "parent id = ${this.parent_id} current id = ${this.id}")
-
-                userUpvoted = commentPOJO["likes"]?.run {
-                    if (this as Boolean) 1 else -1
-                } ?: 0
-
-                author_flair_text?.let { author_flair_text = Html.fromHtml(author_flair_text).toString() }
-                commentPOJO["created"]?.apply { created = formatDate(this as Double) }
-
-                // have to do this because reddit has a decided this can be boolean or string
-                try {
-                     editedDate = formatDate(commentPOJO["edited"] as Double)
-                } catch (e : Exception) { }
-
-            })
+            launch (Dispatchers.IO) {
+                InsertPostsTask().execute(appDB, deferredList.awaitAll(), listing)
+            }
         }
+    }
 
-        if (commentEntities.size > 0) {
-            appDB.commentDAO.insertComments(commentEntities)
+    private class InsertPostsTask : AsyncTask<Any, Int, Unit>() {
+        override fun doInBackground(vararg objects: Any) {
+            val appDB = objects[0] as ApplicationDB
+            val comments = objects[1] as List<CommentEntity>
+            val listing = objects[2] as ListingEntity
+
+            appDB.commentDAO.insertComments(comments)
             appDB.listingDAO.insertListing(listing)
+        }
+    }
+
+    // TODO find a better way to unmarshall these objects
+    private suspend fun unmarshallComment(commentChild : JSONObject) : CommentEntity {
+        val commentPOJO = commentChild["data"] as JSONObject
+        return gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
+            commentPOJO["replies"]?.let { childJson ->
+                if (childJson.toString().isNotEmpty()) {
+                    // start another coroutine to parse the children of this comment
+                    coroutineScope { parseComments(id, childJson as JSONObject) }
+
+                    // set reply count for this object
+                    val childJsonData = (childJson as JSONObject)["data"] as JSONObject
+                    replyCount = (childJsonData["children"] as JSONArray).size
+                }
+            }
+
+            parent_id = removeTypePrefix(parent_id)
+            Log.d(TAG, "parent id = ${this.parent_id} current id = ${this.id}")
+
+            userUpvoted = commentPOJO["likes"]?.run {
+                if (this as Boolean) 1 else -1
+            } ?: 0
+
+            author_flair_text?.let {
+                author_flair_text = Html.fromHtml(author_flair_text).toString()
+            }
+            commentPOJO["created"]?.apply { created = formatDate(this as Double) }
+
+            // have to do this because reddit has a decided this can be boolean or string
+            try {
+                editedDate = formatDate(commentPOJO["edited"] as Double)
+            } catch (e: Exception) { }
         }
     }
 

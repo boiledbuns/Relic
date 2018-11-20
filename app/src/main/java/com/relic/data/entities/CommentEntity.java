@@ -32,6 +32,9 @@ public class CommentEntity {
 
   @ColumnInfo(name = "authorFlairText")
   public String author_flair_text;
+  @ColumnInfo(name = "authorFlairTextColor")
+  public String author_flair_text_color;
+
   @ColumnInfo(name = "isSubmitter")
   public boolean is_submitter;
   @ColumnInfo(name = "scoreHidden")
