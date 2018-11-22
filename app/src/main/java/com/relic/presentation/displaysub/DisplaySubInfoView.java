@@ -37,8 +37,6 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
     super.onCreate(savedInstanceState);
 //    displaySubInfoVM = ViewModelProviders.of(this).get(DisplaySubInfoVM.class);
 //    displaySubInfoVM.initialize(subName, new SubRepositoryImpl(getContext()));
-
-    displaySubVM = ViewModelProviders.of(getActivity()).get(DisplaySubVM.class);
   }
 
   @Nullable

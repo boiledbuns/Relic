@@ -31,6 +31,8 @@ import com.relic.presentation.adapter.ImageOnClick
 import com.relic.presentation.adapter.PostItemOnclick
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
+import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
@@ -248,12 +250,12 @@ class DisplaySubView : Fragment() {
     private fun initializeOnClicks() {
         // set onclick to display sub info when the title is clicked
         subToolbar.setOnClickListener {
-            val displaySubInfoView = DisplaySubInfoView()
-            val bundle = Bundle()
-            bundle.putString("name", subName)
-
-            displaySubInfoView.arguments = bundle
-            displaySubInfoView.show(activity!!.supportFragmentManager, TAG)
+            SubInfoBottomSheetDialog().apply {
+                arguments = Bundle().apply {
+                    putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
+                }
+                show(this@DisplaySubView.fragmentManager, TAG)
+            }
         }
     }
 

@@ -21,6 +21,9 @@ class SubInfoDialogVM (
     private val _subredditLiveData = subRepo.getSingleSub(subredditName)
     val subredditLiveData : LiveData<SubredditModel> = _subredditLiveData
 
+    private val _sideBarLiveData = subRepo.subGateway.getSidebar(subredditName)
+    val sideBarLiveData : LiveData<String> = _sideBarLiveData
+
     init {
         subRepo.subGateway.getAdditionalSubInfo(subredditName)
     }

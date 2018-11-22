@@ -5,7 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
-import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +20,7 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
 
 class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
+    private val TAG = "SUB_INFO_DIALOG"
 
     private val viewModel : SubInfoDialogVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
@@ -52,7 +53,7 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subNameView.text = subName
+        subNameView.text = resources.getString(R.string.sub_prefix_name, subName)
 
         // initialize onclicks
         subscribeButtonView.setOnClickListener { }
@@ -61,6 +62,9 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun bindVm() {
         viewModel.subredditLiveData.nonNull().observe(this) { setSubredditData(it) }
+        viewModel.sideBarLiveData.nonNull().observe(this) {
+            Log.d(TAG, "Sidebar $it")
+        }
     }
 
     private fun setSubredditData(subredditModel: SubredditModel) {

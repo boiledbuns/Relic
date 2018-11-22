@@ -20,6 +20,7 @@ class CommentItemVH (
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, DOWNVOTE_PRESSED) }
             commentReplyCount.setOnClickListener {
                 adapter.displayCommentReplies(commentPosition, commentsExpanded)
+                // if showing replies, display a placeholder loading
                 commentsExpanded = !commentsExpanded
             }
         }

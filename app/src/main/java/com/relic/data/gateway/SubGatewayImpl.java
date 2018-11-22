@@ -19,6 +19,8 @@ import org.json.simple.parser.ParseException;
 
 public class SubGatewayImpl implements SubGateway {
   private final String ENDPOINT = "https://oauth.reddit.com/";
+  private final String NON_OAUTH_ENDPOINT = "https://www.reddit.com/";
+
   public static String TAG = "SUB_GATEWAY";
   private String authToken;
 
@@ -111,7 +113,7 @@ public class SubGatewayImpl implements SubGateway {
     MutableLiveData<String> sidebar = new MutableLiveData<>();
 
     // get sub sidebar
-    String end = ENDPOINT + "r/" + subredditName + "/about/sidebar";
+    String end = ENDPOINT + "r/" + subredditName + "about/sidebar";
     Log.d(TAG, "from " + end);
     requestManager.processRequest(new RelicOAuthRequest(
             RelicOAuthRequest.GET,
