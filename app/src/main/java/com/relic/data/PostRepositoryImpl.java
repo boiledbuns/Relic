@@ -197,8 +197,10 @@ public class PostRepositoryImpl implements PostRepository {
 
       // TODO create parse class/switch to a more efficient method of removing html
       String authorFlair = (String) post.get("author_flair_text");
-      if (authorFlair != null) {
+      if (authorFlair != null && !authorFlair.isEmpty()) {
         postEntity.author_flair_text = Html.fromHtml(authorFlair).toString();
+      } else {
+        postEntity.author_flair_text = null;
       }
       Log.d(TAG, "epoch = " + post.get("created"));
 

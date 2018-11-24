@@ -32,6 +32,9 @@
     <string name="sort_scope_year">year</string>
     <string name="sort_scope_all">all</string>
 
+    <string name="sort_by_info">sorting by %s for %s</string>
+    <string name="sort_by_info_no_scope">sorting by %s</string>
+
     <string name="nsfw">NSFW</string>
     <string name="reply">reply</string>
     <string name="empty_parent_body">This post has no text body</string>

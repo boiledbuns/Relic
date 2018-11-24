@@ -34,13 +34,16 @@ class DisplaySubVM (
     private var currentSortingScope = PostRepository.SCOPE_NONE
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
-    val subredditLivedata : LiveData<SubredditModel> = _subredditMediator
+    val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
 
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
 
-    private val _navigationLivedata = MutableLiveData<NavigationData>()
-    val navigationLivedata : LiveData<NavigationData> = _navigationLivedata
+    private val _navigationLiveData = MutableLiveData<NavigationData>()
+    val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
+
+    private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
+    val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
 
     init {
         // observe the list of posts stored locally
@@ -75,10 +78,15 @@ class DisplaySubVM (
             }
         }
 
+        _subInfoLiveData.postValue(DisplaySubInfoData(
+            sortingMethod = currentSortingType,
+            sortingScope = currentSortingScope
+        ))
     }
 
     /**
-     * Method that allows views aware of the VM to request the VM retrieve more posts
+     * Method to retrieve more posts
+     * @param resetPosts : indicates whether the old posts should be cleared
      */
     override fun retrieveMorePosts(resetPosts: Boolean) {
         if (resetPosts) {
@@ -90,10 +98,16 @@ class DisplaySubVM (
         }
     }
 
-    override fun changeSortingMethod(sortingCode: Int, sortScope: Int) {
-        // update the current sorting method and scope
-        currentSortingType = sortingCode
-        currentSortingScope = sortScope
+    /**
+     * Called when the user has changed an aspect of the sorting method for this sub. Null values
+     * for either the sortTpe or sortScope indicate no change
+     * @param sortType : code corresponding to sort type
+     * @param sortScope : code corresponding to sort scope
+     */
+    override fun changeSortingMethod(sortType: Int?, sortScope: Int?) {
+        // update the current sorting method and scope if it has changed
+        sortType?.let { currentSortingType = it }
+        sortScope?.let { currentSortingScope = it }
 
         // remove all posts from current db for this subreddit (triggers retrieval)
         postRepo.clearAllSubPosts(subName)
@@ -143,7 +157,7 @@ class DisplaySubVM (
     override fun visitPost(postFullname: String) {
         postRepo.postGateway.visitPost(postFullname)
 
-        _navigationLivedata.apply {
+        _navigationLiveData.apply {
             value = NavigationData.ToPost(postFullname, subName)
             value = null
         }
@@ -160,11 +174,39 @@ class DisplaySubVM (
     }
 
     override fun showImage(postThumbnailUrl: String) {
-        _navigationLivedata.apply {
+        _navigationLiveData.apply {
             value = NavigationData.ToImage(postThumbnailUrl)
             value = null
         }
     }
 
     // end region view action delegate
+
+    // region sorting type helper functions
+    companion object {
+        fun convertSortingTypeToText(sortByCode : Int) : String  {
+            return when(sortByCode) {
+                PostRepository.SORT_DEFAULT-> "best"
+                PostRepository.SORT_HOT -> "hot"
+                PostRepository.SORT_NEW -> "new"
+                PostRepository.SORT_RISING-> "rising"
+                PostRepository.SORT_TOP -> "top"
+                PostRepository.SORT_CONTROVERSIAL -> "controversial"
+                else -> "default"
+            }
+        }
+
+        fun convertSortingScopeToText(sortByScope : Int) : String? {
+            return when(sortByScope) {
+                PostRepository.SCOPE_HOUR-> "hour"
+                PostRepository.SCOPE_DAY -> "day"
+                PostRepository.SCOPE_WEEK -> "week"
+                PostRepository.SCOPE_MONTH-> "month"
+                PostRepository.SCOPE_YEAR -> "year"
+                PostRepository.SCOPE_ALL -> "all"
+                else -> null
+            }
+        }
+    }
+    // endregion sorting type helper functions
 }

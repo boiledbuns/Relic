@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
 
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/subCollapsingToolbarLlyout"
+            android:id="@+id/subCollapsingToolbarLayout"
             android:layout_width="match_parent"
             android:layout_height="170dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snapMargins"
@@ -34,13 +34,13 @@
                     android:layout_height="match_parent"/>
 
                 <TextView
+                    android:id="@+id/subSortByInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:layout_marginStart="@dimen/toolbar_subtitle_margin_side"
-                    android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"
-                    android:text="sorting by hot"/>
+                    android:layout_marginBottom="@dimen/toolbar_subtitle_margin_bottom"/>
 
                 <Button
                     android:id="@+id/subscribeButtonView"

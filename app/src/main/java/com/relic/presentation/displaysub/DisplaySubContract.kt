@@ -2,7 +2,7 @@ package com.relic.presentation.displaysub
 
 interface DisplaySubContract {
     interface ViewModel {
-        fun changeSortingMethod(sortingCode: Int, sortScope: Int)
+        fun changeSortingMethod(sortingCode: Int? = null, sortScope: Int? = null)
 
         fun retrieveMorePosts(resetPosts: Boolean)
 
@@ -27,3 +27,8 @@ sealed class NavigationData {
             val thumbnail : String
     ) : NavigationData ()
 }
+
+data class DisplaySubInfoData (
+    var sortingMethod : Int,
+    var sortingScope : Int
+)

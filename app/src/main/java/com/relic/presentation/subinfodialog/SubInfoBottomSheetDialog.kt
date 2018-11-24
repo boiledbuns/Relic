@@ -56,8 +56,8 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
         subNameView.text = resources.getString(R.string.sub_prefix_name, subName)
 
         // initialize onclicks
-        subscribeButtonView.setOnClickListener { }
-        pinButtonView.setOnClickListener { viewModel.pinSubreddit(true) }
+        subInfoSubView.setOnClickListener { }
+        subInfoPinView.setOnClickListener { viewModel.pinSubreddit(true) }
     }
 
     private fun bindVm() {
@@ -69,11 +69,11 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun setSubredditData(subredditModel: SubredditModel) {
         if (subredditModel.isSubscribed) {
-            subscribeButtonView.text = getString(R.string.subscribed)
-            subscribeButtonView.background?.setTint(resources.getColor(R.color.positive))
+//            subscribeButtonView.text = getString(R.string.subscribed)
+            subInfoSubView.background?.setTint(resources.getColor(R.color.positive))
         } else {
-            subscribeButtonView.text = getString(R.string.subscribe)
-            subscribeButtonView.background?.setTint(resources.getColor(R.color.negative))
+//            subscribeButtonView.text = getString(R.string.subscribe)
+            subInfoSubView.background?.setTint(resources.getColor(R.color.negative))
         }
 
         subCountView.text = resources.getString(R.string.subscriber_count, subredditModel.subscriberCount)

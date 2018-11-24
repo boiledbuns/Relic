@@ -1,8 +1,5 @@
 package com.relic.presentation.displaysub;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.relic.R;
-import com.relic.data.SubRepositoryImpl;
 import com.relic.data.models.SubredditModel;
 import com.relic.databinding.DisplaySubInfoBinding;
 import com.relic.presentation.displaysubinfo.DisplaySubInfoContract;
@@ -53,7 +49,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
 
   private void loadSubIcon() {
     // observe the livedata for sub model and load the image once it loads
-    displaySubVM.getSubredditLivedata().observe(this, (SubredditModel subModel) -> {
+    displaySubVM.getSubredditLiveData().observe(this, (SubredditModel subModel) -> {
 
       ImageView icon = displaySubInfoBinding.getRoot().findViewById(R.id.display_subinfo_icon);
       String iconUrl = subModel.getSubIcon();
@@ -95,7 +91,7 @@ public class DisplaySubInfoView extends BottomSheetDialogFragment{
    * Add observers and onchange actions to all appropriate live data
    */
   private void subscribeToVM() {
-    displaySubVM.getSubredditLivedata().observe(this, (@NonNull SubredditModel subModel) -> {
+    displaySubVM.getSubredditLiveData().observe(this, (@NonNull SubredditModel subModel) -> {
       // updates the submodel bound to the view
       displaySubInfoBinding.setSubModel(subModel);
     });

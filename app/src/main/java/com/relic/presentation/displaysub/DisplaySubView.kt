@@ -36,6 +36,7 @@ import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
+import kotlinx.android.synthetic.main.display_sub_info.view.*
 import java.lang.Error
 
 class DisplaySubView : Fragment() {
@@ -64,8 +65,9 @@ class DisplaySubView : Fragment() {
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
-    private var sortType : Int = PostRepository.SORT_DEFAULT
 
+
+    // region lifecycle hooks
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,14 +80,12 @@ class DisplaySubView : Fragment() {
         bindViewModel()
     }
 
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.display_sub, container, false)
-
         val recyclerView = root.findViewById<RecyclerView>(R.id.subPostsRecyclerView)
         val toolbar = root.findViewById<Toolbar>(R.id.subToolbar)
 
@@ -186,19 +186,24 @@ class DisplaySubView : Fragment() {
             // when the sorting type is changed
             R.id.post_sort_best, R.id.post_sort_hot, R.id.post_sort_new, R.id.post_sort_rising,
             R.id.post_sort_top, R.id.post_sort_controversial -> {
-                sortType = convertSortType(item.itemId)
+                val sortMethod = convertMenuItemToSortType(item.itemId)
+                displaySubVM.changeSortingMethod(sortType = sortMethod)
+                Toast.makeText(context, "Sorting option selected $sortMethod", Toast.LENGTH_SHORT).show()
+
+                postAdapter.clear()
+                subAppBarLayout.setExpanded(true)
+                subSwipeRefreshLayout.isRefreshing = true
             }
             // when the sorting scope is changed
             R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
             R.id.order_scope_month, R.id.order_scope_year, R.id.order_scope_all -> {
+                val sortScope = convertMenuItemToSortScope(item.itemId)
+                displaySubVM.changeSortingMethod(sortScope = sortScope)
+                Toast.makeText(context, "Sorting option selected $sortScope", Toast.LENGTH_SHORT).show()
 
-                displaySubVM.changeSortingMethod(sortType, convertSortScope(item.itemId))
-
+                postAdapter.clear()
                 subAppBarLayout.setExpanded(true)
                 subSwipeRefreshLayout.isRefreshing = true
-                postAdapter.clear()
-
-                Toast.makeText(context, "Sorting option selected $sortType", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 override = super.onOptionsItemSelected(item)
@@ -207,8 +212,9 @@ class DisplaySubView : Fragment() {
 
         return override
     }
+    // endregion lifecycle hooks
 
-
+    // region view functions
 
     /**
      * Observe all the livedata exposed by the viewmodel and attach the appropriate event listeners
@@ -225,7 +231,7 @@ class DisplaySubView : Fragment() {
         }
 
         // observe the subreddit model representing this subreddit
-        displaySubVM.subredditLivedata.nonNull().observe(this) { subredditModel ->
+        displaySubVM.subredditLiveData.nonNull().observe(this) { subredditModel ->
             subscribeButtonView.apply {
                 text = if (subredditModel.isSubscribed) "subbed" else "subscribe"
             }
@@ -235,7 +241,7 @@ class DisplaySubView : Fragment() {
             }
         }
 
-        displaySubVM.navigationLivedata.nonNull().observe(this) { navigationData ->
+        displaySubVM.navigationLiveData.nonNull().observe(this) { navigationData ->
             when (navigationData) {
                 is NavigationData.ToPost -> {
                     PostItemOnClick().onClick(navigationData.postId, navigationData.subredditName)
@@ -244,6 +250,20 @@ class DisplaySubView : Fragment() {
                     OnClickImage().onClick(navigationData.thumbnail)
                 }
             }
+        }
+
+        displaySubVM.subInfoLiveData.nonNull().observe (this) {
+            val method = DisplaySubVM.convertSortingTypeToText(it.sortingMethod)
+            val scope = DisplaySubVM.convertSortingScopeToText(it.sortingScope)
+
+            val sortInfoText = if (scope != null) {
+                resources.getString(R.string.sort_by_info, method, scope)
+            } else {
+                resources.getString(R.string.sort_by_info_no_scope, method)
+            }
+
+            subToolbar?.display_subinfo_subtitle?.text = sortInfoText
+            subSortByInfo.text = sortInfoText
         }
     }
 
@@ -366,8 +386,8 @@ class DisplaySubView : Fragment() {
         }
     }
 
-    companion object {
-        fun convertSortType(optionId : Int) : Int {
+    companion object SortTypeHelper {
+        fun convertMenuItemToSortType(optionId : Int) : Int {
             return when(optionId) {
                 R.id.post_sort_best -> PostRepository.SORT_BEST
                 R.id.post_sort_hot -> PostRepository.SORT_HOT
@@ -379,7 +399,7 @@ class DisplaySubView : Fragment() {
             }
         }
 
-        fun convertSortScope(optionId : Int) : Int{
+        fun convertMenuItemToSortScope(optionId : Int) : Int{
             return when(optionId) {
                 R.id.order_scope_hour -> PostRepository.SCOPE_HOUR
                 R.id.order_scope_day -> PostRepository.SCOPE_DAY
