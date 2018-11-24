@@ -66,8 +66,6 @@
 
                 </RelativeLayout>
 
-
-
                 <TextView
                     android:id="@+id/display_subinfo_subtitle"
                     android:layout_width="wrap_content"

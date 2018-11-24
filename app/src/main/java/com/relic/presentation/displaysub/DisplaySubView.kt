@@ -65,9 +65,9 @@ class DisplaySubView : Fragment() {
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
+    private var tempSortMethod = PostRepository.SORT_DEFAULT
 
-
-    // region lifecycle hooks
+    // region fragment lifecycle hooks
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,6 +178,9 @@ class DisplaySubView : Fragment() {
             }
         }
     }
+    // endregion fragment lifecycle hooks
+
+    // region fragment hooks
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
@@ -186,22 +189,16 @@ class DisplaySubView : Fragment() {
             // when the sorting type is changed
             R.id.post_sort_best, R.id.post_sort_hot, R.id.post_sort_new, R.id.post_sort_rising,
             R.id.post_sort_top, R.id.post_sort_controversial -> {
-                val sortMethod = convertMenuItemToSortType(item.itemId)
-                displaySubVM.changeSortingMethod(sortType = sortMethod)
-                Toast.makeText(context, "Sorting option selected $sortMethod", Toast.LENGTH_SHORT).show()
-
-                postAdapter.clear()
-                subAppBarLayout.setExpanded(true)
-                subSwipeRefreshLayout.isRefreshing = true
+                // update the temporary local sorting method since we don't sort yet
+                tempSortMethod = convertMenuItemToSortType(item.itemId)
             }
             // when the sorting scope is changed
             R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
             R.id.order_scope_month, R.id.order_scope_year, R.id.order_scope_all -> {
                 val sortScope = convertMenuItemToSortScope(item.itemId)
-                displaySubVM.changeSortingMethod(sortScope = sortScope)
+                displaySubVM.changeSortingMethod(sortType = tempSortMethod, sortScope = sortScope)
                 Toast.makeText(context, "Sorting option selected $sortScope", Toast.LENGTH_SHORT).show()
 
-                postAdapter.clear()
                 subAppBarLayout.setExpanded(true)
                 subSwipeRefreshLayout.isRefreshing = true
             }
@@ -212,7 +209,7 @@ class DisplaySubView : Fragment() {
 
         return override
     }
-    // endregion lifecycle hooks
+    // endregion fragment hooks
 
     // region view functions
 

@@ -100,7 +100,7 @@ class DisplaySubVM (
 
     /**
      * Called when the user has changed an aspect of the sorting method for this sub. Null values
-     * for either the sortTpe or sortScope indicate no change
+     * for either the sortType or sortScope indicate no change
      * @param sortType : code corresponding to sort type
      * @param sortScope : code corresponding to sort scope
      */
@@ -111,6 +111,7 @@ class DisplaySubVM (
 
         // remove all posts from current db for this subreddit (triggers retrieval)
         postRepo.clearAllSubPosts(subName)
+        postRepo.retrieveSortedPosts(subName, currentSortingType, currentSortingScope)
     }
 
     override fun onNextListing(nextVal: String?) {
@@ -179,10 +180,10 @@ class DisplaySubVM (
             value = null
         }
     }
-
-    // end region view action delegate
+    // endregion view action delegate
 
     // region sorting type helper functions
+
     companion object {
         fun convertSortingTypeToText(sortByCode : Int) : String  {
             return when(sortByCode) {

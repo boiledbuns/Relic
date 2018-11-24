@@ -86,7 +86,6 @@ class PostItemVH (
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
         itemView.postItemNSFWView.visibility = if (postModel.isNsfw) View.VISIBLE else View.GONE
 
-
         itemView.postItemTagView.apply {
             if (postModel.linkFlair != null) {
                 text = postModel.linkFlair
