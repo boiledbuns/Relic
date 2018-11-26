@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 @Entity
 public class CommentEntity {
   private static String NOT_EDITED = "false";
+  public static int REPLY_LINK_LENGTH = 7;
 
   @NonNull
   @PrimaryKey
@@ -43,6 +44,7 @@ public class CommentEntity {
 
   public int replyCount;
   public int depth;
+  public String replyLink;
 
   public String editedDate;
 

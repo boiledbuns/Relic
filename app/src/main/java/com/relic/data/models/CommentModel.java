@@ -21,6 +21,7 @@ public class CommentModel {
   public String edited;
   public int depth;
   public int replyCount;
+  public String replyLink;
 
   public CommentModel() {}
 

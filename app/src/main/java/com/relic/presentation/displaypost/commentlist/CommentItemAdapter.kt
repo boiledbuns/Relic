@@ -58,8 +58,8 @@ class CommentItemAdapter (
 
     // region onclick handler
 
-    fun displayCommentReplies(itemPosition : Int, commentExpanded : Boolean) {
-        actionDelegate.onExpandReplies(itemPosition, commentExpanded)
+    fun displayCommentReplies(itemId : String, commentExpanded : Boolean) {
+        actionDelegate.onExpandReplies(itemId, commentExpanded)
     }
 
     fun voteOnComment(itemPosition : Int, voteValue : Int) {

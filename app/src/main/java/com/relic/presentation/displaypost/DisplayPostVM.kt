@@ -124,20 +124,41 @@ class DisplayPostVM (
 
     // -- region view action delegate --
 
-    override fun onExpandReplies(position: Int, expanded : Boolean) {
-        val commentModel = _commentListLiveData.value!![position]
+    override fun onExpandReplies(commentId: String, expanded : Boolean) {
+//        val commentModel = _commentListLiveData.value!![position]
+//
+//        if (expanded) {
+//            removeReplies(position)
+//        } else {
+//            val commentSource = commentRepo.getReplies(commentModel.id)
+//            _commentListLiveData.addSource(commentSource) { replies ->
+//                replies?.let {
+//                    if (it.isNotEmpty()) {
+//                        insertReplies(position, it)
+//                    } else {
+//                        // TODO retrieve comments from server if replies are not loaded
+//                        commentRepo.retrieveCommentChildren(commentModel)
+//                    }
+//                    // remove this as a source since this is a one off to retrieve replies
+//                    _commentListLiveData.removeSource(commentSource)
+//                }
+//            }
+//        }
+
+        val commentPosition = _commentListLiveData.value!!.indexOfFirst { it.id == commentId }
+        val commentModel = _commentListLiveData.value!![commentPosition]
 
         if (expanded) {
-            removeReplies(position)
+            removeReplies(commentPosition)
         } else {
             val commentSource = commentRepo.getReplies(commentModel.id)
             _commentListLiveData.addSource(commentSource) { replies ->
                 replies?.let {
                     if (it.isNotEmpty()) {
-                        insertReplies(position, it)
-                        // TODO switch to observer, which can be removed after comment retrieved
+                        insertReplies(commentPosition, it)
                     } else {
                         // TODO retrieve comments from server if replies are not loaded
+                        commentRepo.retrieveCommentChildren(commentModel)
                     }
                     // remove this as a source since this is a one off to retrieve replies
                     _commentListLiveData.removeSource(commentSource)

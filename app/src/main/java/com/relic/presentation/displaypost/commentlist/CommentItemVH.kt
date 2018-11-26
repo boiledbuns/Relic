@@ -13,13 +13,23 @@ class CommentItemVH (
 ): RecyclerView.ViewHolder(commentItem) {
     private var commentsExpanded = false
     private var commentPosition = 0
+    private var commentId = ""
 
     fun initializeOnClicks(adapter : CommentItemAdapter) {
         commentItem.apply {
             commentUpvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, UPVOTE_PRESSED) }
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, DOWNVOTE_PRESSED) }
+//            commentReplyCount.setOnClickListener {
+//                adapter.displayCommentReplies(commentPosition, commentsExpanded)
+//                // if showing replies, display a placeholder loading
+//                commentsExpanded = !commentsExpanded
+//            }
+            // new method, will play around a bit but there are alternatives
+            // a) display comment replies as children views for each comment item
+            // b) this way, send the comment id in the method and have the viewmodel search through
+            //    its set of comment (which imo seems somewhat inefficient)
             commentReplyCount.setOnClickListener {
-                adapter.displayCommentReplies(commentPosition, commentsExpanded)
+                adapter.displayCommentReplies(commentId, commentsExpanded)
                 // if showing replies, display a placeholder loading
                 commentsExpanded = !commentsExpanded
             }
@@ -28,6 +38,7 @@ class CommentItemVH (
 
     fun bindComment(commentModel : CommentModel, position : Int) {
         commentPosition = position
+        commentId = commentModel.id
 
         commentItem.apply {
             commentScoreView.text = commentModel.score.toString() + " " + commentModel.depth

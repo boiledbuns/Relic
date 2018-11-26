@@ -112,6 +112,9 @@ class DisplaySubVM (
         // remove all posts from current db for this subreddit (triggers retrieval)
         postRepo.clearAllSubPosts(subName)
         postRepo.retrieveSortedPosts(subName, currentSortingType, currentSortingScope)
+        _subInfoLiveData.postValue(
+            DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
+        )
     }
 
     override fun onNextListing(nextVal: String?) {

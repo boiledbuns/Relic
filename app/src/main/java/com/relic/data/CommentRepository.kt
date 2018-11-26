@@ -20,6 +20,8 @@ interface CommentRepository {
      */
     fun retrieveComments(subName: String, postFullName: String, refresh : Boolean)
 
+    fun retrieveCommentChildren(commentModel: CommentModel)
+
     /**
      * clears all locally stored comments
      * @param postFullName full name of the post to clear the comments for

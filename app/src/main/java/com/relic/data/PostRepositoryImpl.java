@@ -326,7 +326,6 @@ public class PostRepositoryImpl implements PostRepository {
     ));
   }
 
-
   private PostEntity parsePost(String response) throws ParseException {
     Gson gson = new GsonBuilder().create();
     JSONObject data = (JSONObject)((JSONObject) ((JSONArray) JSONParser.parse(response)).get(0)).get("data");

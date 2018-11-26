@@ -42,6 +42,8 @@ class CommentRepositoryImpl(
 ) : CommentRepository {
 
     private val ENDPOINT = "https://oauth.reddit.com/"
+    private val NON_OAUTH_ENDPOINT = "https://www.reddit.com/"
+
     private val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
     private val TAG = "COMMENT_REPO"
 
@@ -124,6 +126,28 @@ class CommentRepositoryImpl(
         return responseReturn
     }
 
+    override fun retrieveCommentChildren(commentModel: CommentModel) {
+        GlobalScope.async (Dispatchers.IO) {
+            var ending = "api/morechildren?api_type=json&link_id=${commentModel.fullName}&id=${commentModel.replyLink}"
+
+            requestManager.processRequest(RelicOAuthRequest(
+                RelicOAuthRequest.GET,
+                NON_OAUTH_ENDPOINT + ending,
+                Response.Listener { response ->
+                    try {
+                        Log.d(TAG, "More replies" + response)
+                    } catch (e: Exception) {
+                        Log.d(TAG, "Error parsing JSON return " + e.message)
+                    }
+                },
+                Response.ErrorListener{  error -> Log.d(TAG, "Error with request : " + error.message) },
+                authToken!!
+            ))
+
+        }
+    }
+
+
     private fun parseCommentRequestResponse(postFullName: String, response: String) {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
@@ -135,53 +159,50 @@ class CommentRepositoryImpl(
      * Parse the response from the api and store the comments in the room db
      * @param response json string response
      * @param parentId fullname of post used as a key for the "after" value
+     * @return : size of the list to the child list
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private suspend fun parseComments(parentId: String, response: JSONObject) = coroutineScope {
+    private suspend fun parseComments(parentId: String, response: JSONObject) : Int {
         val commentsData = (response["data"] as JSONObject)
         val listing = ListingEntity(parentId, commentsData["after"]?.run { this as String })
 
         // get the list of children (comments) associated with the post
         val commentChildren = commentsData["children"] as JSONArray
+        val deferredList = ArrayList<Deferred<CommentEntity>>()
 
-        async {
-            val deferredList = ArrayList<Deferred<CommentEntity>>()
-            commentChildren.forEach { commentChild ->
-                deferredList.add(
-                    async { unmarshallComment(commentChild as JSONObject) }
-                )
-            }
+        coroutineScope {
+            async {
+                commentChildren.forEach { commentChild ->
+                    deferredList.add(
+                        async { unmarshallComment(commentChild as JSONObject) }
+                    )
+                }
 
-            launch (Dispatchers.IO) {
-                InsertPostsTask().execute(appDB, deferredList.awaitAll(), listing)
+                launch (Dispatchers.IO) {
+                    InsertPostsTask().execute(appDB, deferredList.awaitAll(), listing)
+                }
             }
         }
-    }
 
-    private class InsertPostsTask : AsyncTask<Any, Int, Unit>() {
-        override fun doInBackground(vararg objects: Any) {
-            val appDB = objects[0] as ApplicationDB
-            val comments = objects[1] as List<CommentEntity>
-            val listing = objects[2] as ListingEntity
-
-            appDB.commentDAO.insertComments(comments)
-            appDB.listingDAO.insertListing(listing)
-        }
+        return deferredList.awaitAll().size
     }
 
     // TODO find a better way to unmarshall these objects
     private suspend fun unmarshallComment(commentChild : JSONObject) : CommentEntity {
         val commentPOJO = commentChild["data"] as JSONObject
+
         return gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
             commentPOJO["replies"]?.let { childJson ->
+                // try to parse the child json as nested replies
                 if (childJson.toString().isNotEmpty()) {
                     // start another coroutine to parse the children of this comment
-                    coroutineScope { parseComments(id, childJson as JSONObject) }
-
+                    coroutineScope {
+                        replyCount = async { parseComments(id, childJson as JSONObject) }.await()
+                    }
                     // set reply count for this object
                     val childJsonData = (childJson as JSONObject)["data"] as JSONObject
-                    replyCount = (childJsonData["children"] as JSONArray).size
+                    // replyCount = (childJsonData["children"] as JSONArray).size
                 }
             }
 
@@ -201,6 +222,17 @@ class CommentRepositoryImpl(
             try {
                 editedDate = formatDate(commentPOJO["edited"] as Double)
             } catch (e: Exception) { }
+        }
+    }
+
+    private class InsertPostsTask : AsyncTask<Any, Int, Unit>() {
+        override fun doInBackground(vararg objects: Any) {
+            val appDB = objects[0] as ApplicationDB
+            val comments = objects[1] as List<CommentEntity>
+            val listing = objects[2] as ListingEntity
+
+            appDB.commentDAO.insertComments(comments)
+            appDB.listingDAO.insertListing(listing)
         }
     }
 

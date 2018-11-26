@@ -199,6 +199,7 @@ class DisplaySubView : Fragment() {
                 displaySubVM.changeSortingMethod(sortType = tempSortMethod, sortScope = sortScope)
                 Toast.makeText(context, "Sorting option selected $sortScope", Toast.LENGTH_SHORT).show()
 
+                postAdapter.clear()
                 subAppBarLayout.setExpanded(true)
                 subSwipeRefreshLayout.isRefreshing = true
             }

@@ -26,6 +26,7 @@ class PostItemAdapter (
 
     fun clear() {
         postList = ArrayList()
+        notifyDataSetChanged()
     }
 
     fun setPostList(newPostList: MutableList<PostModel>) {
