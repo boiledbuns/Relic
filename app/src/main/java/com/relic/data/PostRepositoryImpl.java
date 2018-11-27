@@ -47,7 +47,6 @@ public class PostRepositoryImpl implements PostRepository {
   private ApplicationDB appDB;
 
   private NetworkRequestManager requestManager;
-  private int currentSortingCode = PostRepository.Companion.getSORT_HOT();
 
   @Inject
   public PostRepositoryImpl(Context context, NetworkRequestManager networkRequestManager) {
@@ -121,15 +120,17 @@ public class PostRepositoryImpl implements PostRepository {
    */
   @Override
   public void retrieveSortedPosts(String subredditName, int sortType, int sortScope) {
-    // generate the ending of the request url based on sorting mzethod specified by the used
+    // generate the ending of the request url based on sorting method specified
     String ending = ENDPOINT + "r/" + subredditName;
 
     // change the endpoint based on which sorting option the user has selected
-    if (sortType != Companion.getSORT_DEFAULT() && sortType <= sortByMethods.length) {
+    if (sortType != PostRepository.SORT_DEFAULT && sortType <= sortByMethods.length) {
       // build the appropriate endpoint based on the "sort by" code and time scope
       ending += "/" + sortByMethods[sortType - 1] + "/?sort=" + sortByMethods[sortType - 1];
-      // add the scope to the query string if it has been selected
-      if (sortScope != PostRepository.Companion.getSCOPE_NONE()) {
+
+      // only add sort scope for these sorting types
+      if (sortType == SORT_HOT || sortType == SORT_RISING || sortType == SORT_TOP) {
+        // add the scope only if the sorting type has one
         ending += "&t=" + sortScopes[sortScope - 1];
       }
     }

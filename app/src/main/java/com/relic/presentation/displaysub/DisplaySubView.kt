@@ -187,10 +187,13 @@ class DisplaySubView : Fragment() {
         when (item?.itemId) {
             R.id.display_sub_searchitem -> { }
             // when the sorting type is changed
-            R.id.post_sort_best, R.id.post_sort_hot, R.id.post_sort_new, R.id.post_sort_rising,
-            R.id.post_sort_top, R.id.post_sort_controversial -> {
+            R.id.post_sort_hot, R.id.post_sort_rising, R.id.post_sort_top -> {
                 // update the temporary local sorting method since we don't sort yet
                 tempSortMethod = convertMenuItemToSortType(item.itemId)
+            }
+            // these sorting types don't have a scope, so we send sort method immediately
+            R.id.post_sort_new, R.id.post_sort_best, R.id.post_sort_controversial -> {
+                displaySubVM.changeSortingMethod(sortType = convertMenuItemToSortType(item.itemId))
             }
             // when the sorting scope is changed
             R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
@@ -239,31 +242,38 @@ class DisplaySubView : Fragment() {
             }
         }
 
-        displaySubVM.navigationLiveData.nonNull().observe(this) { navigationData ->
-            when (navigationData) {
-                is NavigationData.ToPost -> {
-                    PostItemOnClick().onClick(navigationData.postId, navigationData.subredditName)
-                }
-                is NavigationData.ToImage -> {
-                    OnClickImage().onClick(navigationData.thumbnail)
-                }
+        displaySubVM.navigationLiveData.nonNull().observe(this) { setNavigationData(it) }
+        displaySubVM.subInfoLiveData.nonNull().observe (this) { setSubInfoData(it) }
+    }
+
+    // region LiveData handlers
+
+    private fun setNavigationData(navigationData: NavigationData) {
+        when (navigationData) {
+            is NavigationData.ToPost -> {
+                PostItemOnClick().onClick(navigationData.postId, navigationData.subredditName)
             }
-        }
-
-        displaySubVM.subInfoLiveData.nonNull().observe (this) {
-            val method = DisplaySubVM.convertSortingTypeToText(it.sortingMethod)
-            val scope = DisplaySubVM.convertSortingScopeToText(it.sortingScope)
-
-            val sortInfoText = if (scope != null) {
-                resources.getString(R.string.sort_by_info, method, scope)
-            } else {
-                resources.getString(R.string.sort_by_info_no_scope, method)
+            is NavigationData.ToImage -> {
+                OnClickImage().onClick(navigationData.thumbnail)
             }
-
-            subToolbar?.display_subinfo_subtitle?.text = sortInfoText
-            subSortByInfo.text = sortInfoText
         }
     }
+
+    private fun setSubInfoData(sortingInfo : DisplaySubInfoData) {
+        val method = DisplaySubVM.convertSortingTypeToText(sortingInfo.sortingMethod)
+        val scope = DisplaySubVM.convertSortingScopeToText(sortingInfo.sortingScope)
+
+        val sortInfoText = if (scope != null) {
+            resources.getString(R.string.sort_by_info, method, scope)
+        } else {
+            resources.getString(R.string.sort_by_info_no_scope, method)
+        }
+
+        subToolbar?.display_subinfo_subtitle?.text = sortInfoText
+        subSortByInfo.text = sortInfoText
+    }
+
+    // endregion LiveData handlers
 
     private fun initializeOnClicks() {
         // set onclick to display sub info when the title is clicked

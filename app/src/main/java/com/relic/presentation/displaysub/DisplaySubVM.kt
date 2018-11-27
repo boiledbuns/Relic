@@ -155,7 +155,6 @@ class DisplaySubVM (
         }
     }
 
-
     // region view action delegate
 
     override fun visitPost(postFullname: String) {

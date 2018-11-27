@@ -68,21 +68,21 @@ interface PostRepository {
     fun clearAllSubPosts(subredditName: String)
 
     companion object {
-        val SORT_DEFAULT = 0
-        val SORT_BEST = 1
-        val SORT_CONTROVERSIAL = 2
-        val SORT_HOT = 3
-        val SORT_NEW = 4
-        val SORT_RISING = 5
-        val SORT_TOP = 6
+        const val SORT_DEFAULT = 0
+        const val SORT_BEST = 1
+        const val SORT_CONTROVERSIAL = 2
+        const val SORT_HOT = 3
+        const val SORT_NEW = 4
+        const val SORT_RISING = 5
+        const val SORT_TOP = 6
 
-        val SCOPE_NONE = 0
-        val SCOPE_HOUR = 1
-        val SCOPE_DAY = 2
-        val SCOPE_WEEK = 3
-        val SCOPE_MONTH = 4
-        val SCOPE_YEAR = 5
-        val SCOPE_ALL = 6
+        const val SCOPE_NONE = 0
+        const val SCOPE_HOUR = 1
+        const val SCOPE_DAY = 2
+        const val SCOPE_WEEK = 3
+        const val SCOPE_MONTH = 4
+        const val SCOPE_YEAR = 5
+        const val SCOPE_ALL = 6
     }
 
 }
