@@ -14,6 +14,7 @@ import com.relic.data.Authenticator;
 import com.relic.network.VolleyQueue;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.presentation.displaysubs.DisplaySubsView;
+import com.relic.presentation.home.HomeFragment;
 
 import javax.inject.Inject;
 
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     if (fragCount < 1) {
       getSupportFragmentManager()
               .beginTransaction()
-              .replace(R.id.main_content_frame, new DisplaySubsView())
+              .replace(R.id.main_content_frame, new HomeFragment())
               .commit();
     }
   }
