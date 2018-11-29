@@ -90,10 +90,10 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
                 layoutManager = LinearLayoutManager(context)
             }
 
-            (displaySubsToolbar as Toolbar).also {
-                it.setTitle(R.string.app_name)
-                (activity as AppCompatActivity).setSupportActionBar(it)
-            }
+//            (displaySubsToolbar as Toolbar).also {
+//                it.setTitle(R.string.app_name)
+//                (activity as AppCompatActivity).setSupportActionBar(it)
+//            }
         }
 
         // attach the actions associated with loading the posts

@@ -125,7 +125,6 @@ class DisplaySubView : Fragment() {
 //        })
     }
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -155,7 +154,7 @@ class DisplaySubView : Fragment() {
             // inflate only sorting types that have a sub scope menu
             val menuWithSubMenu = listOf(2, 3, 4)
             for (i in menuWithSubMenu) {
-                inflate(R.menu.order_scope_menu, sortTypeMenu?.getItem(i)?.subMenu)
+//                inflate(R.menu.order_scope_menu, sortTypeMenu?.getItem(i)?.subMenu)
             }
         }
 

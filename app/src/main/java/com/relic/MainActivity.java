@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
     initializeDefaultView();
   }
 
-
   public void initializeDefaultView() {
     // get the number of additional (non default) fragments in the stack
     int fragCount = getSupportFragmentManager().getBackStackEntryCount();
