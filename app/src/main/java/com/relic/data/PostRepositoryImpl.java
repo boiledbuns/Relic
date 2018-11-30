@@ -74,9 +74,16 @@ public class PostRepositoryImpl implements PostRepository {
    * @return livedata list of posts
    */
   public LiveData<List<PostModel>> getPosts(String subreddit) {
-    return appDB.getPostDao().getSubredditPosts(subreddit);
+    LiveData<List<PostModel>> subredditPosts;
+    // handles specific cases
+    // try to convert this to enum if time permits
+    if (subreddit.isEmpty()) {
+      subredditPosts = appDB.getPostDao().getFrontPagePosts();
+    } else {
+      subredditPosts = appDB.getPostDao().getSubredditPosts(subreddit);
+    }
+    return subredditPosts;
   }
-
 
   /**
    * Retrieves posts for a subreddit
@@ -195,6 +202,10 @@ public class PostRepositoryImpl implements PostRepository {
       PostEntity postEntity = gson.fromJson(post.toJSONString(), PostEntity.class);
       Boolean likes = (Boolean) post.get("likes");
       postEntity.userUpvoted = likes == null ? 0 : (likes ? 1 : -1);
+
+      if (subreddit.isEmpty()) {
+        postEntity.origin = PostEntity.ORIGIN_FRONTPAGE;
+      }
 
       // TODO create parse class/switch to a more efficient method of removing html
       String authorFlair = (String) post.get("author_flair_text");

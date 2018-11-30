@@ -7,6 +7,7 @@ import com.relic.presentation.displaypost.DisplayPostVM
 import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.displaysubs.DisplaySubsVM
 import com.relic.presentation.editor.EditorVM
+import com.relic.presentation.home.frontpage.FrontpageVM
 import com.relic.presentation.subinfodialog.SubInfoDialogVM
 import dagger.Component
 import javax.inject.Singleton
@@ -26,4 +27,6 @@ interface VMComponent {
     fun getDisplaySubsVM() : DisplaySubsVM.Factory
 
     fun getDisplaySubVM() : DisplaySubVM.Factory
+
+    fun getDisplayFrontpageVM() : FrontpageVM.Factory
 }

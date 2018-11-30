@@ -7,6 +7,10 @@ import android.arch.persistence.room.PrimaryKey;
 
 @Entity
 public class PostEntity {
+  public static final int ORIGIN_SUB = 0;
+  public static final int ORIGIN_FRONTPAGE = 1;
+  public static final int ORIGIN_ALL = 2;
+
   // api metadata
   @PrimaryKey(autoGenerate = true)
   public int order;
@@ -64,4 +68,7 @@ public class PostEntity {
 
   public String subreddit;
   public int userUpvoted;
+
+  // custom local fields
+  public int origin;
 }

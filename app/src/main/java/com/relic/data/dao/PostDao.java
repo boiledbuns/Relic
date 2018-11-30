@@ -14,7 +14,13 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  @Query("SELECT * FROM PostEntity WHERE subreddit = :subName ORDER BY `order` ASC")
+  // Currently can't use constants from entity class in query annotation so hardcoded for now
+  // TODO fix it
+
+  @Query("SELECT * FROM PostEntity WHERE origin = 1 ORDER BY `order` ASC")
+  public abstract LiveData<List<PostModel>> getFrontPagePosts();
+
+  @Query("SELECT * FROM PostEntity WHERE subreddit = :subName AND origin = 0 ORDER BY `order` ASC")
   public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.relic.R
 import com.relic.presentation.displaysubs.DisplaySubsView
+import com.relic.presentation.home.frontpage.FrontpageFragment
 import kotlinx.android.synthetic.main.home.view.*
 import kotlinx.android.synthetic.main.relic_toolbar.view.*
 
@@ -40,7 +41,7 @@ class HomeFragment : Fragment() {
 
     private fun initializeFragments() {
         tabFragments.add(DisplaySubsView())
-        tabFragments.add(DisplaySubsView())
+        tabFragments.add(FrontpageFragment())
     }
 
     private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

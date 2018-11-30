@@ -13,7 +13,7 @@ import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
 import javax.inject.Inject
 
-class DisplaySubVM (
+open class DisplaySubVM (
         private val subName: String,
         private val subRepo: SubRepository,
         private var postRepo: PostRepository

@@ -117,7 +117,11 @@ public class PostModel implements Post {
   }
 
   public void setThumbnail(String thumbnail) {
-    this.thumbnail = thumbnail.equals("self") ? null : thumbnail;
+    if (thumbnail != null && thumbnail.equals("self")) {
+      this.thumbnail = null;
+    } else {
+      this.thumbnail = thumbnail;
+    }
   }
 
   public boolean isNsfw() {
