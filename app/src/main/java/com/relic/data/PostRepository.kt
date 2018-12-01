@@ -26,7 +26,7 @@ interface PostRepository {
      * @param subredditName valid subreddit name
      * @param postingAfter null ? refresh : "after" value for the next listing
      */
-    fun retrieveMorePosts(subredditName: String, postingAfter: String)
+    fun retrieveMorePosts(postSource: PostSource, postingAfter: String)
 
     /**
      *
@@ -56,9 +56,9 @@ interface PostRepository {
      * @param subredditName
      * @param sortByCode
      */
-    fun retrieveSortedPosts(subredditName: String, sortByCode: Int, sortScopeCode: Int)
+    fun retrieveSortedPosts(postSource: PostSource, sortByCode: Int, sortScopeCode: Int)
 
-    fun retrieveSortedPosts(subredditName: String, sortByCode: Int)
+    fun retrieveSortedPosts(postSource: PostSource, sortByCode: Int)
 
     /**
      * //TODO tentative -> should expose or not
@@ -83,6 +83,15 @@ interface PostRepository {
         const val SCOPE_MONTH = 4
         const val SCOPE_YEAR = 5
         const val SCOPE_ALL = 6
+    }
+
+    sealed class PostSource {
+        class Frontpage : PostSource()
+        class All : PostSource()
+        class Popular : PostSource()
+        data class Subreddit(
+            val subredditName : String
+        ) : PostSource()
     }
 
 }
