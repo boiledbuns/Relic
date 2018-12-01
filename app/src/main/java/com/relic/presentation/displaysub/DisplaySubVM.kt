@@ -50,9 +50,10 @@ open class DisplaySubVM (
         _postListMediator.addSource(postRepo.getPosts(subName)) { postModels ->
             // retrieve posts when the posts stored locally for this sub have been cleared
             if (postModels != null && postModels.isEmpty()) {
+                val postSource = PostRepository.PostSource.Subreddit(subName)
                 Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
                 // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
-                postRepo.retrieveSortedPosts(subName, currentSortingType, currentSortingScope)
+                postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
                 // TODO add a livedata boolean success listener
                 // TODO add a flag for the to check if retrieval occured
             } else {
@@ -111,7 +112,8 @@ open class DisplaySubVM (
 
         // remove all posts from current db for this subreddit (triggers retrieval)
         postRepo.clearAllSubPosts(subName)
-        postRepo.retrieveSortedPosts(subName, currentSortingType, currentSortingScope)
+        val postSource = PostRepository.PostSource.Subreddit(subName)
+        postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
         _subInfoLiveData.postValue(
             DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
         )
@@ -121,7 +123,8 @@ open class DisplaySubVM (
         Log.d(TAG, "Retrieving next posts with $nextVal")
         // retrieve the "after" value for the next posting
         nextVal?.let {
-            postRepo.retrieveMorePosts(subName, it)
+            val postSource = PostRepository.PostSource.Subreddit(subName)
+            postRepo.retrieveMorePosts(postSource, it)
         }
     }
 
