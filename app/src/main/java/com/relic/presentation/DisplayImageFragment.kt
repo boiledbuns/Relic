@@ -46,4 +46,16 @@ class DisplayImageFragment : Fragment() {
                     .into(rootView.findViewById<ImageView>(R.id.fullImage))
         }
     }
+
+    companion object {
+        fun create(thumbnailUrl : String) : DisplayImageFragment{
+            val bundle = Bundle()
+            bundle.putString("image_url", thumbnailUrl)
+
+            return DisplayImageFragment().apply {
+                arguments = bundle
+            }
+        }
+    }
+
 }

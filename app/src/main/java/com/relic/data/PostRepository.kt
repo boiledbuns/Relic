@@ -19,7 +19,7 @@ interface PostRepository {
      * @param subredditName name of the subreddit to retrieve the posts for
      * @return list of posts from this subreddit as livedata (empty if none)
      */
-    fun getPosts(subredditName: String): LiveData<List<PostModel>>
+    fun getPosts(postSource: PostSource): LiveData<List<PostModel>>
 
     /**
      * retrieves more posts from the network and store them locally
@@ -33,7 +33,7 @@ interface PostRepository {
      * @param callback
      * @param subName
      */
-    fun getNextPostingVal(callback: RetrieveNextListingCallback, subName: String)
+    fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource)
 
     /**
      * exposes a single post model as livedata
@@ -65,7 +65,7 @@ interface PostRepository {
      * need to decide whether the Viewmodel should handle this or not
      * @param subredditName
      */
-    fun clearAllSubPosts(subredditName: String)
+    fun clearAllSubPosts(postSource: PostSource)
 
     companion object {
         const val SORT_DEFAULT = 0

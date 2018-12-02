@@ -10,12 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.relic.R
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysubs.DisplaySubsView
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import kotlinx.android.synthetic.main.home.view.*
 import kotlinx.android.synthetic.main.relic_toolbar.view.*
 
-class HomeFragment : Fragment() {
+class HomeFragment : RelicFragment() {
     private val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
     private val tabFragments = ArrayList<Fragment>()
 

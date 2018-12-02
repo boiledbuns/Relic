@@ -205,4 +205,18 @@ class DisplayPostFragment : Fragment() {
         activity!!.supportFragmentManager.beginTransaction()
                 .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit()
     }
+
+    companion object {
+        fun create(postId : String, subreddit : String) : DisplayPostFragment {
+            // create a new bundle for the post id
+            val bundle = Bundle()
+            bundle.putString("full_name", postId)
+            bundle.putString("subreddit", subreddit)
+
+            return DisplayPostFragment().apply {
+                arguments = bundle
+            }
+        }
+    }
+
 }

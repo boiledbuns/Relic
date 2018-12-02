@@ -38,7 +38,7 @@ class DisplayPostVM (
     }
 
     private val TAG = "DISPLAYPOST_VM"
-    private val validImageEndings = listOf("jpg", "png")
+    private val validImageEndings = listOf("jpg", "png", "gif")
 
     private val _postLiveData = MediatorLiveData<PostModel> ()
     private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()

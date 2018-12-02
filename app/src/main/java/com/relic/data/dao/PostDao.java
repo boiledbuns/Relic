@@ -17,17 +17,20 @@ public abstract class PostDao {
   // Currently can't use constants from entity class in query annotation so hardcoded for now
   // TODO fix it
 
-  @Query("SELECT * FROM PostEntity WHERE origin = 1 ORDER BY `order` ASC")
-  public abstract LiveData<List<PostModel>> getFrontPagePosts();
-
   @Query("SELECT * FROM PostEntity WHERE subreddit = :subName AND origin = 0 ORDER BY `order` ASC")
   public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);
+
+  @Query("SELECT * FROM PostEntity WHERE origin = :postOrigin ORDER BY `order` ASC")
+  public abstract LiveData<List<PostModel>> getPostsFromOrigin(int postOrigin);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertPosts(List<PostEntity> posts);
 
   @Query("DELETE FROM PostEntity WHERE subreddit = :subName")
   public abstract void deleteAllFromSub(String subName);
+
+  @Query("DELETE FROM PostEntity WHERE origin = :sourceCode")
+  public abstract void deleteAllFromSource(int sourceCode);
 
   @Query("SELECT * FROM PostEntity WHERE id = :postName")
   public abstract LiveData<PostModel> getSinglePost(String postName);

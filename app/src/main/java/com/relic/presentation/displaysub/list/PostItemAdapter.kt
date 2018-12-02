@@ -66,7 +66,7 @@ class PostItemAdapter (
             it.isVisited = true
 
             // update post to show that it has been visited
-            postAdapterDelegate.visitPost(it.id)
+            postAdapterDelegate.visitPost(it.id, it.subreddit)
         }
         notifyItemChanged(itemPosition)
     }
@@ -110,7 +110,7 @@ class PostItemAdapter (
     }
 
     fun onPostLinkPressed (itemPosition : Int) {
-        postAdapterDelegate.showImage(postList[itemPosition].url)
+        postAdapterDelegate.onThumbnailClicked(postList[itemPosition].url)
     }
     // end region for onclick handlers
 }

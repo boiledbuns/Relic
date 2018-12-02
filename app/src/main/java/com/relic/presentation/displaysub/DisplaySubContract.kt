@@ -1,5 +1,7 @@
 package com.relic.presentation.displaysub
 
+import com.relic.data.models.PostModel
+
 interface DisplaySubContract {
     interface ViewModel {
         fun changeSortingMethod(sortingCode: Int? = null, sortScope: Int? = null)
@@ -10,10 +12,10 @@ interface DisplaySubContract {
     }
 
     interface PostAdapterDelegate {
-        fun visitPost(postFullname: String)
+        fun visitPost(postFullname: String, subreddit : String)
         fun voteOnPost(postFullname: String, voteValue: Int)
         fun savePost(postFullname: String, save: Boolean)
-        fun showImage(postThumbnailUrl: String)
+        fun onThumbnailClicked(postThumbnailUrl: String)
     }
 }
 
@@ -25,6 +27,10 @@ sealed class NavigationData {
 
     data class ToImage (
             val thumbnail : String
+    ) : NavigationData ()
+
+    data class ToExternal (
+        val url : String
     ) : NavigationData ()
 }
 

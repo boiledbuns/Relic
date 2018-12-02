@@ -14,7 +14,7 @@ import com.relic.data.models.SubredditModel
 import javax.inject.Inject
 
 open class DisplaySubVM (
-        private val subName: String,
+        private val postSource: PostRepository.PostSource,
         private val subRepo: SubRepository,
         private var postRepo: PostRepository
 ) : ViewModel(), DisplaySubContract.ViewModel,
@@ -24,8 +24,8 @@ open class DisplaySubVM (
             private val subRepo: SubRepository,
             private val postRepo : PostRepository
     ) {
-        fun create (subName : String) : DisplaySubVM {
-            return DisplaySubVM(subName, subRepo, postRepo)
+        fun create (postSource : PostRepository.PostSource) : DisplaySubVM {
+            return DisplaySubVM(postSource, subRepo, postRepo)
         }
     }
 
@@ -47,10 +47,9 @@ open class DisplaySubVM (
 
     init {
         // observe the list of posts stored locally
-        _postListMediator.addSource(postRepo.getPosts(subName)) { postModels ->
+        _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
             // retrieve posts when the posts stored locally for this sub have been cleared
             if (postModels != null && postModels.isEmpty()) {
-                val postSource = PostRepository.PostSource.Subreddit(subName)
                 Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
                 // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
                 postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
@@ -62,6 +61,19 @@ open class DisplaySubVM (
             }
         }
 
+        when (postSource) {
+            is PostRepository.PostSource.Subreddit -> initializeSubredditInformation(postSource.subredditName)
+            is PostRepository.PostSource.Frontpage -> {}
+            is PostRepository.PostSource.All -> {}
+        }
+
+        _subInfoLiveData.postValue(DisplaySubInfoData(
+            sortingMethod = currentSortingType,
+            sortingScope = currentSortingScope
+        ))
+    }
+
+    private fun initializeSubredditInformation(subName : String ) {
         // TODO: STILL TESTING retrieve the banner image from the subredddit css
         subRepo.subGateway.apply {
             getAdditionalSubInfo(subName)
@@ -78,11 +90,6 @@ open class DisplaySubVM (
                 _subredditMediator.setValue(newModel)
             }
         }
-
-        _subInfoLiveData.postValue(DisplaySubInfoData(
-            sortingMethod = currentSortingType,
-            sortingScope = currentSortingScope
-        ))
     }
 
     /**
@@ -92,10 +99,10 @@ open class DisplaySubVM (
     override fun retrieveMorePosts(resetPosts: Boolean) {
         if (resetPosts) {
             // all we have to do is clear entries in room -> our observer for the posts will auto download new posts when it's empty
-            postRepo.clearAllSubPosts(subName)
+            postRepo.clearAllSubPosts(postSource)
         } else {
             // retrieve the "after" value for the next posting
-            postRepo.getNextPostingVal(this, subName)
+            postRepo.getNextPostingVal(this, postSource)
         }
     }
 
@@ -111,8 +118,7 @@ open class DisplaySubVM (
         sortScope?.let { currentSortingScope = it }
 
         // remove all posts from current db for this subreddit (triggers retrieval)
-        postRepo.clearAllSubPosts(subName)
-        val postSource = PostRepository.PostSource.Subreddit(subName)
+        postRepo.clearAllSubPosts(postSource)
         postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
         _subInfoLiveData.postValue(
             DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
@@ -123,48 +129,49 @@ open class DisplaySubVM (
         Log.d(TAG, "Retrieving next posts with $nextVal")
         // retrieve the "after" value for the next posting
         nextVal?.let {
-            val postSource = PostRepository.PostSource.Subreddit(subName)
             postRepo.retrieveMorePosts(postSource, it)
         }
     }
 
     override fun updateSubStatus(toSubscribe: Boolean) {
-        Log.d(TAG, "Changing to subscribed $toSubscribe")
+        if (postSource is PostRepository.PostSource.Subreddit) {
+            val subName = postSource.subredditName
+            Log.d(TAG, "Changing to subscribed $toSubscribe")
+            if (toSubscribe) {
+                // subscribe if not currently subscribed
+                val successObservable = subRepo.subGateway.subscribe(subName)
+                _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
-        if (toSubscribe) {
-            // subscribe if not currently subscribed
-            val successObservable = subRepo.subGateway.subscribe(subName)
-            _subredditMediator.addSource(successObservable) { success: Boolean? ->
-
-                if (success != null && success) {
-                    Log.d(TAG, "subscribing")
+                    if (success != null && success) {
+                        Log.d(TAG, "subscribing")
+                    }
+                    // unsubscribe after consuming event
+                    _subredditMediator.removeSource(successObservable)
                 }
-                // unsubscribe after consuming event
-                _subredditMediator.removeSource(successObservable)
-            }
-        } else {
-            // unsubscribe if already subscribed
-            val successObservable = subRepo.subGateway.unsubscribe(subName)
-            _subredditMediator.addSource(successObservable) { success: Boolean? ->
+            } else {
+                // unsubscribe if already subscribed
+                val successObservable = subRepo.subGateway.unsubscribe(subName)
+                _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
-                if (success != null && success) {
-                    Log.d(TAG, "unsubscribing")
-                    //subMediator.setValue(false);
+                    if (success != null && success) {
+                        Log.d(TAG, "unsubscribing")
+                        //subMediator.setValue(false);
+                    }
+
+                    //subscribed.setValue(success);
+                    _subredditMediator.removeSource(successObservable)
                 }
-
-                //subscribed.setValue(success);
-                _subredditMediator.removeSource(successObservable)
             }
         }
     }
 
     // region view action delegate
 
-    override fun visitPost(postFullname: String) {
-        postRepo.postGateway.visitPost(postFullname)
+    override fun visitPost(postfullName : String, postSubreddit : String) {
+        postRepo.postGateway.visitPost(postfullName)
 
         _navigationLiveData.apply {
-            value = NavigationData.ToPost(postFullname, subName)
+            value = NavigationData.ToPost(postfullName, postSubreddit)
             value = null
         }
     }
@@ -179,9 +186,20 @@ open class DisplaySubVM (
         postRepo.postGateway.savePost(postFullname, save)
     }
 
-    override fun showImage(postThumbnailUrl: String) {
+    override fun onThumbnailClicked(postThumbnailUrl: String) {
+        val validImageEndings = listOf("jpg", "png", "gif")
+
+        val lastThree = postThumbnailUrl.substring(postThumbnailUrl.length - 3)
+        var isImage = (validImageEndings.contains(lastThree))
+
+        val navigation : NavigationData = if (isImage) {
+            NavigationData.ToImage(postThumbnailUrl)
+        } else {
+            NavigationData.ToExternal(postThumbnailUrl)
+        }
+
         _navigationLiveData.apply {
-            value = NavigationData.ToImage(postThumbnailUrl)
+            value = navigation
             value = null
         }
     }

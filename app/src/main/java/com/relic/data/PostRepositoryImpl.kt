@@ -17,6 +17,8 @@ import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
+import com.relic.data.entities.PostEntity.ORIGIN_ALL
+import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
 import com.relic.data.models.PostModel
 
 import org.json.simple.JSONArray
@@ -40,6 +42,9 @@ constructor(
     private val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
     private val TAG = "POST_REPO"
 
+    private val SOURCE_FRONTPAGE = "frontpage"
+    private val SOURCE_ALL = "all"
+
     private val sortByMethods = arrayOf("best", "controversial", "hot", "new", "rising", "top")
     private val sortScopes = arrayOf("hour", "day", "week", "month", "year", "all")
     private val JSONParser: JSONParser = JSONParser()
@@ -62,16 +67,15 @@ constructor(
      * @param subreddit subreddit to get the list for
      * @return livedata list of posts
      */
-    override fun getPosts(subreddit: String): LiveData<List<PostModel>> {
-        val subredditPosts: LiveData<List<PostModel>>
+    override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
         // handles specific cases
         // try to convert this to enum if time permits
-        if (subreddit.isEmpty()) {
-            subredditPosts = appDB.postDao.frontPagePosts
-        } else {
-            subredditPosts = appDB.postDao.getSubredditPosts(subreddit)
+
+        return when (postSource) {
+            is PostRepository.PostSource.Subreddit -> appDB.postDao.getSubredditPosts(postSource.subredditName)
+            is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromOrigin(ORIGIN_FRONTPAGE)
+            else -> appDB.postDao.getPostsFromOrigin(ORIGIN_ALL)
         }
-        return subredditPosts
     }
 
     /**
@@ -259,7 +263,13 @@ constructor(
      * @param callback callback to send the name to
      * @param subName name of the sub to retrieve the "after" value for
      */
-    override fun getNextPostingVal(callback: RetrieveNextListingCallback, subName: String) {
+    override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
+        val subName = when (postSource) {
+            is PostRepository.PostSource.Subreddit -> postSource.subredditName
+            is PostRepository.PostSource.Frontpage -> SOURCE_FRONTPAGE
+            else -> SOURCE_ALL
+        }
+
         RetrieveListingAfterTask(appDB, callback).execute(subName)
     }
 
@@ -338,15 +348,19 @@ constructor(
         }
     }
 
-    override fun clearAllSubPosts(subredditName: String) {
-        ClearSubredditPosts().execute(appDB, subredditName)
+    override fun clearAllSubPosts(postSource: PostRepository.PostSource) {
+        ClearSubredditPosts().execute(appDB, postSource)
     }
 
     private class ClearSubredditPosts : AsyncTask<Any, Int, Int>() {
         override fun doInBackground(vararg objects: Any): Int? {
             val appDB = objects[0] as ApplicationDB
-            appDB.postDao.deleteAllFromSub(objects[1] as String)
-
+            val postSource = objects[1] as PostRepository.PostSource
+            when (postSource) {
+                is PostRepository.PostSource.Frontpage -> appDB.postDao.deleteAllFromSource(ORIGIN_FRONTPAGE)
+                is PostRepository.PostSource.All -> appDB.postDao.deleteAllFromSource(ORIGIN_ALL)
+                is PostRepository.PostSource.Subreddit -> appDB.postDao.deleteAllFromSub(postSource.subredditName)
+            }
             return null
         }
     }

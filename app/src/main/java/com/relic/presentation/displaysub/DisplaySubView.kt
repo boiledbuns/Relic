@@ -52,7 +52,7 @@ class DisplaySubView : Fragment() {
                         .authModule(AuthModule(context!!))
                         .build()
                         .getDisplaySubVM()
-                        .create(subName) as T
+                        .create(PostRepository.PostSource.Subreddit(subName)) as T
             }
         }).get(DisplaySubVM::class.java)
     }
@@ -241,22 +241,39 @@ class DisplaySubView : Fragment() {
             }
         }
 
-        displaySubVM.navigationLiveData.nonNull().observe(this) { setNavigationData(it) }
+        displaySubVM.navigationLiveData.nonNull().observe(this) { handleNavigation(it) }
         displaySubVM.subInfoLiveData.nonNull().observe (this) { setSubInfoData(it) }
     }
 
     // region LiveData handlers
 
-    private fun setNavigationData(navigationData: NavigationData) {
+    private fun handleNavigation(navigationData: NavigationData) {
         when (navigationData) {
+            // navigates to display post
             is NavigationData.ToPost -> {
-                PostItemOnClick().onClick(navigationData.postId, navigationData.subredditName)
+                val postFragment = DisplayPostFragment.create(
+                    navigationData.postId,
+                    navigationData.subredditName
+                )
+                activity!!.supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
             }
+            // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
-                OnClickImage().onClick(navigationData.thumbnail)
+                val imageFragment = DisplayImageFragment.create(
+                    navigationData.thumbnail
+                )
+                activity!!.supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
+            }
+            // let browser handle navigation to url
+            is NavigationData.ToExternal -> {
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigationData.url))
+                startActivity(openInBrowser)
             }
         }
     }
+
 
     private fun setSubInfoData(sortingInfo : DisplaySubInfoData) {
         val method = DisplaySubVM.convertSortingTypeToText(sortingInfo.sortingMethod)
@@ -276,8 +293,8 @@ class DisplaySubView : Fragment() {
 
     private fun initializeOnClicks() {
         // set onclick to display sub info when the title is clicked
-        subToolbar.setOnClickListener {
-            SubInfoBottomSheetDialog().apply {
+                subToolbar.setOnClickListener {
+                    SubInfoBottomSheetDialog().apply {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
@@ -337,61 +354,58 @@ class DisplaySubView : Fragment() {
 //        outState.putParcelable(SCROLL_POSITION, subPostsRecyclerView.layoutManager?.onSaveInstanceState())
     }
 
-    /**
-     * Onclick class for clicking on posts
-     */
-    private inner class PostItemOnClick : PostItemOnclick {
-        override fun onClick(postId: String, subreddit: String) {
-            // update post to show that it has been visited
-            displaySubVM.visitPost(postId)
-
-            // create a new bundle for the post id
-            val bundle = Bundle()
-            bundle.putString("full_name", postId)
-            bundle.putString("subreddit", subreddit)
-
-            val postFrag = DisplayPostFragment()
-            postFrag.arguments = bundle
-
-            activity?.let {
-                it.supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_content_frame, postFrag)
-                        .addToBackStack(TAG)
-                        .commit()
-                // set flag to show that a fragment has opened
-                fragmentOpened = true
-            }
-        }
-    }
-
-    /**
-     * Onclick class for imageview onclick
-     */
-    private inner class OnClickImage : ImageOnClick {
-        override fun onClick(url: String) {
-            // Parses the url type and routes it appropriately
-            val urlEnding = url.substring(url.length - 3)
-            if (urlEnding == "jpg" || urlEnding == "png" || urlEnding == "gif") {
-                // TODO separate and route according to file ext
-                // create a new bundle for to pass the image url along
-                val bundle = Bundle()
-                bundle.putString("image_url", url)
-
-                val displayImageFragment = DisplayImageFragment()
-                displayImageFragment.arguments = bundle
-
-                // replace the current fragment with the new display image frag and add it to the frag stack
-                activity!!.supportFragmentManager.beginTransaction()
-                        .add(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG)
-                        .commit()
-            } else {
-                // open the url in the browser
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(openInBrowser)
-            }
-        }
-    }
+//    /**
+//     * Onclick class for clicking on posts
+//     */
+//    private inner class PostItemOnClick : PostItemOnclick {
+//        override fun onClick(postId: String, subreddit: String) {
+//            // create a new bundle for the post id
+//            val bundle = Bundle()
+//            bundle.putString("full_name", postId)
+//            bundle.putString("subreddit", subreddit)
+//
+//            val pos tFrag = DisplayPostFragment()
+//            postFrag.arguments = bundle
+//
+//            activity?.let {
+//                it.supportFragmentManager
+//                        .beginTransaction()
+//                        .replace(R.id.main_content_frame, postFrag)
+//                        .addToBackStack(TAG)
+//                        .commit()
+//                // set flag to show that a fragment has opened
+//                fragmentOpened = true
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Onclick class for imageview onclick
+//     */
+//    private inner class OnClickImage : ImageOnClick {
+//        override fun onClick(url: String) {
+//            // Parses the url type and routes it appropriately
+//            val urlEnding = url.substring(url.length - 3)
+//            if (urlEnding == "jpg" || urlEnding == "png" || urlEnding == "gif") {
+//                // TODO separate and route according to file ext
+//                // create a new bundle for to pass the image url along
+//                val bundle = Bundle()
+//                bundle.putString("image_url", url)
+//
+//                val displayImageFragment = DisplayImageFragment()
+//                displayImageFragment.arguments = bundle
+//
+//                // replace the current fragment with the new display image frag and add it to the frag stack
+//                activity!!.supportFragmentManager.beginTransaction()
+//                        .add(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG)
+//                        .commit()
+//            } else {
+//                // open the url in the browser
+//                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+//                startActivity(openInBrowser)
+//            }
+//        }
+//    }
 
     companion object SortTypeHelper {
         fun convertMenuItemToSortType(optionId : Int) : Int {
