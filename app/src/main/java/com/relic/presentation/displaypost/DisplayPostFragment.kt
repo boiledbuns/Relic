@@ -26,6 +26,7 @@ import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
+import com.relic.presentation.displaysub.DisplaySubView
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
 import com.shopify.livedataktx.nonNull
@@ -33,8 +34,24 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
 
 class DisplayPostFragment : Fragment() {
-    private val TAG = "DISPLAYPOST_VIEW"
 
+    companion object {
+        private const val TAG = "DISPLAYPOST_VIEW"
+        private const val ARG_POST_FULLNAME = "full_name"
+        private const val ARG_SUB_NAME = "subreddit"
+
+        fun create(postId : String, subreddit : String) : DisplayPostFragment {
+            // create a new bundle for the post id
+            val bundle = Bundle()
+            bundle.putString(ARG_POST_FULLNAME, postId)
+            bundle.putString(ARG_SUB_NAME, subreddit)
+
+            return DisplayPostFragment().apply {
+                arguments = bundle
+            }
+        }
+    }
+    
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -77,6 +94,12 @@ class DisplayPostFragment : Fragment() {
                 myToolbar = this
                 title = subredditName
                 inflateMenu(R.menu.display_post_menu)
+
+                setOnClickListener {
+                    val subFragment = DisplaySubView.create(subredditName)
+                    activity!!.supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
+                }
             }
 
             findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
@@ -205,18 +228,4 @@ class DisplayPostFragment : Fragment() {
         activity!!.supportFragmentManager.beginTransaction()
                 .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit()
     }
-
-    companion object {
-        fun create(postId : String, subreddit : String) : DisplayPostFragment {
-            // create a new bundle for the post id
-            val bundle = Bundle()
-            bundle.putString("full_name", postId)
-            bundle.putString("subreddit", subreddit)
-
-            return DisplayPostFragment().apply {
-                arguments = bundle
-            }
-        }
-    }
-
 }

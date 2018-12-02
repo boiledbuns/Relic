@@ -178,7 +178,7 @@ public class Authenticator {
     JSONParser parser = new JSONParser();
     try {
       JSONObject data = (JSONObject) parser.parse(response);
-      Log.d(TAG, data.get("scope").toString());
+      Log.d(TAG, "" + data.get("scope").toString());
 
       // stores the token in shared preferences
       SharedPreferences.Editor prefEditor = appContext.

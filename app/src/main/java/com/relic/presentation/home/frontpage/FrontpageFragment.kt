@@ -53,6 +53,7 @@ class FrontpageFragment : Fragment() {
         super.onCreate(savedInstanceState)
         bindViewModel()
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

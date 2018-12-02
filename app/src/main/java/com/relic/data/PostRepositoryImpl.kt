@@ -85,8 +85,8 @@ constructor(
      */
     override fun retrieveMorePosts(postSource: PostRepository.PostSource, after: String) {
         // change the api endpoint to access to get the next post listing
-        var ending = ENDPOINT + when (postSource) {
-            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}?after=$after"
+        val ending =  when (postSource) {
+            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
             else -> ""
         }
 
@@ -94,7 +94,7 @@ constructor(
         requestManager.processRequest(
             RelicOAuthRequest(
                 RelicOAuthRequest.GET,
-                ENDPOINT + ending,
+                "$ENDPOINT$ending?after=$after",
                 Response.Listener { response ->
                     try {
                         parsePosts(response, postSource)

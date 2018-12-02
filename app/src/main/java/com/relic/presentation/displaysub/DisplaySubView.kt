@@ -354,60 +354,17 @@ class DisplaySubView : Fragment() {
 //        outState.putParcelable(SCROLL_POSITION, subPostsRecyclerView.layoutManager?.onSaveInstanceState())
     }
 
-//    /**
-//     * Onclick class for clicking on posts
-//     */
-//    private inner class PostItemOnClick : PostItemOnclick {
-//        override fun onClick(postId: String, subreddit: String) {
-//            // create a new bundle for the post id
-//            val bundle = Bundle()
-//            bundle.putString("full_name", postId)
-//            bundle.putString("subreddit", subreddit)
-//
-//            val pos tFrag = DisplayPostFragment()
-//            postFrag.arguments = bundle
-//
-//            activity?.let {
-//                it.supportFragmentManager
-//                        .beginTransaction()
-//                        .replace(R.id.main_content_frame, postFrag)
-//                        .addToBackStack(TAG)
-//                        .commit()
-//                // set flag to show that a fragment has opened
-//                fragmentOpened = true
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Onclick class for imageview onclick
-//     */
-//    private inner class OnClickImage : ImageOnClick {
-//        override fun onClick(url: String) {
-//            // Parses the url type and routes it appropriately
-//            val urlEnding = url.substring(url.length - 3)
-//            if (urlEnding == "jpg" || urlEnding == "png" || urlEnding == "gif") {
-//                // TODO separate and route according to file ext
-//                // create a new bundle for to pass the image url along
-//                val bundle = Bundle()
-//                bundle.putString("image_url", url)
-//
-//                val displayImageFragment = DisplayImageFragment()
-//                displayImageFragment.arguments = bundle
-//
-//                // replace the current fragment with the new display image frag and add it to the frag stack
-//                activity!!.supportFragmentManager.beginTransaction()
-//                        .add(R.id.main_content_frame, displayImageFragment).addToBackStack(TAG)
-//                        .commit()
-//            } else {
-//                // open the url in the browser
-//                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-//                startActivity(openInBrowser)
-//            }
-//        }
-//    }
-
     companion object SortTypeHelper {
+        private const val ARG_SUBREDDIT_NAME = "SubredditName"
+
+        fun create(subredditName : String) : DisplaySubView {
+            return DisplaySubView().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_SUBREDDIT_NAME, subredditName)
+                }
+            }
+        }
+
         fun convertMenuItemToSortType(optionId : Int) : Int {
             return when(optionId) {
                 R.id.post_sort_best -> PostRepository.SORT_BEST
