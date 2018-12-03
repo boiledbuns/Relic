@@ -51,7 +51,7 @@ class DisplayPostFragment : Fragment() {
             }
         }
     }
-    
+
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -79,7 +79,6 @@ class DisplayPostFragment : Fragment() {
             getString("full_name")?.let { postFullName = it }
             getString("subreddit")?.let { subredditName = it }
         }
-        bindViewModel()
     }
 
     override fun onCreateView(
@@ -108,6 +107,8 @@ class DisplayPostFragment : Fragment() {
             }
         }
 
+        bindViewModel()
+
         attachViewListeners()
         return rootView
     }
@@ -122,9 +123,6 @@ class DisplayPostFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    /**
-     * subscribes the view to the data exposed by the viewmodel
-     */
     private fun bindViewModel() {
         displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
         displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
@@ -150,8 +148,8 @@ class DisplayPostFragment : Fragment() {
     }
 
     /**
-     * Attaches custom scroll listeners to allow more comments to be retrieved when the recyclerview
-     * is scrolled all the way to the bottom
+     * Attaches custom scroll listeners to allow more comments to be retrieved when the recycler
+     * view is scrolled all the way to the bottom
      */
     private fun attachViewListeners() {
         rootView.apply {
@@ -160,7 +158,7 @@ class DisplayPostFragment : Fragment() {
                     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                         super.onScrollStateChanged(recyclerView, newState)
 
-                        // if recyclerview reaches bottom
+                        // if recycler view reaches bottom
                         if (!recyclerView.canScrollVertically(1)) {
                             Log.d(TAG, "Bottom reached")
                             displayPostVM.retrieveMoreComments(false)
@@ -198,13 +196,7 @@ class DisplayPostFragment : Fragment() {
     }
 
     private fun openImage(imageUrl : String) {
-        val displayImageFragment = DisplayImageFragment()
-
-        Bundle().apply {
-            putString("image_url", imageUrl)
-            displayImageFragment.arguments = this
-        }
-
+        val displayImageFragment = DisplayImageFragment.create(imageUrl)
         activity!!.supportFragmentManager
                 .beginTransaction()
                 .add(R.id.main_content_frame, displayImageFragment)

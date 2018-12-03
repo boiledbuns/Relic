@@ -29,7 +29,7 @@ class PostItemAdapter (
         notifyDataSetChanged()
     }
 
-    fun setPostList(newPostList: MutableList<PostModel>) {
+    fun setPostList(newPostList: List<PostModel>) {
         DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
                 return postList.size

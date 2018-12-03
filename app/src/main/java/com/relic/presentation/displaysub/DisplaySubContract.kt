@@ -1,7 +1,5 @@
 package com.relic.presentation.displaysub
 
-import com.relic.data.models.PostModel
-
 interface DisplaySubContract {
     interface ViewModel {
         fun changeSortingMethod(sortingCode: Int? = null, sortScope: Int? = null)

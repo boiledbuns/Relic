@@ -61,8 +61,14 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         bindViewModel()
         setHasOptionsMenu(true)
+        subAdapter = SubItemAdapter(OnClickSubItem())
+
+        // initialize the adapter for the search subs recycler view
+        val searchSubItemOnClick = OnClickSearchSubItem(this@DisplaySubsView)
+        searchItemAdapter = SearchItemAdapter(searchSubItemOnClick)
     }
 
     override fun onCreateView(
@@ -74,10 +80,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
                 .inflate(inflater, R.layout.display_subs, container, false)
 
         displaySubsBinding.apply {
-            // initialize the adapter for the search subs recyclerview
-            val searchSubItemOnClick = OnClickSearchSubItem(this@DisplaySubsView)
-            subAdapter = SubItemAdapter(OnClickSubItem())
-            searchItemAdapter = SearchItemAdapter(searchSubItemOnClick)
 
             displaySubsRecyclerview.also {
                 it.layoutManager = GridLayoutManager(context, 3)
@@ -108,7 +110,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         searchMenuItem = menu!!.findItem(R.id.search_item)
         searchView = searchMenuItem.actionView as SearchView
 
-        // inialize a few of the view properties for the searchvie
+        // initialize a few of the view properties for the searchvie
         val padding = resources.getDimension(R.dimen.search_padding).toInt()
         searchView.setPadding(0, 0, padding, padding)
 
@@ -150,7 +152,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         })
     }
 
-    // region viewmodel binding and handlers
+    // region view model binding and handlers
 
     private fun bindViewModel() {
         // allows the list to be updated as subreddits are retrieved from the network
@@ -179,10 +181,10 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         }
     }
 
-    // end region viewmodel binding and handlers
+    // endregion view model binding and handlers
 
 
-    fun attachScrollListeners() {
+    private fun attachScrollListeners() {
         displaySubsBinding.apply {
             displaySubsSwiperefreshlayout.setOnRefreshListener {
                 displaySubsBinding.subscribedListIsVisible = false

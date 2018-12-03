@@ -51,7 +51,9 @@ class FrontpageFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         bindViewModel()
+        postAdapter = PostItemAdapter(frontpageVM)
     }
 
     override fun onCreateView(
@@ -60,8 +62,6 @@ class FrontpageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.frontpage, container, false).apply {
-            postAdapter = PostItemAdapter(frontpageVM)
-
             frontpageRecyclerView = findViewById<RecyclerView>(R.id.frontpagePostsRecyclerView).apply {
                 itemAnimator = null
                 layoutManager = LinearLayoutManager(context)
@@ -80,7 +80,6 @@ class FrontpageFragment : Fragment() {
                 // empties current items to show that it's being refreshed
                 frontpageRecyclerView.layoutManager!!.scrollToPosition(0)
                 postAdapter.clear()
-
                 // tells vm to clear the posts -> triggers action to retrieve more
                 frontpageVM.retrieveMorePosts(true)
             }
@@ -111,7 +110,7 @@ class FrontpageFragment : Fragment() {
 
     private fun handlePostsLoaded(postModels : List<PostModel>) {
         Log.d(TAG, "size of frontpage" + postModels.size)
-        postAdapter.setPostList(postModels.toMutableList())
+        postAdapter.setPostList(postModels)
 
         // turn off loading animation and unlock scrolling to allow more posts to be loaded
         frontpageSwipeRefreshLayout.isRefreshing = false

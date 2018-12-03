@@ -77,6 +77,7 @@ class DisplaySubView : Fragment() {
             subName = it
         }
 
+        postAdapter = PostItemAdapter(displaySubVM)
         bindViewModel()
     }
 
@@ -89,10 +90,8 @@ class DisplaySubView : Fragment() {
         val recyclerView = root.findViewById<RecyclerView>(R.id.subPostsRecyclerView)
         val toolbar = root.findViewById<Toolbar>(R.id.subToolbar)
 
-        postAdapter = PostItemAdapter(displaySubVM)
         recyclerView.apply {
             adapter = postAdapter
-            itemAnimator = null
             layoutManager = LinearLayoutManager(context)
         }
 
@@ -110,6 +109,11 @@ class DisplaySubView : Fragment() {
 
         initializeOnClicks()
         attachScrollListeners()
+
+        if (fragmentOpened) {
+            fragmentOpened = false
+            subAppBarLayout.setExpanded(false, false)
+        }
 
 //        // adds listener for state change for the appbarlayout issue that always opens it when
 //        // returning to this fragment after popping another off of the stack
@@ -129,18 +133,18 @@ class DisplaySubView : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         // recreate saved the saved instance instance
-        if (savedInstanceState != null) {
-            val position = savedInstanceState.getInt(SCROLL_POSITION)
-            Log.d(TAG, "Previous position = $position")
-            // scroll to the previous position before reconfiguration change
-            // Temporary fix until a better solution is found for jumping to last view position on
-            if (position == 0) {
-                subAppBarLayout.setExpanded(true)
-            } else {
-                subAppBarLayout.setExpanded(false)
-            }
-            subPostsRecyclerView.smoothScrollToPosition(position)
-        }
+//        if (savedInstanceState != null) {
+//            val position = savedInstanceState.getInt(SCROLL_POSITION)
+//            Log.d(TAG, "Previous position = $position")
+//            // scroll to the previous position before reconfiguration change
+//            // Temporary fix until a better solution is found for jumping to last view position on
+//            if (position == 0) {
+//                subAppBarLayout.setExpanded(true)
+//            } else {
+//                subAppBarLayout.setExpanded(false)
+//            }
+//            subPostsRecyclerView.smoothScrollToPosition(position)
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -223,7 +227,7 @@ class DisplaySubView : Fragment() {
         // observe the livedata list of posts for this subreddit
         displaySubVM.postListLiveData.nonNull().observe (this) { postModels ->
             Log.d(TAG, "size of " + postModels.size)
-            postAdapter.setPostList(postModels.toMutableList())
+            postAdapter.setPostList(postModels)
 
             // unlock scrolling to allow more posts to be loaded
             scrollLocked = false
@@ -255,8 +259,11 @@ class DisplaySubView : Fragment() {
                     navigationData.postId,
                     navigationData.subredditName
                 )
-                activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
+                // intentionally because replacing then popping off back stack loses scroll position
+                activity!!.supportFragmentManager.let { fm ->
+                    fm.beginTransaction().replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
+                }
+                fragmentOpened = true
             }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
