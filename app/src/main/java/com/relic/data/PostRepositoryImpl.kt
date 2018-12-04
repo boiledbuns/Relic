@@ -7,7 +7,6 @@ import android.text.Html
 import android.util.Log
 import com.android.volley.Response
 
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.relic.R
 import com.relic.network.NetworkRequestManager
@@ -32,22 +31,25 @@ import java.util.Date
 
 import javax.inject.Inject
 
-// TODO convert to KOTLIN
 class PostRepositoryImpl @Inject
 constructor(
     private val currentContext: Context,
     private val requestManager: NetworkRequestManager
 ) : PostRepository {
-    private val ENDPOINT = "https://oauth.reddit.com/"
-    private val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
-    private val TAG = "POST_REPO"
 
-    private val SOURCE_FRONTPAGE = "frontpage"
-    private val SOURCE_ALL = "all"
+    companion object {
+        private const val ENDPOINT = "https://oauth.reddit.com/"
+        private const val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
+        private const val TAG = "POST_REPO"
 
-    private val sortByMethods = arrayOf("best", "controversial", "hot", "new", "rising", "top")
-    private val sortScopes = arrayOf("hour", "day", "week", "month", "year", "all")
-    private val JSONParser: JSONParser = JSONParser()
+        private const val KEY_FRONTPAGE = "frontpage"
+        private const val KEY_ALL = "all"
+
+        private val sortByMethods = arrayOf("best", "controversial", "hot", "new", "rising", "top")
+        private val sortScopes = arrayOf("hour", "day", "week", "month", "year", "all")
+    }
+
+    private val jsonParser: JSONParser = JSONParser()
     private val appDB: ApplicationDB = ApplicationDB.getDatabase(currentContext)
 
     override val postGateway: PostGateway
@@ -59,18 +61,10 @@ constructor(
         val authKey = currentContext.resources.getString(R.string.AUTH_PREF)
         val tokenKey = currentContext.resources.getString(R.string.TOKEN_KEY)
         return currentContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-            .getString(tokenKey, "DEFAULT")
+            .getString(tokenKey, "DEFAULT") ?: ""
     }
 
-    /**
-     * Exposes the livedata list of posts
-     * @param subreddit subreddit to get the list for
-     * @return livedata list of posts
-     */
     override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
-        // handles specific cases
-        // try to convert this to enum if time permits
-
         return when (postSource) {
             is PostRepository.PostSource.Subreddit -> appDB.postDao.getSubredditPosts(postSource.subredditName)
             is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromOrigin(ORIGIN_FRONTPAGE)
@@ -78,11 +72,6 @@ constructor(
         }
     }
 
-    /**
-     * Retrieves posts for a subreddit
-     * @param subredditName name of the subreddit
-     * @param after the full name of the page to retrieve the posts from
-     */
     override fun retrieveMorePosts(postSource: PostRepository.PostSource, after: String) {
         // change the api endpoint to access to get the next post listing
         val ending =  when (postSource) {
@@ -116,7 +105,7 @@ constructor(
     /**
      * Deletes all locally stored posts and retrieves a new set based on the sorting method specified
      * by the caller
-     * @param subredditName name of the subreddit for the posts to be retrieved
+     * @param postSource source of the subreddit
      * @param sortType code for the associated sort by method
      * @param sortScope  code for the associate time span to sort by
      */
@@ -168,7 +157,7 @@ constructor(
     @Throws(ParseException::class)
     private fun parsePosts(response: String, postSource: PostRepository.PostSource): List<PostEntity> {
         //TODO separate into two separate methods and switch to multithreaded to avoid locking main thread
-        val listingData = (JSONParser.parse(response) as JSONObject)["data"] as JSONObject?
+        val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
 
         // initialize the date formatter and date for now
@@ -176,11 +165,16 @@ constructor(
         val current = Date()
 
         var origin = PostEntity.ORIGIN_SUB
-        val listingKey = when (postSource) {
-            is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            else -> {
+        var listingKey = ""
+
+        when (postSource) {
+            is PostRepository.PostSource.Frontpage -> {
                 origin = PostEntity.ORIGIN_FRONTPAGE
-                "frontpage"
+                listingKey = KEY_FRONTPAGE
+            }
+            is PostRepository.PostSource.Subreddit -> {
+                origin = PostEntity.ORIGIN_SUB
+                listingKey = postSource.subredditName
             }
         }
 
@@ -201,10 +195,7 @@ constructor(
             //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
             //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
             //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
-            Log.d(
-                TAG,
-                "link_flair_richtext : " + post!!["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"]
-            )
+            Log.d(TAG, "link_flair_richtext : " + post!!["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
             //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
 
             //Log.d(TAG, "post keys " + post.keySet().toString())
@@ -248,8 +239,10 @@ constructor(
      * Async task to insert posts and create/update the listing data for the current subreddit to
      * point to the next listing
      */
-    internal class InsertPostsTask(var appDB: ApplicationDB, var postList: List<PostEntity>) :
-        AsyncTask<ListingEntity, Int, Int>() {
+    internal class InsertPostsTask(
+        private var appDB: ApplicationDB,
+        private var postList: List<PostEntity>
+    ) : AsyncTask<ListingEntity, Int, Int>() {
 
         override fun doInBackground(vararg listing: ListingEntity): Int? {
             appDB.postDao.insertPosts(postList)
@@ -261,13 +254,13 @@ constructor(
     /**
      * Retrieves the "after" values to be used for the next post listing
      * @param callback callback to send the name to
-     * @param subName name of the sub to retrieve the "after" value for
+     * @param postSource nsource of the post
      */
     override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
         val subName = when (postSource) {
             is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            is PostRepository.PostSource.Frontpage -> SOURCE_FRONTPAGE
-            else -> SOURCE_ALL
+            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
+            else -> KEY_ALL
         }
 
         RetrieveListingAfterTask(appDB, callback).execute(subName)
@@ -333,7 +326,7 @@ constructor(
     private fun parsePost(response: String): PostEntity {
         val gson = GsonBuilder().create()
         val data =
-            ((JSONParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject?
+            ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject?
         val child = (data!!["children"] as JSONArray)[0] as JSONObject
         val post = child["data"] as JSONObject?
 

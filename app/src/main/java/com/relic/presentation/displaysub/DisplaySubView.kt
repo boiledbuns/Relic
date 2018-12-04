@@ -26,6 +26,7 @@ import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.data.PostRepository
+import com.relic.data.models.SubredditModel
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.adapter.ImageOnClick
 import com.relic.presentation.adapter.PostItemOnclick
@@ -41,7 +42,6 @@ import java.lang.Error
 
 class DisplaySubView : Fragment() {
     private val TAG = "DISPLAYSUB_VIEW"
-    private val SCROLL_POSITION = "POSITION"
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
@@ -73,8 +73,8 @@ class DisplaySubView : Fragment() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        arguments?.getString("SubredditName")?.let {
-            subName = it
+        arguments?.apply {
+            subName = getString(ARG_SUBREDDIT_NAME, "")
         }
 
         postAdapter = PostItemAdapter(displaySubVM)
@@ -129,31 +129,11 @@ class DisplaySubView : Fragment() {
 //        })
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        // recreate saved the saved instance instance
-//        if (savedInstanceState != null) {
-//            val position = savedInstanceState.getInt(SCROLL_POSITION)
-//            Log.d(TAG, "Previous position = $position")
-//            // scroll to the previous position before reconfiguration change
-//            // Temporary fix until a better solution is found for jumping to last view position on
-//            if (position == 0) {
-//                subAppBarLayout.setExpanded(true)
-//            } else {
-//                subAppBarLayout.setExpanded(false)
-//            }
-//            subPostsRecyclerView.smoothScrollToPosition(position)
-//        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
 
         inflater?.apply {
             inflate(R.menu.display_sub_menu, menu)
-
-            val sortTypeMenu = menu?.getItem(1)?.subMenu
 
             // inflate only sorting types that have a sub scope menu
             val menuWithSubMenu = listOf(2, 3, 4)
@@ -221,10 +201,10 @@ class DisplaySubView : Fragment() {
     // region view functions
 
     /**
-     * Observe all the livedata exposed by the viewmodel and attach the appropriate event listeners
+     * Observe all the liveData exposed by the viewModel and attach the appropriate event listeners
      */
     private fun bindViewModel() {
-        // observe the livedata list of posts for this subreddit
+        // observe the liveData list of posts for this subreddit
         displaySubVM.postListLiveData.nonNull().observe (this) { postModels ->
             Log.d(TAG, "size of " + postModels.size)
             postAdapter.setPostList(postModels)
@@ -235,21 +215,22 @@ class DisplaySubView : Fragment() {
         }
 
         // observe the subreddit model representing this subreddit
-        displaySubVM.subredditLiveData.nonNull().observe(this) { subredditModel ->
-            subscribeButtonView.apply {
-                text = if (subredditModel.isSubscribed) "subbed" else "subscribe"
-            }
-
-            subscribeButtonView.setOnClickListener {
-                displaySubVM.updateSubStatus(!subredditModel.isSubscribed)
-            }
-        }
-
+        displaySubVM.subredditLiveData.nonNull().observe(this) { updateSubInfo(it) }
         displaySubVM.navigationLiveData.nonNull().observe(this) { handleNavigation(it) }
         displaySubVM.subInfoLiveData.nonNull().observe (this) { setSubInfoData(it) }
     }
 
     // region LiveData handlers
+
+    private fun updateSubInfo(subredditModel : SubredditModel) {
+        subscribeButtonView.apply {
+            text = if (subredditModel.isSubscribed) "subbed" else "subscribe"
+        }
+
+        subscribeButtonView.setOnClickListener {
+            displaySubVM.updateSubStatus(!subredditModel.isSubscribed)
+        }
+    }
 
     private fun handleNavigation(navigationData: NavigationData) {
         when (navigationData) {
@@ -260,9 +241,7 @@ class DisplaySubView : Fragment() {
                     navigationData.subredditName
                 )
                 // intentionally because replacing then popping off back stack loses scroll position
-                activity!!.supportFragmentManager.let { fm ->
-                    fm.beginTransaction().replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
-                }
+                activity!!.supportFragmentManager.beginTransaction().replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
                 fragmentOpened = true
             }
             // navigates to display image on top of current fragment
@@ -281,7 +260,6 @@ class DisplaySubView : Fragment() {
         }
     }
 
-
     private fun setSubInfoData(sortingInfo : DisplaySubInfoData) {
         val method = DisplaySubVM.convertSortingTypeToText(sortingInfo.sortingMethod)
         val scope = DisplaySubVM.convertSortingScopeToText(sortingInfo.sortingScope)
@@ -292,7 +270,6 @@ class DisplaySubView : Fragment() {
             resources.getString(R.string.sort_by_info_no_scope, method)
         }
 
-        subToolbar?.display_subinfo_subtitle?.text = sortInfoText
         subSortByInfo.text = sortInfoText
     }
 
@@ -300,8 +277,8 @@ class DisplaySubView : Fragment() {
 
     private fun initializeOnClicks() {
         // set onclick to display sub info when the title is clicked
-                subToolbar.setOnClickListener {
-                    SubInfoBottomSheetDialog().apply {
+        subToolbar.setOnClickListener {
+            SubInfoBottomSheetDialog().apply {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
@@ -316,7 +293,7 @@ class DisplaySubView : Fragment() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
-                // checks if the recyclerview can no longer scroll downwards
+                // checks if the recycler view can no longer scroll downwards
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
                     // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
                     scrollLocked = true
@@ -349,16 +326,6 @@ class DisplaySubView : Fragment() {
                 Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString())
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        // put the first visible item position into the bundle to allow us to get back to it
-//        (subPostsRecyclerView.layoutManager as LinearLayoutManager).let {
-//            outState.putInt(SCROLL_POSITION, it.findFirstCompletelyVisibleItemPosition())
-//        }
-//        outState.putParcelable(SCROLL_POSITION, subPostsRecyclerView.layoutManager?.onSaveInstanceState())
     }
 
     companion object SortTypeHelper {

@@ -14,8 +14,7 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  // Currently can't use constants from entity class in query annotation so hardcoded for now
-  // TODO fix it
+  // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
 
   @Query("SELECT * FROM PostEntity WHERE subreddit = :subName AND origin = 0 ORDER BY `order` ASC")
   public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);

@@ -24,7 +24,9 @@ class HomeFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initializeFragments()
+        tabFragments.add(DisplaySubsView())
+        tabFragments.add(FrontpageFragment())
+
         pagerAdapter = HomePagerAdapter(childFragmentManager)
     }
 
@@ -39,11 +41,6 @@ class HomeFragment : RelicFragment() {
             homeTabLayout.setupWithViewPager(homeViewPager)
             homeToolbarView?.findViewById<TextView>(R.id.my_toolbar_title)?.text = resources.getString(R.string.app_name)
         }
-    }
-
-    private fun initializeFragments() {
-        tabFragments.add(DisplaySubsView())
-        tabFragments.add(FrontpageFragment())
     }
 
     private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

@@ -17,8 +17,7 @@ open class DisplaySubVM (
         private val postSource: PostRepository.PostSource,
         private val subRepo: SubRepository,
         private var postRepo: PostRepository
-) : ViewModel(), DisplaySubContract.ViewModel,
-        DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback {
+) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback {
 
     class Factory @Inject constructor(
             private val subRepo: SubRepository,

@@ -67,7 +67,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
         subAdapter = SubItemAdapter(OnClickSubItem())
 
         // initialize the adapter for the search subs recycler view
-        val searchSubItemOnClick = OnClickSearchSubItem(this@DisplaySubsView)
+        val searchSubItemOnClick = OnClickSearchSubItem(this)
         searchItemAdapter = SearchItemAdapter(searchSubItemOnClick)
     }
 
@@ -75,7 +75,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // inflate the databinding view
+        // inflate the data binding view
         displaySubsBinding = DataBindingUtil
                 .inflate(inflater, R.layout.display_subs, container, false)
 
@@ -83,7 +83,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
             displaySubsRecyclerview.also {
                 it.layoutManager = GridLayoutManager(context, 3)
-                it.itemAnimator = null
                 it.adapter = subAdapter
             }
 

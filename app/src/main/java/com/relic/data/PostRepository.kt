@@ -15,18 +15,18 @@ interface PostRepository {
     val postGateway: PostGateway
 
     /**
-     * exposes livedata list of posts for a given subreddit
-     * @param subredditName name of the subreddit to retrieve the posts for
-     * @return list of posts from this subreddit as livedata (empty if none)
+     * Exposes the livedata list of posts
+     * @param postSource subreddit to get the list for
+     * @return live data list of posts
      */
     fun getPosts(postSource: PostSource): LiveData<List<PostModel>>
 
     /**
-     * retrieves more posts from the network and store them locally
-     * @param subredditName valid subreddit name
-     * @param postingAfter null ? refresh : "after" value for the next listing
+     * Retrieves posts for a subreddit
+     * @param postSource origin of the post
+     * @param listingAfter after value associated with the listing of the current set of posts
      */
-    fun retrieveMorePosts(postSource: PostSource, postingAfter: String)
+    fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
 
     /**
      *
@@ -42,7 +42,6 @@ interface PostRepository {
      */
     fun getPost(postFullName: String): LiveData<PostModel>
 
-    // TODO convert this to return livedata and get rid of get post
     /**
      * retrieves a single post from the network and stores it locally
      * @param subredditName name of subreddit that the post was made in
@@ -53,7 +52,7 @@ interface PostRepository {
     /**
      * clears all current posts for this subreddit and retrieves new ones based on the sorting
      * method specified
-     * @param subredditName
+     * @param postSource
      * @param sortByCode
      */
     fun retrieveSortedPosts(postSource: PostSource, sortByCode: Int, sortScopeCode: Int)
@@ -63,7 +62,7 @@ interface PostRepository {
     /**
      * //TODO tentative -> should expose or not
      * need to decide whether the Viewmodel should handle this or not
-     * @param subredditName
+     * @param postSource
      */
     fun clearAllSubPosts(postSource: PostSource)
 

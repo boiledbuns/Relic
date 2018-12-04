@@ -122,8 +122,9 @@ class FrontpageFragment : Fragment() {
             // navigates to display post
             is NavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
-                    navigationData.postId,
-                    navigationData.subredditName
+                    postId = navigationData.postId,
+                    subreddit = navigationData.subredditName,
+                    enableVisitSub = true
                 )
                 activity!!.supportFragmentManager.beginTransaction()
                     .replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()

@@ -39,12 +39,19 @@ class DisplayPostFragment : Fragment() {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"
         private const val ARG_SUB_NAME = "subreddit"
+        private const val ARG_ENABLE_VISIT_SUB = "enable_visit_sub"
 
-        fun create(postId : String, subreddit : String) : DisplayPostFragment {
+        /**
+         * @param enableVisitSub used to allow onClicks to subreddit. Should only be enabled when
+         * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
+         * continuously chaining open subreddit actions
+         */
+        fun create(postId : String, subreddit : String, enableVisitSub : Boolean = false) : DisplayPostFragment {
             // create a new bundle for the post id
             val bundle = Bundle()
             bundle.putString(ARG_POST_FULLNAME, postId)
             bundle.putString(ARG_SUB_NAME, subreddit)
+            bundle.putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
 
             return DisplayPostFragment().apply {
                 arguments = bundle
@@ -67,6 +74,7 @@ class DisplayPostFragment : Fragment() {
 
     private lateinit var postFullName: String
     private lateinit var subredditName: String
+    private var enableVisitSub = false
 
     private lateinit var rootView : View
     private lateinit var myToolbar: Toolbar
@@ -78,6 +86,7 @@ class DisplayPostFragment : Fragment() {
         arguments?.apply {
             getString("full_name")?.let { postFullName = it }
             getString("subreddit")?.let { subredditName = it }
+            enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
         }
     }
 
@@ -94,7 +103,7 @@ class DisplayPostFragment : Fragment() {
                 title = subredditName
                 inflateMenu(R.menu.display_post_menu)
 
-                setOnClickListener {
+                if (enableVisitSub) setOnClickListener {
                     val subFragment = DisplaySubView.create(subredditName)
                     activity!!.supportFragmentManager.beginTransaction()
                         .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
