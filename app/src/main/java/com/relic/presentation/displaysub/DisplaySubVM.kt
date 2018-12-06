@@ -11,6 +11,7 @@ import com.relic.data.SubRepository
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
+import com.shopify.livedataktx.SingleLiveData
 import javax.inject.Inject
 
 open class DisplaySubVM (
@@ -38,7 +39,7 @@ open class DisplaySubVM (
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
 
-    private val _navigationLiveData = MutableLiveData<NavigationData>()
+    private val _navigationLiveData = SingleLiveData<NavigationData>()
     val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
@@ -169,10 +170,11 @@ open class DisplaySubVM (
     override fun visitPost(postfullName : String, postSubreddit : String) {
         postRepo.postGateway.visitPost(postfullName)
 
-        _navigationLiveData.apply {
-            value = NavigationData.ToPost(postfullName, postSubreddit)
-            value = null
-        }
+//        _navigationLiveData.apply {
+//            value = NavigationData.ToPost(postfullName, postSubreddit)
+//            value = null
+//        }
+        _navigationLiveData.value = NavigationData.ToPost(postfullName, postSubreddit)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {

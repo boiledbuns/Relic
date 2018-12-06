@@ -10,7 +10,7 @@ import com.relic.presentation.displaysub.DisplaySubContract
 class PostItemAdapter (
         private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
 ) : RecyclerView.Adapter <PostItemVH> () {
-    private var postList: MutableList<PostModel> = ArrayList()
+    private var postList: List<PostModel> = ArrayList()
 
     override fun getItemCount() = postList.size
 
@@ -54,8 +54,7 @@ class PostItemAdapter (
             }
         }).dispatchUpdatesTo(this)
 
-        postList.clear()
-        postList.addAll(newPostList)
+        postList = newPostList
     }
 
     // start region for onclick handlers

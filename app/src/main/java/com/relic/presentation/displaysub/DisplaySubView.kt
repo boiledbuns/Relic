@@ -1,5 +1,6 @@
 package com.relic.presentation.displaysub
 
+import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -26,10 +27,10 @@ import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.data.PostRepository
+import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
 import com.relic.presentation.DisplayImageFragment
-import com.relic.presentation.adapter.ImageOnClick
-import com.relic.presentation.adapter.PostItemOnclick
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
@@ -37,11 +38,9 @@ import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
-import kotlinx.android.synthetic.main.display_sub_info.view.*
 import java.lang.Error
 
-class DisplaySubView : Fragment() {
-    private val TAG = "DISPLAYSUB_VIEW"
+class DisplaySubView : RelicFragment() {
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
@@ -78,7 +77,6 @@ class DisplaySubView : Fragment() {
         }
 
         postAdapter = PostItemAdapter(displaySubVM)
-        bindViewModel()
     }
 
     override fun onCreateView(
@@ -115,18 +113,18 @@ class DisplaySubView : Fragment() {
             subAppBarLayout.setExpanded(false, false)
         }
 
-//        // adds listener for state change for the appbarlayout issue that always opens it when
-//        // returning to this fragment after popping another off of the stack
-//        subAppBarLayout.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-//            override fun onViewAttachedToWindow(view: View) {
-//                if (fragmentOpened) {
-//                    subAppBarLayout.setExpanded(false)
-//                    fragmentOpened = false
-//                }
-//            }
-//
-//            override fun onViewDetachedFromWindow(view: View) {}
-//        })
+        // adds listener for state change for the appbarlayout issue that always opens it when
+        // returning to this fragment after popping another off of the stack
+        subAppBarLayout.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) {
+                if (fragmentOpened) {
+                    subAppBarLayout.setExpanded(false)
+                    fragmentOpened = false
+                }
+            }
+
+            override fun onViewDetachedFromWindow(view: View) {}
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -196,31 +194,25 @@ class DisplaySubView : Fragment() {
 
         return override
     }
-    // endregion fragment hooks
+    // endregion fragment lifecycle hooks
 
-    // region view functions
-
-    /**
-     * Observe all the liveData exposed by the viewModel and attach the appropriate event listeners
-     */
-    private fun bindViewModel() {
-        // observe the liveData list of posts for this subreddit
-        displaySubVM.postListLiveData.nonNull().observe (this) { postModels ->
-            Log.d(TAG, "size of " + postModels.size)
-            postAdapter.setPostList(postModels)
-
-            // unlock scrolling to allow more posts to be loaded
-            scrollLocked = false
-            subSwipeRefreshLayout.isRefreshing = false
-        }
-
-        // observe the subreddit model representing this subreddit
-        displaySubVM.subredditLiveData.nonNull().observe(this) { updateSubInfo(it) }
-        displaySubVM.navigationLiveData.nonNull().observe(this) { handleNavigation(it) }
-        displaySubVM.subInfoLiveData.nonNull().observe (this) { setSubInfoData(it) }
+    override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
+        displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
+        displaySubVM.subredditLiveData.nonNull().observe(lifecycleOwner) { updateSubInfo(it) }
+        displaySubVM.navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
+        displaySubVM.subInfoLiveData.nonNull().observe (lifecycleOwner) { setSubInfoData(it) }
     }
 
     // region LiveData handlers
+
+    private fun updateLoadedPosts(postModels : List<PostModel>) {
+        Log.d(TAG, "size of " + postModels.size)
+        postAdapter.setPostList(postModels)
+
+        // unlock scrolling to allow more posts to be loaded
+        scrollLocked = false
+        subSwipeRefreshLayout.isRefreshing = false
+    }
 
     private fun updateSubInfo(subredditModel : SubredditModel) {
         subscribeButtonView.apply {
@@ -272,8 +264,9 @@ class DisplaySubView : Fragment() {
 
         subSortByInfo.text = sortInfoText
     }
-
     // endregion LiveData handlers
+
+    // region view functions
 
     private fun initializeOnClicks() {
         // set onclick to display sub info when the title is clicked

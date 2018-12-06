@@ -1,13 +1,16 @@
 package com.relic;
 
+import android.content.Context;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 
 import com.relic.data.Authenticator;
@@ -77,6 +80,11 @@ public class MainActivity extends AppCompatActivity implements AuthenticationCal
               .replace(R.id.main_content_frame, new HomeFragment())
               .commit();
     }
+  }
+
+  @Override
+  public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+    return super.onCreateView(parent, name, context, attrs);
   }
 }
 

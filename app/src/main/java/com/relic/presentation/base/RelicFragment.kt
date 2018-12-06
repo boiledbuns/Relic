@@ -1,11 +1,13 @@
 package com.relic.presentation.base
 
+import android.arch.lifecycle.LifecycleOwner
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import com.relic.R
 
 open class RelicFragment: Fragment() {
-    protected val TAG : String = javaClass.toString().split(".").last()
+    protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
 
     protected fun log(message : String) {
         Log.d(TAG, message)
@@ -22,4 +24,11 @@ open class RelicFragment: Fragment() {
                 .addToBackStack(TAG)
                 .commit()
     }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        bindViewModel(viewLifecycleOwner)
+    }
+
+    protected open fun bindViewModel(lifecycleOwner : LifecycleOwner) { }
 }
