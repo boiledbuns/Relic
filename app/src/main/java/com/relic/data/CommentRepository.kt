@@ -15,7 +15,7 @@ interface CommentRepository {
     /**
      * retrieves comments for a post from the network and stores them locally
      * @param subName display name of a subreddit
-     * @param postFullName full name of the post
+     * @param postFullName id of a post
      * @param refresh whether to refresh comments or get next
      */
     fun retrieveComments(subName: String, postFullName: String, refresh : Boolean)
