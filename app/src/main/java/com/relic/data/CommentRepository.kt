@@ -7,8 +7,8 @@ import com.relic.data.models.CommentModel
 interface CommentRepository {
 
     /**
-     * Exposes the comments as a livedata list
-     * @param postFullName fullname of a post
+     * Exposes the comments as a liveData list
+     * @param postFullName full name of a post
      */
     fun getComments(postFullName: String): LiveData<List<CommentModel>>
 

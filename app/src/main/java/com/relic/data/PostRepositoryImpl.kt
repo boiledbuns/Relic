@@ -64,6 +64,8 @@ constructor(
             .getString(tokenKey, "DEFAULT") ?: ""
     }
 
+    // region interface methods
+
     override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
         return when (postSource) {
             is PostRepository.PostSource.Subreddit -> appDB.postDao.getSubredditPosts(postSource.subredditName)
@@ -96,6 +98,21 @@ constructor(
                 checkToken()
             )
         )
+    }
+
+    /**
+     * Retrieves the "after" values to be used for the next post listing
+     * @param callback callback to send the name to
+     * @param postSource nsource of the post
+     */
+    override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
+        val subName = when (postSource) {
+            is PostRepository.PostSource.Subreddit -> postSource.subredditName
+            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
+            else -> KEY_ALL
+        }
+
+        RetrieveListingAfterTask(appDB, callback).execute(subName)
     }
 
     override fun retrieveSortedPosts(postSource : PostRepository.PostSource, sortType: Int) {
@@ -148,6 +165,44 @@ constructor(
             )
         )
     }
+
+    override fun getPost(postFullName: String): LiveData<PostModel> {
+        return appDB.postDao.getSinglePost(postFullName)
+    }
+
+    override fun retrievePost(subredditName: String, postFullName: String) {
+        val ending = ENDPOINT + "r/" + subredditName + "/comments/" + postFullName.substring(3)
+        // create the new request and submit it
+        requestManager.processRequest(
+            RelicOAuthRequest(
+                RelicOAuthRequest.GET,
+                ending,
+                Response.Listener { response ->
+                    Log.d(TAG, "Loaded response $response")
+                    try {
+                        val post = parsePost(response)
+                        InsertPostTask().execute(appDB, post)
+                    } catch (error: ParseException) {
+                        Log.d(TAG, "Error: " + error.message)
+                    }
+                },
+                Response.ErrorListener { error ->
+                    Log.d(TAG, "Error: " + error.networkResponse)
+                    // TODO add livedata for error
+                    // TODO maybe retry if not an internet connection issue
+                },
+                checkToken()
+            )
+        )
+    }
+
+    override fun clearAllSubPosts(postSource: PostRepository.PostSource) {
+        ClearSubredditPosts().execute(appDB, postSource)
+    }
+
+    // endregion interface methods
+
+    // region helper functions
 
     /**
      * Parses the response from the api and stores the posts in the persistence layer
@@ -229,11 +284,24 @@ constructor(
             postEntities.add(postEntity)
         }
 
-        // insert all the post entities into the db
         InsertPostsTask(appDB, postEntities).execute(listing)
-
         return postEntities
     }
+
+    @Throws(ParseException::class)
+    private fun parsePost(response: String): PostEntity {
+        val gson = GsonBuilder().create()
+        val data =
+            ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject?
+        val child = (data!!["children"] as JSONArray)[0] as JSONObject
+        val post = child["data"] as JSONObject?
+
+        return gson.fromJson(post!!.toJSONString(), PostEntity::class.java)
+    }
+
+    // end region helper functions
+
+    // region async tasks
 
     /**
      * Async task to insert posts and create/update the listing data for the current subreddit to
@@ -251,22 +319,15 @@ constructor(
         }
     }
 
-    /**
-     * Retrieves the "after" values to be used for the next post listing
-     * @param callback callback to send the name to
-     * @param postSource nsource of the post
-     */
-    override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
-        val subName = when (postSource) {
-            is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
-            else -> KEY_ALL
+    private class InsertPostTask : AsyncTask<Any, Int, Int>() {
+        override fun doInBackground(vararg objects: Any): Int? {
+            val applicationDB = objects[0] as ApplicationDB
+            applicationDB.postDao.insertPost(objects[1] as PostEntity)
+            return null
         }
-
-        RetrieveListingAfterTask(appDB, callback).execute(subName)
     }
 
-    internal class RetrieveListingAfterTask(
+    private class RetrieveListingAfterTask(
         var appDB: ApplicationDB,
         var callback: RetrieveNextListingCallback
     ) : AsyncTask<String, Int, Int>() {
@@ -278,73 +339,6 @@ constructor(
             return null
         }
     }
-
-    internal class DeleteSubPostsTask(var appDB: ApplicationDB) : AsyncTask<String, Int, Int>() {
-        var callback: RetrieveNextListingCallback? = null
-
-        override fun doInBackground(vararg strings: String): Int? {
-            // delete the posts associated with the current sub
-            appDB.postDao.deleteAllFromSub(strings[0])
-            return null
-        }
-    }
-
-    override fun getPost(postFullName: String): LiveData<PostModel> {
-        return appDB.postDao.getSinglePost(postFullName)
-    }
-
-    override fun retrievePost(subredditName: String, postFullName: String) {
-        val ending = ENDPOINT + "r/" + subredditName + "/comments/" + postFullName.substring(3)
-
-        Log.d(TAG, ending)
-
-        // create the new request and submit it
-        requestManager.processRequest(
-            RelicOAuthRequest(
-                RelicOAuthRequest.GET,
-                ending,
-                Response.Listener { response ->
-                    Log.d(TAG, "Loaded response $response")
-                    try {
-                        val post = parsePost(response)
-                        InsertPostTask().execute(appDB, post)
-                    } catch (error: ParseException) {
-                        Log.d(TAG, "Error: " + error.message)
-                    }
-                },
-                Response.ErrorListener { error ->
-                    Log.d(TAG, "Error: " + error.networkResponse)
-                    // TODO add livedata for error
-                    // TODO maybe retry if not an internet connection issue
-                },
-                checkToken()
-            )
-        )
-    }
-
-    @Throws(ParseException::class)
-    private fun parsePost(response: String): PostEntity {
-        val gson = GsonBuilder().create()
-        val data =
-            ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject?
-        val child = (data!!["children"] as JSONArray)[0] as JSONObject
-        val post = child["data"] as JSONObject?
-
-        return gson.fromJson(post!!.toJSONString(), PostEntity::class.java)
-    }
-
-    private class InsertPostTask : AsyncTask<Any, Int, Int>() {
-        override fun doInBackground(vararg objects: Any): Int? {
-            val applicationDB = objects[0] as ApplicationDB
-            applicationDB.postDao.insertPost(objects[1] as PostEntity)
-            return null
-        }
-    }
-
-    override fun clearAllSubPosts(postSource: PostRepository.PostSource) {
-        ClearSubredditPosts().execute(appDB, postSource)
-    }
-
     private class ClearSubredditPosts : AsyncTask<Any, Int, Int>() {
         override fun doInBackground(vararg objects: Any): Int? {
             val appDB = objects[0] as ApplicationDB
@@ -357,4 +351,5 @@ constructor(
             return null
         }
     }
+    // endregion async tasks
 }
