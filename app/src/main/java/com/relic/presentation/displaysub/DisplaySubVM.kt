@@ -53,7 +53,7 @@ open class DisplaySubVM (
                 Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
                 // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
                 postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                // TODO add a livedata boolean success listener
+                // TODO add a liveData boolean success listener
                 // TODO add a flag for the to check if retrieval occured
             } else {
                 Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")

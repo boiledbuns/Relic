@@ -229,4 +229,6 @@ public class PostModel implements Post {
   public void setLinkFlair(String linkFlair) {
     this.linkFlair = linkFlair;
   }
+
+  public int origin;
 }

@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/postItemRootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,14 +20,16 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="@dimen/text_s"
-        android:layout_marginEnd="@dimen/title_margin"/>
+        android:layout_marginEnd="@dimen/title_margin"
+        tools:text="random subreddit"/>
 
     <TextView
         android:id="@+id/postDateView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/postSubNameView"
-        android:textSize="@dimen/text_s"/>
+        android:layout_alignParentEnd="true"
+        android:textSize="@dimen/text_s"
+        tools:text="Dec 28th, 10:55 AM"/>
 
     <ImageView
         android:id="@+id/savedPostIconView"
@@ -50,7 +53,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/postSubNameView"
-        android:layout_marginBottom="@dimen/padding_m">
+        android:layout_marginBottom="@dimen/padding_m"
+        tools:text="random subreddit">
 
         <RelativeLayout
             android:layout_width="0dp"

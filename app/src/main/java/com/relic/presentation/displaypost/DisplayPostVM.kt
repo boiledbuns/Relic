@@ -3,7 +3,6 @@ package com.relic.presentation.displaypost
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 
@@ -15,7 +14,6 @@ import com.relic.data.models.PostModel
 import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,7 +52,7 @@ class DisplayPostVM (
     val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
 
     init {
-        observeLivedata()
+        observeLiveData()
         // check internet connection and retrieve more comments if internet is available
         retrieveMoreComments(true)
     }
@@ -62,13 +60,20 @@ class DisplayPostVM (
     /**
      * Add sources and listeners to all local livedata
      */
-    private fun observeLivedata() {
-        // retrieves the livedata post to be exposed to the view
-        _postLiveData.addSource <PostModel>(postRepo.getPost(postFullname)) {
+    private fun observeLiveData() {
+        // retrieves the liveData post to be exposed to the view
+        _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) {
             _postLiveData.postValue(it)
+
+            // turn off refreshing since no comments are present
+            it?.let { post ->
+                if (post.commentCount == 0) {
+                    _refreshingLiveData.postValue(false)
+                }
+            }
         }
 
-        // retrieve the comment list as livedata so that we can expose it to the view first
+        // retrieve the comment list as liveData so that we can expose it to the view first
         _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
             comments?.let {
                 _commentListLiveData.postValue(comments)

@@ -18,6 +18,7 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostEntity.ORIGIN_ALL
 import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
+import com.relic.data.entities.PostEntity.ORIGIN_SUB
 import com.relic.data.models.PostModel
 
 import org.json.simple.JSONArray
@@ -211,7 +212,9 @@ constructor(
      */
     @Throws(ParseException::class)
     private fun parsePosts(response: String, postSource: PostRepository.PostSource): List<PostEntity> {
-        //TODO separate into two separate methods and switch to multithreaded to avoid locking main thread
+        // TODO separate into two separate methods and switch to mutithreaded to avoid locking main thread
+        // This is fine for now because I'm still working on finalizing which fields to use/not use
+        // There will be a lot more experimentation and changes to come in this method as a result
         val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
 
@@ -219,16 +222,16 @@ constructor(
         val formatter = SimpleDateFormat("MMM dd',' hh:mm a")
         val current = Date()
 
-        var origin = PostEntity.ORIGIN_SUB
+        var postOrigin = PostEntity.ORIGIN_SUB
         var listingKey = ""
 
         when (postSource) {
             is PostRepository.PostSource.Frontpage -> {
-                origin = PostEntity.ORIGIN_FRONTPAGE
+                postOrigin = PostEntity.ORIGIN_FRONTPAGE
                 listingKey = KEY_FRONTPAGE
             }
             is PostRepository.PostSource.Subreddit -> {
-                origin = PostEntity.ORIGIN_SUB
+                postOrigin = PostEntity.ORIGIN_SUB
                 listingKey = postSource.subredditName
             }
         }
@@ -252,17 +255,15 @@ constructor(
             //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
             Log.d(TAG, "link_flair_richtext : " + post!!["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
             //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
-
             //Log.d(TAG, "post keys " + post.keySet().toString())
             // unmarshall the object and add it into a list
             val postEntity = gson.fromJson(post.toJSONString(), PostEntity::class.java)
             val likes = post["likes"] as Boolean?
             postEntity.userUpvoted = if (likes == null) 0 else if (likes) 1 else -1
 
-            if (origin != PostEntity.ORIGIN_SUB) {
-                postEntity.origin = PostEntity.ORIGIN_FRONTPAGE
+            if (postOrigin != PostEntity.ORIGIN_SUB) {
+                postEntity.origin = postOrigin
             }
-
 
             // TODO create parse class/switch to a more efficient method of removing html
             val authorFlair = post["author_flair_text"] as String?

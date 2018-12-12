@@ -43,7 +43,4 @@ public class FrontpageView extends Fragment {
     return rootView;
   }
 
-
-
-
 }

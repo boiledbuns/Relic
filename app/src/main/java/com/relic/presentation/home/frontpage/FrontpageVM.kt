@@ -6,8 +6,8 @@ import com.relic.presentation.displaysub.DisplaySubVM
 import javax.inject.Inject
 
 class FrontpageVM (
-    private val subRepo: SubRepository,
-    private val postRepo : PostRepository
+    subRepo: SubRepository,
+    postRepo : PostRepository
 ): DisplaySubVM(PostRepository.PostSource.Frontpage() , subRepo, postRepo) {
 
     private val TAG = "DISPLAY_SUB_VM"

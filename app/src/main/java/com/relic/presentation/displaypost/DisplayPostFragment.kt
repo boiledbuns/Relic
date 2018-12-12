@@ -48,10 +48,11 @@ class DisplayPostFragment : Fragment() {
          */
         fun create(postId : String, subreddit : String, enableVisitSub : Boolean = false) : DisplayPostFragment {
             // create a new bundle for the post id
-            val bundle = Bundle()
-            bundle.putString(ARG_POST_FULLNAME, postId)
-            bundle.putString(ARG_SUB_NAME, subreddit)
-            bundle.putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
+            val bundle = Bundle().apply {
+                putString(ARG_POST_FULLNAME, postId)
+                putString(ARG_SUB_NAME, subreddit)
+                putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
+            }
 
             return DisplayPostFragment().apply {
                 arguments = bundle
@@ -80,6 +81,8 @@ class DisplayPostFragment : Fragment() {
     private lateinit var myToolbar: Toolbar
     private lateinit var commentAdapter: CommentItemAdapter
 
+    // region lifecycle hooks
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -95,29 +98,27 @@ class DisplayPostFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
+        rootView = inflater.inflate(R.layout.display_post, container, false)
 
-        rootView = inflater.inflate(R.layout.display_post, container, false).apply {
+        rootView.findViewById<Toolbar>(R.id.display_post_toolbar).apply {
+            myToolbar = this
+            title = subredditName
+            inflateMenu(R.menu.display_post_menu)
 
-            findViewById<Toolbar>(R.id.display_post_toolbar).apply {
-                myToolbar = this
-                title = subredditName
-                inflateMenu(R.menu.display_post_menu)
-
-                if (enableVisitSub) setOnClickListener {
-                    val subFragment = DisplaySubView.create(subredditName)
-                    activity!!.supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
-                }
-            }
-
-            findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
-                commentAdapter = CommentItemAdapter(displayPostVM)
-                adapter = commentAdapter
+            if (enableVisitSub) setOnClickListener {
+                val subFragment = DisplaySubView.create(subredditName)
+                activity!!.supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
             }
         }
 
-        bindViewModel()
+        rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
+            commentAdapter = CommentItemAdapter(displayPostVM)
+            adapter = commentAdapter
+        }
 
+        bindViewModel()
+        
         attachViewListeners()
         return rootView
     }
@@ -132,6 +133,24 @@ class DisplayPostFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.display_post_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        var override = true
+
+        when (item?.itemId) {
+            R.id.post_menu_reply -> openPostReplyEditor(postFullName)
+            else -> override = super.onOptionsItemSelected(item)
+        }
+
+        return override
+    }
+
+    // endregion lifecycle hooks
+
     private fun bindViewModel() {
         displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
         displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
@@ -140,6 +159,8 @@ class DisplayPostFragment : Fragment() {
             displayPostSwipeRefresh.isRefreshing = it
         }
     }
+
+    // region live data handlers
 
     private fun displayPost (postModel : PostModel) {
         fullPostView.setPost(postModel, displayPostVM.isImage(), displayPostVM)
@@ -155,6 +176,14 @@ class DisplayPostFragment : Fragment() {
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList)
     }
+
+    private fun handleNavigation(navigationData : PostNavigationData) {
+        when (navigationData) {
+            is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
+        }
+    }
+
+    // endregion live data handlers
 
     /**
      * Attaches custom scroll listeners to allow more comments to be retrieved when the recycler
@@ -175,32 +204,11 @@ class DisplayPostFragment : Fragment() {
                     }
                 })
 
-            findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh)
-                .setOnRefreshListener { displayPostVM.retrieveMoreComments(refresh = true) }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater?.inflate(R.menu.display_post_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        var override = true
-
-        Log.d(TAG, "PLEASE " + item!!.itemId)
-        when (item.itemId) {
-            R.id.post_menu_reply -> openPostReplyEditor(postFullName)
-            else -> override = super.onOptionsItemSelected(item)
-        }
-
-        return override
-    }
-
-    private fun handleNavigation(navigationData : PostNavigationData) {
-        when (navigationData) {
-            is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
+            findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).apply {
+                setOnRefreshListener {
+                    displayPostVM.retrieveMoreComments(refresh = true)
+                }
+            }
         }
     }
 
