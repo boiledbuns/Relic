@@ -16,6 +16,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
@@ -63,7 +64,7 @@ class DisplayPostFragment : Fragment() {
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                // construct & inject editor VM
+                // construct & inject editor ViewModel
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
@@ -87,8 +88,8 @@ class DisplayPostFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.apply {
-            getString("full_name")?.let { postFullName = it }
-            getString("subreddit")?.let { subredditName = it }
+            getString(ARG_POST_FULLNAME)?.let { postFullName = it }
+            getString(ARG_SUB_NAME)?.let { subredditName = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
         }
     }
@@ -117,14 +118,13 @@ class DisplayPostFragment : Fragment() {
             adapter = commentAdapter
         }
 
-        bindViewModel()
-        
         attachViewListeners()
         return rootView
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindViewModel()
 
         // TODO: Testing user gateway using user "reddit"
         val userGateway = UserGatewayImpl(context!!, NetworkRequestManager(activity!!.applicationContext))
@@ -180,6 +180,7 @@ class DisplayPostFragment : Fragment() {
     private fun handleNavigation(navigationData : PostNavigationData) {
         when (navigationData) {
             is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
+            is PostNavigationData.ToReply -> openPostReplyEditor(navigationData.parentFullname)
         }
     }
 
@@ -190,24 +191,22 @@ class DisplayPostFragment : Fragment() {
      * view is scrolled all the way to the bottom
      */
     private fun attachViewListeners() {
-        rootView.apply {
-            findViewById<RecyclerView>(R.id.postCommentRecyclerView)
-                .addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                        super.onScrollStateChanged(recyclerView, newState)
+        rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView)
+            .addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
 
-                        // if recycler view reaches bottom
-                        if (!recyclerView.canScrollVertically(1)) {
-                            Log.d(TAG, "Bottom reached")
-                            displayPostVM.retrieveMoreComments(false)
-                        }
+                    // if recycler view reaches bottom
+                    if (!recyclerView.canScrollVertically(1)) {
+                        Log.d(TAG, "Bottom reached")
+                        displayPostVM.retrieveMoreComments(false)
                     }
-                })
-
-            findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).apply {
-                setOnRefreshListener {
-                    displayPostVM.retrieveMoreComments(refresh = true)
                 }
+            })
+
+        rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).apply {
+            setOnRefreshListener {
+                displayPostVM.retrieveMoreComments(refresh = true)
             }
         }
     }
@@ -221,20 +220,11 @@ class DisplayPostFragment : Fragment() {
                 .commit()
     }
 
-    private fun openPostReplyEditor(fullname: String?) {
-        Log.d(TAG, "reply button pressed")
-
-        val subFrag = EditorView()
-
-        // add the subreddit object to the bundle
-        subFrag.arguments = Bundle().apply {
-            putString(EditorView.SUBNAME_ARG, subredditName)
-            putString(EditorView.FULLNAME_ARG, fullname)
-            putInt(EditorView.PARENT_TYPE_KEY, EditorContract.VM.POST_PARENT)
-        }
+    private fun openPostReplyEditor(parentFullname: String) {
+        val editorFragment = EditorView.create(subredditName, parentFullname, EditorContract.ParentType.COMMENT)
 
         // replace the current screen with the newly created fragment
         activity!!.supportFragmentManager.beginTransaction()
-                .replace(R.id.main_content_frame, subFrag).addToBackStack(TAG).commit()
+                .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
     }
 }

@@ -2,17 +2,14 @@ package com.relic.presentation.editor
 
 interface  EditorContract {
 
-    interface VM {
-        companion object {
-            const val POST_PARENT = 0
-            const val COMMENT_PARENT = 1
-        }
+    interface ViewModel {
 
-        fun init(subName: String, fullName: String, parentType : Int)
     }
 
     data class ReplyParent(
-            val title : String? = null,
-            val body : String? = null
+        val title : String? = null,
+        val body : String? = null
     )
+
+    enum class ParentType { POST, COMMENT }
 }

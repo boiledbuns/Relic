@@ -28,7 +28,7 @@ public class FrontpageView extends Fragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // initializes the instance of the post repo and injects it into the VM
+    // initializes the instance of the post repo and injects it into the ViewModel
     PostRepository postRepo = new PostRepositoryImpl(getContext(), new NetworkRequestManager(getContext()));
     Authenticator auth = new Authenticator(getContext());
 

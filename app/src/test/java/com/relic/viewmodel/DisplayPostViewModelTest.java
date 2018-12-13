@@ -29,7 +29,7 @@ import java.util.List;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class DisplayPostVMTest {
+public class DisplayPostViewModelTest {
   @Mock
   Activity activity;
   @Mock Fragment displayPostView;

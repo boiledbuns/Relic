@@ -22,27 +22,48 @@ import kotlinx.android.synthetic.main.editor.view.*
 
 class EditorView : RelicFragment() {
     companion object {
-        const val FULLNAME_ARG = "fullname"
-        const val SUBNAME_ARG = "subreddit"
-        const val PARENT_TYPE_KEY = "post_type"
+        private const val FULLNAME_ARG = "arg_fullname"
+        private const val SUB_NAME_ARG = "arg_subreddit_name"
+        private const val PARENT_TYPE_KEY = "arg_post_type"
+
+        fun create(subredditName : String, fullname : String, parentType : EditorContract.ParentType) : EditorView {
+            return EditorView().apply {
+                arguments = Bundle().apply {
+                    putString(EditorView.SUB_NAME_ARG, subredditName)
+                    putString(EditorView.FULLNAME_ARG, fullname)
+                    putSerializable(EditorView.PARENT_TYPE_KEY, parentType)
+                }
+            }
+        }
     }
 
-    private val viewModel : EditorVM by lazy {
-        initializeVM()
+    private val viewModel : EditorViewModel by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                // construct & inject editor ViewModel
+                return DaggerVMComponent.builder()
+                    .repoModule(RepoModule(context!!))
+                    .authModule(AuthModule(context!!))
+                    .build()
+                    .getEditorVM().create(subName, fullName, parentType) as T
+            }
+        }).get(EditorViewModel::class.java)
     }
+
+    lateinit var subName : String
+    lateinit var fullName : String
+    lateinit var parentType : EditorContract.ParentType
 
     private lateinit var toolbar : Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val subName : String? = arguments?.getString(SUBNAME_ARG)
-        val fullName : String? = arguments?.getString(FULLNAME_ARG)
-        val parentType : Int? = arguments?.getInt(PARENT_TYPE_KEY)
-
-        if (subName != null && fullName != null && parentType != null) {
-            viewModel.init(subName, fullName, parentType)
-        }
+        arguments?.apply {
+            getString(SUB_NAME_ARG)?.let { subName = it } ?: dismiss()
+            getString(FULLNAME_ARG)?.let { fullName = it } ?: dismiss()
+            (get(PARENT_TYPE_KEY) as EditorContract.ParentType?)?.let { parentType = it } ?: dismiss()
+        } ?: dismiss()
 
         setHasOptionsMenu(true)
         bindVM()
@@ -80,21 +101,8 @@ class EditorView : RelicFragment() {
         }
     }
 
-    private fun initializeVM() : EditorVM {
-        return ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                // construct & inject editor VM
-                return DaggerVMComponent.builder()
-                        .repoModule(RepoModule(context!!))
-                        .authModule(AuthModule(context!!))
-                        .build()
-                        .getEditorVM().create() as T
-            }
-        }).get(EditorVM::class.java)
-    }
-
     private fun bindVM() {
-        viewModel.parentModel.nonNull().observe(this) {
+        viewModel.replyParentLiveData.nonNull().observe(this) {
             parentTitleTextView.text = it.title
 
             if (it.body == null || it.body.isEmpty()) {

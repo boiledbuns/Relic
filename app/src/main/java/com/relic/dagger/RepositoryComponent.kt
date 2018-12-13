@@ -11,5 +11,5 @@ interface RepositoryComponent {
 
     fun inject(editorView: EditorView)
 
-//    fun buildEditorVM() : EditorVM
+//    fun buildEditorVM() : EditorViewModel
 }

@@ -9,7 +9,7 @@ interface DisplayPostContract {
 
     interface ViewModel {
         /**
-         * Hook for view to tell the VM to retrieve more comments
+         * Hook for view to tell the ViewModel to retrieve more comments
          * @param refresh whether the comments should be refreshed or not
          */
         fun retrieveMoreComments(refresh: Boolean = false)
@@ -20,11 +20,16 @@ interface DisplayPostContract {
         fun onPostVoted(voteValue: Int)
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onImagePressed()
+        fun onReplyPressed()
     }
 }
 
 sealed class PostNavigationData {
-    data class ToImage (
-            val imageUrl : String
+    data class ToImage(
+        val imageUrl : String
+    ) : PostNavigationData()
+
+    data class ToReply(
+        val parentFullname : String
     ) : PostNavigationData()
 }
