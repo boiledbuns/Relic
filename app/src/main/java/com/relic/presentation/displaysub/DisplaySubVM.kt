@@ -99,7 +99,7 @@ open class DisplaySubVM (
     override fun retrieveMorePosts(resetPosts: Boolean) {
         if (resetPosts) {
             // all we have to do is clear entries in room -> our observer for the posts will auto download new posts when it's empty
-            postRepo.clearAllSubPosts(postSource)
+            postRepo.clearAllPostsFromSource(postSource)
         } else {
             // retrieve the "after" value for the next posting
             postRepo.getNextPostingVal(this, postSource)
@@ -118,7 +118,7 @@ open class DisplaySubVM (
         sortScope?.let { currentSortingScope = it }
 
         // remove all posts from current db for this subreddit (triggers retrieval)
-        postRepo.clearAllSubPosts(postSource)
+        postRepo.clearAllPostsFromSource(postSource)
         postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
         _subInfoLiveData.postValue(
             DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)

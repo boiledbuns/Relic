@@ -2,7 +2,7 @@ package com.relic.presentation.displaysub
 
 interface DisplaySubContract {
     interface ViewModel {
-        fun changeSortingMethod(sortingCode: Int? = null, sortScope: Int? = null)
+        fun changeSortingMethod(sortType: Int? = null, sortScope: Int? = null)
 
         fun retrieveMorePosts(resetPosts: Boolean)
 

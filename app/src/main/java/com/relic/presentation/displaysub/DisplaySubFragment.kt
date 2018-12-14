@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -40,7 +39,7 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
 import java.lang.Error
 
-class DisplaySubView : RelicFragment() {
+class DisplaySubFragment : RelicFragment() {
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
@@ -130,14 +129,15 @@ class DisplaySubView : RelicFragment() {
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater?.apply {
-            inflate(R.menu.display_sub_menu, menu)
+        inflater?.inflate(R.menu.display_sub_menu, menu)
 
-            // inflate only sorting types that have a sub scope menu
-            val menuWithSubMenu = listOf(2, 3, 4)
-            for (i in menuWithSubMenu) {
-//                inflate(R.menu.order_scope_menu, sortTypeMenu?.getItem(i)?.subMenu)
-            }
+        // have to first get the reference to the menu in charge of sorting
+        val sortMenu = menu?.findItem(DisplaySubMenuHelper.sortMenuId)?.subMenu
+
+        // inflate only sorting types that have a sub scope menu
+        DisplaySubMenuHelper.sortMethodSubMenuIdsWithScope.forEach { subMenuId ->
+            val sortingMethodSubMenu = sortMenu?.findItem(subMenuId)?.subMenu
+            inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
         }
 
         menu?.findItem(R.id.display_sub_searchitem)?.let {
@@ -159,9 +159,10 @@ class DisplaySubView : RelicFragment() {
             }
         }
     }
+
     // endregion fragment lifecycle hooks
 
-    // region fragment hooks
+    // region fragment event hooks
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
@@ -170,31 +171,30 @@ class DisplaySubView : RelicFragment() {
             // when the sorting type is changed
             R.id.post_sort_hot, R.id.post_sort_rising, R.id.post_sort_top -> {
                 // update the temporary local sorting method since we don't sort yet
-                tempSortMethod = convertMenuItemToSortType(item.itemId)
+                tempSortMethod = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)
             }
             // these sorting types don't have a scope, so we send sort method immediately
             R.id.post_sort_new, R.id.post_sort_best, R.id.post_sort_controversial -> {
-                displaySubVM.changeSortingMethod(sortType = convertMenuItemToSortType(item.itemId))
+                resetRecyclerView()
+                val sortType = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)
+                displaySubVM.changeSortingMethod(sortType)
             }
             // when the sorting scope is changed
             R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
             R.id.order_scope_month, R.id.order_scope_year, R.id.order_scope_all -> {
-                val sortScope = convertMenuItemToSortScope(item.itemId)
+                resetRecyclerView()
+
+                val sortScope = DisplaySubMenuHelper.convertMenuItemToSortScope(item.itemId)
                 displaySubVM.changeSortingMethod(sortType = tempSortMethod, sortScope = sortScope)
                 Toast.makeText(context, "Sorting option selected $sortScope", Toast.LENGTH_SHORT).show()
-
-                postAdapter.clear()
-                subAppBarLayout.setExpanded(true)
-                subSwipeRefreshLayout.isRefreshing = true
             }
-            else -> {
-                override = super.onOptionsItemSelected(item)
-            }
+            else -> override = super.onOptionsItemSelected(item)
         }
 
         return override
     }
-    // endregion fragment lifecycle hooks
+
+    // endregion fragment event hooks
 
     override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
         displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
@@ -275,7 +275,7 @@ class DisplaySubView : RelicFragment() {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
-                show(this@DisplaySubView.fragmentManager, TAG)
+                show(this@DisplaySubFragment.fragmentManager, TAG)
             }
         }
     }
@@ -300,13 +300,19 @@ class DisplaySubView : RelicFragment() {
 
         // Attach listener for refreshing the sub
         subSwipeRefreshLayout.setOnRefreshListener {
-            // empties current items to show that it's being refreshed
-            subPostsRecyclerView.layoutManager!!.scrollToPosition(0)
-            postAdapter.clear()
-
+            resetRecyclerView()
             // tells vm to clear the posts -> triggers action to retrieve more
             displaySubVM.retrieveMorePosts(true)
         }
+    }
+
+    private fun resetRecyclerView() {
+        // empties current items to show that it's being refreshed
+        subPostsRecyclerView.layoutManager?.scrollToPosition(0)
+        postAdapter.clear()
+
+        subAppBarLayout.setExpanded(true)
+        subSwipeRefreshLayout.isRefreshing = true
     }
 
     private fun loadBannerImage(bannerUrl: String?) {
@@ -322,37 +328,13 @@ class DisplaySubView : RelicFragment() {
     }
 
     companion object SortTypeHelper {
-        private const val ARG_SUBREDDIT_NAME = "SubredditName"
+        private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
 
-        fun create(subredditName : String) : DisplaySubView {
-            return DisplaySubView().apply {
+        fun create(subredditName : String) : DisplaySubFragment {
+            return DisplaySubFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_SUBREDDIT_NAME, subredditName)
                 }
-            }
-        }
-
-        fun convertMenuItemToSortType(optionId : Int) : Int {
-            return when(optionId) {
-                R.id.post_sort_best -> PostRepository.SORT_BEST
-                R.id.post_sort_hot -> PostRepository.SORT_HOT
-                R.id.post_sort_new -> PostRepository.SORT_NEW
-                R.id.post_sort_rising -> PostRepository.SORT_RISING
-                R.id.post_sort_top -> PostRepository.SORT_TOP
-                R.id.post_sort_controversial -> PostRepository.SORT_CONTROVERSIAL
-                else -> PostRepository.SORT_DEFAULT
-            }
-        }
-
-        fun convertMenuItemToSortScope(optionId : Int) : Int{
-            return when(optionId) {
-                R.id.order_scope_hour -> PostRepository.SCOPE_HOUR
-                R.id.order_scope_day -> PostRepository.SCOPE_DAY
-                R.id.order_scope_week -> PostRepository.SCOPE_WEEK
-                R.id.order_scope_month -> PostRepository.SCOPE_MONTH
-                R.id.order_scope_year -> PostRepository.SCOPE_YEAR
-                R.id.order_scope_all -> PostRepository.SCOPE_ALL
-                else -> PostRepository.SCOPE_NONE
             }
         }
     }

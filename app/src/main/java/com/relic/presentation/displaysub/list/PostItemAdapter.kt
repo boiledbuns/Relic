@@ -24,10 +24,7 @@ class PostItemAdapter (
         viewholder.bindPost(postList[position], position)
     }
 
-    fun clear() {
-        postList = ArrayList()
-        notifyDataSetChanged()
-    }
+    fun clear() { setPostList(emptyList()) }
 
     fun setPostList(newPostList: List<PostModel>) {
         DiffUtil.calculateDiff(object : DiffUtil.Callback() {

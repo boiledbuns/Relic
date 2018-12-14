@@ -6,11 +6,9 @@ import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -30,7 +28,7 @@ import com.relic.presentation.adapter.SubItemAdapter
 import com.relic.presentation.adapter.SubItemOnClick
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
-import com.relic.presentation.displaysub.DisplaySubView
+import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
@@ -200,13 +198,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
      */
     internal inner class OnClickSubItem : SubItemOnClick {
         override fun onClick(subItem: SubredditModel) {
-            val subFrag = DisplaySubView()
-
-            // add the subreddit object to the bundle
-            val bundle = Bundle().apply {
-                putString("SubredditName", subItem.subName)
-                subFrag.arguments = this
-            }
+            val subFrag = DisplaySubFragment.create(subItem.name)
 
             // clear items before transition to ensure we don't hold too much in memory
             subAdapter.clearList()
@@ -232,13 +224,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
     internal inner class OnClickSearchSubItem(fragment: Fragment) : SearchSubItemOnClick {
         override fun onClick(subName: String) {
 
-            // add the subreddit object to the bundle
-            val bundle = Bundle()
-            bundle.putString("SubredditName", subName)
-
-            val subFrag = DisplaySubView()
-            subFrag.arguments = bundle
-
+            val subFrag = DisplaySubFragment.create(subName)
             // clear items in the adapter
             searchItemAdapter.clearSearchResults()
         }

@@ -25,7 +25,7 @@ public abstract class PostDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertPosts(List<PostEntity> posts);
 
-  @Query("DELETE FROM PostEntity WHERE subreddit = :subName")
+  @Query("DELETE FROM PostEntity WHERE subreddit = :subName AND origin = 0")
   public abstract void deleteAllFromSub(String subName);
 
   @Query("DELETE FROM PostEntity WHERE origin = :sourceCode")

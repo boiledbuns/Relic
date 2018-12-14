@@ -16,7 +16,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
@@ -27,7 +26,7 @@ import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
-import com.relic.presentation.displaysub.DisplaySubView
+import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
 import com.shopify.livedataktx.nonNull
@@ -107,7 +106,7 @@ class DisplayPostFragment : Fragment() {
             inflateMenu(R.menu.display_post_menu)
 
             if (enableVisitSub) setOnClickListener {
-                val subFragment = DisplaySubView.create(subredditName)
+                val subFragment = DisplaySubFragment.create(subredditName)
                 activity!!.supportFragmentManager.beginTransaction()
                     .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
             }

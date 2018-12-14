@@ -64,7 +64,7 @@ interface PostRepository {
      * need to decide whether the Viewmodel should handle this or not
      * @param postSource
      */
-    fun clearAllSubPosts(postSource: PostSource)
+    fun clearAllPostsFromSource(postSource: PostSource)
 
     companion object {
         const val SORT_DEFAULT = 0

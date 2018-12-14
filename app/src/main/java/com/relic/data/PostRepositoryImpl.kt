@@ -18,7 +18,6 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostEntity.ORIGIN_ALL
 import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
-import com.relic.data.entities.PostEntity.ORIGIN_SUB
 import com.relic.data.models.PostModel
 
 import org.json.simple.JSONArray
@@ -197,8 +196,8 @@ constructor(
         )
     }
 
-    override fun clearAllSubPosts(postSource: PostRepository.PostSource) {
-        ClearSubredditPosts().execute(appDB, postSource)
+    override fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
+        ClearPostsFromSourceTask().execute(appDB, postSource)
     }
 
     // endregion interface methods
@@ -331,17 +330,16 @@ constructor(
     private class RetrieveListingAfterTask(
         var appDB: ApplicationDB,
         var callback: RetrieveNextListingCallback
-    ) : AsyncTask<String, Int, Int>() {
-
-        override fun doInBackground(vararg strings: String): Int? {
+    ) : AsyncTask<String, Unit, Unit>() {
+        override fun doInBackground(vararg strings: String) {
             // get the "after" value for the most current sub listing
             val subAfter = appDB.listingDAO.getNext(strings[0])
             callback.onNextListing(subAfter)
-            return null
         }
     }
-    private class ClearSubredditPosts : AsyncTask<Any, Int, Int>() {
-        override fun doInBackground(vararg objects: Any): Int? {
+
+    private class ClearPostsFromSourceTask : AsyncTask<Any, Unit, Unit>() {
+        override fun doInBackground(vararg objects: Any) {
             val appDB = objects[0] as ApplicationDB
             val postSource = objects[1] as PostRepository.PostSource
             when (postSource) {
@@ -349,7 +347,6 @@ constructor(
                 is PostRepository.PostSource.All -> appDB.postDao.deleteAllFromSource(ORIGIN_ALL)
                 is PostRepository.PostSource.Subreddit -> appDB.postDao.deleteAllFromSub(postSource.subredditName)
             }
-            return null
         }
     }
     // endregion async tasks
