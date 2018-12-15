@@ -41,6 +41,18 @@ import java.lang.Error
 
 class DisplaySubFragment : RelicFragment() {
 
+    companion object {
+        private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
+
+        fun create(subredditName : String) : DisplaySubFragment {
+            return DisplaySubFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_SUBREDDIT_NAME, subredditName)
+                }
+            }
+        }
+    }
+
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -57,13 +69,12 @@ class DisplaySubFragment : RelicFragment() {
 
     private lateinit var subName: String
 
-    private var searchView: SearchView? = null
-
+    private lateinit var searchView: SearchView
     private lateinit var postAdapter: PostItemAdapter
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
-    private var tempSortMethod = PostRepository.SORT_DEFAULT
+    private var tempSortMethod = PostRepository.SortType.DEFAULT
 
     // region fragment lifecycle hooks
 
@@ -253,8 +264,8 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     private fun setSubInfoData(sortingInfo : DisplaySubInfoData) {
-        val method = DisplaySubVM.convertSortingTypeToText(sortingInfo.sortingMethod)
-        val scope = DisplaySubVM.convertSortingScopeToText(sortingInfo.sortingScope)
+        val method = DisplaySubMenuHelper.convertSortingTypeToText(sortingInfo.sortingMethod)
+        val scope = DisplaySubMenuHelper.convertSortingScopeToText(sortingInfo.sortingScope)
 
         val sortInfoText = if (scope != null) {
             resources.getString(R.string.sort_by_info, method, scope)
@@ -313,29 +324,5 @@ class DisplaySubFragment : RelicFragment() {
 
         subAppBarLayout.setExpanded(true)
         subSwipeRefreshLayout.isRefreshing = true
-    }
-
-    private fun loadBannerImage(bannerUrl: String?) {
-        if (bannerUrl != null && !bannerUrl.isEmpty()) {
-            // does not load image if the banner img string is empty
-            try {
-                Log.d("DISPLAY_SUB_VIEW", "URL = $bannerUrl")
-                //        Picasso.get().load(bannerUrl).fit().centerCrop().into(bannerImageView);
-            } catch (e : Error) {
-                Log.d("DISPLAY_SUB_VIEW", "Issue loading image " + e.toString())
-            }
-        }
-    }
-
-    companion object SortTypeHelper {
-        private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
-
-        fun create(subredditName : String) : DisplaySubFragment {
-            return DisplaySubFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_SUBREDDIT_NAME, subredditName)
-                }
-            }
-        }
     }
 }

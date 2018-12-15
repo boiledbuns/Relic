@@ -1,8 +1,10 @@
 package com.relic.presentation.displaysub
 
+import com.relic.data.PostRepository
+
 interface DisplaySubContract {
     interface ViewModel {
-        fun changeSortingMethod(sortType: Int? = null, sortScope: Int? = null)
+        fun changeSortingMethod(sortType: PostRepository.SortType? = null, sortScope: PostRepository.SortScope? = null)
 
         fun retrieveMorePosts(resetPosts: Boolean)
 
@@ -33,6 +35,6 @@ sealed class NavigationData {
 }
 
 data class DisplaySubInfoData (
-    var sortingMethod : Int,
-    var sortingScope : Int
+    var sortingMethod : PostRepository.SortType,
+    var sortingScope : PostRepository.SortScope
 )

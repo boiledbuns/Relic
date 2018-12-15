@@ -30,8 +30,8 @@ open class DisplaySubVM (
     }
 
     private val TAG = "DISPLAY_SUB_VM"
-    private var currentSortingType = PostRepository.SORT_DEFAULT
-    private var currentSortingScope = PostRepository.SCOPE_NONE
+    private var currentSortingType = PostRepository.SortType.DEFAULT
+    private var currentSortingScope = PostRepository.SortScope.NONE
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
@@ -112,7 +112,7 @@ open class DisplaySubVM (
      * @param sortType : code corresponding to sort type
      * @param sortScope : code corresponding to sort scope
      */
-    override fun changeSortingMethod(sortType: Int?, sortScope: Int?) {
+    override fun changeSortingMethod(sortType: PostRepository.SortType?, sortScope: PostRepository.SortScope?) {
         // update the current sorting method and scope if it has changed
         sortType?.let { currentSortingType = it }
         sortScope?.let { currentSortingScope = it }
@@ -204,34 +204,6 @@ open class DisplaySubVM (
             value = null
         }
     }
+
     // endregion view action delegate
-
-    // region sorting type helper functions
-
-    companion object {
-        fun convertSortingTypeToText(sortByCode : Int) : String  {
-            return when(sortByCode) {
-                PostRepository.SORT_DEFAULT-> "best"
-                PostRepository.SORT_HOT -> "hot"
-                PostRepository.SORT_NEW -> "new"
-                PostRepository.SORT_RISING-> "rising"
-                PostRepository.SORT_TOP -> "top"
-                PostRepository.SORT_CONTROVERSIAL -> "controversial"
-                else -> "default"
-            }
-        }
-
-        fun convertSortingScopeToText(sortByScope : Int) : String? {
-            return when(sortByScope) {
-                PostRepository.SCOPE_HOUR-> "hour"
-                PostRepository.SCOPE_DAY -> "day"
-                PostRepository.SCOPE_WEEK -> "week"
-                PostRepository.SCOPE_MONTH-> "month"
-                PostRepository.SCOPE_YEAR -> "year"
-                PostRepository.SCOPE_ALL -> "all"
-                else -> null
-            }
-        }
-    }
-    // endregion sorting type helper functions
 }

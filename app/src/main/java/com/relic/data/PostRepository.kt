@@ -52,36 +52,44 @@ interface PostRepository {
     /**
      * clears all current posts for this subreddit and retrieves new ones based on the sorting
      * method specified
-     * @param postSource
-     * @param sortByCode
+     * @param sortType
+     * @param sortScope
      */
-    fun retrieveSortedPosts(postSource: PostSource, sortByCode: Int, sortScopeCode: Int)
+    fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
 
     fun retrieveSortedPosts(postSource: PostSource, sortByCode: Int)
 
     /**
      * //TODO tentative -> should expose or not
-     * need to decide whether the Viewmodel should handle this or not
+     * need to decide whether the viewModel should handle this or not
      * @param postSource
      */
     fun clearAllPostsFromSource(postSource: PostSource)
 
-    companion object {
-        const val SORT_DEFAULT = 0
-        const val SORT_BEST = 1
-        const val SORT_CONTROVERSIAL = 2
-        const val SORT_HOT = 3
-        const val SORT_NEW = 4
-        const val SORT_RISING = 5
-        const val SORT_TOP = 6
+//    companion object {
+//        const val SORT_DEFAULT = 0
+//        const val SORT_BEST = 1
+//        const val SORT_CONTROVERSIAL = 2
+//        const val SORT_HOT = 3
+//        const val SORT_NEW = 4
+//        const val SORT_RISING = 5
+//        const val SORT_TOP = 6
+//
+//        const val SCOPE_NONE = 0
+//        const val SCOPE_HOUR = 1
+//        const val SCOPE_DAY = 2
+//        const val SCOPE_WEEK = 3
+//        const val SCOPE_MONTH = 4
+//        const val SCOPE_YEAR = 5
+//        const val SCOPE_ALL = 6
+//    }
 
-        const val SCOPE_NONE = 0
-        const val SCOPE_HOUR = 1
-        const val SCOPE_DAY = 2
-        const val SCOPE_WEEK = 3
-        const val SCOPE_MONTH = 4
-        const val SCOPE_YEAR = 5
-        const val SCOPE_ALL = 6
+    enum class SortType {
+        DEFAULT, BEST, CONTROVERSIAL, HOT, NEW, RISING, TOP
+    }
+
+    enum class SortScope {
+        NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
     }
 
     sealed class PostSource {
