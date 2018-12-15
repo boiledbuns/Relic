@@ -31,8 +31,7 @@ import java.util.Date
 
 import javax.inject.Inject
 
-class PostRepositoryImpl @Inject
-constructor(
+class PostRepositoryImpl @Inject constructor(
     private val currentContext: Context,
     private val requestManager: NetworkRequestManager
 ) : PostRepository {
@@ -115,8 +114,8 @@ constructor(
         RetrieveListingAfterTask(appDB, callback).execute(subName)
     }
 
-    override fun retrieveSortedPosts(postSource : PostRepository.PostSource, sortType: Int) {
-        retrieveSortedPosts(postSource, sortType, 0)
+    override fun retrieveSortedPosts(postSource : PostRepository.PostSource, sortType: PostRepository.SortType) {
+        retrieveSortedPosts(postSource, sortType, PostRepository.SortScope.NONE)
     }
 
     /**
@@ -126,7 +125,7 @@ constructor(
      * @param sortType code for the associated sort by method
      * @param sortScope  code for the associate time span to sort by
      */
-    override fun retrieveSortedPosts(postSource: PostRepository.PostSource, sortType: Int, sortScope: Int) {
+    override fun retrieveSortedPosts(postSource: PostRepository.PostSource, sortType: PostRepository.SortType, sortScope: PostRepository.SortScope) {
 
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
@@ -135,14 +134,14 @@ constructor(
         }
 
         // change the endpoint based on which sorting option the user has selected
-        if (sortType != PostRepository.SORT_DEFAULT && sortType <= sortByMethods.size) {
+        if (sortType != PostRepository.SortType.DEFAULT) {
             // build the appropriate endpoint based on the "sort by" code and time scope
-            ending += "/" + sortByMethods[sortType - 1] + "/?sort=" + sortByMethods[sortType - 1]
+            ending += "/" + sortType.name.toLowerCase() + "/?sort=" + sortScope.name.toLowerCase()
 
             // only add sort scope for these sorting types
-            if (sortType == PostRepository.SORT_HOT || sortType == PostRepository.SORT_RISING || sortType == PostRepository.SORT_TOP) {
+            if (sortType == PostRepository.SortType.HOT || sortType == PostRepository.SortType.RISING || sortType == PostRepository.SortType.TOP) {
                 // add the scope only if the sorting type has one
-                ending += "&t=" + sortScopes[sortScope - 1]
+                ending += "&t=" + sortScope.name.toLowerCase()
             }
         }
 

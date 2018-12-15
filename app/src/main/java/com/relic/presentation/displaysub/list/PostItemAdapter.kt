@@ -108,5 +108,7 @@ class PostItemAdapter (
     fun onPostLinkPressed (itemPosition : Int) {
         postAdapterDelegate.onThumbnailClicked(postList[itemPosition].url)
     }
+
     // end region for onclick handlers
 }
+

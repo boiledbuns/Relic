@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -32,12 +33,12 @@ import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
-import java.lang.Error
 
 class DisplaySubFragment : RelicFragment() {
 
@@ -71,6 +72,7 @@ class DisplaySubFragment : RelicFragment() {
 
     private lateinit var searchView: SearchView
     private lateinit var postAdapter: PostItemAdapter
+    private lateinit var subItemTouchHelper : ItemTouchHelper
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
@@ -117,6 +119,8 @@ class DisplaySubFragment : RelicFragment() {
 
         initializeOnClicks()
         attachScrollListeners()
+        subItemTouchHelper = ItemTouchHelper(PostItemsTouchHelper(displaySubVM))
+        subItemTouchHelper.attachToRecyclerView(subPostsRecyclerView)
 
         if (fragmentOpened) {
             fragmentOpened = false
@@ -325,4 +329,6 @@ class DisplaySubFragment : RelicFragment() {
         subAppBarLayout.setExpanded(true)
         subSwipeRefreshLayout.isRefreshing = true
     }
+
+    // endregion view functions
 }

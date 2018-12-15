@@ -57,7 +57,7 @@ interface PostRepository {
      */
     fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
 
-    fun retrieveSortedPosts(postSource: PostSource, sortByCode: Int)
+    fun retrieveSortedPosts(postSource: PostSource, sortType: SortType)
 
     /**
      * //TODO tentative -> should expose or not

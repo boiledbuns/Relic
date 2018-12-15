@@ -13,7 +13,8 @@ class PostItemVH (
         itemView : RelicPostItem
 ) : RecyclerView.ViewHolder(itemView) {
 
-    private var itemPosition  = 0
+    private var itemPosition = 0
+    var itemFullName = ""
 
     fun initializeOnClicks(adapter : PostItemAdapter) {
         itemView.apply {
@@ -69,7 +70,9 @@ class PostItemVH (
             postScore.text = postModel.score.toString()
             postCommentCountView.text = postModel.commentCount.toString()
         }
+
         itemPosition = position
+        itemFullName = postModel.id
     }
 
     private fun setThumbnail(thumbnailUrl : String) {

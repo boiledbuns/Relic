@@ -5,9 +5,7 @@ import com.relic.data.PostRepository
 interface DisplaySubContract {
     interface ViewModel {
         fun changeSortingMethod(sortType: PostRepository.SortType? = null, sortScope: PostRepository.SortScope? = null)
-
         fun retrieveMorePosts(resetPosts: Boolean)
-
         fun updateSubStatus(subscribe: Boolean)
     }
 
