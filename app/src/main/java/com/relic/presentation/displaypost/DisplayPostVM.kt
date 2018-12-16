@@ -18,11 +18,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DisplayPostVM (
-        private val postRepo : PostRepository,
-        private val commentRepo: CommentRepository,
-        private val listingRepo: ListingRepository,
-        private val subName: String,
-        private val postFullname: String
+    private val postRepo : PostRepository,
+    private val commentRepo: CommentRepository,
+    private val listingRepo: ListingRepository,
+    private val subName: String,
+    private val postFullname: String,
+    private val postSource : PostRepository.PostSource
 ): ViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
 
     class Factory @Inject constructor(
@@ -30,8 +31,8 @@ class DisplayPostVM (
         private val commentRepo: CommentRepository,
         private val listingRepo: ListingRepository
     ) {
-        fun create(subredditName : String, postFullname : String) : DisplayPostVM {
-            return DisplayPostVM(postRepo, commentRepo, listingRepo, subredditName, postFullname)
+        fun create(subredditName : String, postFullname : String, postSource: PostRepository.PostSource) : DisplayPostVM {
+            return DisplayPostVM(postRepo, commentRepo, listingRepo, subredditName, postFullname, postSource)
         }
     }
 
@@ -88,6 +89,16 @@ class DisplayPostVM (
         }
     }
 
+    override fun refreshData() {
+        _refreshingLiveData.postValue(true)
+
+        GlobalScope.launch {
+            postRepo.retrievePost(subName, postFullname, postSource)
+            retrieveMoreComments(true)
+            commentRepo.clearComments(postFullname)
+        }
+    }
+
     override fun retrieveMoreComments(refresh: Boolean) {
         // TODO check if there is connection
         // retrieves post and comments from network
@@ -95,7 +106,6 @@ class DisplayPostVM (
             if (refresh) {
                 _refreshingLiveData.postValue(true)
                 commentRepo.clearComments(postFullname)
-                postRepo.retrievePost(subName, postFullname)
             }
             commentRepo.retrieveComments(subName, postFullname, refresh)
         }

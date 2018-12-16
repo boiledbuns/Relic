@@ -245,7 +245,8 @@ class DisplaySubFragment : RelicFragment() {
             is NavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
                     navigationData.postId,
-                    navigationData.subredditName
+                    navigationData.subredditName,
+                    navigationData.postSource
                 )
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction().replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()

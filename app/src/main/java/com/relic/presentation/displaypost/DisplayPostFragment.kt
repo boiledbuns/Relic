@@ -20,6 +20,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.data.PostRepository
 import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
@@ -39,6 +40,7 @@ class DisplayPostFragment : Fragment() {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"
         private const val ARG_SUB_NAME = "subreddit"
+        private const val ARG_POST_SOURCE = "post_source"
         private const val ARG_ENABLE_VISIT_SUB = "enable_visit_sub"
 
         /**
@@ -46,12 +48,13 @@ class DisplayPostFragment : Fragment() {
          * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
          * continuously chaining open subreddit actions
          */
-        fun create(postId : String, subreddit : String, enableVisitSub : Boolean = false) : DisplayPostFragment {
+        fun create(postId : String, subreddit : String, postSource: PostRepository.PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
             // create a new bundle for the post id
             val bundle = Bundle().apply {
                 putString(ARG_POST_FULLNAME, postId)
                 putString(ARG_SUB_NAME, subreddit)
                 putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
+                putParcelable(ARG_POST_SOURCE, postSource)
             }
 
             return DisplayPostFragment().apply {
@@ -68,13 +71,14 @@ class DisplayPostFragment : Fragment() {
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
                         .build()
-                        .getDisplayPostVM().create(subredditName, postFullName) as T
+                        .getDisplayPostVM().create(subredditName, postFullName, postSource) as T
             }
         }).get(DisplayPostVM::class.java)
     }
 
     private lateinit var postFullName: String
     private lateinit var subredditName: String
+    private lateinit var postSource: PostRepository.PostSource
     private var enableVisitSub = false
 
     private lateinit var rootView : View
@@ -89,6 +93,7 @@ class DisplayPostFragment : Fragment() {
         arguments?.apply {
             getString(ARG_POST_FULLNAME)?.let { postFullName = it }
             getString(ARG_SUB_NAME)?.let { subredditName = it }
+            getParcelable<PostRepository.PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
         }
     }
@@ -205,7 +210,7 @@ class DisplayPostFragment : Fragment() {
 
         rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).apply {
             setOnRefreshListener {
-                displayPostVM.retrieveMoreComments(refresh = true)
+                displayPostVM.refreshData()
             }
         }
     }

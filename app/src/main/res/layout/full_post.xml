@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    android:id="@+id/fullPostRootView"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullPostRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:visibility="gone">
 
     <!-- image displayed if the post is an image link -->
     <ImageView
@@ -29,9 +31,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_spacing_s"
             android:textSize="@dimen/title_size_s"
-            android:text="@string/placeholder_text"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/postTitleView"/>
+            app:layout_constraintBottom_toTopOf="@id/postTitleView"
+            tools:text="u/test_author"/>
 
         <TextView
             android:id="@+id/postTitleView"
@@ -39,11 +41,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_xs"
             android:textSize="@dimen/title_size_m"
-            android:text="@string/placeholder_text"
             android:fontFamily="sans-serif"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/postAuthorView"
-            app:layout_constraintVertical_chainStyle="packed"/>
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Post Title"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/postTitleBarrier"
@@ -79,14 +81,14 @@
             android:layout_marginEnd="@dimen/padding_s"
             android:background="@drawable/tag"
             android:backgroundTint="@color/positive"
-            android:text="@string/short_placeholder_text"
             android:textSize="@dimen/text_m2"
             android:textColor="@color/negative_text"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/postTitleView"
             app:layout_constraintStart_toEndOf="@id/postNSFWView"
             app:layout_constraintEnd_toStartOf="@id/postAuthorFlairView"
-            app:layout_constraintHorizontal_chainStyle="packed"/>
+            app:layout_constraintHorizontal_chainStyle="packed"
+            tools:text="tag"/>
 
         <TextView
             android:id="@+id/postAuthorFlairView"
@@ -95,14 +97,14 @@
             android:layout_marginTop="@dimen/padding_s"
             android:background="@drawable/tag"
             android:backgroundTint="@color/positive"
-            android:text="@string/short_placeholder_text"
             android:textSize="@dimen/text_m2"
             android:textColor="@color/negative_text"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/postTitleView"
             app:layout_constraintStart_toEndOf="@id/postTagView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_chainStyle="packed"/>
+            app:layout_constraintHorizontal_chainStyle="packed"
+            tools:text="author flair"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/postTagsBottomBarrier"

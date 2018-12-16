@@ -4,6 +4,9 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import org.jetbrains.annotations.PropertyKey;
 
 @Entity
 public class PostEntity {
@@ -11,13 +14,12 @@ public class PostEntity {
   public static final int ORIGIN_FRONTPAGE = 1;
   public static final int ORIGIN_ALL = 2;
 
-  // api metadata
-  @PrimaryKey(autoGenerate = true)
-  public int order;
-
   // every post is associated with a listing (many posts to one listing)
+  @NonNull
+  @PrimaryKey
   @ColumnInfo(name = "id")
   public String name;
+
 //  public String getSubreddit_id;
 //  public String postListingId;
   public boolean clicked;
@@ -70,5 +72,7 @@ public class PostEntity {
   public int userUpvoted;
 
   // custom local fields
+  public int order;
+  // this field should never be updated
   public int origin;
 }

@@ -20,7 +20,8 @@ interface DisplaySubContract {
 sealed class NavigationData {
     data class ToPost (
             val postId : String,
-            val subredditName : String
+            val subredditName : String,
+            val postSource: PostRepository.PostSource
     ) : NavigationData ()
 
     data class ToImage (

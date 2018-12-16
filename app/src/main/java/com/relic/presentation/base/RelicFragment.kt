@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleOwner
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
+import android.view.View
 import com.relic.R
 
 open class RelicFragment: Fragment() {
@@ -25,8 +26,8 @@ open class RelicFragment: Fragment() {
                 .commit()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         bindViewModel(viewLifecycleOwner)
     }
 

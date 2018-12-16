@@ -174,7 +174,7 @@ open class DisplaySubVM (
 //            value = NavigationData.ToPost(postfullName, postSubreddit)
 //            value = null
 //        }
-        _navigationLiveData.value = NavigationData.ToPost(postfullName, postSubreddit)
+        _navigationLiveData.value = NavigationData.ToPost(postfullName, postSubreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {

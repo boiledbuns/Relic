@@ -64,6 +64,7 @@ class FullPostView @JvmOverloads constructor(
             postCommentCountView.text = commentCount.toString()
         }
 
+        fullPostRootView.visibility = View.VISIBLE
         initializeOnClicks(delegate)
         loadLinks(postModel)
     }

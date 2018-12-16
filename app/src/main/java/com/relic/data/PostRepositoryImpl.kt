@@ -43,13 +43,15 @@ class PostRepositoryImpl @Inject constructor(
 
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
-
-        private val sortByMethods = arrayOf("best", "controversial", "hot", "new", "rising", "top")
-        private val sortScopes = arrayOf("hour", "day", "week", "month", "year", "all")
     }
 
     private val jsonParser: JSONParser = JSONParser()
     private val appDB: ApplicationDB = ApplicationDB.getDatabase(currentContext)
+
+    private val gson = GsonBuilder().create()
+    // initialize the date formatter and date for "now"
+    private val formatter = SimpleDateFormat("MMM dd',' hh:mm a")
+    private val current = Date()
 
     override val postGateway: PostGateway
         get() = PostGatewayImpl(currentContext, requestManager)
@@ -88,7 +90,6 @@ class PostRepositoryImpl @Inject constructor(
                 Response.Listener { response ->
                     try {
                         parsePosts(response, postSource)
-                        //new InsertPostsTask(appDB, parsePosts(response, subredditName)).execute();
                     } catch (error: ParseException) {
                         Log.d(TAG, "Error: " + error.message)
                     }
@@ -114,8 +115,8 @@ class PostRepositoryImpl @Inject constructor(
         RetrieveListingAfterTask(appDB, callback).execute(subName)
     }
 
-    override fun retrieveSortedPosts(postSource : PostRepository.PostSource, sortType: PostRepository.SortType) {
-        retrieveSortedPosts(postSource, sortType, PostRepository.SortScope.NONE)
+    override fun getPost(postFullName: String): LiveData<PostModel> {
+        return appDB.postDao.getSinglePost(postFullName)
     }
 
     /**
@@ -125,7 +126,11 @@ class PostRepositoryImpl @Inject constructor(
      * @param sortType code for the associated sort by method
      * @param sortScope  code for the associate time span to sort by
      */
-    override fun retrieveSortedPosts(postSource: PostRepository.PostSource, sortType: PostRepository.SortType, sortScope: PostRepository.SortScope) {
+    override fun retrieveSortedPosts(
+        postSource: PostRepository.PostSource,
+        sortType: PostRepository.SortType,
+        sortScope: PostRepository.SortScope
+    ) {
 
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
@@ -165,11 +170,7 @@ class PostRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getPost(postFullName: String): LiveData<PostModel> {
-        return appDB.postDao.getSinglePost(postFullName)
-    }
-
-    override fun retrievePost(subredditName: String, postFullName: String) {
+    override fun retrievePost(subredditName: String, postFullName: String, postSource: PostRepository.PostSource) {
         val ending = ENDPOINT + "r/" + subredditName + "/comments/" + postFullName.substring(3)
         // create the new request and submit it
         requestManager.processRequest(
@@ -177,17 +178,15 @@ class PostRepositoryImpl @Inject constructor(
                 RelicOAuthRequest.GET,
                 ending,
                 Response.Listener { response ->
-                    Log.d(TAG, "Loaded response $response")
                     try {
-                        val post = parsePost(response)
-                        InsertPostTask().execute(appDB, post)
+                        parsePost(response, postSource)
                     } catch (error: ParseException) {
                         Log.d(TAG, "Error: " + error.message)
                     }
                 },
                 Response.ErrorListener { error ->
                     Log.d(TAG, "Error: " + error.networkResponse)
-                    // TODO add livedata for error
+                    // TODO add liveData for error
                     // TODO maybe retry if not an internet connection issue
                 },
                 checkToken()
@@ -205,20 +204,14 @@ class PostRepositoryImpl @Inject constructor(
 
     /**
      * Parses the response from the api and stores the posts in the persistence layer
+     * TODO separate into two separate methods and switch to mutithreaded to avoid locking main thread
      * @param response the json response from the server with the listing object
      * @throws ParseException
      */
     @Throws(ParseException::class)
-    private fun parsePosts(response: String, postSource: PostRepository.PostSource): List<PostEntity> {
-        // TODO separate into two separate methods and switch to mutithreaded to avoid locking main thread
-        // This is fine for now because I'm still working on finalizing which fields to use/not use
-        // There will be a lot more experimentation and changes to come in this method as a result
+    private fun parsePosts(response: String, postSource: PostRepository.PostSource) {
         val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
-
-        // initialize the date formatter and date for now
-        val formatter = SimpleDateFormat("MMM dd',' hh:mm a")
-        val current = Date()
 
         var postOrigin = PostEntity.ORIGIN_SUB
         var listingKey = ""
@@ -235,18 +228,45 @@ class PostRepositoryImpl @Inject constructor(
         }
 
         // create the new listing entity
-        val listing = ListingEntity(listingKey, listingData!!["after"] as String?)
-        Log.d(TAG, "Listing after val : " + listing.afterPosting)
-
-        // GSON reader to unmarshall the json response
-        val gson = GsonBuilder().create()
+        val listing = ListingEntity(listingKey, listingData["after"] as String?)
 
         val postIterator = listingPosts!!.iterator()
         val postEntities = ArrayList<PostEntity>()
 
         // generate the list of posts using the json array
         while (postIterator.hasNext()) {
-            val post = (postIterator.next() as JSONObject)["data"] as JSONObject?
+            val post = (postIterator.next() as JSONObject)["data"] as JSONObject
+            postEntities.add(extractPost(post, postOrigin))
+        }
+
+        InsertPostsTask(appDB, postEntities).execute(listing)
+    }
+
+    private fun parsePost(response: String, postSource: PostRepository.PostSource) {
+        val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
+        val child = (data["children"] as JSONArray)[0] as JSONObject
+        val post = child["data"] as JSONObject
+
+        val postOrigin = when (postSource) {
+            is PostRepository.PostSource.Frontpage -> PostEntity.ORIGIN_FRONTPAGE
+            is PostRepository.PostSource.Subreddit -> PostEntity.ORIGIN_SUB
+            else -> PostEntity.ORIGIN_ALL
+        }
+
+        val postEntity = extractPost(post, postOrigin)
+
+        // update the post if it already exists in the db, insert it otherwise
+        InsertPostTask().execute(appDB, postEntity)
+    }
+
+    /**
+     * This is fine for now because I'm still working on finalizing which fields to use/not use
+     * There will be a lot more experimentation and changes to come in this method as a result
+     */
+    @Throws(ParseException::class)
+    private fun extractPost(post: JSONObject, postOrigin : Int) : PostEntity {
+        // use "api" prefix to indicate fields accessed directly from api
+        return gson.fromJson(post.toJSONString(), PostEntity::class.java).apply {
             //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
             //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
             //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
@@ -255,47 +275,30 @@ class PostRepositoryImpl @Inject constructor(
             //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
             //Log.d(TAG, "post keys " + post.keySet().toString())
             // unmarshall the object and add it into a list
-            val postEntity = gson.fromJson(post.toJSONString(), PostEntity::class.java)
-            val likes = post["likes"] as Boolean?
-            postEntity.userUpvoted = if (likes == null) 0 else if (likes) 1 else -1
+
+            val apiLikes = post["likes"] as Boolean?
+            userUpvoted = if (apiLikes == null) 0 else if (apiLikes) 1 else -1
 
             if (postOrigin != PostEntity.ORIGIN_SUB) {
-                postEntity.origin = postOrigin
+                origin = postOrigin
             }
 
             // TODO create parse class/switch to a more efficient method of removing html
             val authorFlair = post["author_flair_text"] as String?
-            if (authorFlair != null && !authorFlair.isEmpty()) {
-                postEntity.author_flair_text = Html.fromHtml(authorFlair).toString()
-            } else {
-                postEntity.author_flair_text = null
-            }
-            Log.d(TAG, "epoch = " + post["created"]!!)
+            author_flair_text = if (authorFlair != null && !authorFlair.isEmpty()) {
+                Html.fromHtml(authorFlair).toString()
+            } else null
 
             // add year to stamp if the post year doesn't match the current one
-            val created = Date((post["created"] as Double).toLong() * 1000)
-            if (current.year != created.year) {
-                postEntity.created = created.year.toString() + " " + formatter.format(created)
+            Log.d(TAG, "epoch = " + post["created"]!!)
+            val apiCreated = Date((post["created"] as Double).toLong() * 1000)
+            created = if (current.year != apiCreated.year) {
+                apiCreated.year.toString() + " " + formatter.format(apiCreated)
             } else {
-                postEntity.created = formatter.format(created)
+                formatter.format(apiCreated)
             }
 
-            postEntities.add(postEntity)
         }
-
-        InsertPostsTask(appDB, postEntities).execute(listing)
-        return postEntities
-    }
-
-    @Throws(ParseException::class)
-    private fun parsePost(response: String): PostEntity {
-        val gson = GsonBuilder().create()
-        val data =
-            ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject?
-        val child = (data!!["children"] as JSONArray)[0] as JSONObject
-        val post = child["data"] as JSONObject?
-
-        return gson.fromJson(post!!.toJSONString(), PostEntity::class.java)
     }
 
     // end region helper functions
@@ -348,5 +351,6 @@ class PostRepositoryImpl @Inject constructor(
             }
         }
     }
+
     // endregion async tasks
 }

@@ -18,6 +18,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.data.PostRepository
 import com.relic.data.models.PostModel
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
@@ -124,6 +125,7 @@ class FrontpageFragment : Fragment() {
                 val postFragment = DisplayPostFragment.create(
                     postId = navigationData.postId,
                     subreddit = navigationData.subredditName,
+                    postSource = navigationData.postSource,
                     enableVisitSub = true
                 )
                 activity!!.supportFragmentManager.beginTransaction()

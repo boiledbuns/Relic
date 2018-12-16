@@ -1,11 +1,13 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
+import android.os.Parcelable
 
 import com.relic.data.gateway.PostGateway
 import com.relic.data.gateway.SubGateway
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
+import kotlinx.android.parcel.Parcelize
 
 interface PostRepository {
     /**
@@ -47,7 +49,7 @@ interface PostRepository {
      * @param subredditName name of subreddit that the post was made in
      * @param postFullName "full name" of the subreddit"
      */
-    fun retrievePost(subredditName: String, postFullName: String)
+    fun retrievePost(subredditName: String, postFullName: String, postSource: PostSource)
 
     /**
      * clears all current posts for this subreddit and retrieves new ones based on the sorting
@@ -55,9 +57,10 @@ interface PostRepository {
      * @param sortType
      * @param sortScope
      */
-    fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
-
-    fun retrieveSortedPosts(postSource: PostSource, sortType: SortType)
+    fun retrieveSortedPosts(
+        postSource: PostSource,
+        sortType: SortType,
+        sortScope: SortScope)
 
     /**
      * //TODO tentative -> should expose or not
@@ -92,10 +95,17 @@ interface PostRepository {
         NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
     }
 
-    sealed class PostSource {
+    sealed class PostSource : Parcelable {
+        @Parcelize
         class Frontpage : PostSource()
+
+        @Parcelize
         class All : PostSource()
+
+        @Parcelize
         class Popular : PostSource()
+
+        @Parcelize
         data class Subreddit(
             val subredditName : String
         ) : PostSource()
