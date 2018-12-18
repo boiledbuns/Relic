@@ -19,6 +19,9 @@ import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostEntity.ORIGIN_ALL
 import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
 import com.relic.data.models.PostModel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -255,8 +258,19 @@ class PostRepositoryImpl @Inject constructor(
 
         val postEntity = extractPost(post, postOrigin)
 
-        // update the post if it already exists in the db, insert it otherwise
-        InsertPostTask().execute(appDB, postEntity)
+        GlobalScope.launch {
+            val existingPost = async {
+                appDB.postDao.getPostWithId(postEntity.name)
+            }.await()
+
+            existingPost?.let {
+                // update the order of the new post entity with the order it currently has in
+                // the database to allow it to maintain its position
+                postEntity.order = it.order
+            }
+
+            launch { InsertPostTask().execute(appDB, postEntity) }
+        }
     }
 
     /**

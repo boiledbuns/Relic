@@ -44,7 +44,7 @@ class PostItemsTouchHelper(val delegate : DisplaySubContract.PostAdapterDelegate
 
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
-                viewHolder.itemView.translationX = dX / 4
+                viewHolder.itemView.translationX = dX / 3
             }
             else -> super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }

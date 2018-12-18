@@ -207,10 +207,12 @@ class DisplayPostVM (
 
     override fun onImagePressed() {
         _navigationLiveData.value = PostNavigationData.ToImage(_postLiveData.value!!.url)
+        _navigationLiveData.value = null
     }
 
     override fun onReplyPressed() {
         _navigationLiveData.value = PostNavigationData.ToReply(postFullname)
+        _navigationLiveData.value = null
     }
 
     // endregion view action delegate

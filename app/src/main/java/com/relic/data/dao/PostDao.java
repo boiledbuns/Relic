@@ -45,4 +45,8 @@ public abstract class PostDao {
 
   @Query("UPDATE PostEntity SET saved = :saved  where id = :postFullname")
   public abstract void updateSave(String postFullname, boolean saved);
+
+  @Query("SELECT * FROM PostEntity WHERE id = :postFullname LIMIT 1")
+  public abstract PostEntity getPostWithId(String postFullname);
+
 }
