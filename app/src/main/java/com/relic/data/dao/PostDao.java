@@ -49,4 +49,9 @@ public abstract class PostDao {
   @Query("SELECT * FROM PostEntity WHERE id = :postFullname LIMIT 1")
   public abstract PostEntity getPostWithId(String postFullname);
 
+  @Query("SELECT COUNT() FROM PostEntity WHERE subreddit = :subredditName AND origin = 0")
+  public abstract int getItemsCountForSub(String subredditName);
+
+  @Query("SELECT COUNT() FROM PostEntity WHERE origin = :postOrigin")
+  public abstract int getItemsCountForOrigin(int postOrigin);
 }

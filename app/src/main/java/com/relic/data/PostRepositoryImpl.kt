@@ -236,13 +236,24 @@ class PostRepositoryImpl @Inject constructor(
         val postIterator = listingPosts!!.iterator()
         val postEntities = ArrayList<PostEntity>()
 
-        // generate the list of posts using the json array
-        while (postIterator.hasNext()) {
-            val post = (postIterator.next() as JSONObject)["data"] as JSONObject
-            postEntities.add(extractPost(post, postOrigin))
-        }
 
-        InsertPostsTask(appDB, postEntities).execute(listing)
+        GlobalScope.launch {
+            var postCount = async {
+                when (postSource) {
+                    is PostRepository.PostSource.Subreddit ->appDB.postDao.getItemsCountForSub(postSource.subredditName)
+                    else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
+                }
+            }.await()
+
+            // generate the list of posts using the json array
+            while (postIterator.hasNext()) {
+                val post = (postIterator.next() as JSONObject)["data"] as JSONObject
+                postEntities.add(extractPost(post, postOrigin, postCount))
+                postCount ++
+            }
+
+            launch {  InsertPostsTask(appDB, postEntities).execute(listing) }
+        }
     }
 
     private fun parsePost(response: String, postSource: PostRepository.PostSource) {
@@ -256,18 +267,22 @@ class PostRepositoryImpl @Inject constructor(
             else -> PostEntity.ORIGIN_ALL
         }
 
-        val postEntity = extractPost(post, postOrigin)
-
         GlobalScope.launch {
+            val postEntity = extractPost(post, postOrigin, null)
+
             val existingPost = async {
                 appDB.postDao.getPostWithId(postEntity.name)
             }.await()
 
-            existingPost?.let {
-                // update the order of the new post entity with the order it currently has in
-                // the database to allow it to maintain its position
-                postEntity.order = it.order
-            }
+            postEntity.order = existingPost?.order ?: async {
+                when (postSource) {
+                    is PostRepository.PostSource.Subreddit -> appDB.postDao.getItemsCountForSub(
+                        postSource.subredditName
+                    )
+                    else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
+                }
+            }.await()
+
 
             launch { InsertPostTask().execute(appDB, postEntity) }
         }
@@ -278,14 +293,14 @@ class PostRepositoryImpl @Inject constructor(
      * There will be a lot more experimentation and changes to come in this method as a result
      */
     @Throws(ParseException::class)
-    private fun extractPost(post: JSONObject, postOrigin : Int) : PostEntity {
+    private fun extractPost(post: JSONObject, postOrigin : Int, postOrder : Int?) : PostEntity {
         // use "api" prefix to indicate fields accessed directly from api
         return gson.fromJson(post.toJSONString(), PostEntity::class.java).apply {
             //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
             //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
             //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
             //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
-            Log.d(TAG, "link_flair_richtext : " + post!!["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
+            Log.d(TAG, "link_flair_richtext : " + post["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
             //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
             //Log.d(TAG, "post keys " + post.keySet().toString())
             // unmarshall the object and add it into a list
@@ -312,6 +327,7 @@ class PostRepositoryImpl @Inject constructor(
                 formatter.format(apiCreated)
             }
 
+            postOrder?.let { order = it }
         }
     }
 
