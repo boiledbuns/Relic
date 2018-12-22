@@ -1,5 +1,6 @@
 package com.relic.presentation.displaysub.list
 
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
@@ -29,6 +30,12 @@ class PostItemVH (
 
     fun bindPost(postModel : PostModel, position: Int) {
         itemView.apply {
+            val backgroundColor = if (postModel.isVisited) {
+                R.color.backgroundSecondaryB
+            } else R.color.backgroundSecondary
+
+            postItemRootView.setBackgroundColor(resources.getColor(backgroundColor))
+
             if (!postModel.thumbnail.isNullOrBlank()) {
                 postThumbnailView.visibility = View.VISIBLE
                 setThumbnail(postModel.thumbnail)
@@ -48,9 +55,6 @@ class PostItemVH (
             else {
                 postBodyView.visibility = View.GONE
             }
-
-            postItemRootView.setBackgroundResource(if (postModel.isVisited)
-                R.color.backgroundSecondary else R.color.backgroundSecondary)
 
             when (postModel.userUpvoted) {
                 1 -> {

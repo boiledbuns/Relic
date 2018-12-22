@@ -116,11 +116,11 @@ public class PostGatewayImpl implements  PostGateway {
   @Override
   public LiveData<Boolean> visitPost(String postFullname) {
     Log.d(TAG, "Setting " + postFullname + "to visited");
-    new UpdateVisitStatus().execute(appDb, postFullname);
+    new UpdateVisitStatusTask().execute(appDb, postFullname);
     return null;
   }
 
-  private static class UpdateVisitStatus extends AsyncTask<Object, Integer, Integer> {
+  private static class UpdateVisitStatusTask extends AsyncTask<Object, Integer, Integer> {
     @Override
     protected Integer doInBackground(Object... objects) {
       ApplicationDB appDb = (ApplicationDB) objects[0];

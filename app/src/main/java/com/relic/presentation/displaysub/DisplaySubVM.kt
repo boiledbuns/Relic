@@ -169,11 +169,6 @@ open class DisplaySubVM (
 
     override fun visitPost(postfullName : String, postSubreddit : String) {
         postRepo.postGateway.visitPost(postfullName)
-
-//        _navigationLiveData.apply {
-//            value = NavigationData.ToPost(postfullName, postSubreddit)
-//            value = null
-//        }
         _navigationLiveData.value = NavigationData.ToPost(postfullName, postSubreddit, postSource)
     }
 

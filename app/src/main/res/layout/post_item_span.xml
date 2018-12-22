@@ -6,7 +6,6 @@
     android:id="@+id/postItemRootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/backgroundSecondary"
     android:layout_marginTop="@dimen/postitem_margin"
     android:paddingTop="@dimen/padding_s"
     android:paddingBottom="@dimen/padding_m"

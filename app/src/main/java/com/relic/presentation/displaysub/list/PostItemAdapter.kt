@@ -60,7 +60,6 @@ class PostItemAdapter (
         postList[itemPosition].also {
             // update the view and local model to reflect onclick
             it.isVisited = true
-
             // update post to show that it has been visited
             postAdapterDelegate.visitPost(it.id, it.subreddit)
         }
