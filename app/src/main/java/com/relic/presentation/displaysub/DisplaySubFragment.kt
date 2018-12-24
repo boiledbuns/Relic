@@ -312,6 +312,10 @@ class DisplaySubFragment : RelicFragment() {
                     displaySubVM.retrieveMorePosts(false)
                 }
             }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) onScrollUp() else onScrollDown()
+            }
         })
 
         // Attach listener for refreshing the sub
@@ -321,6 +325,24 @@ class DisplaySubFragment : RelicFragment() {
             displaySubVM.retrieveMorePosts(true)
         }
     }
+
+    // region handle recyclerview scroll listeners
+
+    private fun onScrollUp() {
+        displaySubFAB.apply {
+            show()
+            setOnClickListener {
+                subAppBarLayout.setExpanded(true)
+                subPostsRecyclerView.layoutManager?.scrollToPosition(0)
+            }
+        }
+    }
+
+    private fun onScrollDown() {
+        displaySubFAB.hide()
+    }
+
+    // endregion handle recyclerview scroll listeners
 
     private fun resetRecyclerView() {
         // empties current items to show that it's being refreshed

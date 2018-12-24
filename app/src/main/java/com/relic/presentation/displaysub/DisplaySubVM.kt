@@ -54,7 +54,7 @@ open class DisplaySubVM (
                 // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
                 postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
                 // TODO add a liveData boolean success listener
-                // TODO add a flag for the to check if retrieval occured
+                // TODO add a flag for the to check if retrieval occurred
             } else {
                 Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")
                 _postListMediator.setValue(postModels)
@@ -74,7 +74,7 @@ open class DisplaySubVM (
     }
 
     private fun initializeSubredditInformation(subName : String ) {
-        // TODO: STILL TESTING retrieve the banner image from the subredddit css
+        // TODO: STILL TESTING retrieve the banner image from the subreddit css
         subRepo.subGateway.apply {
             getAdditionalSubInfo(subName)
             getSidebar(subName)
@@ -133,11 +133,11 @@ open class DisplaySubVM (
         }
     }
 
-    override fun updateSubStatus(toSubscribe: Boolean) {
+    override fun updateSubStatus(subscribe: Boolean) {
         if (postSource is PostRepository.PostSource.Subreddit) {
             val subName = postSource.subredditName
-            Log.d(TAG, "Changing to subscribed $toSubscribe")
-            if (toSubscribe) {
+            Log.d(TAG, "Changing to subscribed $subscribe")
+            if (subscribe) {
                 // subscribe if not currently subscribed
                 val successObservable = subRepo.subGateway.subscribe(subName)
                 _subredditMediator.addSource(successObservable) { success: Boolean? ->
