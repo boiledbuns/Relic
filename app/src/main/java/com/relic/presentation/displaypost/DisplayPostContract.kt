@@ -36,7 +36,8 @@ sealed class PostNavigationData {
     ) : PostNavigationData()
 }
 
-sealed class PostExceptionData {
+sealed class PostExceptionData : Exception() {
+    object NoComments : PostExceptionData()
     object NetworkUnavailable : PostExceptionData()
     object UnexpectedException : PostExceptionData()
 }

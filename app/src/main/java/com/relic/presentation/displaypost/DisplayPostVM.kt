@@ -68,22 +68,18 @@ class DisplayPostVM (
         // retrieves the liveData post to be exposed to the view
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) {
             _postLiveData.postValue(it)
-
-            // turn off refreshing since no comments are present
-            it?.let { post ->
-                if (post.commentCount == 0) {
-                    _refreshingLiveData.postValue(false)
-                }
-            }
         }
 
         // retrieve the comment list as liveData so that we can expose it to the view first
-        _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
-            comments?.let {
+        _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { nullableComments ->
+            nullableComments?.let { comments ->
                 _commentListLiveData.postValue(comments)
-                if (it.isEmpty()) {
+                if (comments.isEmpty()) {
                     // retrieve more comments if we detect that none are stored locally
                     //commentRepo.retrieveComments(subName, postFullname, null)
+                    _postLiveData.value?.let {
+                        if (it.commentCount == 0) publishException(PostExceptionData.NoComments)
+                    }
                 } else {
                     // TODO add additional actions to trigger when comments loaded
                     _refreshingLiveData.postValue(false)
@@ -150,6 +146,11 @@ class DisplayPostVM (
             else -> PostExceptionData.UnexpectedException
         }
 
+        publishException(viewException)
+    }
+
+    private fun publishException(viewException : PostExceptionData) {
+        _refreshingLiveData.postValue(false)
         _errorLiveData.postValue(viewException)
     }
 

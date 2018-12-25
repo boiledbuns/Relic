@@ -60,6 +60,10 @@
     <string name="short_placeholder_text">flair</string>
     <string name="placeholder_text">Placeholder text</string>
 
+    <!-- display post error strings -->
     <string name="network_unavailable">Network unavailable</string>
     <string name="unknown_error">An unknown error occurred</string>
+    <string name="no_comments">This post has no comments</string>
+    <string name="retry">retry</string>
+
 </resources>

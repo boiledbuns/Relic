@@ -169,12 +169,6 @@ class DisplayPostFragment : Fragment() {
 
     private fun displayPost (postModel : PostModel) {
         fullPostView.setPost(postModel, displayPostVM.isImage(), displayPostVM)
-
-        if (postModel.commentCount == 0) {
-            // TODO show the no comment image if this sub has no comments
-            // hide the loading icon if some comments have been loaded
-            Snackbar.make(displayPostRootView, "No comments for this post", Snackbar.LENGTH_SHORT).show()
-        }
     }
 
     private fun displayComments(commentList : List<CommentModel>) {
@@ -191,21 +185,35 @@ class DisplayPostFragment : Fragment() {
 
     private fun handleError(error : PostExceptionData) {
         // I do realize that error != exception, but still not convinced about the exception naming
-        var snackbarMessage = ""
+        var snackbarMessage = resources.getString(R.string.unknown_error)
         var displayLength = Snackbar.LENGTH_SHORT
 
+        var actionMessage : String? = null
+        var action : () -> Unit = {}
+
         when (error) {
+            is PostExceptionData.NoComments -> {
+                // TODO show the no comment image if this sub has no comments
+                // hide the loading icon if some comments have been loaded
+                snackbarMessage = resources.getString(R.string.no_comments)
+                displayLength = Snackbar.LENGTH_INDEFINITE
+                actionMessage = resources.getString(R.string.retry)
+                action = { displayPostVM.refreshData() }
+            }
             is PostExceptionData.NetworkUnavailable -> {
                 snackbarMessage = resources.getString(R.string.network_unavailable)
                 displayLength = Snackbar.LENGTH_INDEFINITE
-            }
-            is PostExceptionData.UnexpectedException -> {
-                snackbarMessage = resources.getString(R.string.unknown_error)
-                displayLength = Snackbar.LENGTH_SHORT
+                actionMessage = resources.getString(R.string.retry)
+                action = { displayPostVM.refreshData() }
             }
         }
 
-        Snackbar.make(displayPostRootView, snackbarMessage, displayLength).show()
+        Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply{
+            actionMessage?.let {
+                setAction(it) { action.invoke() }
+            }
+            show()
+        }
     }
 
     // endregion live data handlers
