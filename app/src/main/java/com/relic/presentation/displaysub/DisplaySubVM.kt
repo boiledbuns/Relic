@@ -39,8 +39,8 @@ open class DisplaySubVM (
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
 
-    private val _navigationLiveData = SingleLiveData<NavigationData>()
-    val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
+    private val _navigationLiveData = SingleLiveData<SubNavigationData>()
+    val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
 
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
@@ -169,7 +169,7 @@ open class DisplaySubVM (
 
     override fun visitPost(postfullName : String, postSubreddit : String) {
         postRepo.postGateway.visitPost(postfullName)
-        _navigationLiveData.value = NavigationData.ToPost(postfullName, postSubreddit, postSource)
+        _navigationLiveData.value = SubNavigationData.ToPost(postfullName, postSubreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
@@ -188,14 +188,14 @@ open class DisplaySubVM (
         val lastThree = postThumbnailUrl.substring(postThumbnailUrl.length - 3)
         var isImage = (validImageEndings.contains(lastThree))
 
-        val navigation : NavigationData = if (isImage) {
-            NavigationData.ToImage(postThumbnailUrl)
+        val subNavigation : SubNavigationData = if (isImage) {
+            SubNavigationData.ToImage(postThumbnailUrl)
         } else {
-            NavigationData.ToExternal(postThumbnailUrl)
+            SubNavigationData.ToExternal(postThumbnailUrl)
         }
 
         _navigationLiveData.apply {
-            value = navigation
+            value = subNavigation
             value = null
         }
     }

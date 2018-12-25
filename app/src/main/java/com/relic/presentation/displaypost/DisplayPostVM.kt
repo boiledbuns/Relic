@@ -11,6 +11,7 @@ import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
+import com.relic.network.request.RelicRequestError
 import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.GlobalScope
@@ -43,6 +44,7 @@ class DisplayPostVM (
     private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()
     private val _navigationLiveData = SingleLiveData<PostNavigationData> ()
     private val _refreshingLiveData = MutableLiveData<Boolean> ()
+    private val _errorLiveData = MutableLiveData<PostExceptionData> ()
 
     private val commentListingKey = MediatorLiveData<String> ()
     private val error = MutableLiveData<RelicError>()
@@ -51,6 +53,7 @@ class DisplayPostVM (
     val commentListLiveData : LiveData<List<CommentModel>> = _commentListLiveData
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
     val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
+    val errorLiveData : LiveData<PostExceptionData> = _errorLiveData
 
     init {
         observeLiveData()
@@ -92,11 +95,11 @@ class DisplayPostVM (
     override fun refreshData() {
         _refreshingLiveData.postValue(true)
 
-        GlobalScope.launch {
-            postRepo.retrievePost(subName, postFullname, postSource)
-            retrieveMoreComments(true)
-            commentRepo.clearComments(postFullname)
+        postRepo.retrievePost(subName, postFullname, postSource) {
+            exception : RelicRequestError -> publishException(exception)
         }
+        retrieveMoreComments(true)
+        commentRepo.clearComments(postFullname)
     }
 
     override fun retrieveMoreComments(refresh: Boolean) {
@@ -135,6 +138,19 @@ class DisplayPostVM (
             commentList.subList(position + 1, position + 1 + itemsToRemove).clear()
             _commentListLiveData.postValue(commentList)
         }
+    }
+
+    /**
+     * converts exceptions we handle into exceptions we've defined in the contract and posts
+     * it to the livedata to let the view display it
+     */
+    private fun publishException(exception : Exception) {
+        val viewException : PostExceptionData = when (exception) {
+            is RelicRequestError -> PostExceptionData.NetworkUnavailable
+            else -> PostExceptionData.UnexpectedException
+        }
+
+        _errorLiveData.postValue(viewException)
     }
 
     // -- region view action delegate --

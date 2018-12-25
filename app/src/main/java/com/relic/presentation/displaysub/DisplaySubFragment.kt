@@ -121,10 +121,11 @@ class DisplaySubFragment : RelicFragment() {
         attachScrollListeners()
         subItemTouchHelper = ItemTouchHelper(PostItemsTouchHelper(displaySubVM))
         subItemTouchHelper.attachToRecyclerView(subPostsRecyclerView)
+        displaySubFAB.hide()
 
         if (fragmentOpened) {
             fragmentOpened = false
-            subAppBarLayout.setExpanded(false, false)
+            subAppBarLayout.setExpanded(false)
         }
 
         // adds listener for state change for the appbarlayout issue that always opens it when
@@ -214,7 +215,7 @@ class DisplaySubFragment : RelicFragment() {
     override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
         displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
         displaySubVM.subredditLiveData.nonNull().observe(lifecycleOwner) { updateSubInfo(it) }
-        displaySubVM.navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
+        displaySubVM.subNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
         displaySubVM.subInfoLiveData.nonNull().observe (lifecycleOwner) { setSubInfoData(it) }
     }
 
@@ -239,30 +240,30 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun handleNavigation(navigationData: NavigationData) {
-        when (navigationData) {
+    private fun handleNavigation(subNavigationData: SubNavigationData) {
+        when (subNavigationData) {
             // navigates to display post
-            is NavigationData.ToPost -> {
+            is SubNavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
-                    navigationData.postId,
-                    navigationData.subredditName,
-                    navigationData.postSource
+                    subNavigationData.postId,
+                    subNavigationData.subredditName,
+                    subNavigationData.postSource
                 )
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction().replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
                 fragmentOpened = true
             }
             // navigates to display image on top of current fragment
-            is NavigationData.ToImage -> {
+            is SubNavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
-                    navigationData.thumbnail
+                    subNavigationData.thumbnail
                 )
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
             }
             // let browser handle navigation to url
-            is NavigationData.ToExternal -> {
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigationData.url))
+            is SubNavigationData.ToExternal -> {
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }
         }
@@ -314,7 +315,7 @@ class DisplaySubFragment : RelicFragment() {
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy <= 0) onScrollUp() else onScrollDown()
+                if (dy < 0) onScrollUp() else onScrollDown()
             }
         })
 

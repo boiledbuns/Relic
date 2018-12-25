@@ -28,10 +28,15 @@ interface DisplayPostContract {
 
 sealed class PostNavigationData {
     data class ToImage(
-        val imageUrl : String
+            val imageUrl: String
     ) : PostNavigationData()
 
     data class ToReply(
-        val parentFullname : String
+            val parentFullname: String
     ) : PostNavigationData()
+}
+
+sealed class PostExceptionData {
+    object NetworkUnavailable : PostExceptionData()
+    object UnexpectedException : PostExceptionData()
 }

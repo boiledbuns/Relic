@@ -18,11 +18,10 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
-import com.relic.data.PostRepository
 import com.relic.data.models.PostModel
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
-import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -104,7 +103,7 @@ class FrontpageFragment : Fragment() {
     private fun bindViewModel() {
         // observe the live data list of posts for this subreddit
         frontpageVM.postListLiveData.nonNull().observe(this) { handlePostsLoaded(it) }
-        frontpageVM.navigationLiveData.nonNull().observe(this) { handleNavigation(it) }
+        frontpageVM.subNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
     }
 
     // region live data handlers
@@ -118,30 +117,30 @@ class FrontpageFragment : Fragment() {
         scrollLocked = false
     }
 
-    private fun handleNavigation(navigationData: NavigationData) {
-        when (navigationData) {
+    private fun handleNavigation(subNavigationData: SubNavigationData) {
+        when (subNavigationData) {
             // navigates to display post
-            is NavigationData.ToPost -> {
+            is SubNavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
-                    postId = navigationData.postId,
-                    subreddit = navigationData.subredditName,
-                    postSource = navigationData.postSource,
+                    postId = subNavigationData.postId,
+                    subreddit = subNavigationData.subredditName,
+                    postSource = subNavigationData.postSource,
                     enableVisitSub = true
                 )
                 activity!!.supportFragmentManager.beginTransaction()
                     .replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
             }
             // navigates to display image on top of current fragment
-            is NavigationData.ToImage -> {
+            is SubNavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
-                    navigationData.thumbnail
+                    subNavigationData.thumbnail
                 )
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
             }
             // let browser handle navigation to url
-            is NavigationData.ToExternal -> {
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigationData.url))
+            is SubNavigationData.ToExternal -> {
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }
         }

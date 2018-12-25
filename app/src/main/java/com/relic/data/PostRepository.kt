@@ -4,9 +4,9 @@ import android.arch.lifecycle.LiveData
 import android.os.Parcelable
 
 import com.relic.data.gateway.PostGateway
-import com.relic.data.gateway.SubGateway
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
+import com.relic.network.request.RelicRequestError
 import kotlinx.android.parcel.Parcelize
 
 interface PostRepository {
@@ -49,7 +49,12 @@ interface PostRepository {
      * @param subredditName name of subreddit that the post was made in
      * @param postFullName "full name" of the subreddit"
      */
-    fun retrievePost(subredditName: String, postFullName: String, postSource: PostSource)
+    fun retrievePost(
+        subredditName: String,
+        postFullName: String,
+        postSource: PostSource,
+        errorHandler : (error : RelicRequestError) -> Unit
+    )
 
     /**
      * clears all current posts for this subreddit and retrieves new ones based on the sorting

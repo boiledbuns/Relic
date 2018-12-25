@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.AsyncTask
 import android.text.Html
 import android.util.Log
+import com.android.volley.NoConnectionError
 import com.android.volley.Response
 
 import com.google.gson.GsonBuilder
@@ -19,6 +20,7 @@ import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostEntity.ORIGIN_ALL
 import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
 import com.relic.data.models.PostModel
+import com.relic.network.request.RelicRequestError
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -41,7 +43,6 @@ class PostRepositoryImpl @Inject constructor(
 
     companion object {
         private const val ENDPOINT = "https://oauth.reddit.com/"
-        private const val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
         private const val TAG = "POST_REPO"
 
         private const val KEY_FRONTPAGE = "frontpage"
@@ -106,7 +107,7 @@ class PostRepositoryImpl @Inject constructor(
     /**
      * Retrieves the "after" values to be used for the next post listing
      * @param callback callback to send the name to
-     * @param postSource nsource of the post
+     * @param postSource source of the post
      */
     override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
         val subName = when (postSource) {
@@ -173,26 +174,34 @@ class PostRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun retrievePost(subredditName: String, postFullName: String, postSource: PostRepository.PostSource) {
-        val ending = ENDPOINT + "r/" + subredditName + "/comments/" + postFullName.substring(3)
-        // create the new request and submit it
+    override fun retrievePost(
+            subredditName: String,
+            postFullName: String,
+            postSource: PostRepository.PostSource,
+            errorHandler: (error : RelicRequestError) -> Unit
+    ) {
+        val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
         requestManager.processRequest(
             RelicOAuthRequest(
-                RelicOAuthRequest.GET,
-                ending,
-                Response.Listener { response ->
+                method = RelicOAuthRequest.GET,
+                url = ENDPOINT + ending,
+                listener = Response.Listener { response ->
                     try {
                         parsePost(response, postSource)
                     } catch (error: ParseException) {
                         Log.d(TAG, "Error: " + error.message)
                     }
                 },
-                Response.ErrorListener { error ->
-                    Log.d(TAG, "Error: " + error.networkResponse)
-                    // TODO add liveData for error
+                errorListener = Response.ErrorListener { error ->
+                    Log.d(TAG, "Error retrieving post: " + error.networkResponse)
+
                     // TODO maybe retry if not an internet connection issue
+                    // TODO decide if it would be better to move this to another method
+                    when (error) {
+                        is NoConnectionError -> errorHandler.invoke(RelicRequestError.NetworkUnavailableError())
+                    }
                 },
-                checkToken()
+                authToken = checkToken()
             )
         )
     }

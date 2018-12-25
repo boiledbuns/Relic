@@ -159,6 +159,7 @@ class DisplayPostFragment : Fragment() {
         displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
         displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
         displayPostVM.postNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
+        displayPostVM.errorLiveData.nonNull().observe(this) { handleError(it) }
         displayPostVM.refreshingLiveData.nonNull().observe(this) {
             displayPostSwipeRefresh.isRefreshing = it
         }
@@ -186,6 +187,25 @@ class DisplayPostFragment : Fragment() {
             is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
             is PostNavigationData.ToReply -> openPostReplyEditor(navigationData.parentFullname)
         }
+    }
+
+    private fun handleError(error : PostExceptionData) {
+        // I do realize that error != exception, but still not convinced about the exception naming
+        var snackbarMessage = ""
+        var displayLength = Snackbar.LENGTH_SHORT
+
+        when (error) {
+            is PostExceptionData.NetworkUnavailable -> {
+                snackbarMessage = resources.getString(R.string.network_unavailable)
+                displayLength = Snackbar.LENGTH_INDEFINITE
+            }
+            is PostExceptionData.UnexpectedException -> {
+                snackbarMessage = resources.getString(R.string.unknown_error)
+                displayLength = Snackbar.LENGTH_SHORT
+            }
+        }
+
+        Snackbar.make(displayPostRootView, snackbarMessage, displayLength).show()
     }
 
     // endregion live data handlers
