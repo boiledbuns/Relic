@@ -58,7 +58,7 @@ class DisplayPostVM (
     init {
         observeLiveData()
         // check internet connection and retrieve more comments if internet is available
-        retrieveMoreComments(true)
+        refreshData()
     }
 
     /**
@@ -66,8 +66,16 @@ class DisplayPostVM (
      */
     private fun observeLiveData() {
         // retrieves the liveData post to be exposed to the view
-        _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) {
-            _postLiveData.postValue(it)
+        _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
+            _postLiveData.postValue(post)
+
+            // necessary for specific case where we have a post with no comments, we refresh, and
+            // the post still has no comments since the livedata for the comments don't notify
+            // the observer if there is no change
+            refreshingLiveData.value?.let { refreshing ->
+                val noComments = post?.commentCount == 0
+                if (noComments && refreshing) publishException(PostExceptionData.NoComments)
+            }
         }
 
         // retrieve the comment list as liveData so that we can expose it to the view first
