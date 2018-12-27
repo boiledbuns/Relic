@@ -6,6 +6,7 @@
     <string name="REFRESH_TOKEN_KEY">refresh_token</string>
     <string name="REDIRECT_CODE">code</string>
 
+    <string name="app_author">u/boiledbuns</string>
 
     <!-- search strings-->
     <string name="searchmenu_title">Search</string>
@@ -65,5 +66,8 @@
     <string name="unknown_error">An unknown error occurred</string>
     <string name="no_comments">This post has no comments</string>
     <string name="retry">retry</string>
+
+    <!-- navigation menu -->
+    <string name="preferences">preferences</string>
 
 </resources>

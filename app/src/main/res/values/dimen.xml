@@ -107,5 +107,7 @@
 
     <dimen name="darken_background">0.5</dimen>
 
+    <!-- navigation -->
+    <dimen name="nav_header_height">200dp</dimen>
 
 </resources>
