@@ -20,6 +20,7 @@ import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.displaysubs.DisplaySubsView
 import com.relic.presentation.home.HomeFragment
+import com.relic.presentation.preferences.PreferenceFragment
 
 import javax.inject.Inject
 
@@ -87,9 +88,17 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
     private fun handleNavMenuOnclick(item : MenuItem) : Boolean {
         when (item.itemId) {
-            R.id.preferences -> navDrawer.closeDrawers()
+            R.id.preferences -> {
+                val preferenceFragment = PreferenceFragment.create()
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.main_content_frame, preferenceFragment)
+                    .addToBackStack(TAG)
+                    .commit()
+            }
         }
 
+        navDrawer.closeDrawers()
         return true
     }
 

@@ -1,5 +1,10 @@
 <resources>
-    <!-- Base application theme. -->
+    <!-- Base application theme -->
+    <style name="RelicTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/backgroundSecondary</item>
+    </style>
+
+    <!-- Deprecated -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/backgroundSecondary</item>
@@ -44,7 +49,5 @@
     <style name="collapsingTitleAppearance" parent="TextAppearance.AppCompat.Title">
         <item name="android:textSize">24sp</item>
     </style>
-
-
 
 </resources>
