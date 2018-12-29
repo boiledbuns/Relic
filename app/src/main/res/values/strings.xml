@@ -70,4 +70,7 @@
     <!-- navigation menu -->
     <string name="preferences">preferences</string>
 
+    <!-- preferences menu -->
+    <string name="preference_theme">Edit Theme</string>
+
 </resources>
