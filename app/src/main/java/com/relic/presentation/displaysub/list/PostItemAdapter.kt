@@ -4,7 +4,7 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.relic.data.models.PostModel
-import com.relic.presentation.customview.RelicPostItem
+import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
 
 class PostItemAdapter (
@@ -15,7 +15,7 @@ class PostItemAdapter (
     override fun getItemCount() = postList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
-        return PostItemVH(RelicPostItem(parent.context)).apply {
+        return PostItemVH(RelicPostItemView(parent.context)).apply {
             initializeOnClicks(this@PostItemAdapter)
         }
     }

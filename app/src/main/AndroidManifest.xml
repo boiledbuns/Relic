@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- TODO add deep link capabilities :eyes -->
     <application
         android:name=".RelicApp"
         android:allowBackup="true"
@@ -11,7 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/RelicThemePrimary">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

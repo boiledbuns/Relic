@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true">
 
-    <include
-        layout="@layout/post_item_span"
-        />
+    <TextView
+        android:id="@+id/themeEditTitleView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_l"
+        android:text="@string/preference_theme_title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/themeEditDescView"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/themeEditDescView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_l"
+        android:text="@string/preference_theme_instruction"
+        app:layout_constraintTop_toBottomOf="@id/themeEditTitleView"
+        app:layout_constraintBottom_toTopOf="@id/previewPostView"/>
+
+    <com.relic.presentation.customview.RelicPostItemView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/previewPostView"
+        app:layout_constraintTop_toBottomOf="@id/themeEditDescView"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

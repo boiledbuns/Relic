@@ -57,9 +57,15 @@
     <string name="user_and_time">u/%s, posted on %s</string>
     <string name="reply_count">%d replies</string>
 
-
+    <!-- tool strings -->
+    <string name="placeholder_text">placeholder_text</string>
     <string name="short_placeholder_text">flair</string>
-    <string name="placeholder_text">Placeholder text</string>
+    <string name="long_placeholder_text">
+        Hey this is a long place holder string meant to be used by the tools
+        attribute in the xml to display long text. Look at how great it looks!
+    </string>
+
+
 
     <!-- display post error strings -->
     <string name="network_unavailable">Network unavailable</string>
@@ -72,5 +78,8 @@
 
     <!-- preferences menu -->
     <string name="preference_theme">Edit Theme</string>
+    <string name="preference_theme_title">This is the theme selection screen</string>
+    <string name="preference_theme_instruction">Select a theme for a preview of what it\'ll look like in the app</string>
+
 
 </resources>

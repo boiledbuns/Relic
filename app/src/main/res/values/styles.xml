@@ -1,16 +1,28 @@
 <resources>
-    <!-- Base application theme -->
-    <style name="RelicTheme" parent="Theme.AppCompat.NoActionBar">
+    <!-- REGION THEMES -->
+    <style name="RelicThemePrimary" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/backgroundSecondary</item>
+        <item name="android:textColor">@color/paleGray</item>
     </style>
 
-    <!-- Deprecated -->
+    <style name="ThemeLight" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:textColor">@color/darkGray</item>
+    </style>
+
+    <style name="ThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/backgroundSecondary</item>
+        <item name="android:textColor">@color/paleDarkGray</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/backgroundSecondary</item>
         <item name="colorPrimaryDark">@color/backgroundSecondary</item>
         <item name="colorAccent">@color/paleDarkGray</item>
     </style>
+
+    <!-- ENDREGION THEMES -->
 
     <style name="RelicCard" parent="CardView.Dark">
         <!--<item name="cardBackgroundColor">@color/darkGray</item>

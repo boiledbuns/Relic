@@ -33,5 +33,6 @@
 
     <color name="positive">#1A8B0C</color>
     <color name="negative">#be4345</color>
+    <color name="white">#ffffff</color>
 
 </resources>
