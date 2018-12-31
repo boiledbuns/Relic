@@ -25,11 +25,12 @@ class RelicPostItemView @JvmOverloads constructor(
 
     fun setPost(postModel : PostModel) {
         rootView.apply {
-            val backgroundColor = if (postModel.isVisited) {
-                R.color.backgroundSecondaryB
-            } else R.color.backgroundSecondary
-
-            postItemRootView.setBackgroundColor(resources.getColor(backgroundColor))
+            // TODO figure out how to set the background colour based on the theme
+//            val backgroundColor = if (postModel.isVisited) {
+//                R.color.backgroundSecondaryB
+//            } else R.color.backgroundSecondary
+//
+//            postItemRootView.setBackgroundColor(resources.getColor(backgroundColor))
 
             if (!postModel.thumbnail.isNullOrBlank()) {
                 postThumbnailView.visibility = View.VISIBLE

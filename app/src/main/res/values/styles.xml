@@ -2,11 +2,14 @@
     <!-- REGION THEMES -->
     <style name="RelicThemePrimary" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/backgroundSecondary</item>
+        <item name="android:windowBackground">@color/paleDarkGray</item>
         <item name="android:textColor">@color/paleGray</item>
     </style>
 
     <style name="ThemeLight" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/white</item>
+        <item name="android:colorBackground">@color/paleGray</item>
+        <item name="android:windowBackground">@color/paleGray</item>
         <item name="android:textColor">@color/darkGray</item>
     </style>
 

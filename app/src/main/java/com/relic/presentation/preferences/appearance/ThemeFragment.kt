@@ -1,6 +1,7 @@
 package com.relic.presentation.preferences.appearance
 
 import android.os.Bundle
+import android.support.v7.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,10 @@ class ThemeFragment : RelicFragment() {
     // region android lifecycle hooks
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.preferences_theme, container, false).apply {
+        val contextWrapper = ContextThemeWrapper(activity, R.style.ThemeLight)
+        val localInflater = inflater.cloneInContext(contextWrapper)
+
+        return localInflater.inflate(R.layout.preferences_theme, container, false).apply {
             this@ThemeFragment.rootView = this
             initializePreview()
         }
@@ -37,8 +41,8 @@ class ThemeFragment : RelicFragment() {
         // TODO separate this fragment into its own activity or
         // TODO manually set attributes of the preview post to allow it to reload new theme dynamically
         activity?.apply {
-            setTheme(R.style.ThemeLight)
-            recreate()
+//            setTheme(R.style.ThemeLight)
+//            recreate()
         }
     }
 

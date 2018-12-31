@@ -333,8 +333,8 @@ class DisplaySubFragment : RelicFragment() {
         displaySubFAB.apply {
             show()
             setOnClickListener {
-                subAppBarLayout.setExpanded(true)
-                subPostsRecyclerView.layoutManager?.scrollToPosition(0)
+                subPostsRecyclerView.smoothScrollToPosition(0)
+//                subAppBarLayout.setExpanded(true)
             }
         }
     }

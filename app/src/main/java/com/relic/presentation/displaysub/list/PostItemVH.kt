@@ -6,8 +6,8 @@ import com.relic.presentation.customview.RelicPostItemView
 import kotlinx.android.synthetic.main.post_item_span.view.*
 
 class PostItemVH (
-        itemView : RelicPostItemView
-) : RecyclerView.ViewHolder(itemView) {
+    private val postItemView : RelicPostItemView
+) : RecyclerView.ViewHolder(postItemView) {
 
     private var itemPosition = 0
     var itemFullName = ""
@@ -24,7 +24,7 @@ class PostItemVH (
     }
 
     fun bindPost(postModel : PostModel, position: Int) {
-        (itemView as RelicPostItemView).setPost(postModel)
+        postItemView.setPost(postModel)
 
         itemPosition = position
         itemFullName = postModel.id
