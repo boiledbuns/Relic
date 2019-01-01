@@ -1,26 +1,22 @@
 package com.relic
 
 import android.content.Context
-import android.os.PersistableBundle
-import android.support.v4.view.MotionEventCompat
+import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.widget.DrawerLayout
 
-import android.util.AttributeSet
 import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
 import android.widget.TextView
 
 import com.relic.data.Authenticator
 import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
-import com.relic.presentation.displaysubs.DisplaySubsView
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.preferences.PreferenceFragment
+import com.relic.util.PreferencesManagerImpl
 
 import javax.inject.Inject
 
@@ -39,7 +35,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        setTheme()
         (application as RelicApp).appComponent.inject(this)
 
         // initialize the request queue and authenticator instance
@@ -82,6 +78,15 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                     .replace(R.id.main_content_frame, HomeFragment())
                     .commit()
         }
+    }
+
+    private fun setTheme() {
+        PreferencesManagerImpl
+                .create(getPreferences(Context.MODE_PRIVATE))
+                .getApplicationTheme()
+                ?.let { themeId ->
+                    setTheme(themeId)
+                }
     }
 
     // region navigation view handlers
