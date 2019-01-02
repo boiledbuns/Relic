@@ -2,7 +2,6 @@ package com.relic
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -16,8 +15,14 @@ import com.relic.data.Authenticator
 import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.home.HomeFragment
-import com.relic.presentation.preferences.PreferenceFragment
+import com.relic.presentation.preferences.PreferenceChangedListener
+import com.relic.presentation.preferences.PreferenceLink
+import com.relic.presentation.preferences.PreferencesActivity
+import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
+import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.util.PreferencesManagerImpl
+import com.relic.util.RequestCodes
+import kotlinx.android.synthetic.main.preferences.*
 
 import javax.inject.Inject
 
@@ -35,8 +40,10 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
         setTheme()
+        setContentView(R.layout.activity_main)
+
         (application as RelicApp).appComponent.inject(this)
 
         // initialize the request queue and authenticator instance
@@ -63,13 +70,24 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            RequestCodes.CHANGED_PREFERENCES -> {
+                data?.getParcelableArrayListExtra<PreferenceLink>(KEY_RESULT_PREF_LINKS)?.let{
+                    handlePreferenceChanges(it)
+                }
+            }
+            else -> super.onActivityResult(requestCode, resultCode, data)
+        }
     }
+
+    // region callback interface
 
     override fun onAuthenticated() {
         // sends user to default view of subreddits
         initializeDefaultView()
     }
+
+    // endregion callback interface
 
     private fun initializeDefaultView() {
         // get the number of additional (non default) fragments in the stack
@@ -93,18 +111,16 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         setTheme(themeId)
     }
 
+    private fun handlePreferenceChanges(changedPreferenceLinks : ArrayList <PreferenceLink> ) {
+        // TODO handle each set of changed preferences properly when we add new ones
+        recreate()
+    }
+
     // region navigation view handlers
 
     private fun handleNavMenuOnclick(item : MenuItem) : Boolean {
         when (item.itemId) {
-            R.id.preferences -> {
-                val preferenceFragment = PreferenceFragment.create()
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_content_frame, preferenceFragment)
-                    .addToBackStack(TAG)
-                    .commit()
-            }
+            R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 
         navDrawer.closeDrawers()

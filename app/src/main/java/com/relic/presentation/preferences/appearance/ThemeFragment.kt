@@ -10,6 +10,8 @@ import com.relic.R
 import com.relic.data.models.PostModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.customview.RelicPostItemView
+import com.relic.presentation.preferences.PreferenceChangedListener
+import com.relic.presentation.preferences.PreferenceLink
 import com.relic.util.PreferencesManager
 import com.relic.util.PreferencesManagerImpl
 import kotlinx.android.synthetic.main.preferences_theme.*
@@ -18,6 +20,8 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
     private lateinit var previewPost : PostModel
     private lateinit var rootView : View
+
+    private lateinit var preferenceChangedListener: PreferenceChangedListener
 
     private lateinit var preferencesManager : PreferencesManager
     private var currentTheme : Int = -1
@@ -52,6 +56,10 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
                 themeDropdownAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 selectThemeSpinnerView.apply {
                     adapter = themeDropdownAdapter
+
+
+                    // we have to do this because spinner auto calls onItemSelected otherwise
+                    setSelection(0)
                     onItemSelectedListener = this@ThemeFragment
                 }
             }
@@ -99,6 +107,9 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
             currentTheme = tempTheme
             preferencesManager.setApplicationTheme(currentTheme)
             resetPostPreviewView()
+
+            // inform the activity of the changes to the theme
+            preferenceChangedListener.onPreferenceChanged(PreferenceLink.Theme)
         }
     }
 
@@ -106,8 +117,10 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
     companion object {
 
-        fun create(): ThemeFragment {
-            return ThemeFragment()
+        fun create(listener : PreferenceChangedListener): ThemeFragment {
+            return ThemeFragment().apply {
+                preferenceChangedListener = listener
+            }
         }
     }
 }

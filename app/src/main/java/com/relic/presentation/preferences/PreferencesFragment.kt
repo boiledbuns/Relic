@@ -12,7 +12,9 @@ import com.relic.presentation.preferences.appearance.ThemeFragment
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.preferences.*
 
-class PreferenceFragment : RelicFragment() {
+class PreferencesFragment : RelicFragment() {
+
+    private lateinit var preferenceChangedListener: PreferenceChangedListener
 
     val preferences : List<PreferenceLink> = listOf(
         PreferenceLink.Appearance,
@@ -61,17 +63,17 @@ class PreferenceFragment : RelicFragment() {
     private fun handleNavigation (preferenceLink : PreferenceLink) {
         val linkFragment : Fragment? = when (preferenceLink) {
             PreferenceLink.Theme -> {
-                ThemeFragment.create()
+                ThemeFragment.create(preferenceChangedListener)
             }
             else -> null
         }
 
         linkFragment?.let {
             activity?.supportFragmentManager!!
-                    .beginTransaction()
-                    .replace(R.id.main_content_frame, it)
-                    .addToBackStack(TAG)
-                    .commit()
+                .beginTransaction()
+                .replace(R.id.perferences_content_frame, it)
+                .addToBackStack(TAG)
+                .commit()
         }
     }
 
@@ -80,24 +82,18 @@ class PreferenceFragment : RelicFragment() {
     companion object {
         private const val KEY_PREFERENCE = "key_preference"
 
-        fun create(preferenceLink : PreferenceLink? = null) : PreferenceFragment{
+        fun create(
+            preferenceLink : PreferenceLink? = null,
+            listener : PreferenceChangedListener
+        ) : PreferencesFragment{
             val args = Bundle().apply {
                 preferenceLink?.let { putParcelable(KEY_PREFERENCE, preferenceLink)}
             }
 
-            return PreferenceFragment().apply {
+            return PreferencesFragment().apply {
                 arguments = args
+                preferenceChangedListener = listener
             }
-        }
-
-        /**
-         * used for opening specific preference options
-         */
-        sealed class PreferenceLink : Parcelable {
-            @Parcelize
-            object Appearance : PreferenceLink()
-            @Parcelize
-            object Theme : PreferenceLink()
         }
     }
 }

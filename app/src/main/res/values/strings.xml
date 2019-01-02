@@ -77,7 +77,7 @@
     <string name="preferences">preferences</string>
 
     <!-- preferences menu -->
-    <string name="preference_theme">Edit Theme</string>
+    <string name="preference_theme">Theme Editor</string>
     <string name="preference_theme_title">This is the theme selection screen</string>
     <string name="preference_theme_instruction">Select a theme for a preview of what it\'ll look like in the app</string>
 
