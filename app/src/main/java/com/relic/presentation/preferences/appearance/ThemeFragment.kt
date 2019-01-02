@@ -16,29 +16,32 @@ import kotlinx.android.synthetic.main.preferences_theme.*
 
 class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
-    lateinit var previewPost : PostModel
-    lateinit var rootView : View
+    private lateinit var previewPost : PostModel
+    private lateinit var rootView : View
 
-    lateinit var preferencesManager : PreferencesManager
+    private lateinit var preferencesManager : PreferencesManager
+    private var currentTheme : Int = -1
 
     // region android lifecycle hooks
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity?.let {
             preferencesManager = PreferencesManagerImpl.create(it.getPreferences(Context.MODE_PRIVATE))
+            currentTheme = preferencesManager.getApplicationTheme()
         }
 
-        val contextWrapper = ContextThemeWrapper(activity, preferencesManager.getApplicationTheme())
+        val contextWrapper = ContextThemeWrapper(activity, currentTheme)
         val localInflater = inflater.cloneInContext(contextWrapper)
 
         return localInflater.inflate(R.layout.preferences_theme, container, false).apply {
             this@ThemeFragment.rootView = this
-            initializePreview()
+            initializePreviewPost()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        resetPostPreviewView()
 
         context?.let {
             ArrayAdapter.createFromResource(
@@ -59,26 +62,23 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
     // region view helper functions
 
-    private fun initializePreview() {
-        initializePreviewPost()
-
-        rootView.findViewById<RelicPostItemView>(R.id.previewPostView).let { postItemView ->
-            postItemView.setPost(previewPost)
-        }
-
-        // TODO separate this fragment into its own activity or
-        // TODO manually set attributes of the preview post to allow it to reload new theme dynamically
-        activity?.apply {
-//            setTheme(R.style.ThemeLight)
-//            recreate()
-        }
-    }
-
     private fun initializePreviewPost() {
         previewPost = PostModel().apply {
             title = resources.getString(R.string.preference_theme_instruction)
             selftext = resources.getString(R.string.long_placeholder_text)
             subreddit = "theme_editor"
+        }
+    }
+
+    private fun resetPostPreviewView() {
+        val contextWrapper = ContextThemeWrapper(activity, currentTheme)
+        val postItemView = RelicPostItemView(contextWrapper)
+
+        postItemView.setPost(previewPost)
+
+        previewPostFrameView.apply {
+            removeAllViews()
+            addView(postItemView)
         }
     }
 
@@ -89,12 +89,17 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(p0: AdapterView<*>?) { }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
-        val selectedTheme = when (pos) {
+        val tempTheme = when (pos) {
             1 -> R.style.RelicThemeLight
             else -> R.style.RelicThemePrimary
         }
 
-        preferencesManager.setApplicationTheme(selectedTheme)
+        // only update if there is a change
+        if (currentTheme != tempTheme) {
+            currentTheme = tempTheme
+            preferencesManager.setApplicationTheme(currentTheme)
+            resetPostPreviewView()
+        }
     }
 
     // endregion spinner item selection listener

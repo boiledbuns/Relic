@@ -37,12 +37,21 @@
         android:layout_marginBottom="@dimen/padding_l"
         android:text="@string/preference_theme_instruction"
         app:layout_constraintTop_toBottomOf="@id/themeEditTitleView"
-        app:layout_constraintBottom_toTopOf="@id/previewPostView"/>
+        app:layout_constraintBottom_toTopOf="@id/previewPostFrameView"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/previewPostFrameView"
+        app:layout_constraintTop_toBottomOf="@id/themeEditDescView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"/>
 
     <com.relic.presentation.customview.RelicPostItemView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/previewPostView"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/themeEditDescView"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
