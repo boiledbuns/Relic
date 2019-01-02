@@ -21,7 +21,7 @@ class PreferencesManagerImpl(
         }
     }
 
-    override fun getApplicationTheme(): Int? {
+    override fun getApplicationTheme(): Int {
         return sharedPreferences.getInt(KEY_THEME, Context.MODE_PRIVATE)
     }
 

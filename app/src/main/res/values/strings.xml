@@ -81,5 +81,8 @@
     <string name="preference_theme_title">This is the theme selection screen</string>
     <string name="preference_theme_instruction">Select a theme for a preview of what it\'ll look like in the app</string>
 
-
+    <string-array name="theme_names">
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
 </resources>

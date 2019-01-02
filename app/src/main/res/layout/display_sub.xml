@@ -19,7 +19,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snapMargins"
             app:expandedTitleTextAppearance="@style/collapsingTitleAppearance"
             app:expandedTitleMarginBottom="@dimen/appbarlayout_title_margin_bottom"
-            app:contentScrim="@color/backgroundSecondary"
+            app:contentScrim="?attr/colorPrimary"
             app:scrimAnimationDuration="6">
 
             <RelativeLayout
@@ -82,7 +82,7 @@
             android:paddingBottom="@dimen/postitem_margin"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
-s
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/displaySubFAB"
         android:layout_width="wrap_content"

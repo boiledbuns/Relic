@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/margin_xxxs"
     android:padding="@dimen/displaypost_rvpadding"
-    android:background="@color/backgroundSecondary">
+    android:background="?attr/colorPrimary">
 
     <TextView
         android:id="@+id/commentScoreView"

@@ -10,7 +10,7 @@
 
     <!-- need constraint layout to keep the square shape -->
     <android.support.constraint.ConstraintLayout
-        android:background="@color/backgroundSecondary"
+        android:background="?attr/colorPrimary"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_marginStart="@dimen/subitem_margin"

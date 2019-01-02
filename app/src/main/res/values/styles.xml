@@ -8,7 +8,6 @@
 
     <style name="RelicThemeLight" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/white</item>
-        <item name="android:colorBackground">@color/paleGray</item>
         <item name="android:windowBackground">@color/paleGray</item>
         <item name="android:textColor">@color/darkGray</item>
     </style>

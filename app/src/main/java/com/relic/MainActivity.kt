@@ -1,6 +1,7 @@
 package com.relic
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -61,6 +62,10 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         navigationView.setNavigationItemSelectedListener { handleNavMenuOnclick(it) }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onAuthenticated() {
         // sends user to default view of subreddits
         initializeDefaultView()
@@ -81,12 +86,11 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     private fun setTheme() {
-        PreferencesManagerImpl
+        val themeId = PreferencesManagerImpl
                 .create(getPreferences(Context.MODE_PRIVATE))
                 .getApplicationTheme()
-                ?.let { themeId ->
-                    setTheme(themeId)
-                }
+
+        setTheme(themeId)
     }
 
     // region navigation view handlers
