@@ -22,8 +22,9 @@
                        android:resource="@xml/subreddit_searchable"/>
         </activity>
 
-        <activity android:name=".presentation.preferences.PreferencesActivity">
-
+        <activity
+            android:name=".presentation.preferences.PreferencesActivity"
+            android:parentActivityName=".MainActivity">
         </activity>
     </application>
 

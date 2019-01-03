@@ -1,7 +1,6 @@
 package com.relic.presentation.preferences
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
-import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.preferences.*
 
 class PreferencesFragment : RelicFragment() {
@@ -40,6 +38,10 @@ class PreferencesFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnClicks()
+
+        preferencesToolbarView.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
     }
 
     // endregion android lifecycle hooks
@@ -47,7 +49,7 @@ class PreferencesFragment : RelicFragment() {
     // region view helper functions
 
     private fun initOnClicks() {
-        preferenceThemeView.setOnClickListener { handleNavigation(PreferenceLink.Theme)}
+        themeOptionView.setOnClickListener { handleNavigation(PreferenceLink.Theme)}
     }
 
     // endregion view helper functions
@@ -71,7 +73,7 @@ class PreferencesFragment : RelicFragment() {
         linkFragment?.let {
             activity?.supportFragmentManager!!
                 .beginTransaction()
-                .replace(R.id.perferences_content_frame, it)
+                .replace(R.id.preferences_content_frame, it)
                 .addToBackStack(TAG)
                 .commit()
         }

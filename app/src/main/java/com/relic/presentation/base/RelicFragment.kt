@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleOwner
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import com.relic.R
 
@@ -29,6 +30,19 @@ open class RelicFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViewModel(viewLifecycleOwner)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        var override = true
+
+        item?.itemId?.let { id ->
+            when (id) {
+                android.R.id.home -> activity?.onBackPressed()
+                else -> override = super.onOptionsItemSelected(item)
+            }
+        }
+
+        return override
     }
 
     protected open fun bindViewModel(lifecycleOwner : LifecycleOwner) { }

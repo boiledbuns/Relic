@@ -45,6 +45,11 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        preferencesThemeToolbarView.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
+
         resetPostPreviewView()
 
         context?.let {

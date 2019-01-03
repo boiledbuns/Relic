@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import com.relic.R
 import com.relic.util.RequestCodes
+import kotlinx.android.synthetic.main.activity_preferences.*
 
 class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
 
@@ -22,7 +24,7 @@ class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
         PreferencesFragment.create(preferenceLink, this).let { preferencesFragment ->
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.perferences_content_frame, preferencesFragment)
+                .replace(R.id.preferences_content_frame, preferencesFragment)
                 .commit()
         }
     }
@@ -38,6 +40,7 @@ class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
         } else {
             setResult(Activity.RESULT_CANCELED)
         }
+
         super.onBackPressed()
     }
 
