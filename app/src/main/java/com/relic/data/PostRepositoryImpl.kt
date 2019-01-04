@@ -175,10 +175,10 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun retrievePost(
-            subredditName: String,
-            postFullName: String,
-            postSource: PostRepository.PostSource,
-            errorHandler: (error : RelicRequestError) -> Unit
+        subredditName: String,
+        postFullName: String,
+        postSource: PostRepository.PostSource,
+        errorHandler: (error : RelicRequestError) -> Unit
     ) {
         val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
         requestManager.processRequest(
@@ -283,15 +283,15 @@ class PostRepositoryImpl @Inject constructor(
                 appDB.postDao.getPostWithId(postEntity.name)
             }.await()
 
+            postEntity.visited = true
             postEntity.order = existingPost?.order ?: async {
                 when (postSource) {
-                    is PostRepository.PostSource.Subreddit -> appDB.postDao.getItemsCountForSub(
-                        postSource.subredditName
-                    )
+                    is PostRepository.PostSource.Subreddit -> {
+                        appDB.postDao.getItemsCountForSub(postSource.subredditName)
+                    }
                     else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
                 }
             }.await()
-
 
             launch { InsertPostTask().execute(appDB, postEntity) }
         }
@@ -360,11 +360,10 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    private class InsertPostTask : AsyncTask<Any, Int, Int>() {
-        override fun doInBackground(vararg objects: Any): Int? {
+    private class InsertPostTask : AsyncTask<Any, Unit, Unit>() {
+        override fun doInBackground(vararg objects: Any) {
             val applicationDB = objects[0] as ApplicationDB
             applicationDB.postDao.insertPost(objects[1] as PostEntity)
-            return null
         }
     }
 

@@ -12,7 +12,7 @@
     <item android:id="@+id/display_sub_sort"
           android:title="@string/sortby_title"
           android:icon="@drawable/ic_sort"
-          app:showAsAction="always">
+          app:showAsAction="ifRoom|collapseActionView">
 
         <menu>
             <item android:id="@+id/post_sort_new" android:title="@string/sortby_new" app:showAsAction="withText"/>

@@ -35,4 +35,6 @@
     <color name="negative">#be4345</color>
     <color name="white">#ffffff</color>
 
+    <color name="stickied">#5a7e52</color>
+
 </resources>

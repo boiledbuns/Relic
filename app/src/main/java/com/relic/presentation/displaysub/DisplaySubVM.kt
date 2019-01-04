@@ -168,7 +168,7 @@ open class DisplaySubVM (
     // region view action delegate
 
     override fun visitPost(postfullName : String, postSubreddit : String) {
-        postRepo.postGateway.visitPost(postfullName)
+//        postRepo.postGateway.visitPost(postfullName)
         _navigationLiveData.value = SubNavigationData.ToPost(postfullName, postSubreddit, postSource)
     }
 

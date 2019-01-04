@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -16,6 +17,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import com.relic.MainActivity
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
@@ -105,16 +107,17 @@ class DisplayPostFragment : Fragment() {
     ): View? {
         rootView = inflater.inflate(R.layout.display_post, container, false)
 
-        rootView.findViewById<Toolbar>(R.id.display_post_toolbar).apply {
-            myToolbar = this
+        myToolbar = rootView.findViewById<Toolbar>(R.id.displayPostToolbar).apply {
             title = subredditName
-            inflateMenu(R.menu.display_post_menu)
+            (activity as MainActivity).setSupportActionBar(this)
 
             if (enableVisitSub) setOnClickListener {
                 val subFragment = DisplaySubFragment.create(subredditName)
                 activity!!.supportFragmentManager.beginTransaction()
                     .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
             }
+
+            setNavigationOnClickListener { activity?.onBackPressed() }
         }
 
         rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {

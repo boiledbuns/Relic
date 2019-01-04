@@ -1,8 +1,10 @@
 package com.relic.presentation.base
 
 import android.arch.lifecycle.LifecycleOwner
+import android.content.res.TypedArray
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -46,4 +48,5 @@ open class RelicFragment: Fragment() {
     }
 
     protected open fun bindViewModel(lifecycleOwner : LifecycleOwner) { }
+
 }

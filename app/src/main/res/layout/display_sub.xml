@@ -60,6 +60,7 @@
                 android:id="@+id/subToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/toolbar_height"
+                android:elevation="8dp"
                 app:layout_collapseMode="pin"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>

@@ -1,8 +1,10 @@
 package com.relic.presentation.customview
 
 import android.content.Context
+import android.support.annotation.ColorRes
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
@@ -17,6 +19,21 @@ class RelicPostItemView @JvmOverloads constructor(
         defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
+    private val TAG = "POST_ITEM_VIEW"
+    // TODO need to think about increasing min api level from 21
+//    private val pinnedColor = resources.getColor(R.color.positive, context.theme)
+    // TODO set color based on theme, still trying to figure out the best way to do this
+    private val textColor = resources.getColor(R.color.paleGray)
+    private val stickiedColor = resources.getColor(R.color.stickied)
+    private val backgroundColor = resources.getColor(R.color.backgroundSecondary)
+    private val backgroundVisitedColor = resources.getColor(R.color.backgroundSecondaryB)
+
+    init {
+//        val attributes = context.theme.obtainStyledAttributes(R.styleable.RelicViewStyle)
+//        textColor = attributes.getColor(R.styleable.TextAppearance_android_textColor, 0)
+//        attributes.recycle()
+    }
+
     // TODO add view action delegate for handling view options
 
     init {
@@ -25,12 +42,18 @@ class RelicPostItemView @JvmOverloads constructor(
 
     fun setPost(postModel : PostModel) {
         rootView.apply {
-            // TODO figure out how to set the background colour based on the theme
-//            val backgroundColor = if (postModel.isVisited) {
-//                R.color.backgroundSecondaryB
-//            } else R.color.backgroundSecondary
-//
-//            postItemRootView.setBackgroundColor(resources.getColor(backgroundColor))
+
+            if (postModel.isVisited) {
+                postItemRootView.setBackgroundColor(backgroundVisitedColor)
+            } else {
+                postItemRootView.setBackgroundColor(backgroundColor)
+            }
+
+            if (postModel.isStickied) {
+                titleView.setTextColor(stickiedColor)
+            } else {
+                titleView.setTextColor(textColor)
+            }
 
             if (!postModel.thumbnail.isNullOrBlank()) {
                 postThumbnailView.visibility = View.VISIBLE
@@ -74,11 +97,11 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {
-            Log.d("POSTITEM_ADAPTER", "URL = $thumbnailUrl")
+            Log.d(TAG, "URL = $thumbnailUrl")
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(rootView.postThumbnailView)
             rootView.postThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
-            Log.d("POSTITEM_ADAPTER", "Issue loading image " + e.toString())
+            Log.d(TAG, "Issue loading image " + e.toString())
         }
     }
 

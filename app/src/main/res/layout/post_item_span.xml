@@ -21,7 +21,7 @@
         android:textStyle="bold"
         android:textSize="@dimen/text_s"
         android:layout_marginEnd="@dimen/title_margin"
-        tools:text="random subreddit"/>
+        tools:text="[r/preview]"/>
 
     <TextView
         android:id="@+id/postDateView"

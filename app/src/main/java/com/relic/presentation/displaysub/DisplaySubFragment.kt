@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
@@ -21,6 +20,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.relic.MainActivity
 
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
@@ -108,7 +108,8 @@ class DisplaySubFragment : RelicFragment() {
         toolbar.apply {
             title = subName
             subtitle = "Sorting by new"
-            (activity as AppCompatActivity).setSupportActionBar(this)
+            (activity as MainActivity).setSupportActionBar(this)
+            setNavigationOnClickListener { activity?.onBackPressed() }
         }
 
         return root
