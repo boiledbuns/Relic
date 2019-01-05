@@ -22,7 +22,7 @@ public abstract class PostDao {
   @Query("SELECT * FROM PostEntity WHERE origin = :postOrigin ORDER BY `order` ASC")
   public abstract LiveData<List<PostModel>> getPostsFromOrigin(int postOrigin);
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Insert(onConflict = OnConflictStrategy.FAIL)
   public abstract void insertPosts(List<PostEntity> posts);
 
   @Query("DELETE FROM PostEntity WHERE subreddit = :subName AND origin = 0")

@@ -62,7 +62,7 @@ class RelicPostItemView @JvmOverloads constructor(
                 postThumbnailView.visibility = View.GONE
             }
 
-            postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
+            postSubNameView.text = "" + postModel.origin + " " + resources.getString(R.string.sub_prefix_label, postModel.subreddit) + " " + postModel.order
             postDateView.text = postModel.created
             titleView.text = postModel.title
             setPostTags(postModel)

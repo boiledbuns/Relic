@@ -119,7 +119,6 @@ open class DisplaySubVM (
 
         // remove all posts from current db for this subreddit (triggers retrieval)
         postRepo.clearAllPostsFromSource(postSource)
-        postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
         _subInfoLiveData.postValue(
             DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
         )

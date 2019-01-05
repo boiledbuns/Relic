@@ -24,6 +24,7 @@ import com.relic.network.request.RelicRequestError
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -79,9 +80,12 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun retrieveMorePosts(postSource: PostRepository.PostSource, after: String) {
+    override fun retrieveMorePosts(
+        postSource: PostRepository.PostSource,
+        listingAfter: String
+    ) = runBlocking {
         // change the api endpoint to access to get the next post listing
-        val ending =  when (postSource) {
+        val ending = when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
             else -> ""
         }
@@ -90,7 +94,7 @@ class PostRepositoryImpl @Inject constructor(
         requestManager.processRequest(
             RelicOAuthRequest(
                 RelicOAuthRequest.GET,
-                "$ENDPOINT$ending?after=$after",
+                "$ENDPOINT$ending?after=$listingAfter",
                 Response.Listener { response ->
                     try {
                         parsePosts(response, postSource)
@@ -135,7 +139,6 @@ class PostRepositoryImpl @Inject constructor(
         sortType: PostRepository.SortType,
         sortScope: PostRepository.SortScope
     ) {
-
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/" + postSource.subredditName
@@ -242,17 +245,14 @@ class PostRepositoryImpl @Inject constructor(
         // create the new listing entity
         val listing = ListingEntity(listingKey, listingData["after"] as String?)
 
-        val postIterator = listingPosts!!.iterator()
-        val postEntities = ArrayList<PostEntity>()
-
-
         GlobalScope.launch {
-            var postCount = async {
-                when (postSource) {
-                    is PostRepository.PostSource.Subreddit ->appDB.postDao.getItemsCountForSub(postSource.subredditName)
-                    else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
-                }
-            }.await()
+            val postIterator = listingPosts!!.iterator()
+            val postEntities = ArrayList<PostEntity>()
+
+            var postCount = when (postSource) {
+                is PostRepository.PostSource.Subreddit -> appDB.postDao.getItemsCountForSub(postSource.subredditName)
+                else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
+            }
 
             // generate the list of posts using the json array
             while (postIterator.hasNext()) {
@@ -261,7 +261,7 @@ class PostRepositoryImpl @Inject constructor(
                 postCount ++
             }
 
-            launch {  InsertPostsTask(appDB, postEntities).execute(listing) }
+            InsertPostsTask(appDB, postEntities).execute(listing)
         }
     }
 
@@ -284,7 +284,8 @@ class PostRepositoryImpl @Inject constructor(
             }.await()
 
             postEntity.visited = true
-            postEntity.order = existingPost?.order ?: async {
+
+            postEntity.order = existingPost?.order ?: async  {
                 when (postSource) {
                     is PostRepository.PostSource.Subreddit -> {
                         appDB.postDao.getItemsCountForSub(postSource.subredditName)
@@ -292,6 +293,7 @@ class PostRepositoryImpl @Inject constructor(
                     else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
                 }
             }.await()
+
 
             launch { InsertPostTask().execute(appDB, postEntity) }
         }
