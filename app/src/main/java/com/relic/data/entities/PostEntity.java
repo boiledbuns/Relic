@@ -4,9 +4,12 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.Relation;
 import android.support.annotation.NonNull;
 
 import org.jetbrains.annotations.PropertyKey;
+
+import java.util.List;
 
 @Entity
 public class PostEntity {
@@ -75,4 +78,9 @@ public class PostEntity {
   public int order;
   // this field should never be updated
   public int origin;
+
+  // since a post can  only appear in any combination of the three sources
+  public int subredditPosition = -1;
+  public int frontpagePosition = -1;
+  public int allPosition = -1;
 }

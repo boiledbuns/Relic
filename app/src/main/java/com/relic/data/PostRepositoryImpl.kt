@@ -21,10 +21,7 @@ import com.relic.data.entities.PostEntity.ORIGIN_ALL
 import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -74,16 +71,16 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
         return when (postSource) {
-            is PostRepository.PostSource.Subreddit -> appDB.postDao.getSubredditPosts(postSource.subredditName)
-            is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromOrigin(ORIGIN_FRONTPAGE)
-            else -> appDB.postDao.getPostsFromOrigin(ORIGIN_ALL)
+            is PostRepository.PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
+            is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
+            else -> appDB.postDao.getPostsFromAll()
         }
     }
 
     override fun retrieveMorePosts(
         postSource: PostRepository.PostSource,
         listingAfter: String
-    ) = runBlocking {
+    ) {
         // change the api endpoint to access to get the next post listing
         val ending = when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
@@ -91,21 +88,19 @@ class PostRepositoryImpl @Inject constructor(
         }
 
         // create the new request and submit it
-        requestManager.processRequest(
-            RelicOAuthRequest(
-                RelicOAuthRequest.GET,
-                "$ENDPOINT$ending?after=$listingAfter",
-                Response.Listener { response ->
-                    try {
-                        parsePosts(response, postSource)
-                    } catch (error: ParseException) {
-                        Log.d(TAG, "Error: " + error.message)
-                    }
-                },
-                Response.ErrorListener { error -> Log.d(TAG, "Error: " + error.message) },
-                checkToken()
-            )
-        )
+        requestManager.processRequest(RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            "$ENDPOINT$ending?after=$listingAfter",
+            Response.Listener { response ->
+                try {
+                    runBlocking { parsePosts(response, postSource) }
+                } catch (error: ParseException) {
+                    Log.d(TAG, "Error: " + error.message)
+                }
+            },
+            Response.ErrorListener { error -> Log.d(TAG, "Error: " + error.message) },
+            checkToken()
+        ))
     }
 
     /**
@@ -157,24 +152,19 @@ class PostRepositoryImpl @Inject constructor(
             }
         }
 
-        Log.d(TAG, ending)
-        requestManager.processRequest(
-            RelicOAuthRequest(
-                RelicOAuthRequest.GET,
-                ending,
-                Response.Listener { response: String ->
-                    Log.d(TAG, response)
-                    try {
-                        parsePosts(response, postSource)
-                    } catch (e: ParseException) {
-                        e.printStackTrace()
-                    }
-
-                },
-                Response.ErrorListener { error -> Log.d(TAG, "Error retrieving sorted posts $error") },
-                checkToken()
-            )
-        )
+        requestManager.processRequest(RelicOAuthRequest(
+            RelicOAuthRequest.GET,
+            ending,
+            Response.Listener { response: String ->
+                try {
+                    parsePosts(response, postSource)
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                }
+            },
+            Response.ErrorListener { error -> Log.d(TAG, "Error retrieving sorted posts $error") },
+            checkToken()
+        ))
     }
 
     override fun retrievePost(
@@ -250,15 +240,33 @@ class PostRepositoryImpl @Inject constructor(
             val postEntities = ArrayList<PostEntity>()
 
             var postCount = when (postSource) {
-                is PostRepository.PostSource.Subreddit -> appDB.postDao.getItemsCountForSub(postSource.subredditName)
-                else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
+                is PostRepository.PostSource.Subreddit -> {
+                    appDB.postDao.getItemsCountForSubreddit(postSource.subredditName)
+                }
+                is PostRepository.PostSource.Frontpage -> {
+                    appDB.postDao.getItemsCountForFrontpage()
+                }
+                else -> appDB.postDao.getItemsCountForAll()
             }
 
             // generate the list of posts using the json array
             while (postIterator.hasNext()) {
                 val post = (postIterator.next() as JSONObject)["data"] as JSONObject
-                postEntities.add(extractPost(post, postOrigin, postCount))
-                postCount ++
+
+                val newPost = extractPost(post, postOrigin, postCount)
+                postEntities.add(newPost)
+
+                val existingPost = async { appDB.postDao.getPostWithId(newPost.name) }.await()
+                // only increment post count if post does not already exist within the database
+                if (existingPost == null) {
+                    postCount ++
+                } else {
+                    newPost.apply{
+                        frontpagePosition = existingPost.frontpagePosition
+                        subredditPosition = existingPost.subredditPosition
+                        allPosition = existingPost.allPosition
+                    }
+                }
             }
 
             InsertPostsTask(appDB, postEntities).execute(listing)
@@ -278,22 +286,15 @@ class PostRepositoryImpl @Inject constructor(
 
         GlobalScope.launch {
             val postEntity = extractPost(post, postOrigin, null)
-
             val existingPost = async {
                 appDB.postDao.getPostWithId(postEntity.name)
             }.await()
 
             postEntity.visited = true
-
-            postEntity.order = existingPost?.order ?: async  {
-                when (postSource) {
-                    is PostRepository.PostSource.Subreddit -> {
-                        appDB.postDao.getItemsCountForSub(postSource.subredditName)
-                    }
-                    else -> appDB.postDao.getItemsCountForOrigin(postOrigin)
-                }
-            }.await()
-
+            // ensure that that position of the post for any other source is not lost
+            postEntity.subredditPosition = existingPost.subredditPosition
+            postEntity.frontpagePosition = existingPost.frontpagePosition
+            postEntity.allPosition = existingPost.allPosition
 
             launch { InsertPostTask().execute(appDB, postEntity) }
         }
@@ -338,7 +339,13 @@ class PostRepositoryImpl @Inject constructor(
                 formatter.format(apiCreated)
             }
 
-            postOrder?.let { order = it }
+            postOrder?.let {
+                when (postOrigin) {
+                    PostEntity.ORIGIN_SUB -> subredditPosition = it
+                    PostEntity.ORIGIN_FRONTPAGE -> frontpagePosition = it
+                    PostEntity.ORIGIN_ALL -> allPosition = it
+                }
+            }
         }
     }
 

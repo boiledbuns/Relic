@@ -14,44 +14,71 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-  // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
+    // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
 
-  @Query("SELECT * FROM PostEntity WHERE subreddit = :subName AND origin = 0 ORDER BY `order` ASC")
-  public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);
+    @Query("SELECT * FROM PostEntity WHERE subreddit = :subName AND origin = 0 ORDER BY `order` ASC")
+    public abstract LiveData<List<PostModel>> getSubredditPosts(String subName);
 
-  @Query("SELECT * FROM PostEntity WHERE origin = :postOrigin ORDER BY `order` ASC")
-  public abstract LiveData<List<PostModel>> getPostsFromOrigin(int postOrigin);
+    @Query("SELECT * FROM PostEntity WHERE origin = :postOrigin ORDER BY `order` ASC")
+    public abstract LiveData<List<PostModel>> getPostsFromOrigin(int postOrigin);
 
-  @Insert(onConflict = OnConflictStrategy.FAIL)
-  public abstract void insertPosts(List<PostEntity> posts);
+    // region get posts based on origin
 
-  @Query("DELETE FROM PostEntity WHERE subreddit = :subName AND origin = 0")
-  public abstract void deleteAllFromSub(String subName);
+    @Query("SELECT * FROM PostEntity WHERE subredditPosition >= 0 AND subreddit = :subredditName ORDER BY `subredditPosition` ASC")
+    public abstract LiveData<List<PostModel>> getPostsFromSubreddit(String subredditName);
 
-  @Query("DELETE FROM PostEntity WHERE origin = :sourceCode")
-  public abstract void deleteAllFromSource(int sourceCode);
+    @Query("SELECT * FROM PostEntity WHERE frontpagePosition >= 0 ORDER BY `frontpagePosition` ASC")
+    public abstract LiveData<List<PostModel>> getPostsFromFrontpage();
 
-  @Query("SELECT * FROM PostEntity WHERE id = :postName")
-  public abstract LiveData<PostModel> getSinglePost(String postName);
+    @Query("SELECT * FROM PostEntity WHERE allPosition >= 0 ORDER BY `allPosition` ASC")
+    public abstract LiveData<List<PostModel>> getPostsFromAll();
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  public abstract void insertPost(PostEntity post);
+    // endregion get posts based on origin
 
-  @Query("UPDATE PostEntity SET visited = 1 where id = :postFullname")
-  public abstract void updateVisited(String postFullname);
+    @Query("UPDATE PostEntity SET subredditPosition = -1 WHERE subreddit = :subName")
+    public abstract void removeSubredditAsOrigin(String subName);
 
-  @Query("UPDATE PostEntity SET userUpvoted = :vote  where id = :postFullname")
-  public abstract void updateVote(String postFullname, int vote);
+    @Query("UPDATE PostEntity SET frontpagePosition = -1 WHERE subreddit = :subName")
+    public abstract void removeFrontpageAsOrigin(String subName);
 
-  @Query("UPDATE PostEntity SET saved = :saved  where id = :postFullname")
-  public abstract void updateSave(String postFullname, boolean saved);
+    @Query("UPDATE PostEntity SET allPosition = -1 WHERE subreddit = :subName")
+    public abstract void removeAllAsOrigin(String subName);
 
-  @Query("SELECT * FROM PostEntity WHERE id = :postFullname LIMIT 1")
-  public abstract PostEntity getPostWithId(String postFullname);
+    // endregion remove origin from post
 
-  @Query("SELECT COUNT() FROM PostEntity WHERE subreddit = :subredditName AND origin = 0")
-  public abstract int getItemsCountForSub(String subredditName);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void insertPosts(List<PostEntity> posts);
 
-  @Query("SELECT COUNT() FROM PostEntity WHERE origin = :postOrigin")
-  public abstract int getItemsCountForOrigin(int postOrigin);
+    @Query("DELETE FROM PostEntity WHERE subreddit = :subName AND origin = 0")
+    public abstract void deleteAllFromSub(String subName);
+
+    @Query("DELETE FROM PostEntity WHERE origin = :sourceCode")
+    public abstract void deleteAllFromSource(int sourceCode);
+
+    @Query("SELECT * FROM PostEntity WHERE id = :postName")
+    public abstract LiveData<PostModel> getSinglePost(String postName);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void insertPost(PostEntity post);
+
+    @Query("UPDATE PostEntity SET visited = 1 where id = :postFullname")
+    public abstract void updateVisited(String postFullname);
+
+    @Query("UPDATE PostEntity SET userUpvoted = :vote  where id = :postFullname")
+    public abstract void updateVote(String postFullname, int vote);
+
+    @Query("UPDATE PostEntity SET saved = :saved  where id = :postFullname")
+    public abstract void updateSave(String postFullname, boolean saved);
+
+    @Query("SELECT * FROM PostEntity WHERE id = :postFullname LIMIT 1")
+    public abstract PostEntity getPostWithId(String postFullname);
+
+    @Query("SELECT COUNT() FROM PostEntity WHERE subreddit = :subredditName AND subredditPosition >= 0")
+    public abstract int getItemsCountForSubreddit(String subredditName);
+
+    @Query("SELECT COUNT() FROM PostEntity WHERE frontpagePosition >= 0")
+    public abstract int getItemsCountForFrontpage();
+
+    @Query("SELECT COUNT() FROM PostEntity WHERE allPosition >= 0")
+    public abstract int getItemsCountForAll();
 }

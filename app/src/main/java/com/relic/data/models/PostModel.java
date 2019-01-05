@@ -231,5 +231,6 @@ public class PostModel implements Post {
   }
 
   public int origin;
-  public int order;
+  public int subredditPosition;
+  public int frontpagePosition;
 }
