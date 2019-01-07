@@ -12,7 +12,7 @@ import kotlinx.android.parcel.Parcelize
 interface PostRepository {
     /**
      * Exposes gateway for vm to interact with objects stored on the server
-     * @return gateway object for exponsing post actions
+     * @return gateway object for exposing post actions
      */
     val postGateway: PostGateway
 
@@ -28,7 +28,7 @@ interface PostRepository {
      * @param postSource origin of the post
      * @param listingAfter after value associated with the listing of the current set of posts
      */
-    fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
+    suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
 
     /**
      *
@@ -49,7 +49,7 @@ interface PostRepository {
      * @param subredditName name of subreddit that the post was made in
      * @param postFullName "full name" of the subreddit"
      */
-    fun retrievePost(
+    suspend fun retrievePost(
         subredditName: String,
         postFullName: String,
         postSource: PostSource,
@@ -62,7 +62,7 @@ interface PostRepository {
      * @param sortType
      * @param sortScope
      */
-    fun retrieveSortedPosts(
+    suspend fun retrieveSortedPosts(
         postSource: PostSource,
         sortType: SortType,
         sortScope: SortScope)
@@ -72,25 +72,7 @@ interface PostRepository {
      * need to decide whether the viewModel should handle this or not
      * @param postSource
      */
-    fun clearAllPostsFromSource(postSource: PostSource)
-
-//    companion object {
-//        const val SORT_DEFAULT = 0
-//        const val SORT_BEST = 1
-//        const val SORT_CONTROVERSIAL = 2
-//        const val SORT_HOT = 3
-//        const val SORT_NEW = 4
-//        const val SORT_RISING = 5
-//        const val SORT_TOP = 6
-//
-//        const val SCOPE_NONE = 0
-//        const val SCOPE_HOUR = 1
-//        const val SCOPE_DAY = 2
-//        const val SCOPE_WEEK = 3
-//        const val SCOPE_MONTH = 4
-//        const val SCOPE_YEAR = 5
-//        const val SCOPE_ALL = 6
-//    }
+    suspend fun clearAllPostsFromSource(postSource: PostSource)
 
     enum class SortType {
         DEFAULT, BEST, CONTROVERSIAL, HOT, NEW, RISING, TOP
@@ -100,20 +82,23 @@ interface PostRepository {
         NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
     }
 
+    /**
+     * Used to represent how a post is being accessed
+     * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
+     */
     sealed class PostSource : Parcelable {
         @Parcelize
-        class Frontpage : PostSource()
+        object Frontpage : PostSource()
 
         @Parcelize
-        class All : PostSource()
+        object All : PostSource()
 
         @Parcelize
-        class Popular : PostSource()
+        object Popular : PostSource()
 
         @Parcelize
         data class Subreddit(
             val subredditName : String
         ) : PostSource()
     }
-
 }

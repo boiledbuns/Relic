@@ -12,13 +12,19 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
 import com.shopify.livedataktx.SingleLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 open class DisplaySubVM (
-        private val postSource: PostRepository.PostSource,
-        private val subRepo: SubRepository,
-        private var postRepo: PostRepository
-) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback {
+    private val postSource: PostRepository.PostSource,
+    private val subRepo: SubRepository,
+    private var postRepo: PostRepository,
+    override val coroutineContext: CoroutineContext = Dispatchers.Default
+) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, CoroutineScope {
 
     class Factory @Inject constructor(
             private val subRepo: SubRepository,
@@ -32,6 +38,7 @@ open class DisplaySubVM (
     private val TAG = "DISPLAY_SUB_VM"
     private var currentSortingType = PostRepository.SortType.DEFAULT
     private var currentSortingScope = PostRepository.SortScope.NONE
+    private var retrievalInProgress = false
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
@@ -49,15 +56,17 @@ open class DisplaySubVM (
         // observe the list of posts stored locally
         _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
             // retrieve posts when the posts stored locally for this sub have been cleared
-            if (postModels != null && postModels.isEmpty()) {
+            if (!retrievalInProgress && postModels != null && postModels.isEmpty()) {
                 Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
                 // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
-                postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                // TODO add a liveData boolean success listener
-                // TODO add a flag for the to check if retrieval occurred
+                GlobalScope.launch {
+                    postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
+                }
+                retrievalInProgress = true
             } else {
                 Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")
                 _postListMediator.setValue(postModels)
+                retrievalInProgress = false
             }
         }
 
@@ -97,12 +106,14 @@ open class DisplaySubVM (
      * @param resetPosts : indicates whether the old posts should be cleared
      */
     override fun retrieveMorePosts(resetPosts: Boolean) {
-        if (resetPosts) {
-            // all we have to do is clear entries in room -> our observer for the posts will auto download new posts when it's empty
-            postRepo.clearAllPostsFromSource(postSource)
-        } else {
-            // retrieve the "after" value for the next posting
-            postRepo.getNextPostingVal(this, postSource)
+        GlobalScope.launch {
+            if (resetPosts) {
+                // all we have to do is clear entries in room -> our observer for the posts will auto download new posts when it's empty
+                postRepo.clearAllPostsFromSource(postSource)
+            } else {
+                // retrieve the "after" value for the next posting
+                postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
+            }
         }
     }
 
@@ -117,8 +128,10 @@ open class DisplaySubVM (
         sortType?.let { currentSortingType = it }
         sortScope?.let { currentSortingScope = it }
 
-        // remove all posts from current db for this subreddit (triggers retrieval)
-        postRepo.clearAllPostsFromSource(postSource)
+        GlobalScope.launch {
+            // remove all posts from current db for this subreddit (triggers retrieval)
+            postRepo.clearAllPostsFromSource(postSource)
+        }
         _subInfoLiveData.postValue(
             DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
         )
@@ -128,7 +141,9 @@ open class DisplaySubVM (
         Log.d(TAG, "Retrieving next posts with $nextVal")
         // retrieve the "after" value for the next posting
         nextVal?.let {
-            postRepo.retrieveMorePosts(postSource, it)
+            GlobalScope.launch {
+                postRepo.retrieveMorePosts(postSource, it)
+            }
         }
     }
 

@@ -12,7 +12,7 @@ import java.util.HashMap
 class RelicOAuthRequest(
         method: Int,
         url: String,
-        listener: Response.Listener<String>,
+        var listener: Response.Listener<String>,
         errorListener: Response.ErrorListener,
         private val authToken: String
 ) : StringRequest(method, url, listener, errorListener) {

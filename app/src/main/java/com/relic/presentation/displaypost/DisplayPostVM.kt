@@ -99,8 +99,10 @@ class DisplayPostVM (
     override fun refreshData() {
         _refreshingLiveData.postValue(true)
 
-        postRepo.retrievePost(subName, postFullname, postSource) {
-            exception : RelicRequestError -> publishException(exception)
+        GlobalScope.launch {
+            postRepo.retrievePost(subName, postFullname, postSource) {
+                exception : RelicRequestError -> publishException(exception)
+            }
         }
         retrieveMoreComments(true)
         commentRepo.clearComments(postFullname)

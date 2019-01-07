@@ -6,7 +6,6 @@ import android.os.AsyncTask
 import android.text.Html
 import android.util.Log
 import com.android.volley.NoConnectionError
-import com.android.volley.Response
 
 import com.google.gson.GsonBuilder
 import com.relic.R
@@ -17,8 +16,6 @@ import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
-import com.relic.data.entities.PostEntity.ORIGIN_ALL
-import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
 import com.relic.data.entities.PostSourceEntity
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
@@ -28,15 +25,35 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
+import java.lang.Exception
 
 import java.text.SimpleDateFormat
 import java.util.ArrayList
 import java.util.Date
 
 import javax.inject.Inject
-
+/**
+ * This repository is used for accessing posts either by:
+ * a) getting a livedata reference for locally stored posts
+ * b) retrieving posts from the network and storing them locally
+ *
+ * Note: Cancellation of parent coroutines automatically propagate downward to
+ * all its children. When performing retrieval methods (eg. post retrieval) from
+ * the network, the process should not be cancelled even if its parent coroutine
+ * is cancelled.
+ *
+ * I initially designed the retrieval methods as non-suspending functions that internally
+ * launched a coroutine from the Global scope but realized suspend functions offered more
+ * benefits:
+ * a) The method is poorly thought out and makes cancellation more difficult than necessary
+ * b) Because the new methods are now suspending, the caller has control over the coroutine
+ * scope. This is certainly more flexible as there are some (though rare) cases where we can
+ * supply a non-global scope that we can close at our own convenience to cancel retrieval
+ *
+ *  As a result, the retrieval methods are now suspend functions
+ */
 class PostRepositoryImpl @Inject constructor(
-    private val currentContext: Context,
+    private val appContext: Context,
     private val requestManager: NetworkRequestManager
 ) : PostRepository {
 
@@ -44,12 +61,19 @@ class PostRepositoryImpl @Inject constructor(
         private const val ENDPOINT = "https://oauth.reddit.com/"
         private const val TAG = "POST_REPO"
 
+        // keys for the "after" value for listings
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
     }
 
+    private val sortTypesWithScope = arrayOf(
+        PostRepository.SortType.HOT,
+        PostRepository.SortType.RISING,
+        PostRepository.SortType.TOP
+    )
+
     private val jsonParser: JSONParser = JSONParser()
-    private val appDB: ApplicationDB = ApplicationDB.getDatabase(currentContext)
+    private val appDB: ApplicationDB = ApplicationDB.getDatabase(appContext)
 
     private val gson = GsonBuilder().create()
     // initialize the date formatter and date for "now"
@@ -57,14 +81,14 @@ class PostRepositoryImpl @Inject constructor(
     private val current = Date()
 
     override val postGateway: PostGateway
-        get() = PostGatewayImpl(currentContext, requestManager)
+        get() = PostGatewayImpl(appContext, requestManager)
 
     // get the oauth token from the app's shared preferences
     private fun checkToken(): String {
         // retrieve the auth token shared preferences
-        val authKey = currentContext.resources.getString(R.string.AUTH_PREF)
-        val tokenKey = currentContext.resources.getString(R.string.TOKEN_KEY)
-        return currentContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+        val authKey = appContext.resources.getString(R.string.AUTH_PREF)
+        val tokenKey = appContext.resources.getString(R.string.TOKEN_KEY)
+        return appContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
             .getString(tokenKey, "DEFAULT") ?: ""
     }
 
@@ -78,7 +102,7 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun retrieveMorePosts(
+    override suspend fun retrieveMorePosts(
         postSource: PostRepository.PostSource,
         listingAfter: String
     ) {
@@ -88,20 +112,18 @@ class PostRepositoryImpl @Inject constructor(
             else -> ""
         }
 
-        // create the new request and submit it
-        requestManager.processRequest(RelicOAuthRequest(
-            RelicOAuthRequest.GET,
-            "$ENDPOINT$ending?after=$listingAfter",
-            Response.Listener { response ->
-                try {
-                    runBlocking { parsePosts(response, postSource) }
-                } catch (error: ParseException) {
-                    Log.d(TAG, "Error: " + error.message)
-                }
-            },
-            Response.ErrorListener { error -> Log.d(TAG, "Error: " + error.message) },
-            checkToken()
-        ))
+        try {
+            // create the new request and submit it
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = "$ENDPOINT$ending?after=$listingAfter",
+                authToken = checkToken()
+            )
+            parsePosts(response, postSource)
+        } catch (e : Exception) {
+            Log.d(TAG, "Error: " + e.message)
+        }
+
     }
 
     /**
@@ -130,7 +152,7 @@ class PostRepositoryImpl @Inject constructor(
      * @param sortType code for the associated sort by method
      * @param sortScope  code for the associate time span to sort by
      */
-    override fun retrieveSortedPosts(
+    override suspend fun retrieveSortedPosts(
         postSource: PostRepository.PostSource,
         sortType: PostRepository.SortType,
         sortScope: PostRepository.SortScope
@@ -141,66 +163,56 @@ class PostRepositoryImpl @Inject constructor(
             else -> ""
         }
 
-        // change the endpoint based on which sorting option the user has selected
+        // modify the endpoint based on the sorting options selected by the user
         if (sortType != PostRepository.SortType.DEFAULT) {
             // build the appropriate endpoint based on the "sort by" code and time scope
-            ending += "/" + sortType.name.toLowerCase() + "/?sort=" + sortScope.name.toLowerCase()
+            ending += "/" + sortType.name + "/?sort=" + sortScope.name
 
-            // only add sort scope for these sorting types
-            if (sortType == PostRepository.SortType.HOT || sortType == PostRepository.SortType.RISING || sortType == PostRepository.SortType.TOP) {
-                // add the scope only if the sorting type has one
-                ending += "&t=" + sortScope.name.toLowerCase()
-            }
+            // only add sort scope for the options that accept it
+            if (sortTypesWithScope.contains(sortType)) ending += "&t=" + sortScope.name
         }
 
-        requestManager.processRequest(RelicOAuthRequest(
-            RelicOAuthRequest.GET,
-            ending,
-            Response.Listener { response: String ->
-                try {
-                    parsePosts(response, postSource)
-                } catch (e: ParseException) {
-                    e.printStackTrace()
-                }
-            },
-            Response.ErrorListener { error -> Log.d(TAG, "Error retrieving sorted posts $error") },
-            checkToken()
-        ))
+        try {
+            val response = requestManager.processRequest(
+                RelicOAuthRequest.GET,
+                ending,
+                checkToken()
+            )
+
+            parsePosts(response, postSource)
+        } catch (e : Exception) {
+            Log.d(TAG, "Error retrieving sorted posts $e")
+        }
     }
 
-    override fun retrievePost(
+    override suspend fun retrievePost(
         subredditName: String,
         postFullName: String,
         postSource: PostRepository.PostSource,
         errorHandler: (error : RelicRequestError) -> Unit
     ) {
         val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
-        requestManager.processRequest(
-            RelicOAuthRequest(
+
+        try {
+            val response = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending,
-                listener = Response.Listener { response ->
-                    try {
-                        parsePost(response)
-                    } catch (error: ParseException) {
-                        Log.d(TAG, "Error: " + error.message)
-                    }
-                },
-                errorListener = Response.ErrorListener { error ->
-                    Log.d(TAG, "Error retrieving post: " + error.networkResponse)
-
-                    // TODO maybe retry if not an internet connection issue
-                    // TODO decide if it would be better to move this to another method
-                    when (error) {
-                        is NoConnectionError -> errorHandler.invoke(RelicRequestError.NetworkUnavailableError())
-                    }
-                },
                 authToken = checkToken()
             )
-        )
+            parsePost(response)
+        } catch (e :Exception) {
+            // TODO maybe retry if not an internet connection issue
+            // TODO decide if it would be better to move this to another method
+            when (e) {
+                is NoConnectionError -> {
+                    errorHandler.invoke(RelicRequestError.NetworkUnavailableError())
+                }
+                else -> Log.d(TAG, "Error retrieving post: $e")
+            }
+        }
     }
 
-    override fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
+    override suspend fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
         ClearPostsFromSourceTask().execute(appDB, postSource)
     }
 
@@ -215,7 +227,10 @@ class PostRepositoryImpl @Inject constructor(
      * @throws ParseException
      */
     @Throws(ParseException::class)
-    private fun parsePosts(response: String, postSource: PostRepository.PostSource) {
+    private suspend fun parsePosts(
+        response: String,
+        postSource: PostRepository.PostSource
+    ) = coroutineScope {
         val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
 
@@ -228,7 +243,7 @@ class PostRepositoryImpl @Inject constructor(
         // create the new listing entity
         val listing = ListingEntity(listingKey, listingData["after"] as String?)
 
-        GlobalScope.launch {
+        async {
             val postIterator = listingPosts!!.iterator()
             val postEntities = ArrayList<PostEntity>()
             val postSourceEntities = ArrayList<PostSourceEntity>()
@@ -279,21 +294,24 @@ class PostRepositoryImpl @Inject constructor(
                 postCount ++
             }
 
-            InsertPostsTask(appDB, postEntities, postSourceEntities).execute(listing)
-        }
+//            InsertPostsTask(appDB, postEntities, postSourceEntities).execute(listing)
+            appDB.postDao.insertPosts(postEntities)
+            appDB.postSourceDao.insertPostSources(postSourceEntities)
+            appDB.listingDAO.insertListing(listing)
+        }.await()
     }
 
-    private fun parsePost(response: String) {
+    private suspend fun parsePost(response: String) = coroutineScope {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
         val child = (data["children"] as JSONArray)[0] as JSONObject
         val post = child["data"] as JSONObject
 
-        GlobalScope.launch {
+        launch {
             val postEntity = extractPost(post).apply {
                 visited = true
             }
 
-            launch { InsertPostTask().execute(appDB, postEntity) }
+            InsertPostTask().execute(appDB, postEntity)
         }
     }
 

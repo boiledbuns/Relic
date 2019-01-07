@@ -8,7 +8,7 @@ import javax.inject.Inject
 class FrontpageVM (
     subRepo: SubRepository,
     postRepo : PostRepository
-): DisplaySubVM(PostRepository.PostSource.Frontpage() , subRepo, postRepo) {
+): DisplaySubVM(PostRepository.PostSource.Frontpage , subRepo, postRepo) {
 
     private val TAG = "DISPLAY_SUB_VM"
 
