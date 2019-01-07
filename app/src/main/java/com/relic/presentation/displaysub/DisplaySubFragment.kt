@@ -251,7 +251,7 @@ class DisplaySubFragment : RelicFragment() {
                     subNavigationData.postSource
                 )
                 // intentionally because replacing then popping off back stack loses scroll position
-                activity!!.supportFragmentManager.beginTransaction().replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
+                activity!!.supportFragmentManager.beginTransaction().add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
                 fragmentOpened = true
             }
             // navigates to display image on top of current fragment

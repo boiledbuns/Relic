@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <!--<declare-styleable name="RelicViewStyle">-->
-        <!--<dimen name="stickiedTextColor" format="color"/>-->
-    <!--</declare-styleable>-->
-
+    <attr name="relicBackgroundColor" format="color"/>
 </resources>
