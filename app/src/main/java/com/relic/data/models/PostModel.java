@@ -230,7 +230,7 @@ public class PostModel implements Post {
     this.linkFlair = linkFlair;
   }
 
-  public int origin;
+//  public int origin;
   public int subredditPosition;
-  public int frontpagePosition;
+//  public int frontpagePosition;
 }

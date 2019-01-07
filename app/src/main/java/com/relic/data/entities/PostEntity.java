@@ -75,12 +75,12 @@ public class PostEntity {
   public int userUpvoted;
 
   // custom local fields
-  public int order;
+//  public int order;
   // this field should never be updated
-  public int origin;
+//  public int origin;
 
   // since a post can  only appear in any combination of the three sources
-  public int subredditPosition = -1;
-  public int frontpagePosition = -1;
-  public int allPosition = -1;
+//  public int subredditPosition = -1;
+//  public int frontpagePosition = -1;
+//  public int allPosition = -1;
 }

@@ -42,7 +42,6 @@ class RelicPostItemView @JvmOverloads constructor(
 
     fun setPost(postModel : PostModel) {
         rootView.apply {
-
             if (postModel.isVisited) {
                 postItemRootView.setBackgroundColor(backgroundVisitedColor)
             } else {

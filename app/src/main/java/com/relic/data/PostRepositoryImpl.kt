@@ -19,6 +19,7 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostEntity.ORIGIN_ALL
 import com.relic.data.entities.PostEntity.ORIGIN_FRONTPAGE
+import com.relic.data.entities.PostSourceEntity
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
 import kotlinx.coroutines.*
@@ -180,7 +181,7 @@ class PostRepositoryImpl @Inject constructor(
                 url = ENDPOINT + ending,
                 listener = Response.Listener { response ->
                     try {
-                        parsePost(response, postSource)
+                        parsePost(response)
                     } catch (error: ParseException) {
                         Log.d(TAG, "Error: " + error.message)
                     }
@@ -218,18 +219,10 @@ class PostRepositoryImpl @Inject constructor(
         val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
 
-        var postOrigin = PostEntity.ORIGIN_SUB
-        var listingKey = ""
-
-        when (postSource) {
-            is PostRepository.PostSource.Frontpage -> {
-                postOrigin = PostEntity.ORIGIN_FRONTPAGE
-                listingKey = KEY_FRONTPAGE
-            }
-            is PostRepository.PostSource.Subreddit -> {
-                postOrigin = PostEntity.ORIGIN_SUB
-                listingKey = postSource.subredditName
-            }
+        val listingKey = when (postSource) {
+            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
+            is PostRepository.PostSource.Subreddit -> postSource.subredditName
+            else -> KEY_ALL
         }
 
         // create the new listing entity
@@ -238,63 +231,67 @@ class PostRepositoryImpl @Inject constructor(
         GlobalScope.launch {
             val postIterator = listingPosts!!.iterator()
             val postEntities = ArrayList<PostEntity>()
+            val postSourceEntities = ArrayList<PostSourceEntity>()
 
             var postCount = when (postSource) {
                 is PostRepository.PostSource.Subreddit -> {
-                    appDB.postDao.getItemsCountForSubreddit(postSource.subredditName)
+                    appDB.postSourceDao.getItemsCountForSubreddit(postSource.subredditName)
                 }
                 is PostRepository.PostSource.Frontpage -> {
-                    appDB.postDao.getItemsCountForFrontpage()
+                    appDB.postSourceDao.getItemsCountForFrontpage()
                 }
-                else -> appDB.postDao.getItemsCountForAll()
+                else -> appDB.postSourceDao.getItemsCountForAll()
             }
 
             // generate the list of posts using the json array
             while (postIterator.hasNext()) {
                 val post = (postIterator.next() as JSONObject)["data"] as JSONObject
-
-                val newPost = extractPost(post, postOrigin, postCount)
+                val newPost = extractPost(post)
                 postEntities.add(newPost)
 
-                val existingPost = async { appDB.postDao.getPostWithId(newPost.name) }.await()
-                // only increment post count if post does not already exist within the database
-                if (existingPost == null) {
-                    postCount ++
-                } else {
-                    newPost.apply{
-                        frontpagePosition = existingPost.frontpagePosition
-                        subredditPosition = existingPost.subredditPosition
-                        allPosition = existingPost.allPosition
+                val postSourceEntity = PostSourceEntity(newPost.name, newPost.subreddit)
+                postSourceEntities.add(postSourceEntity)
+
+                val existingPostSource = async {
+                    appDB.postSourceDao.getPostSource(newPost.name)
+                }.await()
+
+                if (existingPostSource != null) {
+                    postSourceEntity.apply {
+                        subredditPosition = existingPostSource.subredditPosition
+                        frontpagePosition= existingPostSource.frontpagePosition
+                        allPosition = existingPostSource.allPosition
                     }
                 }
+
+                when (postSource) {
+                    is PostRepository.PostSource.Subreddit -> {
+                        postSourceEntity.subredditPosition = postCount
+                    }
+                    is PostRepository.PostSource.Frontpage -> {
+                        postSourceEntity.frontpagePosition = postCount
+                    }
+                    is PostRepository.PostSource.All -> {
+                        postSourceEntity.allPosition = postCount
+                    }
+                }
+
+                postCount ++
             }
 
-            InsertPostsTask(appDB, postEntities).execute(listing)
+            InsertPostsTask(appDB, postEntities, postSourceEntities).execute(listing)
         }
     }
 
-    private fun parsePost(response: String, postSource: PostRepository.PostSource) {
+    private fun parsePost(response: String) {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
         val child = (data["children"] as JSONArray)[0] as JSONObject
         val post = child["data"] as JSONObject
 
-        val postOrigin = when (postSource) {
-            is PostRepository.PostSource.Frontpage -> PostEntity.ORIGIN_FRONTPAGE
-            is PostRepository.PostSource.Subreddit -> PostEntity.ORIGIN_SUB
-            else -> PostEntity.ORIGIN_ALL
-        }
-
         GlobalScope.launch {
-            val postEntity = extractPost(post, postOrigin, null)
-            val existingPost = async {
-                appDB.postDao.getPostWithId(postEntity.name)
-            }.await()
-
-            postEntity.visited = true
-            // ensure that that position of the post for any other source is not lost
-            postEntity.subredditPosition = existingPost.subredditPosition
-            postEntity.frontpagePosition = existingPost.frontpagePosition
-            postEntity.allPosition = existingPost.allPosition
+            val postEntity = extractPost(post).apply {
+                visited = true
+            }
 
             launch { InsertPostTask().execute(appDB, postEntity) }
         }
@@ -305,7 +302,7 @@ class PostRepositoryImpl @Inject constructor(
      * There will be a lot more experimentation and changes to come in this method as a result
      */
     @Throws(ParseException::class)
-    private fun extractPost(post: JSONObject, postOrigin : Int, postOrder : Int?) : PostEntity {
+    private fun extractPost(post: JSONObject) : PostEntity {
         // use "api" prefix to indicate fields accessed directly from api
         return gson.fromJson(post.toJSONString(), PostEntity::class.java).apply {
             //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
@@ -319,10 +316,6 @@ class PostRepositoryImpl @Inject constructor(
 
             val apiLikes = post["likes"] as Boolean?
             userUpvoted = if (apiLikes == null) 0 else if (apiLikes) 1 else -1
-
-            if (postOrigin != PostEntity.ORIGIN_SUB) {
-                origin = postOrigin
-            }
 
             // TODO create parse class/switch to a more efficient method of removing html
             val authorFlair = post["author_flair_text"] as String?
@@ -338,14 +331,6 @@ class PostRepositoryImpl @Inject constructor(
             } else {
                 formatter.format(apiCreated)
             }
-
-            postOrder?.let {
-                when (postOrigin) {
-                    PostEntity.ORIGIN_SUB -> subredditPosition = it
-                    PostEntity.ORIGIN_FRONTPAGE -> frontpagePosition = it
-                    PostEntity.ORIGIN_ALL -> allPosition = it
-                }
-            }
         }
     }
 
@@ -359,11 +344,13 @@ class PostRepositoryImpl @Inject constructor(
      */
     internal class InsertPostsTask(
         private var appDB: ApplicationDB,
-        private var postList: List<PostEntity>
+        private var postList: List<PostEntity>,
+        private var postSourceEntities : ArrayList<PostSourceEntity>
     ) : AsyncTask<ListingEntity, Int, Int>() {
 
         override fun doInBackground(vararg listing: ListingEntity): Int? {
             appDB.postDao.insertPosts(postList)
+            appDB.postSourceDao.insertPostSources(postSourceEntities)
             appDB.listingDAO.insertListing(listing[0])
             return null
         }
@@ -392,10 +379,18 @@ class PostRepositoryImpl @Inject constructor(
             val appDB = objects[0] as ApplicationDB
             val postSource = objects[1] as PostRepository.PostSource
             when (postSource) {
-                is PostRepository.PostSource.Frontpage -> appDB.postDao.deleteAllFromSource(ORIGIN_FRONTPAGE)
-                is PostRepository.PostSource.All -> appDB.postDao.deleteAllFromSource(ORIGIN_ALL)
-                is PostRepository.PostSource.Subreddit -> appDB.postDao.deleteAllFromSub(postSource.subredditName)
+                is PostRepository.PostSource.Frontpage -> {
+                    appDB.postSourceDao.removeAllFrontpageAsSource()
+                }
+                is PostRepository.PostSource.All -> {
+                    appDB.postSourceDao.removeAllAllAsSource()
+                }
+                is PostRepository.PostSource.Subreddit -> {
+                    appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
+                }
             }
+            // remove all the source entities that no longer correspond to any remaining posts
+            appDB.postSourceDao.removeAllUnusedSources()
         }
     }
 
