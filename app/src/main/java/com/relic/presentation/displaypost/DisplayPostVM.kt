@@ -46,9 +46,6 @@ class DisplayPostVM (
     private val _refreshingLiveData = MutableLiveData<Boolean> ()
     private val _errorLiveData = MutableLiveData<PostExceptionData> ()
 
-    private val commentListingKey = MediatorLiveData<String> ()
-    private val error = MutableLiveData<RelicError>()
-
     val postLiveData : LiveData<PostModel> =_postLiveData
     val commentListLiveData : LiveData<List<CommentModel>> = _commentListLiveData
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData

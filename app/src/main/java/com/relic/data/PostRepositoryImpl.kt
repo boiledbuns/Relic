@@ -32,6 +32,7 @@ import java.util.ArrayList
 import java.util.Date
 
 import javax.inject.Inject
+
 /**
  * This repository is used for accessing posts either by:
  * a) getting a livedata reference for locally stored posts
@@ -145,13 +146,6 @@ class PostRepositoryImpl @Inject constructor(
         return appDB.postDao.getSinglePost(postFullName)
     }
 
-    /**
-     * Deletes all locally stored posts and retrieves a new set based on the sorting method specified
-     * by the caller
-     * @param postSource source of the subreddit
-     * @param sortType code for the associated sort by method
-     * @param sortScope  code for the associate time span to sort by
-     */
     override suspend fun retrieveSortedPosts(
         postSource: PostRepository.PostSource,
         sortType: PostRepository.SortType,
@@ -166,19 +160,18 @@ class PostRepositoryImpl @Inject constructor(
         // modify the endpoint based on the sorting options selected by the user
         if (sortType != PostRepository.SortType.DEFAULT) {
             // build the appropriate endpoint based on the "sort by" code and time scope
-            ending += "/" + sortType.name + "/?sort=" + sortScope.name
+            ending += "/${sortType.name.toLowerCase()}/"
 
             // only add sort scope for the options that accept it
-            if (sortTypesWithScope.contains(sortType)) ending += "&t=" + sortScope.name
+            if (sortTypesWithScope.contains(sortType)) ending += "?t=" + sortScope.name.toLowerCase()
         }
 
         try {
             val response = requestManager.processRequest(
-                RelicOAuthRequest.GET,
-                ending,
-                checkToken()
+                method = RelicOAuthRequest.GET,
+                url = ending,
+                authToken = checkToken()
             )
-
             parsePosts(response, postSource)
         } catch (e : Exception) {
             Log.d(TAG, "Error retrieving sorted posts $e")
@@ -201,7 +194,6 @@ class PostRepositoryImpl @Inject constructor(
             )
             parsePost(response)
         } catch (e :Exception) {
-            // TODO maybe retry if not an internet connection issue
             // TODO decide if it would be better to move this to another method
             when (e) {
                 is NoConnectionError -> {

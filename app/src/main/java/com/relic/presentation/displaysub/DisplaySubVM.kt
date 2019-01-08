@@ -27,8 +27,8 @@ open class DisplaySubVM (
 ) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, CoroutineScope {
 
     class Factory @Inject constructor(
-            private val subRepo: SubRepository,
-            private val postRepo : PostRepository
+        private val subRepo: SubRepository,
+        private val postRepo : PostRepository
     ) {
         fun create (postSource : PostRepository.PostSource) : DisplaySubVM {
             return DisplaySubVM(postSource, subRepo, postRepo)
@@ -182,7 +182,7 @@ open class DisplaySubVM (
     // region view action delegate
 
     override fun visitPost(postfullName : String, postSubreddit : String) {
-//        postRepo.postGateway.visitPost(postfullName)
+        postRepo.postGateway.visitPost(postfullName)
         _navigationLiveData.value = SubNavigationData.ToPost(postfullName, postSubreddit, postSource)
     }
 
