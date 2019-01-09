@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -91,6 +90,7 @@ class DisplayPostFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
 
         arguments?.apply {
             getString(ARG_POST_FULLNAME)?.let { postFullName = it }
@@ -109,6 +109,7 @@ class DisplayPostFragment : Fragment() {
 
         myToolbar = rootView.findViewById<Toolbar>(R.id.displayPostToolbar).apply {
             title = subredditName
+
             (activity as MainActivity).setSupportActionBar(this)
 
             if (enableVisitSub) setOnClickListener {
@@ -136,12 +137,12 @@ class DisplayPostFragment : Fragment() {
         // TODO: Testing user gateway using user "reddit"
         val userGateway = UserGatewayImpl(context!!, NetworkRequestManager(activity!!.applicationContext))
         userGateway.getUser("reddit")
-
-        setHasOptionsMenu(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
+
+        menu?.clear()
         inflater?.inflate(R.menu.display_post_menu, menu)
     }
 

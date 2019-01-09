@@ -9,14 +9,20 @@
         <item name="colorPrimary">@color/backgroundSecondary</item>
         <item name="android:windowBackground">@color/paleDarkGray</item>
         <item name="relicBackgroundColor">@color/paleDarkGray</item>
+        <item name="relicBackgroundColorB">@color/backgroundSecondaryB</item>
+
         <item name="android:textColor">@color/paleGray</item>
+        <item name="relicStickiedColor">@color/stickied</item>
     </style>
 
     <style name="RelicThemeLight" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/white</item>
         <item name="android:windowBackground">@color/paleGray</item>
-        <item name="relicBackgroundColor">@color/paleDarkGray</item>
+        <item name="relicBackgroundColor">@color/white</item>
+        <item name="relicBackgroundColorB">@color/paleGray</item>
+
         <item name="android:textColor">@color/paleGray</item>
+        <item name="relicStickiedColor">@color/stickied</item>
     </style>
 
     <style name="ThemeDark" parent="Theme.AppCompat.NoActionBar">

@@ -146,6 +146,7 @@ class DisplaySubFragment : RelicFragment() {
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
 
+        menu?.clear()
         inflater?.inflate(R.menu.display_sub_menu, menu)
 
         // have to first get the reference to the menu in charge of sorting
@@ -223,8 +224,9 @@ class DisplaySubFragment : RelicFragment() {
     // region LiveData handlers
 
     private fun updateLoadedPosts(postModels : List<PostModel>) {
-        Log.d(TAG, "size of " + postModels.size)
         postAdapter.setPostList(postModels)
+        // updates post list size info
+//        sub(postModels.size)
 
         // unlock scrolling to allow more posts to be loaded
         scrollLocked = false

@@ -1,11 +1,15 @@
 package com.relic.presentation.displaysub.list
 
 import android.graphics.Canvas
+import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import com.relic.presentation.displaysub.DisplaySubContract
+import kotlinx.coroutines.delay
 
-class PostItemsTouchHelper(val delegate : DisplaySubContract.PostAdapterDelegate) : ItemTouchHelper.Callback() {
+class PostItemsTouchHelper(
+    private val delegate : DisplaySubContract.PostAdapterDelegate
+) : ItemTouchHelper.Callback() {
 
     override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int {
         return ItemTouchHelper.Callback.makeFlag(
@@ -41,7 +45,6 @@ class PostItemsTouchHelper(val delegate : DisplaySubContract.PostAdapterDelegate
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
                 viewHolder.itemView.translationX = dX / 3

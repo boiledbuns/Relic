@@ -1,7 +1,6 @@
 package com.relic.presentation.customview
 
 import android.content.Context
-import android.support.annotation.ColorRes
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -21,17 +20,28 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private val TAG = "POST_ITEM_VIEW"
     // TODO need to think about increasing min api level from 21
-//    private val pinnedColor = resources.getColor(R.color.positive, context.theme)
     // TODO set color based on theme, still trying to figure out the best way to do this
-    private val textColor = resources.getColor(R.color.paleGray)
-    private val stickiedColor = resources.getColor(R.color.stickied)
-    private val backgroundColor = resources.getColor(R.color.backgroundSecondary)
-    private val backgroundVisitedColor = resources.getColor(R.color.backgroundSecondaryB)
+    private val textColor: Int
+    private val stickiedColor: Int
+    private val backgroundColor: Int
+    private val backgroundVisitedColor: Int
 
     init {
-//        val attributes = context.theme.obtainStyledAttributes(R.styleable.RelicViewStyle)
-//        textColor = attributes.getColor(R.styleable.TextAppearance_android_textColor, 0)
-//        attributes.recycle()
+        val typedVal = TypedValue()
+
+        context.theme.apply {
+            resolveAttribute(R.attr.colorPrimary, typedVal, true)
+            backgroundColor = typedVal.data
+
+            resolveAttribute(R.attr.relicBackgroundColorB, typedVal, true)
+            backgroundVisitedColor = typedVal.data
+
+            resolveAttribute(android.R.attr.textColor, typedVal, true)
+            textColor = typedVal.data
+
+            resolveAttribute(R.attr.relicStickiedColor, typedVal, true)
+            stickiedColor = typedVal.data
+        }
     }
 
     // TODO add view action delegate for handling view options

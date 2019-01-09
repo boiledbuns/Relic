@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="relicBackgroundColor" format="color"/>
+    <attr name="relicBackgroundColorB" format="color"/>
+    <attr name="relicStickiedColor" format="color"/>
+
 </resources>
