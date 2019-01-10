@@ -196,8 +196,10 @@ class DisplayPostVM (
                     if (it.isNotEmpty()) {
                         insertReplies(commentPosition, it)
                     } else {
-                        // TODO retrieve comments from server if replies are not loaded
-                        commentRepo.retrieveCommentChildren(commentModel)
+                        GlobalScope.launch {
+                            // TODO retrieve comments from server if replies are not loaded
+                            commentRepo.retrieveCommentChildren(commentModel)
+                        }
                     }
                     // remove this as a source since this is a one off to retrieve replies
                     _commentListLiveData.removeSource(commentSource)

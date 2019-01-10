@@ -6,6 +6,7 @@ import android.os.AsyncTask
 import android.text.Html
 import android.util.Log
 import com.android.volley.Response
+import com.android.volley.VolleyError
 
 import com.google.gson.GsonBuilder
 import com.relic.R
@@ -14,14 +15,7 @@ import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
 import com.relic.network.request.RelicOAuthRequest
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -75,32 +69,36 @@ class CommentRepositoryImpl(
         return appDB.commentDAO.getChildren(removeTypePrefix(postFullName))
     }
 
-    override fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) {
+    override suspend fun retrieveComments(
+        subName: String,
+        postFullName: String,
+        refresh : Boolean
+    ) {
+        val postName = removeTypePrefix(postFullName)
+        var url = "${ENDPOINT}r/$subName/comments/$postName?count=20"
+
         if (refresh) {
-            GlobalScope.launch (Dispatchers.IO) {
-                async { createRetrieveCommentsRequest(subName, postFullName) }
+            val after = withContext(Dispatchers.Default) { listingRepo.getAfterString(postFullName) }
+            url += "&after=$after"
+        }
+
+        try {
+            val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
+            val parsedData = parseCommentRequestResponse(postFullName, response)
+
+            withContext (Dispatchers.IO) {
+                InsertPostsTask().execute(appDB, parsedData.commentList, parsedData.listingEntity)
             }
         }
-        else {
-//            val removableObserver = listingRepo.getAfter(postFullName)
-//            removableObserver.observeForever(object : Observer<String?> {
-//                override fun onChanged(afterValue: String?) {
-//                    GlobalScope.launch { createRetrieveCommentsRequest(subName, postFullName, afterValue) }
-//                    removableObserver.removeObserver(this)
-//                }
-//            })
-            GlobalScope.launch {
-                var after : String? = null
-                async { after = listingRepo.getAfterString(postFullName) ?: "empty_after"}.await()
-                after?.let { createRetrieveCommentsRequest(subName, postFullName, after) }
-
-                Log.d(TAG, "async check $after")
+        catch (e : Exception) {
+            when (e) {
+                is VolleyError -> Log.d(TAG, "Error with request : " + e.message)
+                else -> Log.d(TAG, "Error parsing JSON return " + e.message)
             }
-
         }
     }
 
-    override fun retrieveCommentChildren(commentModel: CommentModel) {
+    override suspend fun retrieveCommentChildren(commentModel: CommentModel) {
         GlobalScope.launch (Dispatchers.IO) {
             val ending = "api/morechildren?api_type=json&link_id=${commentModel.fullName}&id=${commentModel.replyLink}"
 
@@ -133,40 +131,15 @@ class CommentRepositoryImpl(
 
     // region helper
 
-    private fun createRetrieveCommentsRequest(
-        subName: String,
+    private suspend fun parseCommentRequestResponse(
         postFullName: String,
-        after : String? = null
-    ) : String? {
-        var ending = "r/$subName/comments/${postFullName.substring(3)}?count=20"
-        after?.let { ending += "&after=$it" }
-
-        var responseReturn : String? = null
-        runBlocking {
-            requestManager.processRequest(RelicOAuthRequest(
-                RelicOAuthRequest.GET,
-                ENDPOINT + ending,
-                Response.Listener { response ->
-                    try {
-                        responseReturn = response
-                        // TODO convert to promise based
-                        parseCommentRequestResponse(postFullName, response)
-                    } catch (e: Exception) {
-                        Log.d(TAG, "Error parsing JSON return " + e.message)
-                    }
-                },
-                Response.ErrorListener{  error -> Log.d(TAG, "Error with request : " + error.message) },
-                authToken!!
-            ))
-        }
-        return responseReturn
-    }
-
-    private fun parseCommentRequestResponse(postFullName: String, response: String) {
+        response: String
+    ) : ParsedCommentData {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
         val parentId = removeTypePrefix(postFullName)
-        GlobalScope.launch { parseComments(parentId, requestData[1] as JSONObject) }
+
+        return parseComments(parentId, requestData[1] as JSONObject)
     }
 
     /**
@@ -177,7 +150,7 @@ class CommentRepositoryImpl(
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private suspend fun parseComments(parentId: String, response: JSONObject) : Int {
+    private suspend fun parseComments(parentId: String, response: JSONObject) : ParsedCommentData {
         val commentsData = (response["data"] as JSONObject)
         val listing = ListingEntity(parentId, commentsData["after"]?.run { this as String })
 
@@ -186,20 +159,14 @@ class CommentRepositoryImpl(
         val deferredList = ArrayList<Deferred<CommentEntity>>()
 
         coroutineScope {
-            async {
-                commentChildren.forEach { commentChild ->
-                    deferredList.add(
-                        async { unmarshallComment(commentChild as JSONObject) }
-                    )
-                }
-
-                launch (Dispatchers.IO) {
-                    InsertPostsTask().execute(appDB, deferredList.awaitAll(), listing)
-                }
+            commentChildren.forEach { commentChild ->
+                deferredList.add(
+                    async { unmarshallComment(commentChild as JSONObject) }
+                )
             }
         }
 
-        return deferredList.awaitAll().size
+        return ParsedCommentData(listing, deferredList.awaitAll())
     }
 
     // TODO find a better way to unmarshall these objects and clean this up
@@ -212,12 +179,8 @@ class CommentRepositoryImpl(
                 // try to parse the child json as nested replies
                 if (childJson.toString().isNotEmpty()) {
                     // start another coroutine to parse the children of this comment
-                    coroutineScope {
-                        replyCount = async { parseComments(id, childJson as JSONObject) }.await()
-                    }
-                    // set reply count for this object
-                    val childJsonData = (childJson as JSONObject)["data"] as JSONObject
-                    // replyCount = (childJsonData["children"] as JSONArray).size
+                    val parsedCommentData = parseComments(id, childJson as JSONObject)
+                    replyCount = parsedCommentData.commentList.size
                 }
             }
 
@@ -276,3 +239,8 @@ class CommentRepositoryImpl(
 
     // endregion async tasks
 }
+
+private data class ParsedCommentData(
+    val listingEntity : ListingEntity,
+    val commentList : List<CommentEntity>
+)

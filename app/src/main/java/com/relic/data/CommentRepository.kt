@@ -18,9 +18,9 @@ interface CommentRepository {
      * @param postFullName id of a post
      * @param refresh whether to refresh comments or get next
      */
-    fun retrieveComments(subName: String, postFullName: String, refresh : Boolean)
+    suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean)
 
-    fun retrieveCommentChildren(commentModel: CommentModel)
+    suspend fun retrieveCommentChildren(commentModel: CommentModel)
 
     /**
      * clears all locally stored comments
