@@ -2,29 +2,46 @@ package com.relic.presentation.displaypost.commentlist
 
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.relic.R
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
-) : RecyclerView.Adapter<CommentItemVH>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val TAG = "COMMENT_ADAPTER"
+    private val VIEW_TYPE_COMMENT = 0
+    private val VIEW_TYPE_LOAD_MORE = 1
+
     private var commentList : MutableList<CommentModel> = ArrayList()
 
     override fun getItemCount(): Int = commentList.size
 
-    override fun onBindViewHolder(viewHolder: CommentItemVH, position: Int) {
-        viewHolder.bindComment(commentList[position], position)
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        when (getItemViewType(position)) {
+            VIEW_TYPE_COMMENT -> {
+                (viewHolder as CommentItemVH).bindComment(commentList[position], position)
+            }
+            VIEW_TYPE_LOAD_MORE -> {
+                (viewHolder as CommentMoreItemsVH).bindLoadMore(commentList[position], position)
+            }
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, position: Int): CommentItemVH {
-        return CommentItemVH(CommentView(parent.context)).apply {
-            initializeOnClicks(this@CommentItemAdapter)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context)).apply {
+                initializeOnClicks(this@CommentItemAdapter)
+            }
+            else -> CommentMoreItemsVH(RelicCommentMoreItemsView(parent.context)).apply {
+                initializeOnclicks(this@CommentItemAdapter)
+            }
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (commentList[position].isLoadMore) VIEW_TYPE_LOAD_MORE else VIEW_TYPE_COMMENT
     }
 
     fun setComments(newComments: List<CommentModel>) {
@@ -76,5 +93,6 @@ class CommentItemAdapter (
     fun replyToComment(itemPosition : Int) {
 
     }
+
     // end region onclick handler
 }

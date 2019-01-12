@@ -9,9 +9,9 @@ import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import kotlinx.android.synthetic.main.comment_item.view.*
 
 class CommentItemVH (
-        private val commentItem : CommentView
+    private val commentItem : RelicCommentView,
+    private var commentsExpanded : Boolean = false
 ): RecyclerView.ViewHolder(commentItem) {
-    private var commentsExpanded = false
     private var commentPosition = 0
     private var commentId = ""
 

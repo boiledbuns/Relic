@@ -54,7 +54,10 @@ public class PostEntity {
   // post metadata
   @ColumnInfo(name = "viewCount")
   public int view_count;
-  public int gilded;
+
+  public int platinum;
+  public int gold;
+  public int silver;
 
   @ColumnInfo(name = "nsfw")
   public boolean over_18;

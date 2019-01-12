@@ -97,8 +97,10 @@ class CommentRepositoryImpl(
                 response = response
             )
 
-            withContext (Dispatchers.IO) {
-                InsertCommentsTask().execute(appDB, parsedData.commentList, parsedData.listingEntity)
+            coroutineScope {
+                launch (Dispatchers.IO) {
+                    insertComments(parsedData.commentList, parsedData.listingEntity)
+                }
             }
         }
 
@@ -121,8 +123,8 @@ class CommentRepositoryImpl(
                 response = response
             )
 
-            withContext (Dispatchers.IO) {
-                InsertCommentsTask().execute(appDB, parsedData.commentList, parsedData.listingEntity)
+            coroutineScope {
+                launch (Dispatchers.IO) { insertComments(parsedData.commentList, parsedData.listingEntity) }
             }
         } catch (e : Exception) {
             when (e) {
@@ -143,7 +145,6 @@ class CommentRepositoryImpl(
     // endregion interface
 
     // region helper
-
 
     private suspend fun parseCommentRequestResponse(
         postFullName: String,
@@ -205,7 +206,6 @@ class CommentRepositoryImpl(
                 }
 
                 childCount ++
-
             }
         }
 
@@ -245,23 +245,30 @@ class CommentRepositoryImpl(
                     }
                 }
 
+                // converts fields that have already been unmarshalled by gson
                 parent_id = removeTypePrefix(parent_id)
-                Log.d(TAG, "parent id = ${this.parent_id} current id = ${this.id}")
+                author_flair_text?.let {
+                    author_flair_text = Html.fromHtml(author_flair_text).toString()
+                }
 
+                // converts fields from json not in explicitly unmarshalled by gson
                 userUpvoted = commentPOJO["likes"]?.run {
                     if (this as Boolean) 1 else -1
                 } ?: 0
 
-                author_flair_text?.let {
-                    author_flair_text = Html.fromHtml(author_flair_text).toString()
+                commentPOJO["created"]?.let { created = formatDate(it as Double) }
+
+                // get the gildings
+                (commentPOJO["gildings"] as JSONObject?)?.let { gilding ->
+                    platinum = (gilding["gid_1"] as Long).toInt()
+                    gold = (gilding["gid_2"] as Long).toInt()
+                    silver = (gilding["gid_3"] as Long).toInt()
                 }
-                commentPOJO["created"]?.apply { created = formatDate(this as Double) }
 
                 // have to do this because Reddit has a decided this can be boolean or string
                 try {
                     editedDate = formatDate(commentPOJO["edited"] as Double)
-                } catch (e: Exception) {
-                }
+                } catch (e: Exception) { }
             }
 
             deferredCommentData?.let {
@@ -286,8 +293,9 @@ class CommentRepositoryImpl(
             id = moreJsonObject["name"] as String
             parentPostId = postFullName
             parent_id = moreJsonObject["parent_id"] as String
-            author = CommentEntity.MORE_AUTHOR
+            created = CommentEntity.MORE_CREATED
             position = commentPosition
+            depth = (moreJsonObject["depth"] as Long).toInt()
             replyCount = (moreJsonObject["count"] as Long).toInt()
 
             val childrenLinks = moreJsonObject["children"] as JSONArray
@@ -310,15 +318,9 @@ class CommentRepositoryImpl(
 
     // region async tasks
 
-    private class InsertCommentsTask : AsyncTask<Any, Int, Unit>() {
-        override fun doInBackground(vararg objects: Any) {
-            val appDB = objects[0] as ApplicationDB
-            val comments = objects[1] as List<CommentEntity>
-            val listing = objects[2] as ListingEntity
-
-            appDB.commentDAO.insertComments(comments)
-            appDB.listingDAO.insertListing(listing)
-        }
+    private fun insertComments(comments : List<CommentEntity>, listing : ListingEntity) {
+        appDB.commentDAO.insertComments(comments)
+        appDB.listingDAO.insertListing(listing)
     }
 
     private class ClearCommentsTask : AsyncTask<Any, Int, Unit>() {

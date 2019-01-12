@@ -341,6 +341,13 @@ class PostRepositoryImpl @Inject constructor(
             } else {
                 formatter.format(apiCreated)
             }
+
+            // get the gildings
+            (post["gildings"] as JSONObject?)?.let { gilding ->
+                platinum = (gilding["gid_1"] as Long).toInt()
+                gold = (gilding["gid_2"] as Long).toInt()
+                silver = (gilding["gid_3"] as Long).toInt()
+            }
         }
     }
 

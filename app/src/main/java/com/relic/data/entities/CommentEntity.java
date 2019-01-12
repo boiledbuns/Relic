@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class CommentEntity {
-  public static final String MORE_AUTHOR = "more_author";
+  public static final String MORE_CREATED = "more_author";
 
   @NonNull
   @PrimaryKey
@@ -19,8 +19,8 @@ public class CommentEntity {
   public String author;
   public String subreddit;
 
-    // post parent id
-    public String parentPostId;
+  // post parent id
+  public String parentPostId;
 
   // parent comment id
   @ColumnInfo(name ="parentId")
@@ -30,8 +30,10 @@ public class CommentEntity {
   public String body_html;
 
   public int score;
-  @ColumnInfo(name = "gilded")
-  public int gilded;
+
+  public int platinum;
+  public int gold;
+  public int silver;
 
   @ColumnInfo(name = "authorFlairText")
   public String author_flair_text;

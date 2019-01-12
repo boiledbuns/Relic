@@ -7,7 +7,7 @@ import android.widget.RelativeLayout
 import com.relic.R
 import kotlinx.android.synthetic.main.comment_item.view.*
 
-class CommentView (
+class RelicCommentView (
         context: Context,
         attrs : AttributeSet? = null,
         defStyleAttr : Int = 0

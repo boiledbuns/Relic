@@ -15,7 +15,11 @@ public class CommentModel {
   private int userUpvoted;
 
   public String authorFlairText;
-  public boolean gilded;
+
+  public int platinum;
+  public int gold;
+  public int silver;
+
   public boolean isSubmitter;
 
   public String edited;
@@ -63,4 +67,8 @@ public class CommentModel {
   }
 
   public float position;
+
+  public boolean isLoadMore() {
+      return author == null;
+  }
 }
