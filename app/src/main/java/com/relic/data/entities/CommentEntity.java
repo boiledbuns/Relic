@@ -20,7 +20,10 @@ public class CommentEntity {
   public String author;
   public String subreddit;
 
-  // post id for comments in  s
+    // post parent id
+    public String parentPostId;
+
+  // parent comment id
   @ColumnInfo(name ="parentId")
   public String parent_id;
 
@@ -58,4 +61,6 @@ public class CommentEntity {
   public void setId(@NonNull String id) {
       this.id = id;
   }
+
+    public float position;
 }

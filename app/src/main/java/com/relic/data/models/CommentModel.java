@@ -61,4 +61,6 @@ public class CommentModel {
   public void setUserUpvoted(int userUpvoted) {
     this.userUpvoted = userUpvoted;
   }
+
+  public float position;
 }

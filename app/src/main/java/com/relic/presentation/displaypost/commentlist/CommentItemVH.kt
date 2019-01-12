@@ -42,7 +42,7 @@ class CommentItemVH (
 
         commentItem.apply {
             commentScoreView.text = commentModel.score.toString() + " " + commentModel.depth
-            commentFlairView.text = commentModel.authorFlairText
+            commentFlairView.text = " " + commentModel.position  + " " + commentModel.authorFlairText
             commentAuthorView.text = commentModel.author
             commentCreatedView.text = commentModel.created
 

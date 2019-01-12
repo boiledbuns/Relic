@@ -9,8 +9,9 @@ interface CommentRepository {
     /**
      * Exposes the comments as a liveData list
      * @param postFullName full name of a post
+     * @param displayNRows if greater than 0, displays top x comments loaded
      */
-    fun getComments(postFullName: String): LiveData<List<CommentModel>>
+    fun getComments(postFullName: String, displayNRows: Int = 0): LiveData<List<CommentModel>>
 
     /**
      * retrieves comments for a post from the network and stores them locally

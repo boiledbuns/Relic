@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat
 import java.util.ArrayList
 import java.util.Date
 import java.util.Locale
+import kotlin.math.pow
 
 class CommentRepositoryImpl(
         private val viewContext: Context,
@@ -64,8 +65,16 @@ class CommentRepositoryImpl(
 
     // region interface
 
-    override fun getComments(postFullName : String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getChildren(removeTypePrefix(postFullName))
+    override fun getComments(postFullName : String, displayNRows: Int): LiveData<List<CommentModel>> {
+        val postFullname = removeTypePrefix(postFullName)
+        return when {
+            (displayNRows > 0) -> {
+                appDB.commentDAO.getChildrenByLevel(postFullname, displayNRows)
+            }
+            else -> {
+                appDB.commentDAO.getAllComments(postFullname)
+            }
+        }
     }
 
     override suspend fun retrieveComments(
@@ -83,12 +92,16 @@ class CommentRepositoryImpl(
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
-            val parsedData = parseCommentRequestResponse(postFullName, response)
+            val parsedData = parseCommentRequestResponse(
+                postFullName = postFullName,
+                response = response
+            )
 
             withContext (Dispatchers.IO) {
                 InsertCommentsTask().execute(appDB, parsedData.commentList, parsedData.listingEntity)
             }
         }
+
         catch (e : Exception) {
             when (e) {
                 is VolleyError -> Log.d(TAG, "Error with request : at $url \n ${e.networkResponse}")
@@ -103,7 +116,10 @@ class CommentRepositoryImpl(
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
-            val parsedData = parseCommentRequestResponse(commentModel.fullName, response)
+            val parsedData = parseCommentRequestResponse(
+                postFullName = commentModel.fullName,
+                response = response
+            )
 
             withContext (Dispatchers.IO) {
                 InsertCommentsTask().execute(appDB, parsedData.commentList, parsedData.listingEntity)
@@ -121,12 +137,13 @@ class CommentRepositoryImpl(
     }
 
     override fun getReplies(parentId: String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getChildren(parentId)
+        return appDB.commentDAO.getAllComments(parentId)
     }
 
     // endregion interface
 
     // region helper
+
 
     private suspend fun parseCommentRequestResponse(
         postFullName: String,
@@ -134,55 +151,81 @@ class CommentRepositoryImpl(
     ) : ParsedCommentData {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
-        val parentId = removeTypePrefix(postFullName)
+        val parentPostId = removeTypePrefix(postFullName)
 
-        return parseComments(parentId, requestData[1] as JSONObject)
+        return parseComments(parentPostId, requestData[1] as JSONObject)
     }
 
     /**
      * Parse the response from the api and store the comments in the room db
      * @param response json string response
-     * @param parentId full name of post used as a key for the "after" value
+     * @param postFullName full name of post used as a key for the "after" value
+     * @param parentDepth depth of the parent. Since posts start with a depth of 0, -1 is the
+     * depth of the parent when calling from outside a recursive call
+     * @param parentPosition positional value of the parent
      * @return : Parsed comment
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    private suspend fun parseComments(parentId: String, response: JSONObject) : ParsedCommentData {
+    private suspend fun parseComments(
+        postFullName: String,
+        response: JSONObject,
+        parentDepth : Int = -1,
+        parentPosition : Float = 0f
+    ) : ParsedCommentData {
         val commentsData = (response["data"] as JSONObject)
-        val listing = ListingEntity(parentId, commentsData["after"]?.run { this as String })
+        val listing = ListingEntity(postFullName, commentsData["after"]?.run { this as String })
 
         // get the list of children (comments) associated with the post
         val commentChildren = commentsData["children"] as JSONArray
         val commentList = ArrayList<CommentEntity>()
 
+        // used for calculating the position of a comment
+        val scale = 10f.pow(-(parentDepth + 2))
+        var childCount = 1
+
         coroutineScope {
             commentChildren.forEach { commentChild ->
+                val position = parentPosition + childCount*scale
                 val deferredCommentList = async {
-                    unmarshallComment(commentChild as JSONObject)
+                    unmarshallComment(commentChild as JSONObject, postFullName, position)
                 }
                 commentList.addAll(deferredCommentList.await())
+                childCount ++
             }
         }
 
-        return ParsedCommentData(listing, commentList)
+        return ParsedCommentData(listing, commentList, childCount - 1)
     }
 
+    // TODO refactor and move the method into the comment dao method
     // TODO find a better way to unmarshall these objects and clean this up
     // won't be cleaned for a while because still decided how to format data and what is needed
-    private suspend fun unmarshallComment(commentChild : JSONObject) : List<CommentEntity> {
+    private suspend fun unmarshallComment(
+        commentChild : JSONObject,
+        postFullName : String,
+        commentPosition : Float
+    ) : List<CommentEntity> {
         val commentPOJO = commentChild["data"] as JSONObject
         val commentList = ArrayList<CommentEntity>()
 
         coroutineScope {
             var deferredCommentData : Deferred<ParsedCommentData>? = null
             val commentEntity = gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
+                parentPostId = postFullName
+                position = commentPosition
 
                 commentPOJO["replies"]?.let { childJson ->
                     // try to parse the child json as nested replies
                     if (childJson.toString().isNotEmpty()) {
                         // parse the children of this comment
                         deferredCommentData = async {
-                            parseComments(id, childJson as JSONObject)
+                            parseComments(
+                                postFullName = postFullName,
+                                response = childJson as JSONObject,
+                                parentDepth = depth,
+                                parentPosition = commentPosition
+                            )
                         }
                     }
                 }
@@ -205,11 +248,14 @@ class CommentRepositoryImpl(
                 } catch (e: Exception) { }
             }
 
-            commentList.add(commentEntity)
-
             deferredCommentData?.let {
-                commentList.addAll(it.await().commentList)
+                it.await().let { parsedData ->
+                    commentEntity.replyCount = parsedData.replyCount
+                commentList.addAll(parsedData.commentList)
+                }
             }
+
+            commentList.add(commentEntity)
         }
 
         return commentList
@@ -254,5 +300,6 @@ class CommentRepositoryImpl(
 
 private data class ParsedCommentData(
     val listingEntity : ListingEntity,
-    val commentList : List<CommentEntity>
+    val commentList : List<CommentEntity>,
+    val replyCount : Int
 )

@@ -13,12 +13,15 @@ import java.util.List;
 
 @Dao
 public abstract class CommentDao {
-  @Insert (onConflict = OnConflictStrategy.REPLACE)
-  public abstract void insertComments(List<CommentEntity> commentEntities);
+    @Insert (onConflict = OnConflictStrategy.REPLACE)
+    public abstract void insertComments(List<CommentEntity> commentEntities);
 
-  @Query("SELECT * FROM CommentEntity WHERE parentId = :parentId ORDER BY depth ASC")
-  public abstract LiveData<List<CommentModel>> getChildren(String parentId);
+    @Query("SELECT * FROM CommentEntity WHERE parentPostId = :postId ORDER BY position")
+    public abstract LiveData<List<CommentModel>> getAllComments(String postId);
 
-  @Query("DELETE from CommentEntity WHERE parentId = :parentId")
-  public abstract void deletePostComments(String parentId);
+    @Query("SELECT * FROM CommentEntity WHERE parentId = :parentId AND depth < :depth ORDER BY depth ASC")
+    public abstract LiveData<List<CommentModel>> getChildrenByLevel(String parentId, int depth);
+
+    @Query("DELETE from CommentEntity WHERE parentPostId = :postId")
+    public abstract void deletePostComments(String postId);
 }
