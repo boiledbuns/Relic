@@ -181,24 +181,38 @@ class CommentRepositoryImpl(
         val commentList = ArrayList<CommentEntity>()
 
         // used for calculating the position of a comment
-        val scale = 10f.pow(-(parentDepth + 2))
+        val scale = 10f.pow(-(parentDepth + 1))
         var childCount = 1
 
         coroutineScope {
             commentChildren.forEach { commentChild ->
                 val position = parentPosition + childCount*scale
-                val deferredCommentList = async {
-                    unmarshallComment(commentChild as JSONObject, postFullName, position)
+                val commentJson = commentChild as JSONObject
+                val childKind = commentJson["kind"] as String?
+
+                if (childKind == "more") {
+                    // means there is a "more object"
+                    val deferredMore = async {
+                        val moreData = (commentJson["data"] as JSONObject)
+                        unmarshallMore(moreData, postFullName, position)
+                    }
+                    commentList.add(deferredMore.await())
+                } else {
+                    val deferredCommentList = async {
+                        unmarshallComment(commentJson, postFullName, position)
+                    }
+                    commentList.addAll(deferredCommentList.await())
                 }
-                commentList.addAll(deferredCommentList.await())
+
                 childCount ++
+
             }
         }
 
-        return ParsedCommentData(listing, commentList, childCount - 1)
+        return ParsedCommentData(listing, commentList, commentChildren.size)
     }
 
-    // TODO refactor and move the method into the comment dao method
+    // TODO refactor and move the method into a comment entity method
     // TODO find a better way to unmarshall these objects and clean this up
     // won't be cleaned for a while because still decided how to format data and what is needed
     private suspend fun unmarshallComment(
@@ -210,7 +224,8 @@ class CommentRepositoryImpl(
         val commentList = ArrayList<CommentEntity>()
 
         coroutineScope {
-            var deferredCommentData : Deferred<ParsedCommentData>? = null
+
+            var deferredCommentData: Deferred<ParsedCommentData>? = null
             val commentEntity = gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
                 parentPostId = postFullName
                 position = commentPosition
@@ -245,13 +260,14 @@ class CommentRepositoryImpl(
                 // have to do this because Reddit has a decided this can be boolean or string
                 try {
                     editedDate = formatDate(commentPOJO["edited"] as Double)
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+                }
             }
 
             deferredCommentData?.let {
                 it.await().let { parsedData ->
                     commentEntity.replyCount = parsedData.replyCount
-                commentList.addAll(parsedData.commentList)
+                    commentList.addAll(parsedData.commentList)
                 }
             }
 
@@ -259,6 +275,24 @@ class CommentRepositoryImpl(
         }
 
         return commentList
+    }
+
+    private fun unmarshallMore(
+        moreJsonObject : JSONObject,
+        postFullName : String,
+        commentPosition : Float
+    ) : CommentEntity {
+        return CommentEntity().apply {
+            id = moreJsonObject["name"] as String
+            parentPostId = postFullName
+            parent_id = moreJsonObject["parent_id"] as String
+            author = CommentEntity.MORE_AUTHOR
+            position = commentPosition
+            replyCount = (moreJsonObject["count"] as Long).toInt()
+
+            val childrenLinks = moreJsonObject["children"] as JSONArray
+            body_html = childrenLinks.toString()
+        }
     }
 
     private fun formatDate(epochTime : Double) : String? {

@@ -7,8 +7,7 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class CommentEntity {
-  private static String NOT_EDITED = "false";
-  public static int REPLY_LINK_LENGTH = 7;
+  public static final String MORE_AUTHOR = "more_author";
 
   @NonNull
   @PrimaryKey
@@ -63,4 +62,7 @@ public class CommentEntity {
   }
 
     public float position;
+
+  // for "more" values
+     public String moreChildren;
 }
