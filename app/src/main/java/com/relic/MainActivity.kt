@@ -14,15 +14,13 @@ import android.widget.TextView
 import com.relic.data.Authenticator
 import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
+import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
-import com.relic.presentation.preferences.PreferenceChangedListener
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.util.PreferencesManagerImpl
 import com.relic.util.RequestCodes
-import kotlinx.android.synthetic.main.preferences.*
 
 import javax.inject.Inject
 
@@ -57,16 +55,22 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                     .replace(R.id.main_content_frame, loginFragment).commit()
         }
 
-        //    findViewById(R.id.my_toolbar).setOnClickListener(new View.OnClickListener() {
-        //      @Override
-        //      public void onClick(View view) {
-        //        Toast.makeText(getApplicationContext(), "NAVBAR", Toast.LENGTH_SHORT).show();
-        //      }
-        //    });
-
         navigationView = findViewById(R.id.navigationView)
         navDrawer = findViewById(R.id.navigationDrawer)
         navigationView.setNavigationItemSelectedListener { handleNavMenuOnclick(it) }
+
+        // TODO remove hardcoded username and switch to username used by currently logged in user
+        navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).setOnClickListener {
+            val displayUserFrag = DisplayUserFragment.create("boiledbuns")
+
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_content_frame, displayUserFrag)
+                .addToBackStack(TAG)
+                .commit()
+
+            navDrawer.closeDrawers()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

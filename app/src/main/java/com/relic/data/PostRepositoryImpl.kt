@@ -65,6 +65,8 @@ class PostRepositoryImpl @Inject constructor(
         // keys for the "after" value for listings
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
+        private const val KEY_USER = "user"
+        private const val KEY_OTHER = "other"
     }
 
     private val sortTypesWithScope = arrayOf(
@@ -204,6 +206,20 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun retrieveUserSubmissions(username: String) {
+        val ending = "user/${username}/submitted"
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = ENDPOINT + ending,
+                authToken = checkToken()
+            )
+            parsePosts(response, PostRepository.PostSource.CurrentUser)
+        } catch (e :Exception) {
+            Log.d(TAG, "Error retrieving user submissions: $e")
+        }
+    }
+
     override suspend fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
         ClearPostsFromSourceTask().execute(appDB, postSource)
     }
@@ -229,7 +245,9 @@ class PostRepositoryImpl @Inject constructor(
         val listingKey = when (postSource) {
             is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
             is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            else -> KEY_ALL
+            is PostRepository.PostSource.All -> KEY_ALL
+            is PostRepository.PostSource.CurrentUser -> KEY_USER
+            else -> KEY_OTHER
         }
 
         // create the new listing entity

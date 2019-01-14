@@ -67,6 +67,8 @@ interface PostRepository {
         sortType: SortType,
         sortScope: SortScope)
 
+    suspend fun retrieveUserSubmissions(username: String)
+
     /**
      * //TODO tentative -> should expose or not
      * need to decide whether the viewModel should handle this or not
@@ -100,5 +102,8 @@ interface PostRepository {
         data class Subreddit(
             val subredditName : String
         ) : PostSource()
+
+        @Parcelize
+        object CurrentUser: PostSource()
     }
 }
