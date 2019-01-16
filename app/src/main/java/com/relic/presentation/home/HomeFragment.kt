@@ -17,17 +17,16 @@ import kotlinx.android.synthetic.main.home.view.*
 import kotlinx.android.synthetic.main.relic_toolbar.view.*
 
 class HomeFragment : RelicFragment() {
-    private val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
-    private val tabFragments = ArrayList<Fragment>()
+
     private lateinit var pagerAdapter : HomePagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        tabFragments.add(DisplaySubsView())
-        tabFragments.add(FrontpageFragment())
-
-        pagerAdapter = HomePagerAdapter(childFragmentManager)
+        pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
+            tabFragments.add(DisplaySubsView())
+            tabFragments.add(FrontpageFragment())
+        }
     }
 
     override fun onCreateView(
@@ -36,14 +35,18 @@ class HomeFragment : RelicFragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.home, container, false).apply {
-            findViewById<ViewPager>(R.id.homeViewPager).adapter = pagerAdapter
-
+            homeViewPager.adapter = pagerAdapter
             homeTabLayout.setupWithViewPager(homeViewPager)
+
             homeToolbarView?.findViewById<TextView>(R.id.my_toolbar_title)?.text = resources.getString(R.string.app_name)
         }
     }
 
+
     private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+        val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
+        val tabFragments = ArrayList<Fragment>()
+
         override fun getPageTitle(position: Int): CharSequence? {
             return tabFragmentTitles[position]
         }
