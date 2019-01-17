@@ -17,24 +17,13 @@ import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displayuser.fragments.PostsFragment
+import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.view.*
 
 class DisplayUserFragment : RelicFragment() {
 
-    private val displayUserVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .build()
-                    .getDisplayUserVM().create(username) as T
-            }
-        }).get(DisplayUserVM::class.java)
-    }
-
+    private lateinit var displayUserVM : DisplayUserVM
     private lateinit var username : String
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
@@ -44,14 +33,24 @@ class DisplayUserFragment : RelicFragment() {
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
 
+        displayUserVM = ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return DaggerVMComponent.builder()
+                    .repoModule(RepoModule(context!!))
+                    .authModule(AuthModule(context!!))
+                    .build()
+                    .getDisplayUserVM().create(username) as T
+            }
+        }).get(DisplayUserVM::class.java)
+
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
-            contentFragments.add(PostsFragment())
-            contentFragments.add(PostsFragment())
-            contentFragments.add(PostsFragment())
-            contentFragments.add(PostsFragment())
-            contentFragments.add(PostsFragment())
-            contentFragments.add(PostsFragment())
-            contentFragments.add(PostsFragment())
+            contentFragments.add(PostsTabFragment.create(UserTab.Submissions))
+            contentFragments.add(PostsTabFragment.create(UserTab.Comments))
+            contentFragments.add(PostsTabFragment.create(UserTab.Saved))
+            contentFragments.add(PostsTabFragment.create(UserTab.Upvoted))
+            contentFragments.add(PostsTabFragment.create(UserTab.Downvoted))
+            contentFragments.add(PostsTabFragment.create(UserTab.Gilded))
+            contentFragments.add(PostsTabFragment.create(UserTab.Hidden))
         }
     }
 
@@ -60,6 +59,7 @@ class DisplayUserFragment : RelicFragment() {
             (userToolbar as Toolbar).title = getString(R.string.user_prefix_label, username)
 
             userViewPager.adapter = pagerAdapter
+            userViewPager.offscreenPageLimit = 1
             userTabLayout.setupWithViewPager(userViewPager)
         }
     }

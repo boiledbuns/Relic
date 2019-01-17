@@ -42,7 +42,6 @@ class HomeFragment : RelicFragment() {
         }
     }
 
-
     private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
         val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
         val tabFragments = ArrayList<Fragment>()

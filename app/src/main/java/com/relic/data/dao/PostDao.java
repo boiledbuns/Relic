@@ -33,6 +33,11 @@ public abstract class PostDao {
         "WHERE allPosition >= 0 ORDER BY allPosition ASC")
     public abstract LiveData<List<PostModel>> getPostsFromAll();
 
+    @Query("SELECT * FROM PostEntity " +
+        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
+        "WHERE userSubmissionPosition >= 0 ORDER BY userSubmissionPosition ASC")
+    public abstract LiveData<List<PostModel>> getPostsFromUserSubmissions();
+
 //    @Query("SELECT * FROM PostEntity WHERE subredditPosition >= 0 AND subreddit = :subredditName ORDER BY `subredditPosition` ASC")
 //    public abstract LiveData<List<PostModel>> getPostsFromSubreddit1(String subredditName);
 //

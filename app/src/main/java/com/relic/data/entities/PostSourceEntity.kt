@@ -16,4 +16,6 @@ data class PostSourceEntity(
     var subredditPosition : Int = -1
     var frontpagePosition : Int  = -1
     var allPosition : Int = -1
+
+    var userSubmissionPosition : Int = -1
 }

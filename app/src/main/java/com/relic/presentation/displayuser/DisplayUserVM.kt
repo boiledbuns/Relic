@@ -7,6 +7,7 @@ import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.models.PostModel
+import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +17,7 @@ class DisplayUserVM(
     private val commentRepo: CommentRepository,
     private val listingRepo: ListingRepository,
     private val username : String
-) : ViewModel() {
+) : ViewModel(), DisplaySubContract.PostAdapterDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -28,8 +29,8 @@ class DisplayUserVM(
         }
     }
 
-    private val _submissionLiveData  = MutableLiveData<PostModel>()
-    val submissionLiveData : LiveData<PostModel> = _submissionLiveData
+    private val _submissionLiveData  = postRepo.getPosts(PostRepository.PostSource.CurrentUser)
+    val submissionLiveData : LiveData<List<PostModel>> = _submissionLiveData
 
     init {
         GlobalScope.launch {
@@ -37,4 +38,23 @@ class DisplayUserVM(
         }
     }
 
+    fun requestTabPost(tab : UserTab) {
+
+    }
+
+    // region post adapter delegate
+
+    override fun visitPost(postFullname: String, subreddit: String) {
+    }
+
+    override fun voteOnPost(postFullname: String, voteValue: Int) {
+    }
+
+    override fun savePost(postFullname: String, save: Boolean) {
+    }
+
+    override fun onThumbnailClicked(postThumbnailUrl: String) {
+    }
+
+    // endregion post adapter delegate
 }

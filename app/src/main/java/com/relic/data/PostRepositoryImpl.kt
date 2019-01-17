@@ -101,9 +101,11 @@ class PostRepositoryImpl @Inject constructor(
         return when (postSource) {
             is PostRepository.PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
             is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
+            is PostRepository.PostSource.CurrentUser -> appDB.postDao.getPostsFromUserSubmissions()
             else -> appDB.postDao.getPostsFromAll()
         }
     }
+
 
     override suspend fun retrieveMorePosts(
         postSource: PostRepository.PostSource,
@@ -206,15 +208,19 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    // TODO separate methods used for retrieving posts from network from repository
     override suspend fun retrieveUserSubmissions(username: String) {
         val ending = "user/${username}/submitted"
+
         try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending,
                 authToken = checkToken()
             )
+
             parsePosts(response, PostRepository.PostSource.CurrentUser)
+
         } catch (e :Exception) {
             Log.d(TAG, "Error retrieving user submissions: $e")
         }
@@ -238,7 +244,7 @@ class PostRepositoryImpl @Inject constructor(
     private suspend fun parsePosts(
         response: String,
         postSource: PostRepository.PostSource
-    ) = coroutineScope {
+    ) : List<PostEntity> = coroutineScope {
         val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
 
@@ -253,19 +259,19 @@ class PostRepositoryImpl @Inject constructor(
         // create the new listing entity
         val listing = ListingEntity(listingKey, listingData["after"] as String?)
 
-        async {
-            val postIterator = listingPosts!!.iterator()
-            val postEntities = ArrayList<PostEntity>()
-            val postSourceEntities = ArrayList<PostSourceEntity>()
+        val postIterator = listingPosts!!.iterator()
+        val postEntities = ArrayList<PostEntity>()
+        val postSourceEntities = ArrayList<PostSourceEntity>()
 
-            var postCount = when (postSource) {
-                is PostRepository.PostSource.Subreddit -> {
-                    appDB.postSourceDao.getItemsCountForSubreddit(postSource.subredditName)
-                }
-                is PostRepository.PostSource.Frontpage -> {
-                    appDB.postSourceDao.getItemsCountForFrontpage()
-                }
-                else -> appDB.postSourceDao.getItemsCountForAll()
+        async {
+            val sourceDao = appDB.postSourceDao
+
+            var postCount: Int = when (postSource) {
+                is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
+                is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
+                is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
+                is PostRepository.PostSource.Popular -> 0
+                is PostRepository.PostSource.CurrentUser -> sourceDao.getItemsCountForUserSubmission()
             }
 
             // generate the list of posts using the json array
@@ -286,6 +292,7 @@ class PostRepositoryImpl @Inject constructor(
                         subredditPosition = existingPostSource.subredditPosition
                         frontpagePosition= existingPostSource.frontpagePosition
                         allPosition = existingPostSource.allPosition
+                        userSubmissionPosition = existingPostSource.userSubmissionPosition
                     }
                 }
 
@@ -299,16 +306,20 @@ class PostRepositoryImpl @Inject constructor(
                     is PostRepository.PostSource.All -> {
                         postSourceEntity.allPosition = postCount
                     }
+                    is PostRepository.PostSource.CurrentUser -> {
+                        postSourceEntity.userSubmissionPosition = postCount
+                    }
                 }
 
                 postCount ++
             }
 
-//            InsertPostsTask(appDB, postEntities, postSourceEntities).execute(listing)
             appDB.postDao.insertPosts(postEntities)
             appDB.postSourceDao.insertPostSources(postSourceEntities)
             appDB.listingDAO.insertListing(listing)
         }.await()
+
+        postEntities
     }
 
     private suspend fun parsePost(response: String) = coroutineScope {

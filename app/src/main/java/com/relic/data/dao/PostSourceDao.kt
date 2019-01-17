@@ -24,6 +24,9 @@ abstract class PostSourceDao {
     @Query("SELECT COUNT() FROM PostSourceEntity WHERE allPosition >= 0")
     abstract fun getItemsCountForAll(): Int
 
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userSubmissionPosition >= 0")
+    abstract fun getItemsCountForUserSubmission(): Int
+
     // region remove source from all posts based on criteria
 
     @Query("UPDATE PostSourceEntity SET subredditPosition = -1 WHERE subreddit = :subName")
