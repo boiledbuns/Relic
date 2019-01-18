@@ -38,6 +38,9 @@ abstract class PostSourceDao {
     @Query("UPDATE PostSourceEntity SET allPosition = -1 WHERE allPosition >= 0")
     abstract fun removeAllAllAsSource()
 
+    @Query("UPDATE PostSourceEntity SET userSubmissionPosition = -1 WHERE userSubmissionPosition >= 0")
+    abstract fun removeAllCurrentUserAsSource()
+
     // endregion
 
     // region remove source from single post based on criteria

@@ -2,15 +2,13 @@ package com.relic.data.entities;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.Relation;
 import android.support.annotation.NonNull;
 
-import org.jetbrains.annotations.PropertyKey;
 
-import java.util.List;
-
+/**
+ * Data class - used for serializing objects into database compatible fields
+ */
 @Entity
 public class PostEntity {
   public static final int ORIGIN_SUB = 0;

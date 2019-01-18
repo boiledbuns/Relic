@@ -4,16 +4,19 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
+import com.relic.data.models.PostModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.UserTab
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.display_user_submissions.*
 import kotlinx.android.synthetic.main.display_user_submissions.view.*
 
 class PostsTabFragment : RelicFragment() {
@@ -22,6 +25,7 @@ class PostsTabFragment : RelicFragment() {
     private lateinit var selectedUserTab : UserTab
 
     private lateinit var userPostsAdapter : PostItemAdapter
+    private var scrollLocked: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,13 +51,14 @@ class PostsTabFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindViewModel(viewLifecycleOwner)
+        attachScrollListeners()
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-         // subscribe to the appropriate livedata based on tab selected
+        // subscribe to the appropriate livedata based on tab selected
         when(selectedUserTab) {
             is UserTab.Submissions -> postsTabVM.submissionLiveData.nonNull().observe (lifecycleOwner) {
-                userPostsAdapter.setPostList(it)
+                setPosts(it)
             }
             is UserTab.Comments -> {}
             is UserTab.Saved -> {}
@@ -62,6 +67,40 @@ class PostsTabFragment : RelicFragment() {
             is UserTab.Gilded -> {}
             is UserTab.Hidden -> {}
         }
+    }
+
+    private fun attachScrollListeners() {
+        // attach listener for checking if the user has scrolled to the bottom of the recyclerview
+        userTabRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
+                    // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
+                    scrollLocked = true
+                    // fetch the next post listing
+                    postsTabVM.requestPosts(selectedUserTab, false)
+                }
+            }
+        })
+
+        userTabSwipeRefreshLayout.setOnRefreshListener {
+            resetRecyclerView()
+            postsTabVM.requestPosts(selectedUserTab, true)
+        }
+    }
+
+    private fun setPosts(posts : List<PostModel>) {
+        userPostsAdapter.setPostList(posts)
+        userTabSwipeRefreshLayout.isRefreshing = false
+    }
+
+    private fun resetRecyclerView() {
+        // empties current items to show that it's being refreshed
+        userTabRecyclerView.layoutManager?.scrollToPosition(0)
+        userPostsAdapter.clear()
+
+        userTabSwipeRefreshLayout.isRefreshing = true
     }
 
     companion object {

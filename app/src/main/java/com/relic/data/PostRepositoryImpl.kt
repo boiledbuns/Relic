@@ -111,7 +111,7 @@ class PostRepositoryImpl @Inject constructor(
         postSource: PostRepository.PostSource,
         listingAfter: String
     ) {
-        // change the api endpoint to access to get the next post listing
+        // change the api endpoint to access the next post listing
         val ending = when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
             else -> ""
@@ -140,6 +140,7 @@ class PostRepositoryImpl @Inject constructor(
         val subName = when (postSource) {
             is PostRepository.PostSource.Subreddit -> postSource.subredditName
             is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
+            is PostRepository.PostSource.CurrentUser -> KEY_USER
             else -> KEY_ALL
         }
 
@@ -433,6 +434,9 @@ class PostRepositoryImpl @Inject constructor(
                 }
                 is PostRepository.PostSource.Subreddit -> {
                     appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
+                }
+                is PostRepository.PostSource.CurrentUser -> {
+                    appDB.postSourceDao.removeAllCurrentUserAsSource()
                 }
             }
             // remove all the source entities that no longer correspond to any remaining posts
