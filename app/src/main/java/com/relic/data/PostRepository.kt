@@ -23,6 +23,8 @@ interface PostRepository {
      */
     fun getPosts(postSource: PostSource): LiveData<List<PostModel>>
 
+    fun getUserPosts(username : String, option : RetrievalOption): LiveData<List<PostModel>>
+
     /**
      * Retrieves posts for a subreddit
      * @param postSource origin of the post
@@ -67,7 +69,7 @@ interface PostRepository {
         sortType: SortType,
         sortScope: SortScope)
 
-    suspend fun retrieveUserSubmissions(username: String)
+    suspend fun retrieveUserPosts(username: String, option : RetrievalOption)
 
     /**
      * //TODO tentative -> should expose or not
@@ -104,6 +106,14 @@ interface PostRepository {
         ) : PostSource()
 
         @Parcelize
-        object CurrentUser: PostSource()
+        data class User(
+            val username : String
+        ) : PostSource()
+    }
+
+    enum class RetrievalOption {
+        Submissions, Comments,
+        // these should only be available for the current user
+        Saved, Upvoted, Downvoted, Gilded, Hidden
     }
 }

@@ -71,9 +71,6 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        displayUserVM.submissionLiveData.observe (lifecycleOwner){
-
-        }
     }
 
     // region livedata handlers

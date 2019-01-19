@@ -101,11 +101,21 @@ class PostRepositoryImpl @Inject constructor(
         return when (postSource) {
             is PostRepository.PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
             is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
-            is PostRepository.PostSource.CurrentUser -> appDB.postDao.getPostsFromUserSubmissions()
             else -> appDB.postDao.getPostsFromAll()
         }
     }
 
+    override fun getUserPosts(username: String, option: PostRepository.RetrievalOption): LiveData<List<PostModel>> {
+        return when (option) {
+            PostRepository.RetrievalOption.Submissions -> appDB.postDao.getUserPosts(username)
+            PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts(username)
+            PostRepository.RetrievalOption.Saved -> appDB.postDao.getUserSavedPosts(username)
+            PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserVotedPosts(username, 1)
+            PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserVotedPosts(username, -1)
+            PostRepository.RetrievalOption.Gilded -> appDB.postDao.getUserGilded(username)
+            PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts(username)
+        }
+    }
 
     override suspend fun retrieveMorePosts(
         postSource: PostRepository.PostSource,
@@ -140,7 +150,7 @@ class PostRepositoryImpl @Inject constructor(
         val subName = when (postSource) {
             is PostRepository.PostSource.Subreddit -> postSource.subredditName
             is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
-            is PostRepository.PostSource.CurrentUser -> KEY_USER
+            is PostRepository.PostSource.User -> KEY_USER
             else -> KEY_ALL
         }
 
@@ -210,7 +220,10 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     // TODO separate methods used for retrieving posts from network from repository
-    override suspend fun retrieveUserSubmissions(username: String) {
+    override suspend fun retrieveUserPosts(
+        username: String,
+        option : PostRepository.RetrievalOption
+    ) {
         val ending = "user/${username}/submitted"
 
         try {
@@ -220,7 +233,7 @@ class PostRepositoryImpl @Inject constructor(
                 authToken = checkToken()
             )
 
-            parsePosts(response, PostRepository.PostSource.CurrentUser)
+            parsePosts(response, PostRepository.PostSource.User(username))
 
         } catch (e :Exception) {
             Log.d(TAG, "Error retrieving user submissions: $e")
@@ -253,7 +266,7 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
             is PostRepository.PostSource.Subreddit -> postSource.subredditName
             is PostRepository.PostSource.All -> KEY_ALL
-            is PostRepository.PostSource.CurrentUser -> KEY_USER
+            is PostRepository.PostSource.User -> postSource.username
             else -> KEY_OTHER
         }
 
@@ -272,7 +285,7 @@ class PostRepositoryImpl @Inject constructor(
                 is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
                 is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
                 is PostRepository.PostSource.Popular -> 0
-                is PostRepository.PostSource.CurrentUser -> sourceDao.getItemsCountForUserSubmission()
+                is PostRepository.PostSource.User -> sourceDao.getItemsCountForUserSubmission()
             }
 
             // generate the list of posts using the json array
@@ -307,7 +320,7 @@ class PostRepositoryImpl @Inject constructor(
                     is PostRepository.PostSource.All -> {
                         postSourceEntity.allPosition = postCount
                     }
-                    is PostRepository.PostSource.CurrentUser -> {
+                    is PostRepository.PostSource.User -> {
                         postSourceEntity.userSubmissionPosition = postCount
                     }
                 }
@@ -435,7 +448,7 @@ class PostRepositoryImpl @Inject constructor(
                 is PostRepository.PostSource.Subreddit -> {
                     appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
                 }
-                is PostRepository.PostSource.CurrentUser -> {
+                is PostRepository.PostSource.User -> {
                     appDB.postSourceDao.removeAllCurrentUserAsSource()
                 }
             }

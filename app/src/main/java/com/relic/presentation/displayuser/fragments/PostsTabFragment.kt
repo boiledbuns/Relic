@@ -56,16 +56,8 @@ class PostsTabFragment : RelicFragment() {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // subscribe to the appropriate livedata based on tab selected
-        when(selectedUserTab) {
-            is UserTab.Submissions -> postsTabVM.submissionLiveData.nonNull().observe (lifecycleOwner) {
-                setPosts(it)
-            }
-            is UserTab.Comments -> {}
-            is UserTab.Saved -> {}
-            is UserTab.Upvoted -> {}
-            is UserTab.Downvoted -> {}
-            is UserTab.Gilded -> {}
-            is UserTab.Hidden -> {}
+        postsTabVM.getTabPostsLiveData(selectedUserTab).nonNull().observe (lifecycleOwner) {
+            setPosts(it)
         }
     }
 

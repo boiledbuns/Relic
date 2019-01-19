@@ -32,13 +32,25 @@ class DisplayUserVM(
     private var currentSortingType = emptyMap<UserTab, PostRepository.SortType>()
     private var currentSortingScope = emptyMap<UserTab, PostRepository.SortScope>()
 
-    private val _submissionLiveData  = postRepo.getPosts(PostRepository.PostSource.CurrentUser)
-    val submissionLiveData : LiveData<List<PostModel>> = _submissionLiveData
+    private var postsLiveData = mutableMapOf<UserTab, LiveData<List<PostModel>>>()
 
     init {
-        GlobalScope.launch {
-            postRepo.retrieveUserSubmissions(username)
+//        GlobalScope.launch {
+//            postRepo.retrieveUserPosts(username)
+//        }
+    }
+
+    fun getTabPostsLiveData(tab : UserTab) : LiveData<List<PostModel>> {
+        var tabLiveData = postsLiveData[tab]
+        val userRetrievalOption = convertTabToRetrievalOption(tab)
+
+        if (tabLiveData == null) {
+            // create a new livedata if it doesn't already exist
+            tabLiveData = postRepo.getUserPosts(username, userRetrievalOption)
+            postsLiveData[tab] = tabLiveData
         }
+
+        return tabLiveData
     }
 
     /**
@@ -46,33 +58,38 @@ class DisplayUserVM(
      */
     fun requestPosts(tab : UserTab, refresh : Boolean) {
         // subscribe to the appropriate livedata based on tab selected
-        val postSource: PostRepository.PostSource = when (tab) {
-            is UserTab.Submissions -> PostRepository.PostSource.CurrentUser
-            is UserTab.Comments -> PostRepository.PostSource.CurrentUser
-            is UserTab.Saved -> PostRepository.PostSource.CurrentUser
-            is UserTab.Upvoted -> PostRepository.PostSource.CurrentUser
-            is UserTab.Downvoted -> PostRepository.PostSource.CurrentUser
-            is UserTab.Gilded -> PostRepository.PostSource.CurrentUser
-            is UserTab.Hidden -> PostRepository.PostSource.CurrentUser
-        }
+        val postSource = PostRepository.PostSource.User(username)
+        val userRetrievalOption = convertTabToRetrievalOption(tab)
 
         GlobalScope.launch {
             if (refresh) {
                 runBlocking { postRepo.clearAllPostsFromSource(postSource) }
-                postRepo.retrieveUserSubmissions(username)
+                postRepo.retrieveUserPosts(username, userRetrievalOption)
             } else {
                 // not a fan of this design, because it requires the viewmodel to be aware of the
                 // "key" being used to store the "after" value which is an implementation detail.
                 // TODO consider refactoring later, for now be consistent
                 val key = suspendCoroutine<String> { cont ->
                     postRepo.getNextPostingVal(
-                        postSource = PostRepository.PostSource.CurrentUser,
+                        postSource = postSource,
                         callback = RetrieveNextListingCallback { afterVal ->
                             cont.resumeWith(Result.success(afterVal))
                         })
                 }
                 postRepo.retrieveMorePosts(postSource, key)
             }
+        }
+    }
+
+    private fun convertTabToRetrievalOption(tab : UserTab): PostRepository.RetrievalOption {
+        return when (tab) {
+            is UserTab.Submissions -> PostRepository.RetrievalOption.Submissions
+            is UserTab.Comments -> PostRepository.RetrievalOption.Comments
+            is UserTab.Saved -> PostRepository.RetrievalOption.Saved
+            is UserTab.Upvoted -> PostRepository.RetrievalOption.Upvoted
+            is UserTab.Downvoted -> PostRepository.RetrievalOption.Downvoted
+            is UserTab.Gilded -> PostRepository.RetrievalOption.Gilded
+            is UserTab.Hidden -> PostRepository.RetrievalOption.Hidden
         }
     }
 
