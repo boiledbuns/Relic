@@ -34,19 +34,13 @@ class DisplayUserVM(
 
     private var postsLiveData = mutableMapOf<UserTab, LiveData<List<PostModel>>>()
 
-    init {
-//        GlobalScope.launch {
-//            postRepo.retrieveUserPosts(username)
-//        }
-    }
-
     fun getTabPostsLiveData(tab : UserTab) : LiveData<List<PostModel>> {
         var tabLiveData = postsLiveData[tab]
-        val userRetrievalOption = convertTabToRetrievalOption(tab)
+        val userRetrievalOption = toRetrievalOption(tab)
 
         if (tabLiveData == null) {
             // create a new livedata if it doesn't already exist
-            tabLiveData = postRepo.getUserPosts(username, userRetrievalOption)
+            tabLiveData = postRepo.getPosts(PostRepository.PostSource.User(username, userRetrievalOption))
             postsLiveData[tab] = tabLiveData
         }
 
@@ -58,13 +52,16 @@ class DisplayUserVM(
      */
     fun requestPosts(tab : UserTab, refresh : Boolean) {
         // subscribe to the appropriate livedata based on tab selected
-        val postSource = PostRepository.PostSource.User(username)
-        val userRetrievalOption = convertTabToRetrievalOption(tab)
+        val userRetrievalOption = toRetrievalOption(tab)
+        val postSource = PostRepository.PostSource.User(username, userRetrievalOption)
+
+        val type = currentSortingType[tab] ?: PostRepository.SortType.DEFAULT
+        val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
 
         GlobalScope.launch {
             if (refresh) {
                 runBlocking { postRepo.clearAllPostsFromSource(postSource) }
-                postRepo.retrieveUserPosts(username, userRetrievalOption)
+                postRepo.retrieveSortedPosts(postSource, type, scope)
             } else {
                 // not a fan of this design, because it requires the viewmodel to be aware of the
                 // "key" being used to store the "after" value which is an implementation detail.
@@ -81,9 +78,9 @@ class DisplayUserVM(
         }
     }
 
-    private fun convertTabToRetrievalOption(tab : UserTab): PostRepository.RetrievalOption {
+    private fun toRetrievalOption(tab : UserTab): PostRepository.RetrievalOption {
         return when (tab) {
-            is UserTab.Submissions -> PostRepository.RetrievalOption.Submissions
+            is UserTab.Submitted -> PostRepository.RetrievalOption.Submitted
             is UserTab.Comments -> PostRepository.RetrievalOption.Comments
             is UserTab.Saved -> PostRepository.RetrievalOption.Saved
             is UserTab.Upvoted -> PostRepository.RetrievalOption.Upvoted

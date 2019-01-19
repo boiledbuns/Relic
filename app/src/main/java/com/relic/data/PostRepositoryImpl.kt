@@ -65,7 +65,6 @@ class PostRepositoryImpl @Inject constructor(
         // keys for the "after" value for listings
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
-        private const val KEY_USER = "user"
         private const val KEY_OTHER = "other"
     }
 
@@ -101,19 +100,18 @@ class PostRepositoryImpl @Inject constructor(
         return when (postSource) {
             is PostRepository.PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
             is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
+            is PostRepository.PostSource.User -> {
+                when (postSource.retrievalOption) {
+                    PostRepository.RetrievalOption.Submitted -> appDB.postDao.getUserPosts(postSource.username)
+                    PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts(postSource.username)
+                    PostRepository.RetrievalOption.Saved -> appDB.postDao.getUserSavedPosts()
+                    PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserVotedPosts(1)
+                    PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserVotedPosts(-1)
+                    PostRepository.RetrievalOption.Gilded -> appDB.postDao.getUserGilded()
+                    PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts(postSource.username)
+                }
+            }
             else -> appDB.postDao.getPostsFromAll()
-        }
-    }
-
-    override fun getUserPosts(username: String, option: PostRepository.RetrievalOption): LiveData<List<PostModel>> {
-        return when (option) {
-            PostRepository.RetrievalOption.Submissions -> appDB.postDao.getUserPosts(username)
-            PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts(username)
-            PostRepository.RetrievalOption.Saved -> appDB.postDao.getUserSavedPosts(username)
-            PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserVotedPosts(username, 1)
-            PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserVotedPosts(username, -1)
-            PostRepository.RetrievalOption.Gilded -> appDB.postDao.getUserGilded(username)
-            PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts(username)
         }
     }
 
@@ -124,6 +122,7 @@ class PostRepositoryImpl @Inject constructor(
         // change the api endpoint to access the next post listing
         val ending = when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
+            is PostRepository.PostSource.User -> "user/${postSource.username}"
             else -> ""
         }
 
@@ -147,14 +146,8 @@ class PostRepositoryImpl @Inject constructor(
      * @param postSource source of the post
      */
     override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
-        val subName = when (postSource) {
-            is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
-            is PostRepository.PostSource.User -> KEY_USER
-            else -> KEY_ALL
-        }
-
-        RetrieveListingAfterTask(appDB, callback).execute(subName)
+        val key = getListingKey(postSource)
+        RetrieveListingAfterTask(appDB, callback).execute(key)
     }
 
     override fun getPost(postFullName: String): LiveData<PostModel> {
@@ -168,7 +161,10 @@ class PostRepositoryImpl @Inject constructor(
     ) {
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
-            is PostRepository.PostSource.Subreddit -> "r/" + postSource.subredditName
+            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
+            is PostRepository.PostSource.User -> {
+                "user/${postSource.username}/${postSource.retrievalOption.name}"
+            }
             else -> ""
         }
 
@@ -219,27 +215,6 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    // TODO separate methods used for retrieving posts from network from repository
-    override suspend fun retrieveUserPosts(
-        username: String,
-        option : PostRepository.RetrievalOption
-    ) {
-        val ending = "user/${username}/submitted"
-
-        try {
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = ENDPOINT + ending,
-                authToken = checkToken()
-            )
-
-            parsePosts(response, PostRepository.PostSource.User(username))
-
-        } catch (e :Exception) {
-            Log.d(TAG, "Error retrieving user submissions: $e")
-        }
-    }
-
     override suspend fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
         ClearPostsFromSourceTask().execute(appDB, postSource)
     }
@@ -262,13 +237,7 @@ class PostRepositoryImpl @Inject constructor(
         val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
         val listingPosts = listingData!!["children"] as JSONArray?
 
-        val listingKey = when (postSource) {
-            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
-            is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            is PostRepository.PostSource.All -> KEY_ALL
-            is PostRepository.PostSource.User -> postSource.username
-            else -> KEY_OTHER
-        }
+        val listingKey = getListingKey(postSource)
 
         // create the new listing entity
         val listing = ListingEntity(listingKey, listingData["after"] as String?)
@@ -391,6 +360,20 @@ class PostRepositoryImpl @Inject constructor(
                 gold = (gilding["gid_2"] as Long).toInt()
                 silver = (gilding["gid_3"] as Long).toInt()
             }
+        }
+    }
+
+    /**
+     * builds the key used for retrieving the "after" value for a listing using its associated
+     * post source
+     */
+    private fun getListingKey(postSource : PostRepository.PostSource) : String {
+        return when (postSource) {
+            is PostRepository.PostSource.Subreddit -> postSource.subredditName
+            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
+            is PostRepository.PostSource.All -> KEY_ALL
+            is PostRepository.PostSource.User -> postSource.username + postSource.retrievalOption.name
+            else -> KEY_OTHER
         }
     }
 

@@ -23,8 +23,6 @@ interface PostRepository {
      */
     fun getPosts(postSource: PostSource): LiveData<List<PostModel>>
 
-    fun getUserPosts(username : String, option : RetrievalOption): LiveData<List<PostModel>>
-
     /**
      * Retrieves posts for a subreddit
      * @param postSource origin of the post
@@ -49,7 +47,7 @@ interface PostRepository {
     /**
      * retrieves a single post from the network and stores it locally
      * @param subredditName name of subreddit that the post was made in
-     * @param postFullName "full name" of the subreddit"
+     * @param postFullName "full name" of the subreddit
      */
     suspend fun retrievePost(
         subredditName: String,
@@ -68,8 +66,6 @@ interface PostRepository {
         postSource: PostSource,
         sortType: SortType,
         sortScope: SortScope)
-
-    suspend fun retrieveUserPosts(username: String, option : RetrievalOption)
 
     /**
      * //TODO tentative -> should expose or not
@@ -107,12 +103,13 @@ interface PostRepository {
 
         @Parcelize
         data class User(
-            val username : String
+            val username : String,
+            val retrievalOption: RetrievalOption
         ) : PostSource()
     }
 
     enum class RetrievalOption {
-        Submissions, Comments,
+        Submitted, Comments,
         // these should only be available for the current user
         Saved, Upvoted, Downvoted, Gilded, Hidden
     }

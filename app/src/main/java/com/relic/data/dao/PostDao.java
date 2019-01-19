@@ -42,19 +42,19 @@ public abstract class PostDao {
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 AND author= :username AND saved = 1 ORDER BY created DESC")
-    public abstract LiveData<List<PostModel>> getUserSavedPosts(String username);
+        "WHERE userSubmissionPosition >= 0 AND saved = 1 ORDER BY created DESC")
+    public abstract LiveData<List<PostModel>> getUserSavedPosts();
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 AND author= :username AND userUpvoted = :vote ORDER BY created DESC")
-    public abstract LiveData<List<PostModel>> getUserVotedPosts(String username, int vote);
+        "WHERE userSubmissionPosition >= 0 AND userUpvoted = :vote ORDER BY created DESC")
+    public abstract LiveData<List<PostModel>> getUserVotedPosts(int vote);
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 AND author= :username " +
+        "WHERE userSubmissionPosition >= 0 " +
         "AND (platinum >= 0 OR gold >= 0 OR silver >= 0) ORDER BY created DESC")
-    public abstract LiveData<List<PostModel>> getUserGilded(String username);
+    public abstract LiveData<List<PostModel>> getUserGilded();
 
 //    @Query("SELECT * FROM PostEntity WHERE subredditPosition >= 0 AND subreddit = :subredditName ORDER BY `subredditPosition` ASC")
 //    public abstract LiveData<List<PostModel>> getPostsFromSubreddit1(String subredditName);

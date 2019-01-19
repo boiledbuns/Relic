@@ -9,7 +9,7 @@ interface DisplayUserContract {
 }
 
 sealed class UserTab : Parcelable{
-    @Parcelize object Submissions: UserTab()
+    @Parcelize object Submitted: UserTab()
     @Parcelize object Comments: UserTab()
     @Parcelize object Saved: UserTab()
     @Parcelize object Upvoted: UserTab()
