@@ -44,7 +44,7 @@ class DisplayUserFragment : RelicFragment() {
         }).get(DisplayUserVM::class.java)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
-            contentFragments.add(PostsTabFragment.create(UserTab.Submissions))
+            contentFragments.add(PostsTabFragment.create(UserTab.Submitted))
             contentFragments.add(PostsTabFragment.create(UserTab.Comments))
             contentFragments.add(PostsTabFragment.create(UserTab.Saved))
             contentFragments.add(PostsTabFragment.create(UserTab.Upvoted))

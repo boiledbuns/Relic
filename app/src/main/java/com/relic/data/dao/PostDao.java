@@ -37,46 +37,29 @@ public abstract class PostDao {
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 AND author= :username ORDER BY created DESC")
+        "WHERE userSubmittedPosition >= 0 AND author= :username ORDER BY userSubmittedPosition ASC")
     public abstract LiveData<List<PostModel>> getUserPosts(String username);
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 AND saved = 1 ORDER BY created DESC")
+        "WHERE userSavedPosition >= 0 AND saved = 1 ORDER BY userSavedPosition ASC")
     public abstract LiveData<List<PostModel>> getUserSavedPosts();
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 AND userUpvoted = :vote ORDER BY created DESC")
-    public abstract LiveData<List<PostModel>> getUserVotedPosts(int vote);
+        "WHERE userUpvotedPosition >= 0 ORDER BY userUpvotedPosition ASC")
+    public abstract LiveData<List<PostModel>> getUserUpvotedPosts();
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmissionPosition >= 0 " +
-        "AND (platinum >= 0 OR gold >= 0 OR silver >= 0) ORDER BY created DESC")
+        "WHERE  userDownvotedPosition >= 0 ORDER BY userDownvotedPosition ASC")
+    public abstract LiveData<List<PostModel>> getUserDownvotedPosts();
+
+    @Query("SELECT * FROM PostEntity " +
+        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
+        "WHERE userGildedPosition >= 0 " +
+        "AND (platinum >= 0 OR gold >= 0 OR silver >= 0) ORDER BY userGildedPosition ASC")
     public abstract LiveData<List<PostModel>> getUserGilded();
-
-//    @Query("SELECT * FROM PostEntity WHERE subredditPosition >= 0 AND subreddit = :subredditName ORDER BY `subredditPosition` ASC")
-//    public abstract LiveData<List<PostModel>> getPostsFromSubreddit1(String subredditName);
-//
-//    @Query("SELECT * FROM PostEntity WHERE frontpagePosition >= 0 ORDER BY `frontpagePosition` ASC")
-//    public abstract LiveData<List<PostModel>> getPostsFromFrontpage();
-//
-//    @Query("SELECT * FROM PostEntity WHERE allPosition >= 0 ORDER BY `allPosition` ASC")
-//    public abstract LiveData<List<PostModel>> getPostsFromAll();
-
-    // endregion get posts based on origin
-
-//    @Query("UPDATE PostEntity SET subredditPosition = -1 WHERE subreddit = :subName")
-//    public abstract void removeSubredditAsOrigin(String subName);
-//
-//    @Query("UPDATE PostEntity SET frontpagePosition = -1 WHERE subreddit = :subName")
-//    public abstract void removeFrontpageAsOrigin(String subName);
-//
-//    @Query("UPDATE PostEntity SET allPosition = -1 WHERE subreddit = :subName")
-//    public abstract void removeAllAsOrigin(String subName);
-
-    // endregion remove origin from post
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPosts(List<PostEntity> posts);

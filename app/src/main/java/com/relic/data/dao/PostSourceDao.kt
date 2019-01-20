@@ -24,8 +24,23 @@ abstract class PostSourceDao {
     @Query("SELECT COUNT() FROM PostSourceEntity WHERE allPosition >= 0")
     abstract fun getItemsCountForAll(): Int
 
-    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userSubmissionPosition >= 0")
-    abstract fun getItemsCountForUserSubmission(): Int
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userSubmittedPosition >= 0")
+    abstract fun getItemsCountForUserSubmitted(): Int
+
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userUpvotedPosition >= 0")
+    abstract fun getItemsCountForUserUpvoted(): Int
+
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userDownvotedPosition >= 0")
+    abstract fun getItemsCountForUserDownvoted(): Int
+
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userSavedPosition >= 0")
+    abstract fun getItemsCountForUserSaved(): Int
+
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userGildedPosition >= 0")
+    abstract fun getItemsCountForUserGilded(): Int
+
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userHiddenPosition >= 0")
+    abstract fun getItemsCountForUserHidden(): Int
 
     // region remove source from all posts based on criteria
 
@@ -38,9 +53,29 @@ abstract class PostSourceDao {
     @Query("UPDATE PostSourceEntity SET allPosition = -1 WHERE allPosition >= 0")
     abstract fun removeAllAllAsSource()
 
-    @Query("UPDATE PostSourceEntity SET userSubmissionPosition = -1 WHERE userSubmissionPosition >= 0")
-    abstract fun removeAllCurrentUserAsSource()
+    // I honestly hate doing this, but I haven't yet found a good solution
+    // that saves me the pain of writing n queries using room yet
 
+    @Query("UPDATE PostSourceEntity SET userSubmittedPosition = -1 WHERE userSubmittedPosition >= 0")
+    abstract fun removeAllUserSubmittedAsSource()
+
+    @Query("UPDATE PostSourceEntity SET userCommentsPosition = -1 WHERE userCommentsPosition >= 0")
+    abstract fun removeAllUserCommentsAsSource()
+
+    @Query("UPDATE PostSourceEntity SET userSavedPosition = -1 WHERE userSavedPosition >= 0")
+    abstract fun removeAllUserSavedAsSource()
+
+    @Query("UPDATE PostSourceEntity SET userUpvotedPosition = -1 WHERE userUpvotedPosition >= 0")
+    abstract fun removeAllUserUpvotedAsSource()
+
+    @Query("UPDATE PostSourceEntity SET userDownvotedPosition = -1 WHERE userDownvotedPosition >= 0")
+    abstract fun removeAllUserDownvotedAsSource()
+
+    @Query("UPDATE PostSourceEntity SET userGildedPosition = -1 WHERE userGildedPosition >= 0")
+    abstract fun removeAllUserGildedAsSource()
+
+    @Query("UPDATE PostSourceEntity SET userHiddenPosition = -1 WHERE userHiddenPosition >= 0")
+    abstract fun removeAllUserHiddenAsSource()
     // endregion
 
     // region remove source from single post based on criteria

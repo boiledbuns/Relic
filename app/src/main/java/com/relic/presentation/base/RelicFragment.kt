@@ -1,7 +1,9 @@
 package com.relic.presentation.base
 
 import android.arch.lifecycle.LifecycleOwner
+import android.content.Context
 import android.content.res.TypedArray
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
@@ -12,6 +14,10 @@ import com.relic.R
 
 open class RelicFragment: Fragment() {
     protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
+
+    private val connectivityManager: ConnectivityManager by lazy {
+        requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
 
     protected fun log(message : String) {
         Log.d(TAG, message)
@@ -49,4 +55,7 @@ open class RelicFragment: Fragment() {
 
     protected open fun bindViewModel(lifecycleOwner : LifecycleOwner) { }
 
+    protected fun checkInternetConnectivity() : Boolean {
+        return connectivityManager.activeNetworkInfo?.isConnected ?: false
+    }
 }

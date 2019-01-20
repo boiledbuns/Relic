@@ -105,8 +105,8 @@ class PostRepositoryImpl @Inject constructor(
                     PostRepository.RetrievalOption.Submitted -> appDB.postDao.getUserPosts(postSource.username)
                     PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts(postSource.username)
                     PostRepository.RetrievalOption.Saved -> appDB.postDao.getUserSavedPosts()
-                    PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserVotedPosts(1)
-                    PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserVotedPosts(-1)
+                    PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserUpvotedPosts()
+                    PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserDownvotedPosts()
                     PostRepository.RetrievalOption.Gilded -> appDB.postDao.getUserGilded()
                     PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts(postSource.username)
                 }
@@ -122,7 +122,7 @@ class PostRepositoryImpl @Inject constructor(
         // change the api endpoint to access the next post listing
         val ending = when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
-            is PostRepository.PostSource.User -> "user/${postSource.username}"
+            is PostRepository.PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
             else -> ""
         }
 
@@ -133,6 +133,7 @@ class PostRepositoryImpl @Inject constructor(
                 url = "$ENDPOINT$ending?after=$listingAfter",
                 authToken = checkToken()
             )
+            Log.d(TAG, "more posts $response")
             parsePosts(response, postSource)
         } catch (e : Exception) {
             Log.d(TAG, "Error: " + e.message)
@@ -163,7 +164,7 @@ class PostRepositoryImpl @Inject constructor(
         var ending = ENDPOINT + when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
             is PostRepository.PostSource.User -> {
-                "user/${postSource.username}/${postSource.retrievalOption.name}"
+                "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
             }
             else -> ""
         }
@@ -254,7 +255,17 @@ class PostRepositoryImpl @Inject constructor(
                 is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
                 is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
                 is PostRepository.PostSource.Popular -> 0
-                is PostRepository.PostSource.User -> sourceDao.getItemsCountForUserSubmission()
+                is PostRepository.PostSource.User -> {
+                    when (postSource.retrievalOption) {
+                        PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
+                        PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserSubmitted()
+                        PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
+                        PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
+                        PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
+                        PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
+                        PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
+                    }
+                }
             }
 
             // generate the list of posts using the json array
@@ -263,36 +274,17 @@ class PostRepositoryImpl @Inject constructor(
                 val newPost = extractPost(post)
                 postEntities.add(newPost)
 
-                val postSourceEntity = PostSourceEntity(newPost.name, newPost.subreddit)
-                postSourceEntities.add(postSourceEntity)
-
                 val existingPostSource = async {
                     appDB.postSourceDao.getPostSource(newPost.name)
                 }.await()
 
-                if (existingPostSource != null) {
-                    postSourceEntity.apply {
-                        subredditPosition = existingPostSource.subredditPosition
-                        frontpagePosition= existingPostSource.frontpagePosition
-                        allPosition = existingPostSource.allPosition
-                        userSubmissionPosition = existingPostSource.userSubmissionPosition
-                    }
-                }
+                val postSourceEntity = existingPostSource?.apply {
+                    sourceId = newPost.name
+                    subreddit = newPost.subreddit
+                } ?: PostSourceEntity(newPost.name, newPost.subreddit)
 
-                when (postSource) {
-                    is PostRepository.PostSource.Subreddit -> {
-                        postSourceEntity.subredditPosition = postCount
-                    }
-                    is PostRepository.PostSource.Frontpage -> {
-                        postSourceEntity.frontpagePosition = postCount
-                    }
-                    is PostRepository.PostSource.All -> {
-                        postSourceEntity.allPosition = postCount
-                    }
-                    is PostRepository.PostSource.User -> {
-                        postSourceEntity.userSubmissionPosition = postCount
-                    }
-                }
+                setSource(postSourceEntity, postSource, postCount)
+                postSourceEntities.add(postSourceEntity)
 
                 postCount ++
             }
@@ -359,6 +351,33 @@ class PostRepositoryImpl @Inject constructor(
                 platinum = (gilding["gid_1"] as Long).toInt()
                 gold = (gilding["gid_2"] as Long).toInt()
                 silver = (gilding["gid_3"] as Long).toInt()
+            }
+        }
+    }
+
+    private fun setSource(entity : PostSourceEntity, src: PostRepository.PostSource, position : Int) {
+        entity.apply {
+            when (src) {
+                is PostRepository.PostSource.Subreddit -> {
+                    subredditPosition = position
+                }
+                is PostRepository.PostSource.Frontpage -> {
+                    frontpagePosition = position
+                }
+                is PostRepository.PostSource.All -> {
+                    allPosition = position
+                }
+                is PostRepository.PostSource.User -> {
+                    when (src.retrievalOption) {
+                        PostRepository.RetrievalOption.Submitted -> userSubmittedPosition = position
+                        PostRepository.RetrievalOption.Comments -> userCommentsPosition = position
+                        PostRepository.RetrievalOption.Saved -> userSavedPosition = position
+                        PostRepository.RetrievalOption.Upvoted -> userUpvotedPosition = position
+                        PostRepository.RetrievalOption.Downvoted -> userDownvotedPosition = position
+                        PostRepository.RetrievalOption.Gilded -> userGildedPosition = position
+                        PostRepository.RetrievalOption.Hidden -> userHiddenPosition = position
+                    }
+                }
             }
         }
     }
@@ -432,7 +451,17 @@ class PostRepositoryImpl @Inject constructor(
                     appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
                 }
                 is PostRepository.PostSource.User -> {
-                    appDB.postSourceDao.removeAllCurrentUserAsSource()
+                    appDB.postSourceDao.apply {
+                        when (postSource.retrievalOption) {
+                            PostRepository.RetrievalOption.Submitted -> removeAllUserSubmittedAsSource()
+                            PostRepository.RetrievalOption.Comments -> removeAllUserCommentsAsSource()
+                            PostRepository.RetrievalOption.Saved -> removeAllUserSavedAsSource()
+                            PostRepository.RetrievalOption.Upvoted -> removeAllUserUpvotedAsSource()
+                            PostRepository.RetrievalOption.Downvoted -> removeAllUserDownvotedAsSource()
+                            PostRepository.RetrievalOption.Gilded -> removeAllUserGildedAsSource()
+                            PostRepository.RetrievalOption.Hidden -> removeAllUserHiddenAsSource()
+                        }
+                    }
                 }
             }
             // remove all the source entities that no longer correspond to any remaining posts

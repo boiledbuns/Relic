@@ -31,6 +31,7 @@ class PostsTabFragment : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         postsTabVM = ViewModelProviders.of(requireActivity()).get(DisplayUserVM::class.java)
+
         userPostsAdapter = PostItemAdapter(postsTabVM)
 
         arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
@@ -85,6 +86,7 @@ class PostsTabFragment : RelicFragment() {
     private fun setPosts(posts : List<PostModel>) {
         userPostsAdapter.setPostList(posts)
         userTabSwipeRefreshLayout.isRefreshing = false
+        scrollLocked = false
     }
 
     private fun resetRecyclerView() {
