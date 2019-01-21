@@ -37,12 +37,12 @@ public abstract class PostDao {
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmittedPosition >= 0 AND author= :username ORDER BY userSubmittedPosition ASC")
-    public abstract LiveData<List<PostModel>> getUserPosts(String username);
+        "WHERE userSubmittedPosition >= 0 ORDER BY userSubmittedPosition ASC")
+    public abstract LiveData<List<PostModel>> getUserPosts();
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSavedPosition >= 0 AND saved = 1 ORDER BY userSavedPosition ASC")
+        "WHERE userSavedPosition >= 0 ORDER BY userSavedPosition ASC")
     public abstract LiveData<List<PostModel>> getUserSavedPosts();
 
     @Query("SELECT * FROM PostEntity " +
@@ -57,8 +57,7 @@ public abstract class PostDao {
 
     @Query("SELECT * FROM PostEntity " +
         "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userGildedPosition >= 0 " +
-        "AND (platinum >= 0 OR gold >= 0 OR silver >= 0) ORDER BY userGildedPosition ASC")
+        "WHERE userGildedPosition >= 0 ORDER BY userGildedPosition ASC")
     public abstract LiveData<List<PostModel>> getUserGilded();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

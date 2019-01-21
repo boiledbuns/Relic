@@ -102,13 +102,13 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
             is PostRepository.PostSource.User -> {
                 when (postSource.retrievalOption) {
-                    PostRepository.RetrievalOption.Submitted -> appDB.postDao.getUserPosts(postSource.username)
-                    PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts(postSource.username)
+                    PostRepository.RetrievalOption.Submitted -> appDB.postDao.getUserPosts()
+                    PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts()
                     PostRepository.RetrievalOption.Saved -> appDB.postDao.getUserSavedPosts()
                     PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserUpvotedPosts()
                     PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserDownvotedPosts()
                     PostRepository.RetrievalOption.Gilded -> appDB.postDao.getUserGilded()
-                    PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts(postSource.username)
+                    PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts()
                 }
             }
             else -> appDB.postDao.getPostsFromAll()

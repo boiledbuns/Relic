@@ -1,9 +1,6 @@
 package com.relic.data.dao
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.OnConflictStrategy
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import com.relic.data.entities.PostSourceEntity
 import java.util.ArrayList
 
@@ -23,6 +20,8 @@ abstract class PostSourceDao {
 
     @Query("SELECT COUNT() FROM PostSourceEntity WHERE allPosition >= 0")
     abstract fun getItemsCountForAll(): Int
+
+    // region user posts
 
     @Query("SELECT COUNT() FROM PostSourceEntity WHERE userSubmittedPosition >= 0")
     abstract fun getItemsCountForUserSubmitted(): Int
@@ -52,6 +51,8 @@ abstract class PostSourceDao {
 
     @Query("UPDATE PostSourceEntity SET allPosition = -1 WHERE allPosition >= 0")
     abstract fun removeAllAllAsSource()
+
+    // endregion user posts
 
     // I honestly hate doing this, but I haven't yet found a good solution
     // that saves me the pain of writing n queries using room yet
@@ -89,6 +90,10 @@ abstract class PostSourceDao {
     abstract fun removeAllAsSource(postId: String)
     // endregion
 
-    @Query("DELETE FROM PostSourceEntity WHERE subredditPosition < 0 AND frontpagePosition < 0 AND allPosition < 0")
+    @Query("DELETE FROM PostSourceEntity " +
+        "WHERE subredditPosition < 0 AND frontpagePosition < 0 AND allPosition < 0 " +
+        "AND userSubmittedPosition < 0 AND userCommentsPosition < 0 AND userSavedPosition < 0 " +
+        "AND userUpvotedPosition < 0 AND userDownvotedPosition < 0 AND userGildedPosition < 0 " +
+        "AND userHiddenPosition < 0")
     abstract fun removeAllUnusedSources()
 }

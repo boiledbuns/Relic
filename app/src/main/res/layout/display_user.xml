@@ -20,12 +20,13 @@
             app:titleEnabled="false">
 
             <include layout="@layout/relic_toolbar"
-                 android:id="@+id/userToolbar"
-                 android:layout_width="match_parent"
-                 android:layout_height="@dimen/toolbar_height"
-                 android:layout_marginBottom="@dimen/toolbar_height"
-                 android:layout_gravity="top"
-                 app:layout_collapseMode="pin"/>
+                android:id="@+id/userToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_height"
+                android:layout_marginBottom="@dimen/toolbar_height"
+                android:layout_gravity="top"
+                android:elevation="8dp"
+                app:layout_collapseMode="pin"/>
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/userTabLayout"

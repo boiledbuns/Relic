@@ -37,6 +37,10 @@ class PostsTabFragment : RelicFragment() {
         arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
         }
+
+        if (checkInternetConnectivity()) {
+            postsTabVM.requestPosts(tab = selectedUserTab, refresh = true)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

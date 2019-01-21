@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.relic.MainActivity
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
@@ -56,7 +57,11 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.display_user, container, false).apply {
-            (userToolbar as Toolbar).title = getString(R.string.user_prefix_label, username)
+            (userToolbar as Toolbar).apply {
+                title = getString(R.string.user_prefix_label, username)
+                setNavigationOnClickListener { activity?.onBackPressed() }
+                (activity as MainActivity).setSupportActionBar(this)
+            }
 
             userViewPager.adapter = pagerAdapter
             userViewPager.offscreenPageLimit = 1
