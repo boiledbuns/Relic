@@ -102,13 +102,13 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
             is PostRepository.PostSource.User -> {
                 when (postSource.retrievalOption) {
-                    PostRepository.RetrievalOption.Submitted -> appDB.postDao.getUserPosts()
-                    PostRepository.RetrievalOption.Comments -> appDB.postDao.getUserPosts()
-                    PostRepository.RetrievalOption.Saved -> appDB.postDao.getUserSavedPosts()
-                    PostRepository.RetrievalOption.Upvoted -> appDB.postDao.getUserUpvotedPosts()
-                    PostRepository.RetrievalOption.Downvoted -> appDB.postDao.getUserDownvotedPosts()
-                    PostRepository.RetrievalOption.Gilded -> appDB.postDao.getUserGilded()
-                    PostRepository.RetrievalOption.Hidden -> appDB.postDao.getUserPosts()
+                    PostRepository.RetrievalOption.Submitted -> appDB.userPostingDao.getUserPosts()
+                    PostRepository.RetrievalOption.Comments -> appDB.userPostingDao.getUserPosts()
+                    PostRepository.RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedPosts()
+                    PostRepository.RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedPosts()
+                    PostRepository.RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedPosts()
+                    PostRepository.RetrievalOption.Gilded -> appDB.userPostingDao.getUserGilded()
+                    PostRepository.RetrievalOption.Hidden -> appDB.userPostingDao.getUserHidden()
                 }
             }
             else -> appDB.postDao.getPostsFromAll()
@@ -186,7 +186,11 @@ class PostRepositoryImpl @Inject constructor(
             )
             parsePosts(response, postSource)
         } catch (e : Exception) {
-            Log.d(TAG, "Error retrieving sorted posts $e")
+            when (e){
+                is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
+                else -> Log.d(TAG, "Error retrieving sorted posts $e")
+            }
+
         }
     }
 

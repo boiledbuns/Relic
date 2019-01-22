@@ -10,6 +10,7 @@ import com.relic.data.dao.ListingDao;
 import com.relic.data.dao.PostDao;
 import com.relic.data.dao.PostSourceDao;
 import com.relic.data.dao.SubredditDao;
+import com.relic.data.dao.UserPostingDao;
 import com.relic.data.entities.CommentEntity;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
@@ -35,8 +36,9 @@ public abstract class ApplicationDB extends RoomDatabase{
   public abstract PostSourceDao getPostSourceDao();
   public abstract ListingDao getListingDAO();
   public abstract CommentDao getCommentDAO();
+  public abstract UserPostingDao getUserPostingDao();
 
-  public static ApplicationDB getDatabase(Context context) {
+    public static ApplicationDB getDatabase(Context context) {
     if(INSTANCE == null) {
       INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
           ApplicationDB.class, "APP").build();

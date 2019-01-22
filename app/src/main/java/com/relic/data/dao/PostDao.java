@@ -15,7 +15,6 @@ import java.util.List;
 @Dao
 public abstract class PostDao {
     // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
-
     // region get posts based on origin
 
     @Query("SELECT * FROM PostEntity " +
@@ -33,38 +32,8 @@ public abstract class PostDao {
         "WHERE allPosition >= 0 ORDER BY allPosition ASC")
     public abstract LiveData<List<PostModel>> getPostsFromAll();
 
-    // for user specific actions
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmittedPosition >= 0 ORDER BY userSubmittedPosition ASC")
-    public abstract LiveData<List<PostModel>> getUserPosts();
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSavedPosition >= 0 ORDER BY userSavedPosition ASC")
-    public abstract LiveData<List<PostModel>> getUserSavedPosts();
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userUpvotedPosition >= 0 ORDER BY userUpvotedPosition ASC")
-    public abstract LiveData<List<PostModel>> getUserUpvotedPosts();
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE  userDownvotedPosition >= 0 ORDER BY userDownvotedPosition ASC")
-    public abstract LiveData<List<PostModel>> getUserDownvotedPosts();
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userGildedPosition >= 0 ORDER BY userGildedPosition ASC")
-    public abstract LiveData<List<PostModel>> getUserGilded();
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPosts(List<PostEntity> posts);
-
-//    @Query("DELETE FROM PostEntity WHERE subreddit = :subName")
-//    public abstract void deleteAllFromSub(String subName);
 
     @Query("DELETE FROM PostEntity WHERE PostEntity.id IN " +
         "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0 AND subreddit = :subName)")
