@@ -32,6 +32,7 @@ class DisplayUserVM(
     private var currentSortingType = emptyMap<UserTab, PostRepository.SortType>()
     private var currentSortingScope = emptyMap<UserTab, PostRepository.SortScope>()
 
+    // TODO convert to mediator livedata -> allows for both comments and posts
     private var postsLiveData = mutableMapOf<UserTab, LiveData<List<PostModel>>>()
 
     fun getTabPostsLiveData(tab : UserTab) : LiveData<List<PostModel>> {

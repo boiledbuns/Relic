@@ -9,6 +9,8 @@ import com.android.volley.NoConnectionError
 
 import com.google.gson.GsonBuilder
 import com.relic.R
+import com.relic.data.deserializer.CommentDeserializer
+import com.relic.data.entities.CommentEntity
 import com.relic.network.NetworkRequestManager
 import com.relic.data.gateway.PostGateway
 import com.relic.data.gateway.PostGatewayImpl
@@ -66,6 +68,8 @@ class PostRepositoryImpl @Inject constructor(
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
         private const val KEY_OTHER = "other"
+
+        private const val TYPE_POST = "t3"
     }
 
     private val sortTypesWithScope = arrayOf(
@@ -184,6 +188,7 @@ class PostRepositoryImpl @Inject constructor(
                 url = ending,
                 authToken = checkToken()
             )
+
             parsePosts(response, postSource)
         } catch (e : Exception) {
             when (e){
@@ -230,6 +235,7 @@ class PostRepositoryImpl @Inject constructor(
 
     /**
      * Parses the response from the api and stores the posts in the persistence layer
+     * TODO consider creating super class for posts and comments -> allows this method to return both
      * TODO separate into two separate methods and switch to mutithreaded to avoid locking main thread
      * @param response the json response from the server with the listing object
      * @throws ParseException
@@ -249,43 +255,45 @@ class PostRepositoryImpl @Inject constructor(
 
         val postIterator = listingPosts!!.iterator()
         val postEntities = ArrayList<PostEntity>()
+        val commentEntities = ArrayList<CommentEntity>()
+
         val postSourceEntities = ArrayList<PostSourceEntity>()
 
         async {
-            val sourceDao = appDB.postSourceDao
-
-            var postCount: Int = when (postSource) {
-                is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
-                is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
-                is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
-                is PostRepository.PostSource.Popular -> 0
-                is PostRepository.PostSource.User -> {
-                    when (postSource.retrievalOption) {
-                        PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
-                        PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserSubmitted()
-                        PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
-                        PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
-                        PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
-                        PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
-                        PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
-                    }
-                }
-            }
+            var postCount: Int = getSourceCount(postSource)
 
             // generate the list of posts using the json array
             while (postIterator.hasNext()) {
-                val post = (postIterator.next() as JSONObject)["data"] as JSONObject
-                val newPost = extractPost(post)
-                postEntities.add(newPost)
+                val fullEntityJson = (postIterator.next() as JSONObject)
+                var postSourceEntity : PostSourceEntity?
 
-                val existingPostSource = async {
-                    appDB.postSourceDao.getPostSource(newPost.name)
-                }.await()
+                val postKind = fullEntityJson["kind"] as String
 
-                val postSourceEntity = existingPostSource?.apply {
-                    sourceId = newPost.name
-                    subreddit = newPost.subreddit
-                } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+                if (postKind.equals(TYPE_POST)) {
+                    val post = fullEntityJson["data"] as JSONObject
+                    val newPost = extractPost(post)
+                    postEntities.add(newPost)
+
+                    val existingPostSource = async {
+                        appDB.postSourceDao.getPostSource(newPost.name)
+                    }.await()
+
+                    postSourceEntity = existingPostSource?.apply {
+                        sourceId = newPost.name
+                        subreddit = newPost.subreddit
+                    } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+                }
+                else {
+                    val comment = fullEntityJson["data"] as JSONObject
+                    val newComment = CommentDeserializer.unmarshallComment(
+                        commentChild = comment,
+                        postFullName = "",
+                        commentPosition = 0F
+                    ).first()
+                    commentEntities.add(newComment)
+
+                    postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
+                }
 
                 setSource(postSourceEntity, postSource, postCount)
                 postSourceEntities.add(postSourceEntity)
@@ -293,6 +301,7 @@ class PostRepositoryImpl @Inject constructor(
                 postCount ++
             }
 
+            appDB.commentDAO.insertComments(commentEntities)
             appDB.postDao.insertPosts(postEntities)
             appDB.postSourceDao.insertPostSources(postSourceEntities)
             appDB.listingDAO.insertListing(listing)
@@ -397,6 +406,28 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.All -> KEY_ALL
             is PostRepository.PostSource.User -> postSource.username + postSource.retrievalOption.name
             else -> KEY_OTHER
+        }
+    }
+
+    private fun getSourceCount(postSource : PostRepository.PostSource) : Int {
+        val sourceDao = appDB.postSourceDao
+
+        return when (postSource) {
+            is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
+            is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
+            is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
+            is PostRepository.PostSource.Popular -> 0
+            is PostRepository.PostSource.User -> {
+                when (postSource.retrievalOption) {
+                    PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
+                    PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserSubmitted()
+                    PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
+                    PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
+                    PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
+                    PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
+                    PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
+                }
+            }
         }
     }
 
