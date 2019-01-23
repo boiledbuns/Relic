@@ -97,7 +97,7 @@ object CommentDeserializer {
     // TODO refactor and move the method into a comment entity method
     // TODO find a better way to unmarshall these objects and clean this up
     // won't be cleaned for a while because still decided how to format data and what is needed
-    public suspend fun unmarshallComment(
+    suspend fun unmarshallComment(
         commentChild : JSONObject,
         postFullName : String,
         commentPosition : Float

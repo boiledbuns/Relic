@@ -3,14 +3,12 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.os.AsyncTask
-import android.text.Html
 import android.util.Log
 import com.android.volley.NoConnectionError
 
-import com.google.gson.GsonBuilder
 import com.relic.R
-import com.relic.data.deserializer.CommentDeserializer
-import com.relic.data.entities.CommentEntity
+import com.relic.data.deserializer.ParsedPostsData
+import com.relic.data.deserializer.PostDeserializerImpl
 import com.relic.network.NetworkRequestManager
 import com.relic.data.gateway.PostGateway
 import com.relic.data.gateway.PostGatewayImpl
@@ -21,17 +19,13 @@ import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
-import kotlinx.coroutines.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
 import java.lang.Exception
 
-import java.text.SimpleDateFormat
 import java.util.ArrayList
-import java.util.Date
 
 import javax.inject.Inject
 
@@ -68,8 +62,6 @@ class PostRepositoryImpl @Inject constructor(
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
         private const val KEY_OTHER = "other"
-
-        private const val TYPE_POST = "t3"
     }
 
     private val sortTypesWithScope = arrayOf(
@@ -78,13 +70,9 @@ class PostRepositoryImpl @Inject constructor(
         PostRepository.SortType.TOP
     )
 
-    private val jsonParser: JSONParser = JSONParser()
     private val appDB: ApplicationDB = ApplicationDB.getDatabase(appContext)
-
-    private val gson = GsonBuilder().create()
-    // initialize the date formatter and date for "now"
-    private val formatter = SimpleDateFormat("MMM dd',' hh:mm a")
-    private val current = Date()
+    // TODO convert this to DI
+    private val postDeserializer = PostDeserializerImpl(appContext)
 
     override val postGateway: PostGateway
         get() = PostGatewayImpl(appContext, requestManager)
@@ -129,20 +117,24 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
             else -> ""
         }
+        coroutineScope {
+            try {
+                // create the new request and submit it
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = "$ENDPOINT$ending?after=$listingAfter",
+                    authToken = checkToken()
+                )
+                Log.d(TAG, "more posts $response")
 
-        try {
-            // create the new request and submit it
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = "$ENDPOINT$ending?after=$listingAfter",
-                authToken = checkToken()
-            )
-            Log.d(TAG, "more posts $response")
-            parsePosts(response, postSource)
-        } catch (e : Exception) {
-            Log.d(TAG, "Error: " + e.message)
+                val listingKey = getListingKey(postSource)
+                val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
+                launch { insertParsedPosts(parsedData) }
+
+            } catch (e: Exception) {
+                Log.d(TAG, "Error: " + e.message)
+            }
         }
-
     }
 
     /**
@@ -182,20 +174,25 @@ class PostRepositoryImpl @Inject constructor(
             if (sortTypesWithScope.contains(sortType)) ending += "?t=" + sortScope.name.toLowerCase()
         }
 
-        try {
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = ending,
-                authToken = checkToken()
-            )
+        coroutineScope {
+            try {
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = ending,
+                    authToken = checkToken()
+                )
 
-            parsePosts(response, postSource)
-        } catch (e : Exception) {
-            when (e){
-                is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
-                else -> Log.d(TAG, "Error retrieving sorted posts $e")
+                val listingKey = getListingKey(postSource)
+                val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
+                launch { insertParsedPosts(parsedData) }
+
+            } catch (e: Exception) {
+                when (e) {
+                    is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
+                    else -> Log.d(TAG, "Error retrieving sorted posts $e")
+                }
+
             }
-
         }
     }
 
@@ -213,7 +210,10 @@ class PostRepositoryImpl @Inject constructor(
                 url = ENDPOINT + ending,
                 authToken = checkToken()
             )
-            parsePost(response)
+
+            val postEntity = postDeserializer.parsePost(response)
+            PostRepositoryImpl.InsertPostTask().execute(appDB, postEntity)
+
         } catch (e :Exception) {
             // TODO decide if it would be better to move this to another method
             when (e) {
@@ -233,165 +233,13 @@ class PostRepositoryImpl @Inject constructor(
 
     // region helper functions
 
-    /**
-     * Parses the response from the api and stores the posts in the persistence layer
-     * TODO consider creating super class for posts and comments -> allows this method to return both
-     * TODO separate into two separate methods and switch to mutithreaded to avoid locking main thread
-     * @param response the json response from the server with the listing object
-     * @throws ParseException
-     */
-    @Throws(ParseException::class)
-    private suspend fun parsePosts(
-        response: String,
-        postSource: PostRepository.PostSource
-    ) : List<PostEntity> = coroutineScope {
-        val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
-        val listingPosts = listingData!!["children"] as JSONArray?
+    private fun insertParsedPosts(parsedPosts : ParsedPostsData) {
+        parsedPosts.apply {
+            if (postEntities.isNotEmpty())  appDB.postDao.insertPosts(postEntities)
+            if (commentEntities.isNotEmpty()) appDB.commentDAO.insertComments(commentEntities)
 
-        val listingKey = getListingKey(postSource)
-
-        // create the new listing entity
-        val listing = ListingEntity(listingKey, listingData["after"] as String?)
-
-        val postIterator = listingPosts!!.iterator()
-        val postEntities = ArrayList<PostEntity>()
-        val commentEntities = ArrayList<CommentEntity>()
-
-        val postSourceEntities = ArrayList<PostSourceEntity>()
-
-        async {
-            var postCount: Int = getSourceCount(postSource)
-
-            // generate the list of posts using the json array
-            while (postIterator.hasNext()) {
-                val fullEntityJson = (postIterator.next() as JSONObject)
-                var postSourceEntity : PostSourceEntity?
-
-                val postKind = fullEntityJson["kind"] as String
-
-                if (postKind.equals(TYPE_POST)) {
-                    val post = fullEntityJson["data"] as JSONObject
-                    val newPost = extractPost(post)
-                    postEntities.add(newPost)
-
-                    val existingPostSource = async {
-                        appDB.postSourceDao.getPostSource(newPost.name)
-                    }.await()
-
-                    postSourceEntity = existingPostSource?.apply {
-                        sourceId = newPost.name
-                        subreddit = newPost.subreddit
-                    } ?: PostSourceEntity(newPost.name, newPost.subreddit)
-                }
-                else {
-                    val comment = fullEntityJson["data"] as JSONObject
-                    val newComment = CommentDeserializer.unmarshallComment(
-                        commentChild = comment,
-                        postFullName = "",
-                        commentPosition = 0F
-                    ).first()
-                    commentEntities.add(newComment)
-
-                    postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
-                }
-
-                setSource(postSourceEntity, postSource, postCount)
-                postSourceEntities.add(postSourceEntity)
-
-                postCount ++
-            }
-
-            appDB.commentDAO.insertComments(commentEntities)
-            appDB.postDao.insertPosts(postEntities)
             appDB.postSourceDao.insertPostSources(postSourceEntities)
-            appDB.listingDAO.insertListing(listing)
-        }.await()
-
-        postEntities
-    }
-
-    private suspend fun parsePost(response: String) = coroutineScope {
-        val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
-        val child = (data["children"] as JSONArray)[0] as JSONObject
-        val post = child["data"] as JSONObject
-
-        launch {
-            val postEntity = extractPost(post).apply {
-                visited = true
-            }
-
-            InsertPostTask().execute(appDB, postEntity)
-        }
-    }
-
-    /**
-     * This is fine for now because I'm still working on finalizing which fields to use/not use
-     * There will be a lot more experimentation and changes to come in this method as a result
-     */
-    @Throws(ParseException::class)
-    private fun extractPost(post: JSONObject) : PostEntity {
-        // use "api" prefix to indicate fields accessed directly from api
-        return gson.fromJson(post.toJSONString(), PostEntity::class.java).apply {
-            //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
-            //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
-            //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
-            //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
-            Log.d(TAG, "link_flair_richtext : " + post["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
-            //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
-            //Log.d(TAG, "post keys " + post.keySet().toString())
-            // unmarshall the object and add it into a list
-
-            val apiLikes = post["likes"] as Boolean?
-            userUpvoted = if (apiLikes == null) 0 else if (apiLikes) 1 else -1
-
-            // TODO create parse class/switch to a more efficient method of removing html
-            val authorFlair = post["author_flair_text"] as String?
-            author_flair_text = if (authorFlair != null && !authorFlair.isEmpty()) {
-                Html.fromHtml(authorFlair).toString()
-            } else null
-
-            // add year to stamp if the post year doesn't match the current one
-            Log.d(TAG, "epoch = " + post["created"]!!)
-            val apiCreated = Date((post["created"] as Double).toLong() * 1000)
-            created = if (current.year != apiCreated.year) {
-                apiCreated.year.toString() + " " + formatter.format(apiCreated)
-            } else {
-                formatter.format(apiCreated)
-            }
-
-            // get the gildings
-            (post["gildings"] as JSONObject?)?.let { gilding ->
-                platinum = (gilding["gid_1"] as Long).toInt()
-                gold = (gilding["gid_2"] as Long).toInt()
-                silver = (gilding["gid_3"] as Long).toInt()
-            }
-        }
-    }
-
-    private fun setSource(entity : PostSourceEntity, src: PostRepository.PostSource, position : Int) {
-        entity.apply {
-            when (src) {
-                is PostRepository.PostSource.Subreddit -> {
-                    subredditPosition = position
-                }
-                is PostRepository.PostSource.Frontpage -> {
-                    frontpagePosition = position
-                }
-                is PostRepository.PostSource.All -> {
-                    allPosition = position
-                }
-                is PostRepository.PostSource.User -> {
-                    when (src.retrievalOption) {
-                        PostRepository.RetrievalOption.Submitted -> userSubmittedPosition = position
-                        PostRepository.RetrievalOption.Comments -> userCommentsPosition = position
-                        PostRepository.RetrievalOption.Saved -> userSavedPosition = position
-                        PostRepository.RetrievalOption.Upvoted -> userUpvotedPosition = position
-                        PostRepository.RetrievalOption.Downvoted -> userDownvotedPosition = position
-                        PostRepository.RetrievalOption.Gilded -> userGildedPosition = position
-                        PostRepository.RetrievalOption.Hidden -> userHiddenPosition = position
-                    }
-                }
-            }
+            appDB.listingDAO.insertListing(listingEntity)
         }
     }
 
@@ -406,28 +254,6 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.All -> KEY_ALL
             is PostRepository.PostSource.User -> postSource.username + postSource.retrievalOption.name
             else -> KEY_OTHER
-        }
-    }
-
-    private fun getSourceCount(postSource : PostRepository.PostSource) : Int {
-        val sourceDao = appDB.postSourceDao
-
-        return when (postSource) {
-            is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
-            is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
-            is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
-            is PostRepository.PostSource.Popular -> 0
-            is PostRepository.PostSource.User -> {
-                when (postSource.retrievalOption) {
-                    PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
-                    PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserSubmitted()
-                    PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
-                    PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
-                    PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
-                    PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
-                    PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
-                }
-            }
         }
     }
 

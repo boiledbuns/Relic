@@ -7,7 +7,7 @@ import java.util.ArrayList
 @Dao
 abstract class PostSourceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertPostSources(postSourceEntities: ArrayList<PostSourceEntity>)
+    abstract fun insertPostSources(postSourceEntities: List<PostSourceEntity>)
 
     @Query("SELECT * FROM PostSourceEntity WHERE sourceId = :postId")
     abstract fun getPostSource(postId: String): PostSourceEntity?
