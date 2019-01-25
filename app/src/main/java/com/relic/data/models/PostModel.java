@@ -5,7 +5,7 @@ import android.text.Html;
 import com.relic.domain.Post;
 
 
-public class PostModel implements Post {
+public class PostModel implements Post, ListingItem {
   private String id;
   private String subreddit;
   private String author;

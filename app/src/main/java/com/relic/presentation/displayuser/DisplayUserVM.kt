@@ -1,10 +1,12 @@
 package com.relic.presentation.displayuser
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.ViewModel
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
+import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.DisplaySubContract
@@ -32,16 +34,21 @@ class DisplayUserVM(
     private var currentSortingType = emptyMap<UserTab, PostRepository.SortType>()
     private var currentSortingScope = emptyMap<UserTab, PostRepository.SortScope>()
 
-    // TODO convert to mediator livedata -> allows for both comments and posts
-    private var postsLiveData = mutableMapOf<UserTab, LiveData<List<PostModel>>>()
+    private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
-    fun getTabPostsLiveData(tab : UserTab) : LiveData<List<PostModel>> {
+    fun getTabPostsLiveData(tab : UserTab) : LiveData<List<ListingItem>> {
         var tabLiveData = postsLiveData[tab]
         val userRetrievalOption = toRetrievalOption(tab)
 
         if (tabLiveData == null) {
+            val postSource = postRepo.getPosts(PostRepository.PostSource.User(username, userRetrievalOption))
+
             // create a new livedata if it doesn't already exist
-            tabLiveData = postRepo.getPosts(PostRepository.PostSource.User(username, userRetrievalOption))
+            tabLiveData = MediatorLiveData<List<ListingItem>>().apply {
+                addSource(postSource) {
+
+                }
+            }
             postsLiveData[tab] = tabLiveData
         }
 

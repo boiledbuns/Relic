@@ -1,6 +1,7 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
 import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
@@ -17,8 +18,10 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
+import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
+import com.shopify.livedataktx.map
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
@@ -104,6 +107,14 @@ class PostRepositoryImpl @Inject constructor(
                 }
             }
             else -> appDB.postDao.getPostsFromAll()
+        }
+    }
+
+    fun getPostsAndComments(postSource : PostRepository.PostSource) : LiveData<List<ListingItem>> {
+        return MediatorLiveData<List<ListingItem>>().apply {
+            addSource(appDB.itemSourceDao.getItems()) {
+                it?.map { it.postModel ?: it.commentModel }
+            }
         }
     }
 

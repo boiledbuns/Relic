@@ -1,6 +1,6 @@
 package com.relic.data.models;
 
-public class CommentModel {
+public class CommentModel implements ListingItem {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
   public static int NOVOTE = 0;

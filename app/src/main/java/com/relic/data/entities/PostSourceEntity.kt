@@ -13,6 +13,8 @@ data class PostSourceEntity(
     // all posts will have a subreddit regardless of its source
     var subreddit : String
 ) {
+    var commentId : String? = null
+
     // since a post can  only appear in any combination of the three sources
     var subredditPosition : Int = UNINITIALIZED
     var frontpagePosition : Int  = UNINITIALIZED
@@ -23,7 +25,7 @@ data class PostSourceEntity(
     /**
      * Just a note, it's not enough for us to just use user submissions for displaying
      * content related to the user. If we used sorting to display values, the very likely
-     * chance of overlap between items in two categories (eg. upvoted and saved") means
+     * chance of overlap between items in two categories (eg. upvoted and saved) means
      * that if comments are fetched for the first type (upvoted), then results that also
      * overlap with the second type (saved) will show up when displaying the second type
      *
