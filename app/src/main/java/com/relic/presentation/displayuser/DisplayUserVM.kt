@@ -98,6 +98,10 @@ class DisplayUserVM(
         }
     }
 
+    private fun convergeSources() {
+
+    }
+
     // region post adapter delegate
 
     override fun visitPost(postFullname: String, subreddit: String) {

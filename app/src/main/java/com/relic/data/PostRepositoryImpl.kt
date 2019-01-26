@@ -110,14 +110,6 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    fun getPostsAndComments(postSource : PostRepository.PostSource) : LiveData<List<ListingItem>> {
-        return MediatorLiveData<List<ListingItem>>().apply {
-            addSource(appDB.itemSourceDao.getItems()) {
-                it?.map { it.postModel ?: it.commentModel }
-            }
-        }
-    }
-
     override suspend fun retrieveMorePosts(
         postSource: PostRepository.PostSource,
         listingAfter: String

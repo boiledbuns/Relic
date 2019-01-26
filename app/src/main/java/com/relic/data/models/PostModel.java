@@ -1,7 +1,9 @@
 package com.relic.data.models;
 
+import android.arch.persistence.room.Embedded;
 import android.text.Html;
 
+import com.relic.data.entities.PostSourceEntity;
 import com.relic.domain.Post;
 
 
@@ -230,11 +232,10 @@ public class PostModel implements Post, ListingItem {
     this.linkFlair = linkFlair;
   }
 
-  public int subredditPosition;
-  public int frontpagePosition;
-  public int allPosition;
-
   public int platinum;
   public int gold;
   public int silver;
+
+  @Embedded(prefix = "src")
+  public PostSourceEntity postSource;
 }

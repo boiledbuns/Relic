@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.data.models.PostModel
+import com.relic.data.models.ListingItem
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displayuser.DisplayUserVM
@@ -87,8 +87,8 @@ class PostsTabFragment : RelicFragment() {
         }
     }
 
-    private fun setPosts(posts : List<PostModel>) {
-        userPostsAdapter.setPostList(posts)
+    private fun setPosts(posts : List<ListingItem>) {
+//        userPostsAdapter.setPostList(posts)
         userTabSwipeRefreshLayout.isRefreshing = false
         scrollLocked = false
     }

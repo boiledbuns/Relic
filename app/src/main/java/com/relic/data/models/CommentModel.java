@@ -1,5 +1,9 @@
 package com.relic.data.models;
 
+import android.arch.persistence.room.Embedded;
+
+import com.relic.data.entities.PostSourceEntity;
+
 public class CommentModel implements ListingItem {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
@@ -71,4 +75,7 @@ public class CommentModel implements ListingItem {
   public boolean isLoadMore() {
       return author == null;
   }
+
+    @Embedded(prefix = "src")
+    public PostSourceEntity postSource;
 }
