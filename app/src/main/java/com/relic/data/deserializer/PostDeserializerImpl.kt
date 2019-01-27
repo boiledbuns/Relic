@@ -96,9 +96,9 @@ class PostDeserializerImpl(
                     } ?: PostSourceEntity(newPost.name, newPost.subreddit)
                 }
                 else {
-                    val comment = fullEntityJson["data"] as JSONObject
+//                    val comment = fullEntityJson["data"] as JSONObject
                     val newComment = CommentDeserializer.unmarshallComment(
-                        commentChild = comment,
+                        commentChild = fullEntityJson,
                         postFullName = "",
                         commentPosition = 0F
                     ).first()

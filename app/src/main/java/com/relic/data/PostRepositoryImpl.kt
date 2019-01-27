@@ -163,7 +163,7 @@ class PostRepositoryImpl @Inject constructor(
         var ending = ENDPOINT + when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
             is PostRepository.PostSource.User -> {
-                "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
+                "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}?type=links"
             }
             else -> ""
         }

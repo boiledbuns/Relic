@@ -1,16 +1,10 @@
 package com.relic.data.models;
 
-import android.arch.persistence.room.Embedded;
-
-import com.relic.data.entities.PostSourceEntity;
-
 public class CommentModel extends ListingItem {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
   public static int NOVOTE = 0;
   public static String TYPE = "t1_";
-
-  private String id;
 
   public String author;
   private String body;
@@ -35,15 +29,7 @@ public class CommentModel extends ListingItem {
 
   // Note that fullname = type + id
   public String getFullName() {
-    return TYPE + id;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
+    return TYPE + getId();
   }
 
   public String getBody() {
@@ -75,7 +61,4 @@ public class CommentModel extends ListingItem {
   public boolean isLoadMore() {
       return author == null;
   }
-
-//    @Embedded(prefix = "src")
-//    public PostSourceEntity postSource;
 }

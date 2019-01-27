@@ -1,17 +1,10 @@
 package com.relic.data.models;
 
-import android.arch.persistence.room.Embedded;
 import android.text.Html;
 
-import com.relic.data.PostRepository;
-import com.relic.data.entities.PostSourceEntity;
 import com.relic.domain.Post;
 
-import org.jetbrains.annotations.NotNull;
-
-
 public class PostModel extends ListingItem implements Post {
-  private String id;
   private String subreddit;
   private String author;
   private String selftext;
@@ -26,8 +19,6 @@ public class PostModel extends ListingItem implements Post {
   private String thumbnail;
 
   private String authorFlair;
-
-  private boolean visited;
 
   private boolean saved;
 
@@ -50,14 +41,6 @@ public class PostModel extends ListingItem implements Post {
 
   public void setCommentCount(int commentCount) {
     this.commentCount = commentCount;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
   }
 
   public String getTitle() {
@@ -137,15 +120,6 @@ public class PostModel extends ListingItem implements Post {
     this.nsfw = nsfw;
   }
 
-  public boolean isVisited() {
-    return visited;
-  }
-
-  public void setVisited(boolean visited) {
-    this.visited = visited;
-  }
-
-
   public boolean isStickied() {
     return stickied;
   }
@@ -177,7 +151,6 @@ public class PostModel extends ListingItem implements Post {
   public void setPinned(boolean pinned) {
     this.pinned = pinned;
   }
-
 
   public boolean isSaved() {
     return saved;
@@ -238,7 +211,4 @@ public class PostModel extends ListingItem implements Post {
   public int platinum;
   public int gold;
   public int silver;
-
-//  @Embedded(prefix = "src")
-//  public PostSourceEntity postSource;
 }

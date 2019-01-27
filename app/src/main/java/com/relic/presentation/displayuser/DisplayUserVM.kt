@@ -133,8 +133,8 @@ class DisplayUserVM(
             listingItems.addAll(comments)
 
             listingItems.sortWith(Comparator { o1, o2 ->
-                var firstP : Int = 0
-                var secondP : Int = 0
+                var firstP = 0
+                var secondP = 0
 
                 when (tab) {
                     UserTab.Submitted -> {

@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.data.models.ListingItem
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.UserTab
 import com.shopify.livedataktx.nonNull
@@ -19,12 +19,11 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_submissions.*
 import kotlinx.android.synthetic.main.display_user_submissions.view.*
 
-class PostsTabFragment : RelicFragment() {
-
+class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate {
     private lateinit var postsTabVM : DisplayUserVM
     private lateinit var selectedUserTab : UserTab
 
-    private lateinit var userPostsAdapter : PostItemAdapter
+    private lateinit var userPostsAdapter : ListingItemAdapter
     private var scrollLocked: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +31,7 @@ class PostsTabFragment : RelicFragment() {
 
         postsTabVM = ViewModelProviders.of(requireActivity()).get(DisplayUserVM::class.java)
 
-        userPostsAdapter = PostItemAdapter(postsTabVM)
+        userPostsAdapter = ListingItemAdapter(postsTabVM)
 
         arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
@@ -62,7 +61,7 @@ class PostsTabFragment : RelicFragment() {
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // subscribe to the appropriate livedata based on tab selected
         postsTabVM.getTabPostsLiveData(selectedUserTab).nonNull().observe (lifecycleOwner) {
-            setPosts(it)
+            setListingItems(it)
         }
     }
 
@@ -87,8 +86,8 @@ class PostsTabFragment : RelicFragment() {
         }
     }
 
-    private fun setPosts(posts : List<ListingItem>) {
-//        userPostsAdapter.setPostList(posts)
+    private fun setListingItems(listingItems : List<ListingItem>) {
+        userPostsAdapter.setItems(listingItems)
         userTabSwipeRefreshLayout.isRefreshing = false
         scrollLocked = false
     }
@@ -100,6 +99,18 @@ class PostsTabFragment : RelicFragment() {
 
         userTabSwipeRefreshLayout.isRefreshing = true
     }
+
+    // region delegate functions
+
+    override fun visitPost(postFullname: String, subreddit: String) {}
+
+    override fun voteOnPost(postFullname: String, voteValue: Int) {}
+
+    override fun savePost(postFullname: String, save: Boolean) {}
+
+    override fun onThumbnailClicked(postThumbnailUrl: String) {}
+
+    // endregion delegate functions
 
     companion object {
         private val ARG_USER_TAB = "arg_user_tab"
