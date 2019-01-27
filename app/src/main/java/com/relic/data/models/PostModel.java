@@ -3,11 +3,14 @@ package com.relic.data.models;
 import android.arch.persistence.room.Embedded;
 import android.text.Html;
 
+import com.relic.data.PostRepository;
 import com.relic.data.entities.PostSourceEntity;
 import com.relic.domain.Post;
 
+import org.jetbrains.annotations.NotNull;
 
-public class PostModel implements Post, ListingItem {
+
+public class PostModel extends ListingItem implements Post {
   private String id;
   private String subreddit;
   private String author;
@@ -236,6 +239,6 @@ public class PostModel implements Post, ListingItem {
   public int gold;
   public int silver;
 
-  @Embedded(prefix = "src")
-  public PostSourceEntity postSource;
+//  @Embedded(prefix = "src")
+//  public PostSourceEntity postSource;
 }
