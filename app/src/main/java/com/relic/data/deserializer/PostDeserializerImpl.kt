@@ -96,7 +96,6 @@ class PostDeserializerImpl(
                     } ?: PostSourceEntity(newPost.name, newPost.subreddit)
                 }
                 else {
-//                    val comment = fullEntityJson["data"] as JSONObject
                     val newComment = CommentDeserializer.unmarshallComment(
                         commentChild = fullEntityJson,
                         postFullName = "",
@@ -199,7 +198,7 @@ class PostDeserializerImpl(
             is PostRepository.PostSource.User -> {
                 when (postSource.retrievalOption) {
                     PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
-                    PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserSubmitted()
+                    PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserComments()
                     PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
                     PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
                     PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()

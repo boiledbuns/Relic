@@ -2,6 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
@@ -98,7 +99,7 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.User -> {
                 when (postSource.retrievalOption) {
                     PostRepository.RetrievalOption.Submitted -> appDB.userPostingDao.getUserPosts()
-                    PostRepository.RetrievalOption.Comments -> appDB.userPostingDao.getUserPosts()
+                    PostRepository.RetrievalOption.Comments -> MutableLiveData()
                     PostRepository.RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedPosts()
                     PostRepository.RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedPosts()
                     PostRepository.RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedPosts()
@@ -238,7 +239,7 @@ class PostRepositoryImpl @Inject constructor(
 
     private fun insertParsedPosts(parsedPosts : ParsedPostsData) {
         parsedPosts.apply {
-            if (postEntities.isNotEmpty())  appDB.postDao.insertPosts(postEntities)
+            if (postEntities.isNotEmpty()) appDB.postDao.insertPosts(postEntities)
             if (commentEntities.isNotEmpty()) appDB.commentDAO.insertComments(commentEntities)
 
             appDB.postSourceDao.insertPostSources(postSourceEntities)

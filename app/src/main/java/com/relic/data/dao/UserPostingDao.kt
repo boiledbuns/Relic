@@ -43,7 +43,7 @@ abstract class UserPostingDao {
 
     @Query("SELECT * FROM CommentEntity " +
         "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSubmittedPosition >= 0 ORDER BY userSubmittedPosition ASC")
+        "WHERE userCommentsPosition >= 0 ORDER BY userCommentsPosition ASC")
     abstract fun getUserComments(): LiveData<List<CommentModel>>
 
     @Query("SELECT * FROM CommentEntity " +

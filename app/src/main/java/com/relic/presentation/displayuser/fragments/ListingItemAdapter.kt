@@ -73,6 +73,9 @@ class ListingItemAdapter(
         listingItems = newListingItems
     }
 
-    fun clear() { setItems(emptyList()) }
+    fun clear() {
+        listingItems = emptyList()
+        notifyDataSetChanged()
+    }
 
 }

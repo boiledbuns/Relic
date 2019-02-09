@@ -20,6 +20,7 @@ import com.relic.dagger.modules.RepoModule
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.display_user.*
 import kotlinx.android.synthetic.main.display_user.view.*
 
 class DisplayUserFragment : RelicFragment() {
@@ -59,7 +60,6 @@ class DisplayUserFragment : RelicFragment() {
         return inflater.inflate(R.layout.display_user, container, false).apply {
             (userToolbar as Toolbar).apply {
                 title = getString(R.string.user_prefix_label, username)
-                setNavigationOnClickListener { activity?.onBackPressed() }
                 (activity as MainActivity).setSupportActionBar(this)
             }
 
@@ -73,6 +73,7 @@ class DisplayUserFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindViewModel(viewLifecycleOwner)
+        (userToolbar as Toolbar).setNavigationOnClickListener { activity?.onBackPressed() }
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {

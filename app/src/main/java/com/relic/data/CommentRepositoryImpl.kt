@@ -1,6 +1,7 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.os.AsyncTask
 import android.text.Html
@@ -76,13 +77,13 @@ class CommentRepositoryImpl(
 
     override fun getComments(retrievalOption: PostRepository.RetrievalOption): LiveData<List<CommentModel>> {
         return when (retrievalOption) {
-            PostRepository.RetrievalOption.Submitted -> appDB.userPostingDao.getUserComments()
+            PostRepository.RetrievalOption.Submitted -> MutableLiveData()
             PostRepository.RetrievalOption.Comments -> appDB.userPostingDao.getUserComments()
             PostRepository.RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedComments()
             PostRepository.RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedComments()
             PostRepository.RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedComments()
-            PostRepository.RetrievalOption.Gilded -> appDB.userPostingDao.getUserComments()
-            PostRepository.RetrievalOption.Hidden -> appDB.userPostingDao.getUserComments()
+            PostRepository.RetrievalOption.Gilded -> appDB.userPostingDao.getUserGildedComments()
+            PostRepository.RetrievalOption.Hidden -> appDB.userPostingDao.getUserHiddenComments()
         }
     }
 

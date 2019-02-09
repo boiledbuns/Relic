@@ -26,6 +26,9 @@ abstract class PostSourceDao {
     @Query("SELECT COUNT() FROM PostSourceEntity WHERE userSubmittedPosition >= 0")
     abstract fun getItemsCountForUserSubmitted(): Int
 
+    @Query("SELECT COUNT() FROM PostSourceEntity WHERE userCommentsPosition >= 0")
+    abstract fun getItemsCountForUserComments(): Int
+
     @Query("SELECT COUNT() FROM PostSourceEntity WHERE userUpvotedPosition >= 0")
     abstract fun getItemsCountForUserUpvoted(): Int
 
