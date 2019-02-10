@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,7 +14,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/userCollapsingToolbarLayout"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="240dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="?attr/colorPrimary"
             app:scrimAnimationDuration="6"
@@ -27,6 +28,43 @@
                 android:layout_gravity="top"
                 android:elevation="8dp"
                 app:layout_collapseMode="pin"/>
+
+            <!-- displays user info -->
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/toolbar_height">
+
+                <TextView
+                    android:id="@+id/userIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/userCreated"
+                    tools:text="created 10 years ago"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/linkKarma"
+                    tools:text="900 link karma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/commentKarma"
+                    tools:text="100 comment karma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/totalKarma"
+                    tools:text="1000 karma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </android.support.constraint.ConstraintLayout>
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/userTabLayout"

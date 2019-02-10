@@ -17,8 +17,10 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.data.models.UserModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
+import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
 import kotlinx.android.synthetic.main.display_user.view.*
@@ -77,6 +79,13 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
+        displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { updateUserInfo(it) }
+    }
+
+    private fun updateUserInfo(userModel: UserModel) {
+        userCreated.text = userModel.created.toString()
+        linkKarma.text = userModel.linkKarma.toString()
+        commentKarma.text = userModel.commentKarma.toString()
     }
 
     // region livedata handlers

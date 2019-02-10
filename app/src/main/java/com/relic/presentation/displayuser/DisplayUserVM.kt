@@ -2,13 +2,16 @@ package com.relic.presentation.displayuser
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
+import com.relic.data.UserRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
+import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.*
@@ -19,29 +22,43 @@ class DisplayUserVM(
     private val postRepo: PostRepository,
     private val commentRepo: CommentRepository,
     private val listingRepo: ListingRepository,
+    private val userRepo: UserRepository,
     private val username : String
 ) : ViewModel(), DisplaySubContract.PostAdapterDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
         private val commentRepo: CommentRepository,
-        private val listingRepo: ListingRepository
+        private val listingRepo: ListingRepository,
+        private val userRepo: UserRepository
     ) {
         fun create(username : String) : DisplayUserVM {
-            return DisplayUserVM(postRepo, commentRepo, listingRepo, username)
+            return DisplayUserVM(postRepo, commentRepo, listingRepo, userRepo, username)
         }
     }
+
+    private var _userLiveData = MutableLiveData<UserModel>()
+    var userLiveData : LiveData<UserModel> = _userLiveData
+
+    private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
     private var currentSortingType = emptyMap<UserTab, PostRepository.SortType>()
     private var currentSortingScope = emptyMap<UserTab, PostRepository.SortScope>()
 
-    private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
-
-    private var commentLists = mutableMapOf<UserTab, List<CommentModel>>()
+    // used to store the posts and comments since they are retrieved separately before converging
     private var postLists = mutableMapOf<UserTab, List<PostModel>>()
+    private var commentLists = mutableMapOf<UserTab, List<CommentModel>>()
 
+    init {
+        GlobalScope.launch  {
+            _userLiveData.postValue(userRepo.retrieveUser(username))
+        }
+    }
 
     fun getTabPostsLiveData(tab : UserTab) : LiveData<List<ListingItem>> {
+        GlobalScope.launch  {
+            _userLiveData.postValue(userRepo.retrieveUser(username))
+        }
         var tabLiveData = postsLiveData[tab]
         val userRetrievalOption = toRetrievalOption(tab)
 
@@ -106,6 +123,8 @@ class DisplayUserVM(
             }
         }
     }
+
+    // region helper functions
 
     private fun toRetrievalOption(tab : UserTab): PostRepository.RetrievalOption {
         return when (tab) {
@@ -177,6 +196,8 @@ class DisplayUserVM(
 
         return listingItems
     }
+
+    // endregion helper functions
 
     // region post adapter delegate
 

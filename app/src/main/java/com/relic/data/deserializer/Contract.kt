@@ -5,6 +5,7 @@ import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
+import com.relic.data.models.UserModel
 import org.json.simple.JSONObject
 
 interface Contract {
@@ -36,7 +37,9 @@ interface Contract {
 
 
     interface UserDeserializer {
+        suspend fun parseUser(userResponse: String, trophiesResponse : String) : UserModel
     }
+
 }
 
 data class ParsedPostsData(

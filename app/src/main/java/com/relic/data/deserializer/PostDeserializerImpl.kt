@@ -17,6 +17,7 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -77,39 +78,46 @@ class PostDeserializerImpl(
             // generate the list of posts using the json array
             while (postIterator.hasNext()) {
                 val fullEntityJson = (postIterator.next() as JSONObject)
-                var postSourceEntity : PostSourceEntity?
 
-                val postKind = fullEntityJson["kind"] as String
+                try {
+                    var postSourceEntity: PostSourceEntity?
+                    val postKind = fullEntityJson["kind"] as String
 
-                if (postKind.equals(TYPE_POST)) {
-                    val post = fullEntityJson["data"] as JSONObject
-                    val newPost = extractPost(post)
-                    postEntities.add(newPost)
+                    if (postKind.equals(TYPE_POST)) {
 
-                    val existingPostSource = async {
-                        appDB.postSourceDao.getPostSource(newPost.name)
-                    }.await()
+                        val post = fullEntityJson["data"] as JSONObject
+                        val newPost = extractPost(post)
+                        postEntities.add(newPost)
 
-                    postSourceEntity = existingPostSource?.apply {
-                        sourceId = newPost.name
-                        subreddit = newPost.subreddit
-                    } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+                        val existingPostSource = async {
+                            appDB.postSourceDao.getPostSource(newPost.name)
+                        }.await()
+
+                        postSourceEntity = existingPostSource?.apply {
+                            sourceId = newPost.name
+                            subreddit = newPost.subreddit
+                        } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+                    } else {
+                        val newComment = CommentDeserializer.unmarshallComment(
+                            commentChild = fullEntityJson,
+                            postFullName = "",
+                            commentPosition = 0F
+                        ).first()
+                        commentEntities.add(newComment)
+
+                        postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
+                    }
+
+                    setSource(postSourceEntity, postSource, postCount)
+                    postSourceEntities.add(postSourceEntity)
+
+                    postCount++
+
+                } catch (e : Exception) {
+                    when(e) {
+                        is ParseException -> Log.d(TAG, "Error parsing post $fullEntityJson")
+                    }
                 }
-                else {
-                    val newComment = CommentDeserializer.unmarshallComment(
-                        commentChild = fullEntityJson,
-                        postFullName = "",
-                        commentPosition = 0F
-                    ).first()
-                    commentEntities.add(newComment)
-
-                    postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
-                }
-
-                setSource(postSourceEntity, postSource, postCount)
-                postSourceEntities.add(postSourceEntity)
-
-                postCount ++
             }
         }.join()
 

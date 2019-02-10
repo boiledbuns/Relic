@@ -4,6 +4,7 @@ import android.content.Context
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
+import com.relic.R
 import com.relic.network.request.RelicOAuthRequest
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -12,7 +13,7 @@ import kotlin.coroutines.suspendCoroutine
  * Abstraction for all network requests
  */
 class NetworkRequestManager (
-    applicationContext: Context
+    val applicationContext: Context
 ) {
 
     // TODO move this to be injected
@@ -25,7 +26,7 @@ class NetworkRequestManager (
     suspend fun processRequest (
         method: Int,
         url: String,
-        authToken: String
+        authToken: String? = null
     ) : String = suspendCoroutine { cont ->
 
         val relicRequest = RelicOAuthRequest(
@@ -36,9 +37,18 @@ class NetworkRequestManager (
             Response.ErrorListener { e: VolleyError ->
                 cont.resumeWithException(e)
             },
-            authToken
+            authToken ?: checkToken()
         )
 
         volleyQueue.add(relicRequest)
+    }
+
+    // get the oauth token from the app's shared preferences
+    private fun checkToken(): String {
+        // retrieve the auth token shared preferences
+        val authKey = applicationContext.resources.getString(R.string.AUTH_PREF)
+        val tokenKey = applicationContext.resources.getString(R.string.TOKEN_KEY)
+        return applicationContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
+            .getString(tokenKey, "DEFAULT") ?: ""
     }
 }

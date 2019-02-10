@@ -1,14 +1,7 @@
 package com.relic.dagger.modules
 
 import android.content.Context
-import com.relic.data.CommentRepository
-import com.relic.data.CommentRepositoryImpl
-import com.relic.data.ListingRepository
-import com.relic.data.ListingRepositoryImpl
-import com.relic.data.PostRepository
-import com.relic.data.PostRepositoryImpl
-import com.relic.data.SubRepository
-import com.relic.data.SubRepositoryImpl
+import com.relic.data.*
 import com.relic.network.NetworkRequestManager
 import dagger.Module
 import dagger.Provides
@@ -44,5 +37,11 @@ class RepoModule @Inject constructor(
     @Singleton
     fun provideListingRepository() : ListingRepository {
         return ListingRepositoryImpl(applicationContext)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository() : UserRepository {
+        return UserRepositoryImpl(applicationContext, networkRequestManager)
     }
 }
