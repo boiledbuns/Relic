@@ -5,11 +5,11 @@ import android.text.Html
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.relic.data.ApplicationDB
-import com.relic.data.PostRepository
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
+import com.relic.data.PostRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -22,7 +22,7 @@ import java.util.*
 
 class PostDeserializerImpl(
     appContext: Context
-) : PostDeserializer {
+) : Contract.PostDeserializer {
 
     private val appDB: ApplicationDB = ApplicationDB.getDatabase(appContext)
 

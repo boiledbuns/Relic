@@ -15,7 +15,7 @@ import java.util.*
 import kotlin.math.pow
 
 // TODO convert to object and add interface so this can be injected
-object CommentDeserializer {
+object CommentDeserializer : Contract.CommentDeserializer {
     private val gson = GsonBuilder().create()
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val currentYear = Date().year
@@ -31,11 +31,11 @@ object CommentDeserializer {
      * @throws ParseException potential issue with parsing of json structure
      */
     @Throws(ParseException::class)
-    suspend fun parseComments(
+    override suspend fun parseComments(
         postFullName: String,
         response: JSONObject,
-        parentDepth : Int = -1,
-        parentPosition : Float = 0f
+        parentDepth : Int,
+        parentPosition : Float
     ) : ParsedCommentData {
         val commentsData = (response["data"] as JSONObject)
         val listing = ListingEntity(postFullName, commentsData["after"]?.run { this as String })
@@ -97,7 +97,7 @@ object CommentDeserializer {
     // TODO refactor and move the method into a comment entity method
     // TODO find a better way to unmarshall these objects and clean this up
     // won't be cleaned for a while because still decided how to format data and what is needed
-    suspend fun unmarshallComment(
+    override suspend fun unmarshallComment(
         commentChild : JSONObject,
         postFullName : String,
         commentPosition : Float

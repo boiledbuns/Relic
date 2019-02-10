@@ -36,10 +36,6 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
         }
-
-        if (checkInternetConnectivity()) {
-            postsTabVM.requestPosts(tab = selectedUserTab, refresh = true)
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,6 +44,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
                 adapter = userPostsAdapter
                 layoutManager = LinearLayoutManager(context)
             }
+            userTabSwipeRefreshLayout.isRefreshing = true
         }
     }
 
@@ -87,9 +84,11 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     }
 
     private fun setListingItems(listingItems : List<ListingItem>) {
-        userPostsAdapter.setItems(listingItems)
-        userTabSwipeRefreshLayout.isRefreshing = false
-        scrollLocked = false
+        if (listingItems.isNotEmpty()) {
+            userPostsAdapter.setItems(listingItems)
+            userTabSwipeRefreshLayout.isRefreshing = false
+            scrollLocked = false
+        }
     }
 
     private fun resetRecyclerView() {

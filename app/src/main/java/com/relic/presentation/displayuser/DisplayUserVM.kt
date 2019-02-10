@@ -40,13 +40,17 @@ class DisplayUserVM(
     private var commentLists = mutableMapOf<UserTab, List<CommentModel>>()
     private var postLists = mutableMapOf<UserTab, List<PostModel>>()
 
-    private var listingItemLists = mutableMapOf<UserTab, ArrayList<ListingItem>>()
 
     fun getTabPostsLiveData(tab : UserTab) : LiveData<List<ListingItem>> {
         var tabLiveData = postsLiveData[tab]
         val userRetrievalOption = toRetrievalOption(tab)
 
         if (tabLiveData == null) {
+            // request new posts if this is the first time the tab is being created
+            // TODO need to separate the process of deleting old posts from retrieving new posts
+            // TODO to prevent the old posts being deleted --> internet connection unavailable --> so new posts
+            requestPosts(tab = tab, refresh = true)
+
             val postSource = postRepo.getPosts(PostRepository.PostSource.User(username, userRetrievalOption))
             val commentSource = commentRepo.getComments(userRetrievalOption)
 

@@ -12,7 +12,6 @@ import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
-import com.relic.util.RelicError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
