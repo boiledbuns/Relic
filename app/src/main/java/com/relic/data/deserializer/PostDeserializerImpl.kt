@@ -114,9 +114,7 @@ class PostDeserializerImpl(
                     postCount++
 
                 } catch (e : Exception) {
-                    when(e) {
-                        is ParseException -> Log.d(TAG, "Error parsing post $fullEntityJson")
-                    }
+                    Log.d(TAG, "Error parsing post ${e.message} : \n $fullEntityJson")
                 }
             }
         }.join()

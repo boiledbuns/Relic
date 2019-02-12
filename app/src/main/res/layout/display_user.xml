@@ -15,7 +15,7 @@
             android:id="@+id/userCollapsingToolbarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:contentScrim="@android:color/transparent"
             app:scrimAnimationDuration="6"
             app:titleEnabled="false">
@@ -120,7 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:layout_marginTop="@dimen/padding_xxs"
+                    android:layout_marginTop="@dimen/padding_m"
                     app:layout_constraintTop_toBottomOf="@id/linkKarmaContainer"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 

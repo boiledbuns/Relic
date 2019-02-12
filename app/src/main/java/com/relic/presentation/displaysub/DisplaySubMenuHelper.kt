@@ -7,6 +7,9 @@ object DisplaySubMenuHelper {
     const val sortMenuId = R.id.display_sub_sort
     val sortMethodSubMenuIdsWithScope = intArrayOf(R.id.post_sort_hot, R.id.post_sort_rising, R.id.post_sort_top)
 
+    const val userSortMenuId = R.id.display_user_sort
+    val sortMethodUserMenuIdsWithScope = intArrayOf(R.id.user_sort_hot, R.id.user_sort_rising, R.id.user_sort_top)
+
     // region menu item id helpers
 
     fun convertMenuItemToSortType(optionId : Int) : PostRepository.SortType {

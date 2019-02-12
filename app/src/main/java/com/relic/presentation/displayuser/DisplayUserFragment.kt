@@ -9,9 +9,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.widget.Toolbar
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.relic.MainActivity
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
@@ -19,11 +17,16 @@ import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.data.models.UserModel
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaysub.DisplaySubMenuHelper
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
+import com.relic.presentation.helper.DateHelper
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
 import kotlinx.android.synthetic.main.display_user.view.*
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class DisplayUserFragment : RelicFragment() {
 
@@ -56,6 +59,8 @@ class DisplayUserFragment : RelicFragment() {
             contentFragments.add(PostsTabFragment.create(UserTab.Gilded))
             contentFragments.add(PostsTabFragment.create(UserTab.Hidden))
         }
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -78,6 +83,23 @@ class DisplayUserFragment : RelicFragment() {
         (userToolbar as Toolbar).setNavigationOnClickListener { activity?.onBackPressed() }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater?.inflate(R.menu.display_user_menu, menu)
+
+        // have to first get the reference to the menu in charge of sorting
+        val userSortMenu = menu?.findItem(DisplaySubMenuHelper.userSortMenuId)?.subMenu
+
+        // inflate only sorting types that have a scope menu
+        DisplaySubMenuHelper.sortMethodUserMenuIdsWithScope.forEach { userMenuId ->
+            val sortingMethodSubMenu = userSortMenu?.findItem(userMenuId)?.subMenu
+            inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
+        }
+    }
+
+    //
+
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { updateUserInfo(it) }
     }
@@ -85,13 +107,20 @@ class DisplayUserFragment : RelicFragment() {
     private fun updateUserInfo(userModel: UserModel) {
         linkKarma.text = userModel.linkKarma.toString()
         commentKarma.text = userModel.commentKarma.toString()
-
         totalKarma.text = (userModel.linkKarma + userModel.commentKarma).toString()
 
-        val userAge = "test"
-        val userCreationDate = "test"
+        userCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
+    }
 
-        userCreated.text = resources.getString(R.string.account_age, userAge, userCreationDate)
+    private fun getUserCreatedString(created : Long) : String {
+        // initialize the date formatter and date for "now"
+        val formatter = SimpleDateFormat("MMM dd',' YYYY", Locale.CANADA)
+        val createdDate = Date(created * 1000)
+
+        val userAge = DateHelper.getDateDifferenceString(createdDate, Date())
+        val userCreationDate = formatter.format(createdDate)
+
+        return resources.getString(R.string.account_age, userAge, userCreationDate)
     }
 
     // region livedata handlers
