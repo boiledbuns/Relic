@@ -83,9 +83,15 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     private fun updateUserInfo(userModel: UserModel) {
-        userCreated.text = userModel.created.toString()
         linkKarma.text = userModel.linkKarma.toString()
         commentKarma.text = userModel.commentKarma.toString()
+
+        totalKarma.text = (userModel.linkKarma + userModel.commentKarma).toString()
+
+        val userAge = "test"
+        val userCreationDate = "test"
+
+        userCreated.text = resources.getString(R.string.account_age, userAge, userCreationDate)
     }
 
     // region livedata handlers

@@ -102,6 +102,8 @@
     <dimen name="text_m">15sp</dimen>
     <dimen name="text_m2">16sp</dimen>
     <dimen name="text_l">18sp</dimen>
+
+    <dimen name="title_text_xl">32sp</dimen>
     <dimen name="title_text_l">23sp</dimen>
     <dimen name="title_text_m">18sp</dimen>
 

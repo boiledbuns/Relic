@@ -14,57 +14,126 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/userCollapsingToolbarLayout"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="@android:color/transparent"
             app:scrimAnimationDuration="6"
             app:titleEnabled="false">
-
-            <include layout="@layout/relic_toolbar"
-                android:id="@+id/userToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/toolbar_height"
-                android:layout_marginBottom="@dimen/toolbar_height"
-                android:layout_gravity="top"
-                android:elevation="8dp"
-                app:layout_collapseMode="pin"/>
 
             <!-- displays user info -->
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="@dimen/toolbar_height">
+                android:paddingTop="@dimen/toolbar_height"
+                android:paddingBottom="@dimen/toolbar_height"
+                android:paddingStart="@dimen/padding_l"
+                android:paddingEnd="@dimen/padding_l">
 
-                <TextView
-                    android:id="@+id/userIcon"
+                <!-- link karma box -->
+                <LinearLayout
+                    android:id="@+id/totalKarmaContainer"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/linkKarmaContainer">
+
+                    <TextView
+                        android:text="@string/total_karma"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/totalKarma"
+                        tools:text="900"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/title_text_xl"/>
+
+                </LinearLayout>
+
+                <!-- link karma box -->
+                <LinearLayout
+                    android:id="@+id/linkKarmaContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/totalKarmaContainer"
+                    app:layout_constraintEnd_toStartOf="@id/commentKarmaContainer">
+
+                    <TextView
+                        android:text="@string/link_karma"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/linkKarma"
+                        tools:text="900"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/title_text_xl"/>
+
+                </LinearLayout>
+
+                <!-- comment karma box -->
+                <LinearLayout
+                    android:id="@+id/commentKarmaContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/linkKarmaContainer"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:text="@string/comment_karma"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/commentKarma"
+                        tools:text="100"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/title_text_xl"/>
+
+                </LinearLayout>
+                
+                <android.support.constraint.Barrier
+                    android:id="@+id/karmaContainerBarrier"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="totalKarmaContainer"
+                    app:barrierDirection="bottom"/>
 
                 <TextView
                     android:id="@+id/userCreated"
-                    tools:text="created 10 years ago"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/linkKarma"
-                    tools:text="900 link karma"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/commentKarma"
-                    tools:text="100 comment karma"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/totalKarma"
-                    tools:text="1000 karma"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    tools:text="created 10 years ago (Feb 11th, 2009)"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/padding_xxs"
+                    app:layout_constraintTop_toBottomOf="@id/linkKarmaContainer"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
             </android.support.constraint.ConstraintLayout>
+
+            <include layout="@layout/relic_toolbar"
+                     android:id="@+id/userToolbar"
+                     android:layout_width="match_parent"
+                     android:layout_height="@dimen/toolbar_height"
+                     android:layout_marginBottom="@dimen/toolbar_height"
+                     android:layout_gravity="top"
+                     android:elevation="8dp"
+                     app:layout_collapseMode="pin"/>
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/userTabLayout"
