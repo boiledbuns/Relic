@@ -15,6 +15,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.data.PostRepository
 import com.relic.data.models.UserModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
@@ -26,7 +27,6 @@ import kotlinx.android.synthetic.main.display_user.*
 import kotlinx.android.synthetic.main.display_user.view.*
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class DisplayUserFragment : RelicFragment() {
 
@@ -98,6 +98,36 @@ class DisplayUserFragment : RelicFragment() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        var override = true
+        var sortType : PostRepository.SortType? = null
+        var sortScope : PostRepository.SortScope? = null
+
+        when (item?.itemId) {
+            // when the sorting type is changed
+            R.id.user_sort_hot, R.id.user_sort_top -> {
+                sortType = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)
+                displayUserVM.changeSortingMethod(sortType = sortType)
+            }
+            // these sorting types don't have a scope, so we send sort method immediately
+            R.id.user_sort_new, R.id.user_sort_controversial -> {
+                pagerAdapter.getItem(userViewPager.currentItem).resetRecyclerView()
+                sortType = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)
+                displayUserVM.changeSortingMethod(sortType = sortType)
+            }
+            // when the sorting scope is changed
+            R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
+            R.id.order_scope_month, R.id.order_scope_year, R.id.order_scope_all -> {
+                pagerAdapter.getItem(userViewPager.currentItem).resetRecyclerView()
+                sortScope = DisplaySubMenuHelper.convertMenuItemToSortScope(item.itemId)
+                displayUserVM.changeSortingMethod(sortScope = sortScope)
+            }
+            else -> override = super.onOptionsItemSelected(item)
+        }
+
+        return override
+    }
+
     //
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -142,15 +172,29 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     private inner class UserContentPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm) {
-        val contentFragmentTitles = listOf("Submissions", "Comments", "Saved", "Upvoted", "Downvoted", "Gilded", "Hidden")
-        val contentFragments : ArrayList<Fragment> = ArrayList()
+        val contentFragmentTitles = listOf(
+            UserTab.Submitted,
+            UserTab.Comments,
+            UserTab.Saved,
+            UserTab.Upvoted,
+            UserTab.Downvoted,
+            UserTab.Gilded,
+            UserTab.Hidden
+        )
 
-        override fun getItem(p0: Int): Fragment = contentFragments[p0]
+        val contentFragments : ArrayList<PostsTabFragment> = ArrayList()
+
+        override fun getItem(p0: Int) : PostsTabFragment {
+            // tells vm which tab is currently being displayed, used for additional options
+            displayUserVM.setCurrentTab(contentFragmentTitles[p0])
+
+            return contentFragments[p0]
+        }
 
         override fun getCount(): Int = contentFragments.size
 
         override fun getPageTitle(position: Int): CharSequence? {
-            return contentFragmentTitles[position]
+            return contentFragmentTitles[position].tabName
         }
     }
 }

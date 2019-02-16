@@ -8,12 +8,15 @@ interface DisplayUserContract {
     interface ViewModel {}
 }
 
-sealed class UserTab : Parcelable{
-    @Parcelize object Submitted: UserTab()
-    @Parcelize object Comments: UserTab()
-    @Parcelize object Saved: UserTab()
-    @Parcelize object Upvoted: UserTab()
-    @Parcelize object Downvoted: UserTab()
-    @Parcelize object Gilded: UserTab()
-    @Parcelize object Hidden: UserTab()
+sealed class UserTab(
+    val tabName : String
+) : Parcelable {
+
+    @Parcelize object Submitted: UserTab("Submitted")
+    @Parcelize object Comments: UserTab("Comments")
+    @Parcelize object Saved: UserTab("Saved")
+    @Parcelize object Upvoted: UserTab("Upvoted")
+    @Parcelize object Downvoted: UserTab("Downvoted")
+    @Parcelize object Gilded: UserTab("Gilded")
+    @Parcelize object Hidden: UserTab("Hidden")
 }

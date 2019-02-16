@@ -8,18 +8,18 @@ object DisplaySubMenuHelper {
     val sortMethodSubMenuIdsWithScope = intArrayOf(R.id.post_sort_hot, R.id.post_sort_rising, R.id.post_sort_top)
 
     const val userSortMenuId = R.id.display_user_sort
-    val sortMethodUserMenuIdsWithScope = intArrayOf(R.id.user_sort_hot, R.id.user_sort_rising, R.id.user_sort_top)
+    val sortMethodUserMenuIdsWithScope = intArrayOf(R.id.user_sort_hot, R.id.user_sort_top)
 
     // region menu item id helpers
 
     fun convertMenuItemToSortType(optionId : Int) : PostRepository.SortType {
         return when(optionId) {
             R.id.post_sort_best -> PostRepository.SortType.BEST
-            R.id.post_sort_hot -> PostRepository.SortType.HOT
-            R.id.post_sort_new -> PostRepository.SortType.NEW
+            R.id.post_sort_hot, R.id.user_sort_hot -> PostRepository.SortType.HOT
+            R.id.post_sort_new, R.id.user_sort_new -> PostRepository.SortType.NEW
             R.id.post_sort_rising -> PostRepository.SortType.RISING
-            R.id.post_sort_top -> PostRepository.SortType.TOP
-            R.id.post_sort_controversial -> PostRepository.SortType.CONTROVERSIAL
+            R.id.post_sort_top, R.id.user_sort_top -> PostRepository.SortType.TOP
+            R.id.post_sort_controversial, R.id.user_sort_controversial -> PostRepository.SortType.CONTROVERSIAL
             else -> PostRepository.SortType.DEFAULT
         }
     }

@@ -91,7 +91,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         }
     }
 
-    private fun resetRecyclerView() {
+    fun resetRecyclerView() {
         // empties current items to show that it's being refreshed
         userTabRecyclerView.layoutManager?.scrollToPosition(0)
         userPostsAdapter.clear()

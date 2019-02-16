@@ -19,10 +19,8 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
-import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.network.request.RelicRequestError
-import com.shopify.livedataktx.map
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
@@ -122,6 +120,8 @@ class PostRepositoryImpl @Inject constructor(
             else -> ""
         }
         coroutineScope {
+            Log.d(TAG, "retrieve more posts : api url : $ENDPOINT$ending?after=$listingAfter")
+
             try {
                 // create the new request and submit it
                 val response = requestManager.processRequest(
@@ -160,17 +160,18 @@ class PostRepositoryImpl @Inject constructor(
         sortType: PostRepository.SortType,
         sortScope: PostRepository.SortScope
     ) {
+        // convert into a builder to make it easier to build api url
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
             is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
             is PostRepository.PostSource.User -> {
-                "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}?type=links"
+                "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}?sort=${sortType.name.toLowerCase()}&t=${sortScope.name.toLowerCase()}"
             }
             else -> ""
         }
 
         // modify the endpoint based on the sorting options selected by the user
-        if (sortType != PostRepository.SortType.DEFAULT) {
+        if (sortType != PostRepository.SortType.DEFAULT && postSource !is PostRepository.PostSource.User) {
             // build the appropriate endpoint based on the "sort by" code and time scope
             ending += "/${sortType.name.toLowerCase()}/"
 
@@ -179,6 +180,7 @@ class PostRepositoryImpl @Inject constructor(
         }
 
         coroutineScope {
+            Log.d(TAG, "retrieve sorted posts api url : $ending")
             try {
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
@@ -188,6 +190,7 @@ class PostRepositoryImpl @Inject constructor(
 
                 val listingKey = getListingKey(postSource)
                 val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
+                Log.d(TAG, "retrieve more posts : after ${parsedData.listingEntity.afterPosting}")
                 launch { insertParsedPosts(parsedData) }
 
             } catch (e: Exception) {

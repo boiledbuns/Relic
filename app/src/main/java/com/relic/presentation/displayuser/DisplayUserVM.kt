@@ -42,8 +42,9 @@ class DisplayUserVM(
 
     private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
-    private var currentSortingType = emptyMap<UserTab, PostRepository.SortType>()
-    private var currentSortingScope = emptyMap<UserTab, PostRepository.SortScope>()
+    private var currentSortingType = mutableMapOf<UserTab, PostRepository.SortType>()
+    private var currentSortingScope = mutableMapOf<UserTab, PostRepository.SortScope>()
+    private lateinit var currentTab : UserTab
 
     // used to store the posts and comments since they are retrieved separately before converging
     private var postLists = mutableMapOf<UserTab, List<PostModel>>()
@@ -120,6 +121,30 @@ class DisplayUserVM(
                         })
                 }
                 postRepo.retrieveMorePosts(postSource, key)
+            }
+        }
+    }
+
+    fun setCurrentTab(tab : UserTab) {
+        currentTab = tab
+    }
+
+    fun changeSortingMethod(sortType: PostRepository.SortType? = null, sortScope: PostRepository.SortScope? = null) {
+        sortType?.let { currentSortingType[currentTab] = it }
+        sortScope?.let { currentSortingScope[currentTab] = it }
+
+        when (currentSortingType[currentTab]) {
+            // these sorting types don't have a scope, so retrieve sorted scopes asap
+            PostRepository.SortType.NEW, PostRepository.SortType.BEST, PostRepository.SortType.CONTROVERSIAL -> {
+                requestPosts(currentTab, refresh = true)
+            }
+        }
+
+        when (currentSortingScope[currentTab]) {
+            // when the sorting scope is changed
+            PostRepository.SortScope.HOUR, PostRepository.SortScope.DAY, PostRepository.SortScope.WEEK,
+            PostRepository.SortScope.MONTH, PostRepository.SortScope.YEAR, PostRepository.SortScope.ALL -> {
+                requestPosts(currentTab, refresh = true)
             }
         }
     }
