@@ -15,6 +15,14 @@ interface DisplaySubContract {
         fun savePost(postFullname: String, save: Boolean)
         fun onThumbnailClicked(postThumbnailUrl: String)
     }
+
+    interface PostItemAdapterDelegate {
+        fun onPostPressed(itemPosition : Int)
+        fun onPostSavePressed(itemPosition : Int)
+        fun onPostUpvotePressed(itemPosition : Int)
+        fun onPostDownvotePressed(itemPosition : Int)
+        fun onPostLinkPressed(itemPosition : Int)
+    }
 }
 
 sealed class SubNavigationData {

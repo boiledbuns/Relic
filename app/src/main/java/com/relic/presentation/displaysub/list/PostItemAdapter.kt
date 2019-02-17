@@ -9,7 +9,7 @@ import com.relic.presentation.displaysub.DisplaySubContract
 
 class PostItemAdapter (
         private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
-) : RecyclerView.Adapter <PostItemVH> () {
+) : RecyclerView.Adapter <PostItemVH> (), DisplaySubContract.PostItemAdapterDelegate {
     private var postList: List<PostModel> = ArrayList()
 
     override fun getItemCount() = postList.size
@@ -56,7 +56,7 @@ class PostItemAdapter (
 
     // start region for onclick handlers
 
-    fun onPostPressed (itemPosition : Int) {
+    override fun onPostPressed (itemPosition : Int) {
         postList[itemPosition].also {
             // update the view and local model to reflect onclick
             it.isVisited = true
@@ -67,7 +67,7 @@ class PostItemAdapter (
     }
 
     // initialize onclick for the upvote button
-    fun onPostUpvotePressed(itemPosition : Int) {
+    override fun onPostUpvotePressed(itemPosition : Int) {
         postList[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newStatus = if (it.userUpvoted <= 0) 1 else 0
@@ -80,7 +80,7 @@ class PostItemAdapter (
     }
 
     // initialize onclick for the downvote button
-    fun onPostDownvotePressed(itemPosition : Int) {
+    override fun onPostDownvotePressed(itemPosition : Int) {
         postList[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newStatus = if (it.userUpvoted >= 0) -1 else 0
@@ -92,19 +92,19 @@ class PostItemAdapter (
         notifyItemChanged(itemPosition)
     }
 
-    fun onPostSavePressed (itemPosition : Int) {
+    override fun onPostSavePressed (itemPosition : Int) {
         postList[itemPosition].also {
             // calculate new save value based on the previous one and tell vm to update appropriately
-            val newStatus = !it.isSaved
+            val newStatus = !it.saved
             postAdapterDelegate.savePost(it.id, newStatus)
 
             // update the view and local model to reflect onclick
-            it.isSaved = newStatus
+            it.saved = newStatus
         }
         notifyItemChanged(itemPosition)
     }
 
-    fun onPostLinkPressed (itemPosition : Int) {
+    override fun onPostLinkPressed (itemPosition : Int) {
         postAdapterDelegate.onThumbnailClicked(postList[itemPosition].url)
     }
 

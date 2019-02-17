@@ -1,5 +1,7 @@
 package com.relic.data.models;
 
+import android.support.annotation.NonNull;
+
 public class CommentModel extends ListingItem {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
@@ -10,7 +12,6 @@ public class CommentModel extends ListingItem {
   private String body;
   public String created;
   private int score;
-  private int userUpvoted;
 
   public String authorFlairText;
 
@@ -28,8 +29,9 @@ public class CommentModel extends ListingItem {
   public CommentModel() {}
 
   // Note that fullname = type + id
+  @NonNull
   public String getFullName() {
-    return TYPE + getId();
+      return TYPE + "_" + id;
   }
 
   public String getBody() {
@@ -46,14 +48,6 @@ public class CommentModel extends ListingItem {
 
   public void setScore(int score) {
     this.score = score;
-  }
-
-  public int getUserUpvoted() {
-    return userUpvoted;
-  }
-
-  public void setUserUpvoted(int userUpvoted) {
-    this.userUpvoted = userUpvoted;
   }
 
   public float position;

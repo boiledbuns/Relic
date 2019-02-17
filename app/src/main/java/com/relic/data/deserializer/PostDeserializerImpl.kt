@@ -60,23 +60,28 @@ class PostDeserializerImpl(
         postSource: PostRepository.PostSource,
         listingKey : String
     ) : ParsedPostsData = coroutineScope {
-        val listingData = (jsonParser.parse(response) as JSONObject)["data"] as JSONObject?
-        val listingPosts = listingData!!["children"] as JSONArray?
-
-        // create the new listing entity
-        val listing = ListingEntity(listingKey, listingData["after"] as String?)
-
-        val postIterator = listingPosts!!.iterator()
         val postEntities = ArrayList<PostEntity>()
         val commentEntities = ArrayList<CommentEntity>()
-
         val postSourceEntities = ArrayList<PostSourceEntity>()
+        val listing = ListingEntity()
+
+        val listingJSON = jsonParser.parse(response) as JSONObject
+        val listingData = listingJSON["data"] as JSONObject?
+        val listingPosts = listingData!!["children"] as JSONArray?
+
+        // update listing entity fields
+        listing.apply {
+            this.listingKey = listingKey
+            afterPosting = listingData["after"] as String?
+        }
+
+        val postIterator = listingPosts?.iterator()
 
         launch {
             var postCount: Int = getSourceCount(postSource)
 
             // generate the list of posts using the json array
-            while (postIterator.hasNext()) {
+            while (postIterator != null && postIterator.hasNext()) {
                 val fullEntityJson = (postIterator.next() as JSONObject)
 
                 try {
@@ -114,12 +119,12 @@ class PostDeserializerImpl(
                     postCount++
 
                 } catch (e : Exception) {
-                    Log.d(TAG, "Error parsing post ${e.message} : \n $fullEntityJson")
+                    Log.d(TAG, "Error parsing post ${e.message} \n  message :  ${fullEntityJson["data"] as JSONObject}")
                 }
             }
         }.join()
 
-        ParsedPostsData(postSourceEntities,postEntities, commentEntities, listing)
+        ParsedPostsData(postSourceEntities, postEntities, commentEntities, listing)
     }
 
     /**
@@ -149,7 +154,7 @@ class PostDeserializerImpl(
             } else null
 
             // add year to stamp if the post year doesn't match the current one
-            Log.d(TAG, "epoch = " + post["created"]!!)
+            Log.d(TAG, "epoch = " + post["created"])
             val apiCreated = Date((post["created"] as Double).toLong() * 1000)
             created = if (current.year != apiCreated.year) {
                 apiCreated.year.toString() + " " + formatter.format(apiCreated)
@@ -159,9 +164,9 @@ class PostDeserializerImpl(
 
             // get the gildings
             (post["gildings"] as JSONObject?)?.let { gilding ->
-                platinum = (gilding["gid_1"] as Long).toInt()
-                gold = (gilding["gid_2"] as Long).toInt()
-                silver = (gilding["gid_3"] as Long).toInt()
+                (gilding["gid_1"] as Long?)?.let { platinum = it.toInt() }
+                (gilding["gid_2"] as Long?)?.let { gold = it.toInt() }
+                (gilding["gid_3"] as Long?)?.let { silver = it.toInt() }
             }
         }
     }

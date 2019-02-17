@@ -11,10 +11,11 @@ import com.relic.presentation.displaypost.commentlist.CommentItemVH
 import com.relic.presentation.displaypost.commentlist.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.list.PostItemVH
+import com.relic.presentation.displayuser.DisplayUserContract
 
 class ListingItemAdapter(
-    private val actionDelegate : DisplaySubContract.PostAdapterDelegate
-) : RecyclerView.Adapter <RecyclerView.ViewHolder> () {
+    private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
+) : RecyclerView.Adapter <RecyclerView.ViewHolder> (), DisplaySubContract.PostItemAdapterDelegate {
 
     private val VIEW_TYPE_POST = 0
     private val VIEW_TYPE_COMMENT = 1
@@ -33,6 +34,7 @@ class ListingItemAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_POST -> PostItemVH(RelicPostItemView(parent.context)).apply {
+                initializeOnClicks(this@ListingItemAdapter)
             }
             // TODO complete the custom comment VH and view for displaying within the tab
             else -> CommentItemVH(RelicCommentView(parent.context)).apply {
@@ -77,5 +79,62 @@ class ListingItemAdapter(
         listingItems = emptyList()
         notifyDataSetChanged()
     }
+
+
+    // start region for onclick handlers
+
+    override fun onPostPressed (itemPosition : Int) {
+        listingItems[itemPosition].also {
+            // update the view and local model to reflect onclick
+            it.isVisited = true
+
+            // update post to show that it has been visited
+            actionDelegate.visitListing(it)
+        }
+        notifyItemChanged(itemPosition)
+    }
+
+    // initialize onclick for the upvote button
+    override fun onPostUpvotePressed(itemPosition : Int) {
+        listingItems[itemPosition].also {
+            // determine the new vote value based on the current one and change the vote accordingly
+            val newVote = if (it.userUpvoted <= 0) 1 else 0
+            it.userUpvoted = newVote
+            notifyItemChanged(itemPosition)
+
+            actionDelegate.voteOnListing(it, newVote)
+        }
+    }
+
+    // initialize onclick for the downvote button
+    override fun onPostDownvotePressed(itemPosition : Int) {
+        listingItems[itemPosition].also {
+            // determine the new vote value based on the current one and change the vote accordingly
+            val newVote = if (it.userUpvoted >= 0) -1 else 0
+
+            // optimistic, update copy cached in adapter and make request to api to update in server
+            it.userUpvoted = newVote
+            notifyItemChanged(itemPosition)
+
+            actionDelegate.voteOnListing(it, newVote)
+        }
+
+    }
+
+    override fun onPostSavePressed (itemPosition : Int) {
+        listingItems[itemPosition].also {
+            // update the view and local model to reflect onclick
+            it.saved = !it.saved
+            notifyItemChanged(itemPosition)
+
+            actionDelegate.saveListing(it)
+        }
+    }
+
+    override fun onPostLinkPressed (itemPosition : Int) {
+        actionDelegate.onThumbnailClicked(listingItems[itemPosition])
+    }
+
+    // end region for onclick handlers
 
 }

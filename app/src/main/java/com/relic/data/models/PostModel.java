@@ -5,7 +5,9 @@ import android.text.Html;
 import com.relic.domain.Post;
 
 public class PostModel extends ListingItem implements Post {
-  private String subreddit;
+    public static String TYPE = "t3";
+
+    private String subreddit;
   private String author;
   private String selftext;
   private String created;
@@ -20,14 +22,11 @@ public class PostModel extends ListingItem implements Post {
 
   private String authorFlair;
 
-  private boolean saved;
-
   private boolean nsfw;
   private boolean stickied;
   private boolean pinned;
   private boolean locked;
   private boolean archived;
-  private int userUpvoted;
   private int viewCount;
 
 
@@ -152,28 +151,12 @@ public class PostModel extends ListingItem implements Post {
     this.pinned = pinned;
   }
 
-  public boolean isSaved() {
-    return saved;
-  }
-
-  public void setSaved(boolean saved) {
-    this.saved = saved;
-  }
-
   public String getAuthorFlair() {
     return authorFlair;
   }
 
   public void setAuthorFlair(String authorFlair) {
     this.authorFlair = authorFlair;
-  }
-
-  public int getUserUpvoted() {
-    return userUpvoted;
-  }
-
-  public void setUserUpvoted(int userUpvoted) {
-    this.userUpvoted = userUpvoted;
   }
 
   public int getViewCount() {
@@ -211,4 +194,9 @@ public class PostModel extends ListingItem implements Post {
   public int platinum;
   public int gold;
   public int silver;
+
+  @Override
+  public String getFullName() {
+      return TYPE + "_" + id;
+  }
 }

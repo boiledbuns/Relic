@@ -125,12 +125,12 @@ class CommentRepositoryImpl(
 
     override suspend fun retrieveCommentChildren(commentModel: CommentModel) {
 //        val url = "${ENDPOINT}api/morechildren?api_type=json&link_id=${commentModel.fullName}&id=${commentModel.replyLink}"
-        val url = "${ENDPOINT}api/morechildren?api_type=json&link_id=${commentModel.fullName}&children=${commentModel.replyLink}"
+        val url = "${ENDPOINT}api/morechildren?api_type=json&link_id=${commentModel.getFullName()}&children=${commentModel.replyLink}"
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
             val parsedData = parseCommentRequestResponse(
-                postFullName = commentModel.fullName,
+                postFullName = commentModel.getFullName(),
                 response = response
             )
 

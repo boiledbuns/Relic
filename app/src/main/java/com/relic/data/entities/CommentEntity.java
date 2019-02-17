@@ -45,6 +45,7 @@ public class CommentEntity {
   @ColumnInfo(name = "scoreHidden")
   public boolean score_hidden;
   public int userUpvoted;
+    public boolean saved;
 
   public int replyCount;
   public int depth;

@@ -11,6 +11,7 @@ import com.relic.data.SubRepository
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
+import com.relic.presentation.helper.ImageHelper
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -181,9 +182,9 @@ open class DisplaySubVM (
 
     // region view action delegate
 
-    override fun visitPost(postfullName : String, postSubreddit : String) {
-        postRepo.postGateway.visitPost(postfullName)
-        _navigationLiveData.value = SubNavigationData.ToPost(postfullName, postSubreddit, postSource)
+    override fun visitPost(postFullname : String, subreddit : String) {
+        postRepo.postGateway.visitPost(postFullname)
+        _navigationLiveData.value = SubNavigationData.ToPost(postFullname, subreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
@@ -197,10 +198,7 @@ open class DisplaySubVM (
     }
 
     override fun onThumbnailClicked(postThumbnailUrl: String) {
-        val validImageEndings = listOf("jpg", "png", "gif")
-
-        val lastThree = postThumbnailUrl.substring(postThumbnailUrl.length - 3)
-        var isImage = (validImageEndings.contains(lastThree))
+        val isImage = ImageHelper.isValidImage(postThumbnailUrl)
 
         val subNavigation : SubNavigationData = if (isImage) {
             SubNavigationData.ToImage(postThumbnailUrl)
@@ -208,10 +206,7 @@ open class DisplaySubVM (
             SubNavigationData.ToExternal(postThumbnailUrl)
         }
 
-        _navigationLiveData.apply {
-            value = subNavigation
-            value = null
-        }
+        _navigationLiveData.value = subNavigation
     }
 
     // endregion view action delegate

@@ -187,6 +187,7 @@ class PostRepositoryImpl @Inject constructor(
                     url = ending,
                     authToken = checkToken()
                 )
+                Log.d(TAG, "retrieve posts response :  $response")
 
                 val listingKey = getListingKey(postSource)
                 val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
@@ -196,7 +197,7 @@ class PostRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 when (e) {
                     is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
-                    else -> Log.d(TAG, "Error retrieving sorted posts $e")
+                    else -> Log.d(TAG, "Error retrieving sorted posts : $e")
                 }
 
             }

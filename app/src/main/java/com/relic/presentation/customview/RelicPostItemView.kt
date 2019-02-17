@@ -51,11 +51,11 @@ class RelicPostItemView @JvmOverloads constructor(
     }
 
     fun setPost(postModel : PostModel) {
-        rootView.apply {
+        postItemRootView?.apply {
             if (postModel.isVisited) {
-                postItemRootView.setBackgroundColor(backgroundVisitedColor)
+                setBackgroundColor(backgroundVisitedColor)
             } else {
-                postItemRootView.setBackgroundColor(backgroundColor)
+                setBackgroundColor(backgroundColor)
             }
 
             if (postModel.isStickied) {
@@ -107,8 +107,8 @@ class RelicPostItemView @JvmOverloads constructor(
     private fun setThumbnail(thumbnailUrl : String) {
         try {
             Log.d(TAG, "URL = $thumbnailUrl")
-            Picasso.get().load(thumbnailUrl).fit().centerCrop().into(rootView.postThumbnailView)
-            rootView.postThumbnailView.visibility = View.VISIBLE
+            Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postThumbnailView)
+            postThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
             Log.d(TAG, "Issue loading image " + e.toString())
         }
@@ -116,9 +116,9 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setPostTags(postModel: PostModel) {
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        rootView.postItemNSFWView.visibility = if (postModel.isNsfw) View.VISIBLE else View.GONE
+        postItemNSFWView.visibility = if (postModel.isNsfw) View.VISIBLE else View.GONE
 
-        rootView.postItemTagView.apply {
+        postItemTagView.apply {
             if (postModel.linkFlair != null) {
                 text = postModel.linkFlair
                 background?.setTint(resources.getColor(R.color.discussion_tag))
@@ -126,7 +126,7 @@ class RelicPostItemView @JvmOverloads constructor(
             } else { visibility = View.GONE }
         }
 
-        rootView.postItemAuthorFlairView.apply {
+        postItemAuthorFlairView.apply {
             if (postModel.authorFlair != null) {
                 text = postModel.authorFlair
                 background?.setTint(resources.getColor(R.color.discussion_tag))

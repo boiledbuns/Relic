@@ -13,7 +13,9 @@ import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.SubNavigationData
+import com.relic.presentation.helper.ImageHelper
+import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
@@ -24,7 +26,7 @@ class DisplayUserVM(
     private val listingRepo: ListingRepository,
     private val userRepo: UserRepository,
     private val username : String
-) : ViewModel(), DisplaySubContract.PostAdapterDelegate {
+) : ViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -39,6 +41,9 @@ class DisplayUserVM(
 
     private var _userLiveData = MutableLiveData<UserModel>()
     var userLiveData : LiveData<UserModel> = _userLiveData
+
+    private var _navigationLiveData = SingleLiveData<SubNavigationData>()
+    var navigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
 
     private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
@@ -218,7 +223,6 @@ class DisplayUserVM(
             })
         }
 
-
         return listingItems
     }
 
@@ -226,16 +230,47 @@ class DisplayUserVM(
 
     // region post adapter delegate
 
-    override fun visitPost(postFullname: String, subreddit: String) {
+    override fun visitListing(listingItem : ListingItem) {
+        postRepo.postGateway.visitPost(listingItem.getFullName())
+
+        // retrieval option doesn't matter in this case
+        val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
+
+        when (listingItem) {
+            is PostModel ->{
+                _navigationLiveData.value = SubNavigationData.ToPost(
+                    listingItem.getFullName(),
+                    listingItem.subreddit,
+                    postSource
+                )
+            }
+            else -> {
+                // TODO handle for comments
+            }
+        }
+
     }
 
-    override fun voteOnPost(postFullname: String, voteValue: Int) {
+    override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
+        postRepo.postGateway.voteOnPost(listingItem.getFullName(), newVote)
     }
 
-    override fun savePost(postFullname: String, save: Boolean) {
+    override fun saveListing(listingItem : ListingItem) {
+        postRepo.postGateway.savePost(listingItem.getFullName(), !listingItem.saved)
     }
 
-    override fun onThumbnailClicked(postThumbnailUrl: String) {
+    override fun onThumbnailClicked(listingItem : ListingItem) {
+        if (listingItem is PostModel){
+            val isImage = ImageHelper.isValidImage(listingItem.thumbnail)
+
+            val subNavigation : SubNavigationData = if (isImage) {
+                SubNavigationData.ToImage(listingItem.thumbnail)
+            } else {
+                SubNavigationData.ToExternal(listingItem.thumbnail)
+            }
+
+            _navigationLiveData.value = subNavigation
+        }
     }
 
     // endregion post adapter delegate

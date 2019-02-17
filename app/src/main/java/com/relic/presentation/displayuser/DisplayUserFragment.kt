@@ -4,6 +4,8 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -17,8 +19,11 @@ import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.data.PostRepository
 import com.relic.data.models.UserModel
+import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
+import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.helper.DateHelper
 import com.shopify.livedataktx.nonNull
@@ -128,10 +133,11 @@ class DisplayUserFragment : RelicFragment() {
         return override
     }
 
-    //
+    // region livedata handlers
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { updateUserInfo(it) }
+        displayUserVM.navigationLiveData.nonNull().observe (lifecycleOwner) { handleNavigation(it) }
     }
 
     private fun updateUserInfo(userModel: UserModel) {
@@ -141,6 +147,35 @@ class DisplayUserFragment : RelicFragment() {
 
         userCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
     }
+
+    private fun handleNavigation(navigation : SubNavigationData) {
+        when (navigation) {
+            is SubNavigationData.ToPost -> {
+                val postFragment = DisplayPostFragment.create(
+                    navigation.postId,
+                    navigation.subredditName,
+                    navigation.postSource
+                )
+                // intentionally because replacing then popping off back stack loses scroll position
+                activity!!.supportFragmentManager.beginTransaction().add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
+            }
+            // navigates to display image on top of current fragment
+            is SubNavigationData.ToImage -> {
+                val imageFragment = DisplayImageFragment.create(
+                    navigation.thumbnail
+                )
+                activity!!.supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
+            }
+            // let browser handle navigation to url
+            is SubNavigationData.ToExternal -> {
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
+                startActivity(openInBrowser)
+            }
+        }
+    }
+
+    // endregion livedata handlers
 
     private fun getUserCreatedString(created : Long) : String {
         // initialize the date formatter and date for "now"
@@ -152,10 +187,6 @@ class DisplayUserFragment : RelicFragment() {
 
         return resources.getString(R.string.account_age, userAge, userCreationDate)
     }
-
-    // region livedata handlers
-
-    // endregion livedata handlers
 
     companion object {
         val ARG_USERNAME = "arg_username"
