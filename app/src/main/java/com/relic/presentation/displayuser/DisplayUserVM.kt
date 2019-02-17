@@ -15,7 +15,7 @@ import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
-import com.shopify.livedataktx.SingleLiveData
+import com.relic.util.RelicEvent
 import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
@@ -42,8 +42,8 @@ class DisplayUserVM(
     private var _userLiveData = MutableLiveData<UserModel>()
     var userLiveData : LiveData<UserModel> = _userLiveData
 
-    private var _navigationLiveData = SingleLiveData<SubNavigationData>()
-    var navigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
+    private var _navigationLiveData = MutableLiveData<RelicEvent<SubNavigationData>>()
+    var navigationLiveData : LiveData<RelicEvent<SubNavigationData>> = _navigationLiveData
 
     private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
@@ -237,18 +237,18 @@ class DisplayUserVM(
         val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
 
         when (listingItem) {
-            is PostModel ->{
-                _navigationLiveData.value = SubNavigationData.ToPost(
+            is PostModel -> {
+                val navData = SubNavigationData.ToPost(
                     listingItem.id,
                     listingItem.subreddit,
                     postSource
                 )
+                _navigationLiveData.postValue(RelicEvent(navData))
             }
             else -> {
                 // TODO handle for comments
             }
         }
-
     }
 
     override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
@@ -269,7 +269,7 @@ class DisplayUserVM(
                 SubNavigationData.ToExternal(listingItem.thumbnail)
             }
 
-            _navigationLiveData.value = subNavigation
+            _navigationLiveData.postValue(RelicEvent(subNavigation))
         }
     }
 

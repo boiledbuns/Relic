@@ -42,9 +42,7 @@ class PostDeserializerImpl(
         val child = (data["children"] as JSONArray)[0] as JSONObject
         val post = child["data"] as JSONObject
 
-        extractPost(post).apply {
-            visited = true
-        }
+        extractPost(post)
     }
 
     /**

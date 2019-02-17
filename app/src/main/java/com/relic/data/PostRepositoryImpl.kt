@@ -212,23 +212,28 @@ class PostRepositoryImpl @Inject constructor(
     ) {
         val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
 
-        try {
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = ENDPOINT + ending,
-                authToken = checkToken()
-            )
+        coroutineScope {
+            try {
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = ENDPOINT + ending,
+                    authToken = checkToken()
+                )
 
-            val postEntity = postDeserializer.parsePost(response)
-            PostRepositoryImpl.InsertPostTask().execute(appDB, postEntity)
-
-        } catch (e :Exception) {
-            // TODO decide if it would be better to move this to another method
-            when (e) {
-                is NoConnectionError -> {
-                    errorHandler.invoke(RelicRequestError.NetworkUnavailableError())
+                val postEntity = postDeserializer.parsePost(response).apply {
+                    visited = true
                 }
-                else -> Log.d(TAG, "Error retrieving post: $e")
+
+                launch { appDB.postDao.insertPost(postEntity) }
+
+            } catch (e: Exception) {
+                // TODO decide if it would be better to move this to another method
+                when (e) {
+                    is NoConnectionError -> {
+                        errorHandler.invoke(RelicRequestError.NetworkUnavailableError())
+                    }
+                    else -> Log.d(TAG, "Error retrieving post: $e")
+                }
             }
         }
     }

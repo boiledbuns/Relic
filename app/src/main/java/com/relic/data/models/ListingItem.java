@@ -7,8 +7,7 @@ public class ListingItem {
 
     // the id is the "full name" of an item
     protected String id = "";
-    @Ignore
-    private boolean isVisited;
+    private boolean visited;
     private int userUpvoted;
     public boolean saved;
 
@@ -21,7 +20,7 @@ public class ListingItem {
     @Ignore public int userHiddenPosition;
 
     public String getFullName() {
-        return "";
+        return id;
     }
 
     public String getId() {
@@ -33,11 +32,11 @@ public class ListingItem {
     }
 
     public boolean isVisited() {
-        return isVisited;
+        return visited;
     }
 
     public void setVisited(boolean visited) {
-        isVisited = visited;
+        this.visited = visited;
     }
 
     public int getUserUpvoted() {

@@ -28,12 +28,6 @@ public class CommentModel extends ListingItem {
 
   public CommentModel() {}
 
-  // Note that fullname = type + id
-  @NonNull
-  public String getFullName() {
-      return TYPE + "_" + id;
-  }
-
   public String getBody() {
     return body == null ? "" : body;
   }

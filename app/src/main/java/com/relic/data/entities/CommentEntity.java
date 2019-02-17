@@ -46,6 +46,7 @@ public class CommentEntity {
   public boolean score_hidden;
   public int userUpvoted;
     public boolean saved;
+    public boolean visited;
 
   public int replyCount;
   public int depth;

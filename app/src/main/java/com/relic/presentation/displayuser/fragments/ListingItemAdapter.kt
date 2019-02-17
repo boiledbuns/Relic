@@ -85,11 +85,11 @@ class ListingItemAdapter(
 
     override fun onPostPressed (itemPosition : Int) {
         listingItems[itemPosition].also {
-            // update the view and local model to reflect onclick
-            it.isVisited = true
-
             // update post to show that it has been visited
             actionDelegate.visitListing(it)
+
+            // update the view and local model to reflect onclick
+            it.isVisited = true
         }
         notifyItemChanged(itemPosition)
     }
@@ -118,7 +118,6 @@ class ListingItemAdapter(
 
             actionDelegate.voteOnListing(it, newVote)
         }
-
     }
 
     override fun onPostSavePressed (itemPosition : Int) {

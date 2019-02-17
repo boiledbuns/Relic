@@ -26,6 +26,7 @@ import com.relic.presentation.displaysub.DisplaySubMenuHelper
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.helper.DateHelper
+import com.relic.util.RelicEvent
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
@@ -148,29 +149,34 @@ class DisplayUserFragment : RelicFragment() {
         userCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
     }
 
-    private fun handleNavigation(navigation : SubNavigationData) {
-        when (navigation) {
-            is SubNavigationData.ToPost -> {
-                val postFragment = DisplayPostFragment.create(
-                    navigation.postId,
-                    navigation.subredditName,
-                    navigation.postSource
-                )
-                // intentionally because replacing then popping off back stack loses scroll position
-                activity!!.supportFragmentManager.beginTransaction().add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
-            }
-            // navigates to display image on top of current fragment
-            is SubNavigationData.ToImage -> {
-                val imageFragment = DisplayImageFragment.create(
-                    navigation.thumbnail
-                )
-                activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
-            }
-            // let browser handle navigation to url
-            is SubNavigationData.ToExternal -> {
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
-                startActivity(openInBrowser)
+    private fun handleNavigation(navEvent : RelicEvent<SubNavigationData>) {
+        if (!navEvent.consumed) {
+            val navigation = navEvent.consume()
+
+            when (navigation) {
+                is SubNavigationData.ToPost -> {
+                    val postFragment = DisplayPostFragment.create(
+                        navigation.postId,
+                        navigation.subredditName,
+                        navigation.postSource
+                    )
+                    // intentionally because replacing then popping off back stack loses scroll position
+                    activity!!.supportFragmentManager.beginTransaction()
+                        .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
+                }
+                // navigates to display image on top of current fragment
+                is SubNavigationData.ToImage -> {
+                    val imageFragment = DisplayImageFragment.create(
+                        navigation.thumbnail
+                    )
+                    activity!!.supportFragmentManager.beginTransaction()
+                        .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
+                }
+                // let browser handle navigation to url
+                is SubNavigationData.ToExternal -> {
+                    val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
+                    startActivity(openInBrowser)
+                }
             }
         }
     }

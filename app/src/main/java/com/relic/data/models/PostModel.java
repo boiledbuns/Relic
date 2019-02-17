@@ -194,9 +194,4 @@ public class PostModel extends ListingItem implements Post {
   public int platinum;
   public int gold;
   public int silver;
-
-  @Override
-  public String getFullName() {
-      return TYPE + "_" + id;
-  }
 }
