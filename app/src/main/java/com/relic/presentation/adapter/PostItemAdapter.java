@@ -189,11 +189,11 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         PostModel postModel = postList.get(itemPosition);
 
         // calculate new save value based on the previous one and tell vm to update appropriately
-        boolean newStatus = !postModel.isSaved();
+        boolean newStatus = !postModel.saved;
         postAdapterDelegate.savePost(postModel.getId(), newStatus);
 
         // update the view and local model to reflect onclick
-        postModel.setSaved(newStatus);
+        postModel.saved = newStatus;
         notifyItemChanged(itemPosition);
       });
     }

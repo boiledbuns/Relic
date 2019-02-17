@@ -191,32 +191,32 @@ class DisplayUserVM(
 
                 when (tab) {
                     UserTab.Submitted -> {
-                        o1.userSubmittedPosition?.let { firstP = it }
-                        o2.userSubmittedPosition?.let { secondP = it }
+                        firstP = o1.userSubmittedPosition
+                        secondP = o2.userSubmittedPosition
                     }
                     UserTab.Comments -> {
-                        o1.userCommentsPosition?.let { firstP = it }
-                        o2.userCommentsPosition?.let { secondP = it }
+                        firstP = o1.userCommentsPosition
+                        secondP = o2.userCommentsPosition
                     }
                     UserTab.Saved -> {
-                        o1.userSavedPosition?.let { firstP = it }
-                        o2.userSavedPosition?.let { secondP = it }
+                        firstP = o1.userSavedPosition
+                        secondP = o2.userSavedPosition
                     }
                     UserTab.Upvoted -> {
-                        o1.userUpvotedPosition?.let { firstP = it }
-                        o2.userUpvotedPosition?.let { secondP = it }
+                        firstP = o1.userUpvotedPosition
+                        secondP = o2.userUpvotedPosition
                     }
                     UserTab.Downvoted -> {
-                        o1.userDownvotedPosition?.let { firstP = it }
-                        o2.userDownvotedPosition?.let { secondP = it }
+                        firstP = o1.userDownvotedPosition
+                        secondP = o2.userDownvotedPosition
                     }
                     UserTab.Gilded -> {
-                        o1.userGildedPosition?.let { firstP = it }
-                        o2.userGildedPosition?.let { secondP = it }
+                        firstP = o1.userGildedPosition
+                        secondP = o2.userGildedPosition
                     }
                     UserTab.Hidden -> {
-                        o1.userHiddenPosition?.let { firstP = it }
-                        o2.userHiddenPosition?.let { secondP = it }
+                        firstP = o1.userHiddenPosition
+                        secondP = o2.userHiddenPosition
                     }
                 }
                 if (firstP > secondP) 1 else 0
@@ -231,7 +231,7 @@ class DisplayUserVM(
     // region post adapter delegate
 
     override fun visitListing(listingItem : ListingItem) {
-        postRepo.postGateway.visitPost(listingItem.getFullName())
+        postRepo.postGateway.visitPost(listingItem.id)
 
         // retrieval option doesn't matter in this case
         val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
@@ -239,7 +239,7 @@ class DisplayUserVM(
         when (listingItem) {
             is PostModel ->{
                 _navigationLiveData.value = SubNavigationData.ToPost(
-                    listingItem.getFullName(),
+                    listingItem.id,
                     listingItem.subreddit,
                     postSource
                 )
@@ -252,11 +252,11 @@ class DisplayUserVM(
     }
 
     override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
-        postRepo.postGateway.voteOnPost(listingItem.getFullName(), newVote)
+        postRepo.postGateway.voteOnPost(listingItem.id, newVote)
     }
 
     override fun saveListing(listingItem : ListingItem) {
-        postRepo.postGateway.savePost(listingItem.getFullName(), !listingItem.saved)
+        postRepo.postGateway.savePost(listingItem.id, !listingItem.saved)
     }
 
     override fun onThumbnailClicked(listingItem : ListingItem) {

@@ -3,15 +3,13 @@ package com.relic.data.models;
 
 import android.arch.persistence.room.Ignore;
 
-import org.jetbrains.annotations.Nullable;
-
 public class ListingItem {
-    private static final int UNINITIALIZED = -1;
 
-    public String id = "";
+    // the id is the "full name" of an item
+    protected String id = "";
     @Ignore
-    public boolean isVisited;
-    public int userUpvoted;
+    private boolean isVisited;
+    private int userUpvoted;
     public boolean saved;
 
     @Ignore public int userSubmittedPosition;
@@ -24,5 +22,29 @@ public class ListingItem {
 
     public String getFullName() {
         return "";
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isVisited() {
+        return isVisited;
+    }
+
+    public void setVisited(boolean visited) {
+        isVisited = visited;
+    }
+
+    public int getUserUpvoted() {
+        return userUpvoted;
+    }
+
+    public void setUserUpvoted(int userUpvoted) {
+        this.userUpvoted = userUpvoted;
     }
 }
