@@ -1,8 +1,5 @@
 package com.relic.data.models;
 
-
-import android.arch.persistence.room.Ignore;
-
 public class ListingItem {
 
     // the id is the "full name" of an item
@@ -11,13 +8,13 @@ public class ListingItem {
     private int userUpvoted;
     public boolean saved;
 
-    @Ignore public int userSubmittedPosition;
-    @Ignore public int userCommentsPosition;
-    @Ignore public int userSavedPosition;
-    @Ignore public int userUpvotedPosition;
-    @Ignore public int userDownvotedPosition;
-    @Ignore public int userGildedPosition;
-    @Ignore public int userHiddenPosition;
+    public int userSubmittedPosition;
+    public int userCommentsPosition;
+    public int userSavedPosition;
+    public int userUpvotedPosition;
+    public int userDownvotedPosition;
+    public int userGildedPosition;
+    public int userHiddenPosition;
 
     public String getFullName() {
         return id;

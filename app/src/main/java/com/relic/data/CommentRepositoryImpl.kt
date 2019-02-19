@@ -145,7 +145,7 @@ class CommentRepositoryImpl(
         }
     }
 
-    override fun clearComments(postFullName: String) {
+    override fun clearAllCommentsFromSource(postFullName: String) {
         ClearCommentsTask().execute(appDB, CommentDeserializer.removeTypePrefix(postFullName))
     }
 

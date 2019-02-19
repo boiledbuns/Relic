@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
@@ -27,6 +28,8 @@ class DisplayUserVM(
     private val userRepo: UserRepository,
     private val username : String
 ) : ViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
+
+    val TAG = "DISPLAY_USER_VM"
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -81,15 +84,27 @@ class DisplayUserVM(
             tabLiveData = MediatorLiveData<List<ListingItem>>().apply {
                 // TODO add a diff util
                 addSource(postSource) { newList ->
-                    newList?.let {
+                    if (newList!= null && newList.isNotEmpty()) {
                         postLists[tab] = newList
-                        this.postValue(convergeSources(postLists[tab], commentLists[tab], tab))
+                        // TODO move this logic to repository. We shouldn't care about this
+                        // TODO tbh consider moving the entire convergence method outside of vm
+                        // only post source if all posts and comments are in loaded in order
+                        convergeSources(postLists[tab], commentLists[tab], tab).let { converged ->
+                            if (extractTabPosition(converged.last(), tab) == converged.size - 1) {
+                                this.postValue(converged)
+                            }
+                        }
                     }
                 }
                 addSource(commentSource) { newList ->
-                    newList?.let {
+                    if (newList!= null && newList.isNotEmpty()) {
                         commentLists[tab] = newList
-                        this.postValue(convergeSources(postLists[tab], commentLists[tab], tab))
+                        // only post source if all posts and comments are in loaded in order
+                        convergeSources(postLists[tab], commentLists[tab], tab).let { converged ->
+                            if (extractTabPosition(converged.last(), tab) == converged.size - 1) {
+                                this.postValue(converged)
+                            }
+                        }
                     }
                 }
             }
@@ -173,57 +188,51 @@ class DisplayUserVM(
         comments : List<CommentModel>?,
         tab : UserTab
     ) : List<ListingItem> {
-        val listingItems = mutableListOf<ListingItem>()
+        var listingItems = listOf<ListingItem>()
 
         if (posts == null && comments != null) {
-            listingItems.addAll(comments)
+            listingItems = comments
         }
         else if (comments == null && posts != null) {
-            listingItems.addAll(posts)
+            listingItems = posts
         }
         else if (comments != null && posts != null)  {
+            listingItems = mutableListOf()
             listingItems.addAll(posts)
             listingItems.addAll(comments)
 
             listingItems.sortWith(Comparator { o1, o2 ->
-                var firstP = 0
-                var secondP = 0
+                // TODO switch to use a single field for position and return the appropriate position based on the dao query
+                val firstP = extractTabPosition(o1, tab)
+                val secondP = extractTabPosition(o2, tab)
 
-                when (tab) {
-                    UserTab.Submitted -> {
-                        firstP = o1.userSubmittedPosition
-                        secondP = o2.userSubmittedPosition
-                    }
-                    UserTab.Comments -> {
-                        firstP = o1.userCommentsPosition
-                        secondP = o2.userCommentsPosition
-                    }
-                    UserTab.Saved -> {
-                        firstP = o1.userSavedPosition
-                        secondP = o2.userSavedPosition
-                    }
-                    UserTab.Upvoted -> {
-                        firstP = o1.userUpvotedPosition
-                        secondP = o2.userUpvotedPosition
-                    }
-                    UserTab.Downvoted -> {
-                        firstP = o1.userDownvotedPosition
-                        secondP = o2.userDownvotedPosition
-                    }
-                    UserTab.Gilded -> {
-                        firstP = o1.userGildedPosition
-                        secondP = o2.userGildedPosition
-                    }
-                    UserTab.Hidden -> {
-                        firstP = o1.userHiddenPosition
-                        secondP = o2.userHiddenPosition
-                    }
-                }
-                if (firstP > secondP) 1 else 0
+                firstP - secondP
             })
         }
 
+        Log.d(TAG, "saved positions " + listingItems.map {
+            var postTitle = ""
+            if (it is PostModel) {
+                postTitle = it.title
+            } else if (it is CommentModel) {
+                postTitle = it.body.substring(0, 10)
+            }
+            "${it.userSavedPosition} $postTitle"}
+        )
+
         return listingItems
+    }
+
+    private fun extractTabPosition(listingItem: ListingItem, tab: UserTab) : Int {
+        return when (tab) {
+            UserTab.Submitted -> listingItem.userSubmittedPosition
+            UserTab.Comments -> listingItem.userCommentsPosition
+            UserTab.Saved -> listingItem.userSavedPosition
+            UserTab.Upvoted -> listingItem.userUpvotedPosition
+            UserTab.Downvoted -> listingItem.userDownvotedPosition
+            UserTab.Gilded -> listingItem.userGildedPosition
+            UserTab.Hidden -> listingItem.userHiddenPosition
+        }
     }
 
     // endregion helper functions
@@ -261,12 +270,12 @@ class DisplayUserVM(
 
     override fun onThumbnailClicked(listingItem : ListingItem) {
         if (listingItem is PostModel){
-            val isImage = ImageHelper.isValidImage(listingItem.thumbnail)
+            val isImage = ImageHelper.isValidImage(listingItem.url)
 
             val subNavigation : SubNavigationData = if (isImage) {
-                SubNavigationData.ToImage(listingItem.thumbnail)
+                SubNavigationData.ToImage(listingItem.url)
             } else {
-                SubNavigationData.ToExternal(listingItem.thumbnail)
+                SubNavigationData.ToExternal(listingItem.url)
             }
 
             _navigationLiveData.postValue(RelicEvent(subNavigation))

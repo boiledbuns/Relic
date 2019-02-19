@@ -101,7 +101,7 @@ class DisplayPostVM (
             }
         }
         retrieveMoreComments(true)
-        commentRepo.clearComments(postFullname)
+        commentRepo.clearAllCommentsFromSource(postFullname)
     }
 
     override fun retrieveMoreComments(refresh: Boolean) {
@@ -110,7 +110,7 @@ class DisplayPostVM (
         GlobalScope.launch {
             if (refresh) {
                 _refreshingLiveData.postValue(true)
-                commentRepo.clearComments(postFullname)
+                commentRepo.clearAllCommentsFromSource(postFullname)
             }
             commentRepo.retrieveComments(subName, postFullname, refresh)
         }

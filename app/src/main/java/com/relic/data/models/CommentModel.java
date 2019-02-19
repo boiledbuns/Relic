@@ -1,7 +1,5 @@
 package com.relic.data.models;
 
-import android.support.annotation.NonNull;
-
 public class CommentModel extends ListingItem {
   public static int UPVOTE = 1;
   public static int DOWNVOTE = -1;
