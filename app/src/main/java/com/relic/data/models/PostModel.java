@@ -6,9 +6,7 @@ import com.relic.domain.Post;
 
 public class PostModel extends ListingItem implements Post {
     public static String TYPE = "t3";
-
-    private String subreddit;
-  private String author;
+    private String author;
   private String selftext;
   private String created;
   private String linkFlair;

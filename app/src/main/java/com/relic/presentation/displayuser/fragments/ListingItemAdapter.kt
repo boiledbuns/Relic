@@ -37,7 +37,11 @@ class ListingItemAdapter(
                 initializeOnClicks(this@ListingItemAdapter)
             }
             // TODO complete the custom comment VH and view for displaying within the tab
-            else -> CommentItemVH(RelicCommentView(parent.context)).apply {
+            else -> {
+                val commentView = RelicCommentView(parent.context)
+                commentView.displayParent(true)
+
+                CommentItemVH(commentView)
             }
         }
     }

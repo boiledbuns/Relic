@@ -2,6 +2,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/commentRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,25 +10,78 @@
     android:padding="@dimen/displaypost_rvpadding"
     android:background="?attr/colorPrimary">
 
+    <LinearLayout
+        android:id="@+id/parentBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_s"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/parentSubreddit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/displaypost_paddingside"
+            tools:text="subreddit"/>
+
+        <TextView
+            android:id="@+id/parentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="@dimen/text_l"
+            android:layout_marginEnd="@dimen/displaypost_paddingside"
+            tools:text="Blah Blah Blah here is my title"/>
+
+        <TextView
+            android:id="@+id/parentAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/displaypost_paddingside"
+            android:layout_marginBottom="@dimen/padding_s"
+            tools:text="u/random_person"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#c0c0c0"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/indentCommentIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_comment_indent"
+        android:layout_below="@id/parentBlock"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
     <TextView
         android:id="@+id/commentScoreView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/displaypost_paddingside"/>
+        android:layout_marginEnd="@dimen/displaypost_paddingside"
+        android:layout_toEndOf="@id/indentCommentIcon"
+        android:layout_below="@id/parentBlock"/>
 
     <TextView
         android:id="@+id/commentFlairView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        android:layout_toEndOf="@id/commentScoreView"/>
+        android:layout_toEndOf="@id/commentScoreView"
+        android:layout_below="@id/parentBlock"/>
 
     <TextView
         android:id="@+id/commentAuthorView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        android:layout_toEndOf="@id/commentFlairView"/>
+        android:layout_toEndOf="@id/commentFlairView"
+        android:layout_below="@id/parentBlock"/>
 
     <TextView
         android:id="@+id/commentCreatedView"
@@ -40,6 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/commentAuthorView"
+        android:layout_toEndOf="@id/indentCommentIcon"
         android:paddingBottom="0dp"
         android:layout_marginTop="@dimen/text_spacing_s"
         android:textSize="@dimen/text_m"/>
@@ -48,7 +103,8 @@
         android:id="@+id/commentUpvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/commentBodyView"/>
+        android:layout_below="@id/commentBodyView"
+        android:layout_toEndOf="@id/indentCommentIcon"/>
 
     <ImageView
         android:id="@+id/commentDownvoteView"

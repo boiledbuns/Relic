@@ -7,66 +7,71 @@ import android.support.annotation.NonNull;
 
 @Entity
 public class CommentEntity {
-  public static final String MORE_CREATED = "more_author";
+    public static final String MORE_CREATED = "more_author";
 
-  @NonNull
-  @PrimaryKey
-  @ColumnInfo(name = "id")
-  private String id;
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    private String id;
 
-  //public String replies;
-  public String created;
-  public String author;
-  public String subreddit;
+    //public String replies;
+    public String created;
+    public String author;
+    public String subreddit;
 
-  // post parent id
-  public String parentPostId;
+    // post parent id
+    public String parentPostId;
 
-  // parent comment id
-  @ColumnInfo(name ="parentId")
-  public String parent_id;
+    // parent comment id
+    @ColumnInfo(name ="parentId")
+    public String parent_id;
 
-  @ColumnInfo(name = "body")
-  public String body_html;
+    @ColumnInfo(name = "body")
+    public String body_html;
 
-  public int score;
+    public int score;
 
-  public int platinum;
-  public int gold;
-  public int silver;
+    public int platinum;
+    public int gold;
+    public int silver;
 
-  @ColumnInfo(name = "authorFlairText")
-  public String author_flair_text;
-  @ColumnInfo(name = "authorFlairTextColor")
-  public String author_flair_text_color;
+    @ColumnInfo(name = "authorFlairText")
+    public String author_flair_text;
+    @ColumnInfo(name = "authorFlairTextColor")
+    public String author_flair_text_color;
 
-  @ColumnInfo(name = "isSubmitter")
-  public boolean is_submitter;
-  @ColumnInfo(name = "scoreHidden")
-  public boolean score_hidden;
-  public int userUpvoted;
+    @ColumnInfo(name = "isSubmitter")
+    public boolean is_submitter;
+    @ColumnInfo(name = "scoreHidden")
+    public boolean score_hidden;
+    public int userUpvoted;
     public boolean saved;
     public boolean visited;
 
-  public int replyCount;
-  public int depth;
-  public String replyLink;
+    public int replyCount;
+    public int depth;
+    public String replyLink;
 
-  public String editedDate;
+    @ColumnInfo(name = "linkTitle")
+    public String link_title;
+    @ColumnInfo(name = "linkAuthor")
+    public String link_author;
 
-  public CommentEntity(){}
+    public String editedDate;
 
-  @NonNull
-  public String getId() {
+    public CommentEntity(){}
+
+    @NonNull
+    public String getId() {
     return id;
-  }
+    }
 
-  public void setId(@NonNull String id) {
-      this.id = id;
-  }
+    public void setId(@NonNull String id) {
+    this.id = id;
+    }
 
     public float position;
 
-  // for "more" values
-     public String moreChildren;
+    // for "more" values
+    public String moreChildren;
 }

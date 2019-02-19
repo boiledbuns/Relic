@@ -7,6 +7,7 @@ public class ListingItem {
     private boolean visited;
     private int userUpvoted;
     public boolean saved;
+    public String subreddit = "";
 
     public int userSubmittedPosition;
     public int userCommentsPosition;

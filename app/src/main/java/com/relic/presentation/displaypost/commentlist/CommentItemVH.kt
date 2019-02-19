@@ -40,40 +40,6 @@ class CommentItemVH (
         commentPosition = position
         commentId = commentModel.id
 
-        commentItem.apply {
-            commentScoreView.text = commentModel.score.toString() + " " + commentModel.depth
-            commentFlairView.text = " " + commentModel.position  + " " + commentModel.authorFlairText
-            commentAuthorView.text = commentModel.author
-            commentCreatedView.text = commentModel.created
-
-            commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
-            commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
-
-            if (commentModel.isSubmitter) {
-                commentAuthorView.setBackgroundResource(R.drawable.tag)
-                commentAuthorView.background?.setTint(resources.getColor(R.color.discussion_tag))
-            }
-
-            when (commentModel.userUpvoted) {
-                1 -> {
-                    commentUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                    commentDownvoteView.setImageResource(R.drawable.ic_downvote)
-                }
-                0 -> {
-                    commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    commentDownvoteView.setImageResource(R.drawable.ic_downvote)
-                }
-                -1 -> {
-                    commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
-                }
-            }
-
-            if (commentModel.replyCount > 0) {
-                commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
-            }
-
-            commentItem.displayReplyDepth(commentModel.depth)
-        }
+        commentItem.setPost(commentModel)
     }
 }
