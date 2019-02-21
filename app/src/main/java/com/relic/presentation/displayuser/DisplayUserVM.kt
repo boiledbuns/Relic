@@ -253,7 +253,7 @@ class DisplayUserVM(
                     postSource
             )
             is CommentModel -> SubNavigationData.ToPost(
-                    listingItem.parentPostId,
+                    PostModel.TYPE + "_" + listingItem.parentPostId,
                     listingItem.subreddit,
                     postSource,
                     listingItem.id

@@ -11,7 +11,9 @@ public class CommentModel extends ListingItem {
     public String created;
     private int score;
 
-    // post parent id
+    // post parent id, NOT fullname
+    // TODO tbh really need to tidy up consistency with convention
+    // TODO I know I used id for fullname of posts, but should be changed to fullname there
     public String parentPostId;
     public String authorFlairText;
 
