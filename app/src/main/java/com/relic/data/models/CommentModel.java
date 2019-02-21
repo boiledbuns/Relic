@@ -11,6 +11,8 @@ public class CommentModel extends ListingItem {
     public String created;
     private int score;
 
+    // post parent id
+    public String parentPostId;
     public String authorFlairText;
 
     public int platinum;

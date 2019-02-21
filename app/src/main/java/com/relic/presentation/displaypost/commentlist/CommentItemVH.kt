@@ -5,6 +5,7 @@ import android.text.Html
 import com.relic.R
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
+import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import kotlinx.android.synthetic.main.comment_item.view.*
 
@@ -15,7 +16,7 @@ class CommentItemVH (
     private var commentPosition = 0
     private var commentId = ""
 
-    fun initializeOnClicks(adapter : CommentItemAdapter) {
+    fun initializeOnClicks(adapter : DisplayPostContract.CommentAdapterDelegate) {
         commentItem.apply {
             commentUpvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, UPVOTE_PRESSED) }
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, DOWNVOTE_PRESSED) }
@@ -33,6 +34,8 @@ class CommentItemVH (
                 // if showing replies, display a placeholder loading
                 commentsExpanded = !commentsExpanded
             }
+
+            setOnClickListener { adapter.visitComment(commentPosition) }
         }
     }
 

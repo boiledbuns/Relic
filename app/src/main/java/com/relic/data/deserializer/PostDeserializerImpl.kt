@@ -103,7 +103,6 @@ class PostDeserializerImpl(
                     } else {
                         val newComment = CommentDeserializer.unmarshallComment(
                             commentChild = fullEntityJson,
-                            postFullName = "",
                             commentPosition = 0F
                         ).first()
                         commentEntities.add(newComment)

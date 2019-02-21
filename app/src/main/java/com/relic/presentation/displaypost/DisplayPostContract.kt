@@ -24,6 +24,13 @@ interface DisplayPostContract {
         fun onImagePressed()
         fun onReplyPressed()
     }
+
+    interface CommentAdapterDelegate {
+        fun displayCommentReplies(itemId : String, commentExpanded : Boolean)
+        fun voteOnComment(itemPosition : Int, voteValue : Int)
+        fun replyToComment(itemPosition : Int)
+        fun visitComment(itemPosition : Int)
+    }
 }
 
 sealed class PostNavigationData {

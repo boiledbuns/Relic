@@ -29,7 +29,8 @@ sealed class SubNavigationData {
     data class ToPost (
         val postId : String,
         val subredditName : String,
-        val postSource: PostRepository.PostSource
+        val postSource: PostRepository.PostSource,
+        val commentId : String? = null
     ) : SubNavigationData ()
 
     data class ToImage (

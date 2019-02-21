@@ -14,6 +14,7 @@ import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
+import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.util.RelicEvent
@@ -245,18 +246,23 @@ class DisplayUserVM(
         // retrieval option doesn't matter in this case
         val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
 
-        when (listingItem) {
-            is PostModel -> {
-                val navData = SubNavigationData.ToPost(
+        val navData = when (listingItem) {
+            is PostModel -> SubNavigationData.ToPost(
                     listingItem.id,
                     listingItem.subreddit,
                     postSource
-                )
-                _navigationLiveData.postValue(RelicEvent(navData))
-            }
-            else -> {
-                // TODO handle for comments
-            }
+            )
+            is CommentModel -> SubNavigationData.ToPost(
+                    listingItem.parentPostId,
+                    listingItem.subreddit,
+                    postSource,
+                    listingItem.id
+            )
+            else -> null
+        }
+
+        navData?.let {
+            _navigationLiveData.postValue(RelicEvent(it))
         }
     }
 

@@ -7,6 +7,7 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.presentation.customview.RelicPostItemView
+import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.commentlist.CommentItemVH
 import com.relic.presentation.displaypost.commentlist.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
@@ -15,7 +16,8 @@ import com.relic.presentation.displayuser.DisplayUserContract
 
 class ListingItemAdapter(
     private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
-) : RecyclerView.Adapter <RecyclerView.ViewHolder> (), DisplaySubContract.PostItemAdapterDelegate {
+) : RecyclerView.Adapter <RecyclerView.ViewHolder> (),
+    DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentAdapterDelegate {
 
     private val VIEW_TYPE_POST = 0
     private val VIEW_TYPE_COMMENT = 1
@@ -40,8 +42,9 @@ class ListingItemAdapter(
             else -> {
                 val commentView = RelicCommentView(parent.context)
                 commentView.displayParent(true)
-
-                CommentItemVH(commentView)
+                CommentItemVH(commentView).apply {
+                    initializeOnClicks(this@ListingItemAdapter)
+                }
             }
         }
     }
@@ -98,7 +101,6 @@ class ListingItemAdapter(
         notifyItemChanged(itemPosition)
     }
 
-    // initialize onclick for the upvote button
     override fun onPostUpvotePressed(itemPosition : Int) {
         listingItems[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
@@ -110,7 +112,6 @@ class ListingItemAdapter(
         }
     }
 
-    // initialize onclick for the downvote button
     override fun onPostDownvotePressed(itemPosition : Int) {
         listingItems[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
@@ -140,4 +141,24 @@ class ListingItemAdapter(
 
     // end region for onclick handlers
 
+    // TODO consider refactoring onclicks for both posts and comments to consolidate them into a single interface
+    // region comment adapter delegate
+
+    override fun displayCommentReplies(itemId: String, commentExpanded: Boolean) {}
+
+    override fun voteOnComment(itemPosition: Int, voteValue: Int) {
+        if (voteValue == 1) {
+            onPostUpvotePressed(itemPosition)
+        } else if (voteValue == -1){
+            onPostDownvotePressed(itemPosition)
+        }
+    }
+
+    override fun replyToComment(itemPosition: Int) {}
+
+    override fun visitComment(itemPosition: Int) {
+         actionDelegate.visitListing(listingItems[itemPosition])
+    }
+
+    // endregion comment adapter delegate
 }

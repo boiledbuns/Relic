@@ -9,7 +9,7 @@ import com.relic.presentation.displaypost.DisplayPostContract
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), DisplayPostContract.CommentAdapterDelegate {
 
     private var commentDiffer = AsyncListDiffer<CommentModel>(this, DIFF_CALLBACK)
     private val TAG = "COMMENT_ADAPTER"
@@ -50,11 +50,11 @@ class CommentItemAdapter (
 
     // region onclick handler
 
-    fun displayCommentReplies(itemId : String, commentExpanded : Boolean) {
+    override fun displayCommentReplies(itemId : String, commentExpanded : Boolean) {
         actionDelegate.onExpandReplies(itemId, commentExpanded)
     }
 
-    fun voteOnComment(itemPosition : Int, voteValue : Int) {
+    override fun voteOnComment(itemPosition : Int, voteValue : Int) {
         commentDiffer.currentList[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newStatus = actionDelegate.onCommentVoted(it, voteValue)
@@ -65,9 +65,11 @@ class CommentItemAdapter (
         }
     }
 
-    fun replyToComment(itemPosition : Int) {
-
+    override fun replyToComment(itemPosition : Int) {
+        //TODO implement
     }
+
+    override fun visitComment(itemPosition: Int) {}
 
     // end region onclick handler
 

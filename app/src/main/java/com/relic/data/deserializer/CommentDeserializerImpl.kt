@@ -1,6 +1,7 @@
 package com.relic.data.deserializer
 
 import android.text.Html
+import android.util.Log
 import com.google.gson.GsonBuilder
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
@@ -16,6 +17,8 @@ import kotlin.math.pow
 
 // TODO convert to object and add interface so this can be injected
 object CommentDeserializer : Contract.CommentDeserializer {
+    private val TAG = "COMMENT_DESERIALIZER"
+
     private val gson = GsonBuilder().create()
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val currentYear = Date().year
@@ -63,7 +66,7 @@ object CommentDeserializer : Contract.CommentDeserializer {
                     commentList.add(deferredMore.await())
                 } else {
                     val deferredCommentList = async {
-                        unmarshallComment(commentJson, postFullName, position)
+                        unmarshallComment(commentJson, position)
                     }
                     commentList.addAll(deferredCommentList.await())
                 }
@@ -99,7 +102,6 @@ object CommentDeserializer : Contract.CommentDeserializer {
     // won't be cleaned for a while because still decided how to format data and what is needed
     override suspend fun unmarshallComment(
         commentChild : JSONObject,
-        postFullName : String,
         commentPosition : Float
     ) : List<CommentEntity> {
         val commentPOJO = commentChild["data"] as JSONObject
@@ -109,7 +111,7 @@ object CommentDeserializer : Contract.CommentDeserializer {
 
             var deferredCommentData: Deferred<ParsedCommentData>? = null
             val commentEntity = gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
-                parentPostId = postFullName
+                parentPostId = removeTypePrefix(commentPOJO["link_id"] as String)
                 position = commentPosition
 
                 commentPOJO["replies"]?.let { childJson ->
@@ -118,7 +120,7 @@ object CommentDeserializer : Contract.CommentDeserializer {
                         // parse the children of this comment
                         deferredCommentData = async {
                             parseComments(
-                                postFullName = postFullName,
+                                postFullName = parentPostId,
                                 response = childJson as JSONObject,
                                 parentDepth = depth,
                                 parentPosition = commentPosition
@@ -178,7 +180,13 @@ object CommentDeserializer : Contract.CommentDeserializer {
     }
 
     // removes the type associated with the comment, leaving only its id
-    fun removeTypePrefix(fullName : String) : String = fullName.removeRange(0, 3)
+    fun removeTypePrefix(fullName : String) : String {
+        return if (fullName.length >= 4) {
+            fullName.removeRange(0, 3)
+        } else {
+            ""
+        }
+    }
 
 }
 

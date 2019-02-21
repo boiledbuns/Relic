@@ -30,7 +30,6 @@ interface Contract {
 
         suspend fun unmarshallComment(
             commentChild : JSONObject,
-            postFullName : String,
             commentPosition : Float
         ) : List<CommentEntity>
     }
