@@ -47,8 +47,8 @@ public abstract class PostDao {
         "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0)")
     public abstract void deleteAllFromAll();
 
-    @Query("SELECT * FROM PostEntity INNER JOIN PostSourceEntity ON fullName = sourceId WHERE fullName = :postName")
-    public abstract LiveData<PostModel> getSinglePost(String postName);
+    @Query("SELECT * FROM PostEntity INNER JOIN PostSourceEntity ON fullName = sourceId WHERE fullName = :fullName")
+    public abstract LiveData<PostModel> getSinglePost(String fullName);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPost(PostEntity post);

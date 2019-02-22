@@ -37,12 +37,24 @@ class PostDeserializerImpl(
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val current = Date()
 
-    override suspend fun parsePost(response: String) : PostEntity = coroutineScope {
+    override suspend fun parsePost(response: String) : ParsedPostData = coroutineScope {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
         val child = (data["children"] as JSONArray)[0] as JSONObject
         val post = child["data"] as JSONObject
 
-        extractPost(post)
+        val newPost = extractPost(post)
+
+        val existingPostSource = async {
+            appDB.postSourceDao.getPostSource(newPost.name)
+        }.await()
+
+
+        val postSourceEntity = existingPostSource?.apply {
+            sourceId = newPost.name
+            subreddit = newPost.subreddit
+        } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+
+        ParsedPostData(postSourceEntity, newPost)
     }
 
     /**

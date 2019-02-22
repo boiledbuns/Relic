@@ -220,12 +220,15 @@ class PostRepositoryImpl @Inject constructor(
                     authToken = checkToken()
                 )
 
-                val postEntity = postDeserializer.parsePost(response).apply {
-                    visited = true
+                postDeserializer.parsePost(response).apply {
+                    postEntity.visited = true
+
+                    launch {
+                        appDB.postDao.insertPost(postEntity)
+                        appDB.postSourceDao.insertPostSources(listOf(postSourceEntity))
+                    }
                 }
-
-                launch { appDB.postDao.insertPost(postEntity) }
-
+                
             } catch (e: Exception) {
                 // TODO decide if it would be better to move this to another method
                 when (e) {

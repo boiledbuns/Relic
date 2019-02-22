@@ -63,8 +63,9 @@ class DisplayPostVM (
     private fun observeLiveData() {
         // retrieves the liveData post to be exposed to the view
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
-            _postLiveData.postValue(post)
-
+            post?.let {
+                _postLiveData.postValue(it)
+            }
             // necessary for specific case where we have a post with no comments, we refresh, and
             // the post still has no comments since the livedata for the comments don't notify
             // the observer if there is no change

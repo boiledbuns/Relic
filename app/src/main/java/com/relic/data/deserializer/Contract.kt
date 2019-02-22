@@ -11,7 +11,7 @@ import org.json.simple.JSONObject
 interface Contract {
 
     interface PostDeserializer {
-        suspend fun parsePost(response: String) : PostEntity
+        suspend fun parsePost(response: String) : ParsedPostData
 
         suspend fun parsePosts(
             response: String,
@@ -40,6 +40,11 @@ interface Contract {
     }
 
 }
+
+data class ParsedPostData(
+    val postSourceEntity:PostSourceEntity,
+    val postEntity : PostEntity
+)
 
 data class ParsedPostsData(
     val postSourceEntities:List<PostSourceEntity>,
