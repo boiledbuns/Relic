@@ -76,7 +76,7 @@ class CommentItemAdapter (
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CommentModel>() {
             override fun areItemsTheSame(p0: CommentModel, p1: CommentModel): Boolean {
-                return p0.id == p1.id
+                return p0.fullName == p1.fullName
             }
 
             override fun areContentsTheSame(p0: CommentModel, p1: CommentModel): Boolean {

@@ -3,7 +3,7 @@ package com.relic.data.models;
 public class ListingItem {
 
     // the id is the "full name" of an item
-    protected String id = "";
+    protected String fullName = "";
     private boolean visited;
     private int userUpvoted;
     public boolean saved;
@@ -18,15 +18,11 @@ public class ListingItem {
     public int userHiddenPosition;
 
     public String getFullName() {
-        return id;
+        return fullName;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public boolean isVisited() {

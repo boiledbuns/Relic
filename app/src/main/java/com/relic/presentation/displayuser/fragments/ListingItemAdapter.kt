@@ -68,14 +68,14 @@ class ListingItemAdapter(
             }
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return listingItems[oldItemPosition].id == newListingItems[newItemPosition].id
+                return listingItems[oldItemPosition].fullName == newListingItems[newItemPosition].fullName
             }
 
             override fun areContentsTheSame(oldPosition: Int, newPosition: Int): Boolean {
                 val oldItem = listingItems[oldPosition]
                 val newItem = newListingItems[newPosition]
 
-                return oldItem.id == newItem.id && oldItem.isVisited == newItem.isVisited
+                return oldItem.fullName == newItem.fullName && oldItem.isVisited == newItem.isVisited
             }
         }).dispatchUpdatesTo(this)
 

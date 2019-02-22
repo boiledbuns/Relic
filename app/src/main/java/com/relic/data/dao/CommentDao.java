@@ -17,12 +17,12 @@ public abstract class CommentDao {
     public abstract void insertComments(List<CommentEntity> commentEntities);
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
         "WHERE parentPostId = :postId ORDER BY position")
     public abstract LiveData<List<CommentModel>> getAllComments(String postId);
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
         "WHERE parentId = :parentId AND depth < :depth ORDER BY depth ASC")
     public abstract LiveData<List<CommentModel>> getChildrenByLevel(String parentId, int depth);
 

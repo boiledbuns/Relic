@@ -11,7 +11,7 @@ public class CommentEntity {
 
     @NonNull
     @PrimaryKey
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = "fullName")
     private String id;
 
     //public String replies;

@@ -41,7 +41,7 @@ class CommentItemVH (
 
     fun bindComment(commentModel : CommentModel, position : Int) {
         commentPosition = position
-        commentId = commentModel.id
+        commentId = commentModel.fullName
 
         commentItem.setPost(commentModel)
     }

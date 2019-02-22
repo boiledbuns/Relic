@@ -10,7 +10,7 @@ import kotlinx.coroutines.coroutineScope
 class PostMapperImpl : PostMapper {
     override suspend fun toModel(postEntity: PostEntity): PostModel {
         return PostModel().apply {
-            id = postEntity.name
+            fullName = postEntity.name
         }
     }
 

@@ -81,14 +81,14 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-          return postList.get(oldItemPosition).getId().equals(newPostList.get(newItemPosition).getId());
+          return postList.get(oldItemPosition).getFullName().equals(newPostList.get(newItemPosition).getFullName());
         }
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
           PostModel oldPost = postList.get(oldItemPosition);
           PostModel newPost = newPostList.get(newItemPosition);
-          boolean check = oldPost.getId().equals(newPost.getId())
+          boolean check = oldPost.getFullName().equals(newPost.getFullName())
             && oldPost.isVisited() == newPost.isVisited();
 
           return check;
@@ -158,7 +158,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         // optimistic, update copy cached in adapter and make request to api to update in server
         postModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        postAdapterDelegate.voteOnPost(postModel.getId(), newStatus);
+        postAdapterDelegate.voteOnPost(postModel.getFullName(), newStatus);
       });
 
       // initialize onclick for the downvote button
@@ -171,7 +171,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         // optimistic, update copy cached in adapter and make request to api to update in server
         postModel.setUserUpvoted(newStatus);
         notifyItemChanged(itemPosition);
-        postAdapterDelegate.voteOnPost(postModel.getId(), newStatus);
+        postAdapterDelegate.voteOnPost(postModel.getFullName(), newStatus);
       });
 
       // initialize onclick for post item
@@ -182,7 +182,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         postModel.setVisited(true);
         notifyItemChanged(itemPosition);
 
-        onClick.onClick(postModel.getId(), postModel.getSubreddit());
+        onClick.onClick(postModel.getFullName(), postModel.getSubreddit());
       });
 
       postBinding.postitemSaved.setOnClickListener((View view) -> {
@@ -190,7 +190,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
 
         // calculate new save value based on the previous one and tell vm to update appropriately
         boolean newStatus = !postModel.saved;
-        postAdapterDelegate.savePost(postModel.getId(), newStatus);
+        postAdapterDelegate.savePost(postModel.getFullName(), newStatus);
 
         // update the view and local model to reflect onclick
         postModel.saved = newStatus;

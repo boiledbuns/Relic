@@ -37,7 +37,7 @@ class PostItemAdapter (
             }
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return postList[oldItemPosition].id == newPostList[newItemPosition].id
+                return postList[oldItemPosition].fullName == newPostList[newItemPosition].fullName
             }
 
             override fun areContentsTheSame(
@@ -47,7 +47,7 @@ class PostItemAdapter (
                 val oldPost = postList[oldItemPosition]
                 val newPost = newPostList[newItemPosition]
 
-                return oldPost.id == newPost.id && oldPost.isVisited == newPost.isVisited
+                return oldPost.fullName == newPost.fullName && oldPost.isVisited == newPost.isVisited
             }
         }).dispatchUpdatesTo(this)
 
@@ -59,7 +59,7 @@ class PostItemAdapter (
     override fun onPostPressed (itemPosition : Int) {
         postList[itemPosition].also {
             // update post to show that it has been visited
-            postAdapterDelegate.visitPost(it.id, it.subreddit)
+            postAdapterDelegate.visitPost(it.fullName, it.subreddit)
             // update the view and local model to reflect onclick
             it.isVisited = true
         }
@@ -74,7 +74,7 @@ class PostItemAdapter (
 
             // optimistic, update copy cached in adapter and make request to api to update in server
             it.userUpvoted = newStatus
-            postAdapterDelegate.voteOnPost(it.id, newStatus)
+            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
         }
         notifyItemChanged(itemPosition)
     }
@@ -87,7 +87,7 @@ class PostItemAdapter (
 
             // optimistic, update copy cached in adapter and make request to api to update in server
             it.userUpvoted = newStatus
-            postAdapterDelegate.voteOnPost(it.id, newStatus)
+            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
         }
         notifyItemChanged(itemPosition)
     }
@@ -96,7 +96,7 @@ class PostItemAdapter (
         postList[itemPosition].also {
             // calculate new save value based on the previous one and tell vm to update appropriately
             val newStatus = !it.saved
-            postAdapterDelegate.savePost(it.id, newStatus)
+            postAdapterDelegate.savePost(it.fullName, newStatus)
 
             // update the view and local model to reflect onclick
             it.saved = newStatus

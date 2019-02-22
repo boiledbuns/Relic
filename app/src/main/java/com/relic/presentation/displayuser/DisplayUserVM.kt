@@ -241,14 +241,14 @@ class DisplayUserVM(
     // region post adapter delegate
 
     override fun visitListing(listingItem : ListingItem) {
-        postRepo.postGateway.visitPost(listingItem.id)
+        postRepo.postGateway.visitPost(listingItem.fullName)
 
         // retrieval option doesn't matter in this case
         val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
 
         val navData = when (listingItem) {
             is PostModel -> SubNavigationData.ToPost(
-                    listingItem.id,
+                    listingItem.fullName,
                     listingItem.subreddit,
                     postSource
             )
@@ -256,7 +256,7 @@ class DisplayUserVM(
                     PostModel.TYPE + "_" + listingItem.parentPostId,
                     listingItem.subreddit,
                     postSource,
-                    listingItem.id
+                    listingItem.fullName
             )
             else -> null
         }
@@ -267,11 +267,11 @@ class DisplayUserVM(
     }
 
     override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
-        postRepo.postGateway.voteOnPost(listingItem.id, newVote)
+        postRepo.postGateway.voteOnPost(listingItem.fullName, newVote)
     }
 
     override fun saveListing(listingItem : ListingItem) {
-        postRepo.postGateway.savePost(listingItem.id, !listingItem.saved)
+        postRepo.postGateway.savePost(listingItem.fullName, !listingItem.saved)
     }
 
     override fun onThumbnailClicked(listingItem : ListingItem) {

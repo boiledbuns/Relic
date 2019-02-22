@@ -28,6 +28,6 @@ class PostItemVH (
         postItemView.setPost(postModel)
 
         itemPosition = position
-        itemFullName = postModel.id
+        itemFullName = postModel.fullName
     }
 }

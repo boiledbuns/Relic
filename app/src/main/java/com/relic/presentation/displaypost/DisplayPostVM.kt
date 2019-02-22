@@ -183,13 +183,13 @@ class DisplayPostVM (
 //            }
 //        }
 
-        val commentPosition = _commentListLiveData.value!!.indexOfFirst { it.id == commentId }
+        val commentPosition = _commentListLiveData.value!!.indexOfFirst { it.fullName == commentId }
         val commentModel = _commentListLiveData.value!![commentPosition]
 
         if (expanded) {
             removeReplies(commentPosition)
         } else {
-            val commentSource = commentRepo.getReplies(commentModel.id)
+            val commentSource = commentRepo.getReplies(commentModel.fullName)
             _commentListLiveData.addSource(commentSource) { replies ->
                 replies?.let {
                     if (it.isNotEmpty()) {

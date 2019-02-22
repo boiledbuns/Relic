@@ -18,7 +18,7 @@ public class PostEntity {
   // every post is associated with a listing (many posts to one listing)
   @NonNull
   @PrimaryKey
-  @ColumnInfo(name = "id")
+  @ColumnInfo(name = "fullName")
   public String name;
 
 //  public String getSubreddit_id;
