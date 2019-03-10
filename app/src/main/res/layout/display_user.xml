@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/relicBackgroundColor">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/userAppBarLayout"
@@ -140,7 +141,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                app:tabMode="scrollable"/>
+                app:tabMode="scrollable"
+                app:tabTextColor="?android:attr/android:textColor"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 

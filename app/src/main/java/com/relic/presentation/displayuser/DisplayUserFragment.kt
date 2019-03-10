@@ -158,7 +158,8 @@ class DisplayUserFragment : RelicFragment() {
                     val postFragment = DisplayPostFragment.create(
                         navigation.postId,
                         navigation.subredditName,
-                        navigation.postSource
+                        navigation.postSource,
+                        enableVisitSub = true
                     )
                     // intentionally because replacing then popping off back stack loses scroll position
                     activity!!.supportFragmentManager.beginTransaction()

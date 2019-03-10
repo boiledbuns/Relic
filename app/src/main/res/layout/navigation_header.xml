@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:padding="@dimen/padding_l"
-    android:background="@color/darkGray">
+    android:background="?attr/colorPrimary">
 
     <TextView
         android:text="u/boiledbuns"

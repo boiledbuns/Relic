@@ -15,8 +15,9 @@
 
     <color name="darkGray">#384559</color>
 
-
+    <color name="almostWhite">#e9e9e9</color>
     <color name="paleGray">#afafaf</color>
+
     <color name="paleBlueGray">#717375</color>
     <color name="paleDarkGray">#2c333d</color>
 

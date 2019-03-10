@@ -10,12 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.relic.MainActivity
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
@@ -36,7 +31,6 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
 
 class DisplayPostFragment : Fragment() {
-
     companion object {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"

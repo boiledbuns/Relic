@@ -228,7 +228,7 @@ class PostRepositoryImpl @Inject constructor(
                         appDB.postSourceDao.insertPostSources(listOf(postSourceEntity))
                     }
                 }
-                
+
             } catch (e: Exception) {
                 // TODO decide if it would be better to move this to another method
                 when (e) {

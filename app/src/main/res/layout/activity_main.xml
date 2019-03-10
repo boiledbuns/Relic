@@ -20,6 +20,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="?attr/relicBackgroundColor"
         app:menu="@menu/navigation_menu"
         app:headerLayout="@layout/navigation_header"/>
 

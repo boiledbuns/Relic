@@ -2,13 +2,17 @@ package com.relic
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.RectF
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.widget.DrawerLayout
 
 import android.util.Log
+import android.view.GestureDetector
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.widget.TextView
 
 import com.relic.data.Authenticator
@@ -35,6 +39,8 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
     private lateinit var navigationView: NavigationView
     private lateinit var navDrawer: DrawerLayout
+    private lateinit var relicGD: GestureDetectorCompat
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +77,13 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
             navDrawer.closeDrawers()
         }
+
+        relicGD = GestureDetectorCompat(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+
+                return super.onScroll(e1, e2, distanceX, distanceY)
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -81,6 +94,16 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                 }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        // need to return true is the touch event is intercepted
+        return if (relicGD.onTouchEvent(event)) {
+            true
+        }
+        else {
+            super.onTouchEvent(event)
         }
     }
 
@@ -132,7 +155,6 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     // endregion navigation view handlers
-
 }
 
 
