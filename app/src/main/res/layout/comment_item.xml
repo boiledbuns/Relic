@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/commentRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -55,69 +56,93 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_comment_indent"
-        android:layout_below="@id/parentBlock"
         android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/parentBlock"
         tools:visibility="visible"/>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier_indent_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="indentCommentIcon"
+        app:barrierDirection="end"/>
+
+    <!-- region comment info -->
 
     <TextView
         android:id="@+id/commentScoreView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        android:layout_toEndOf="@id/indentCommentIcon"
-        android:layout_below="@id/parentBlock"/>
-
-    <TextView
-        android:id="@+id/commentFlairView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/displaypost_paddingside"
-        android:layout_toEndOf="@id/commentScoreView"
-        android:layout_below="@id/parentBlock"/>
+        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        app:layout_constraintEnd_toStartOf="@id/commentAuthorView"
+        tools:text="100"/>
 
     <TextView
         android:id="@+id/commentAuthorView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        android:layout_toEndOf="@id/commentFlairView"
-        android:layout_below="@id/parentBlock"/>
+        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        app:layout_constraintStart_toEndOf="@id/commentScoreView"
+        app:layout_constraintEnd_toStartOf="@id/commentFlairView"
+        tools:text="user_name"/>
+
+    <TextView
+        android:id="@+id/commentFlairView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/displaypost_paddingside"
+        app:layout_constraintHorizontal_weight="-1"
+        app:layout_constraintStart_toEndOf="@id/commentAuthorView"
+        app:layout_constraintEnd_toStartOf="@id/commentCreatedView"
+        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        tools:text="flair_boi"/>
 
     <TextView
         android:id="@+id/commentCreatedView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        app:layout_constraintStart_toEndOf="@id/commentFlairView"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="24 hours ago"/>
+
+    <!-- endregion comment info -->
 
     <TextView
         android:id="@+id/commentBodyView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/commentAuthorView"
-        android:layout_toEndOf="@id/indentCommentIcon"
-        android:paddingBottom="0dp"
         android:layout_marginTop="@dimen/text_spacing_s"
-        android:textSize="@dimen/text_m"/>
+        android:textSize="@dimen/text_m"
+        app:layout_constraintTop_toBottomOf="@id/commentAuthorView"
+        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible"
+        tools:text="@tools:sample/lorem/random" />
 
     <ImageView
         android:id="@+id/commentUpvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/commentBodyView"
-        android:layout_toEndOf="@id/indentCommentIcon"/>
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"/>
 
     <ImageView
         android:id="@+id/commentDownvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/commentBodyView"
-        android:layout_toEndOf="@id/commentUpvoteView"/>
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        app:layout_constraintStart_toEndOf="@id/commentUpvoteView"/>
 
     <TextView
         android:id="@+id/commentReplyCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/commentBodyView"
-        android:layout_toEndOf="@id/commentDownvoteView"/>
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        app:layout_constraintStart_toEndOf="@id/commentDownvoteView"/>
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
