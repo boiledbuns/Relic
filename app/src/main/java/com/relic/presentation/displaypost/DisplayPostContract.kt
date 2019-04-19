@@ -5,6 +5,9 @@ import com.relic.data.models.CommentModel
 const val UPVOTE_PRESSED = 1
 const val DOWNVOTE_PRESSED = -1
 
+const val IMAGE = 1
+const val LINK = 2
+
 interface DisplayPostContract {
 
     interface ViewModel {
@@ -47,4 +50,9 @@ sealed class PostExceptionData : Exception() {
     object NoComments : PostExceptionData()
     object NetworkUnavailable : PostExceptionData()
     object UnexpectedException : PostExceptionData()
+}
+
+sealed class DisplayPostType {
+    object Image : DisplayPostType()
+    object Link : DisplayPostType()
 }

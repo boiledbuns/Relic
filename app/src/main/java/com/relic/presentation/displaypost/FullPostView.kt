@@ -18,15 +18,15 @@ class FullPostView @JvmOverloads constructor(
 
     private val TAG = "FULL_POST_VIEW"
     private lateinit var viewDelegate : DisplayPostContract.PostViewDelegate
-    private var displayImage : Boolean = false
+    private var postDisplayType : DisplayPostType? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
-    fun setPost(postModel : PostModel, isImage : Boolean, delegate : DisplayPostContract.PostViewDelegate) {
+    fun setPost(postModel : PostModel, displayType : DisplayPostType?, delegate : DisplayPostContract.PostViewDelegate) {
         viewDelegate = delegate
-        displayImage = isImage
+        postDisplayType = displayType
 
         postModel.apply {
             postTitleView.text = title
@@ -77,12 +77,12 @@ class FullPostView @JvmOverloads constructor(
     }
 
     private fun loadLinks(postModel : PostModel) {
-        when {
-            displayImage -> {
+        when (postDisplayType) {
+            DisplayPostType.Image -> {
                 Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
                 postImageView.visibility = View.VISIBLE
             }
-            !(postModel.thumbnail.isNullOrEmpty()) -> {
+            DisplayPostType.Link -> {
                 Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
                 postLinkUrl.text = postModel.url
                 postLinkCard.visibility = View.VISIBLE

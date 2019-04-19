@@ -166,7 +166,7 @@ class DisplayPostFragment : Fragment() {
     // region live data handlers
 
     private fun displayPost (postModel : PostModel) {
-        fullPostView.setPost(postModel, displayPostVM.isImage(), displayPostVM)
+        fullPostView.setPost(postModel, displayPostVM.determineType(), displayPostVM)
     }
 
     private fun displayComments(commentList : List<CommentModel>) {

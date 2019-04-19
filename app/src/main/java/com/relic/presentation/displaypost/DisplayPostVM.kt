@@ -63,9 +63,7 @@ class DisplayPostVM (
     private fun observeLiveData() {
         // retrieves the liveData post to be exposed to the view
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
-            post?.let {
-                _postLiveData.postValue(it)
-            }
+            post?.let { _postLiveData.postValue(it) }
             // necessary for specific case where we have a post with no comments, we refresh, and
             // the post still has no comments since the livedata for the comments don't notify
             // the observer if there is no change
@@ -161,7 +159,7 @@ class DisplayPostVM (
         _errorLiveData.postValue(viewException)
     }
 
-    // -- region view action delegate --
+    //  region view action delegate
 
     override fun onExpandReplies(commentId: String, expanded : Boolean) {
 //        val commentModel = _commentListLiveData.value!![position]
@@ -243,13 +241,28 @@ class DisplayPostVM (
 
     // endregion view action delegate
 
-    fun isImage(): Boolean {
-        var isImage = false
+    // region helpers
 
-        _postLiveData.value?.url?.let {
-            val lastThree = it.substring(it.length - 3)
-            if (validImageEndings.contains(lastThree)) isImage = true
+    fun determineType(): DisplayPostType? {
+        var type : DisplayPostType? = null
+
+        _postLiveData.value?.let {
+            // check url ending to see if it's an image
+            if (it.url != null) {
+                val lastThree = it.url.substring(it.url.length - 3)
+                type = if (validImageEndings.contains(lastThree)) {
+                    DisplayPostType.Image
+                }
+                else {
+                    DisplayPostType.Link
+                }
+            }
+
         }
-        return isImage
+
+        return type
     }
+
+    // endregion helpers
+
 }
