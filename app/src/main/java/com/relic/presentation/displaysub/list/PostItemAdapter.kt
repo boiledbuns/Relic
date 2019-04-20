@@ -21,7 +21,7 @@ class PostItemAdapter (
     }
 
     override fun onBindViewHolder(viewholder: PostItemVH, position: Int) {
-        viewholder.bindPost(postList[position], position)
+        viewholder.bindPost(postList[position])
     }
 
     fun clear() { setPostList(emptyList()) }

@@ -52,8 +52,8 @@ class ListingItemAdapter(
     override fun onBindViewHolder(vh: RecyclerView.ViewHolder, position : Int) {
         val item = listingItems[position]
         when (item) {
-            is PostModel -> (vh as PostItemVH).bindPost(item, position)
-            is CommentModel -> (vh as CommentItemVH).bindComment(item, position)
+            is PostModel -> (vh as PostItemVH).bindPost(item)
+            is CommentModel -> (vh as CommentItemVH).bindComment(item)
         }
     }
 

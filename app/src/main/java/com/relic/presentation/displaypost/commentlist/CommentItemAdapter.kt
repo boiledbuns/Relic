@@ -11,7 +11,18 @@ class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), DisplayPostContract.CommentAdapterDelegate {
 
-    private var commentDiffer = AsyncListDiffer<CommentModel>(this, DIFF_CALLBACK)
+    private val diffCallback = object : DiffUtil.ItemCallback<CommentModel>() {
+        override fun areItemsTheSame(p0: CommentModel, p1: CommentModel): Boolean {
+            return p0.fullName == p1.fullName
+        }
+
+        override fun areContentsTheSame(p0: CommentModel, p1: CommentModel): Boolean {
+            return (p0.userUpvoted == p1.userUpvoted &&
+                p0.replyCount == p1.replyCount)
+        }
+    }
+
+    private var commentDiffer = AsyncListDiffer<CommentModel>(this, diffCallback)
     private val TAG = "COMMENT_ADAPTER"
     private val VIEW_TYPE_COMMENT = 0
     private val VIEW_TYPE_LOAD_MORE = 1
@@ -21,10 +32,10 @@ class CommentItemAdapter (
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
             VIEW_TYPE_COMMENT -> {
-                (viewHolder as CommentItemVH).bindComment(commentDiffer.currentList[position], position)
+                (viewHolder as CommentItemVH).bindComment(commentDiffer.currentList[position])
             }
             VIEW_TYPE_LOAD_MORE -> {
-                (viewHolder as CommentMoreItemsVH).bindLoadMore(commentDiffer.currentList[position], position)
+                (viewHolder as CommentMoreItemsVH).bindLoadMore(commentDiffer.currentList[position])
             }
         }
     }
@@ -33,6 +44,7 @@ class CommentItemAdapter (
         return when (viewType) {
             VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context)).apply {
                 initializeOnClicks(this@CommentItemAdapter)
+                adapterPosition
             }
             else -> CommentMoreItemsVH(RelicCommentMoreItemsView(parent.context)).apply {
                 initializeOnclicks(this@CommentItemAdapter)
@@ -73,16 +85,4 @@ class CommentItemAdapter (
 
     // end region onclick handler
 
-    companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CommentModel>() {
-            override fun areItemsTheSame(p0: CommentModel, p1: CommentModel): Boolean {
-                return p0.fullName == p1.fullName
-            }
-
-            override fun areContentsTheSame(p0: CommentModel, p1: CommentModel): Boolean {
-                return (p0.userUpvoted == p1.userUpvoted &&
-                    p0.replyCount == p1.replyCount)
-            }
-        }
-    }
 }

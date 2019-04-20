@@ -75,7 +75,7 @@ class RelicCommentView (
             parentAuthor.text = commentModel.linkAuthor
             parentSubreddit.text = commentModel.subreddit
         }
-        else {
+        else if (commentModel.depth >= 0){
             displayReplyDepth(commentModel.depth)
         }
     }

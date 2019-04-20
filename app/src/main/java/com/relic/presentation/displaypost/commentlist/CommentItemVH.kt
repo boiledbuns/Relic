@@ -13,13 +13,12 @@ class CommentItemVH (
     private val commentItem : RelicCommentView,
     private var commentsExpanded : Boolean = false
 ): RecyclerView.ViewHolder(commentItem) {
-    private var commentPosition = 0
     private var commentId = ""
 
     fun initializeOnClicks(adapter : DisplayPostContract.CommentAdapterDelegate) {
         commentItem.apply {
-            commentUpvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, UPVOTE_PRESSED) }
-            commentDownvoteView.setOnClickListener { adapter.voteOnComment(commentPosition, DOWNVOTE_PRESSED) }
+            commentUpvoteView.setOnClickListener { adapter.voteOnComment(adapterPosition, UPVOTE_PRESSED) }
+            commentDownvoteView.setOnClickListener { adapter.voteOnComment(adapterPosition, DOWNVOTE_PRESSED) }
 //            commentReplyCount.setOnClickListener {
 //                adapter.displayCommentReplies(commentPosition, commentsExpanded)
 //                // if showing replies, display a placeholder loading
@@ -35,14 +34,12 @@ class CommentItemVH (
                 commentsExpanded = !commentsExpanded
             }
 
-            setOnClickListener { adapter.visitComment(commentPosition) }
+            setOnClickListener { adapter.visitComment(adapterPosition) }
         }
     }
 
-    fun bindComment(commentModel : CommentModel, position : Int) {
-        commentPosition = position
+    fun bindComment(commentModel : CommentModel) {
         commentId = commentModel.fullName
-
         commentItem.setPost(commentModel)
     }
 }

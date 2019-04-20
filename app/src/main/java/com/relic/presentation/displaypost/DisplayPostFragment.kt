@@ -79,6 +79,8 @@ class DisplayPostFragment : Fragment() {
     private lateinit var rootView : View
     private lateinit var myToolbar: Toolbar
     private lateinit var commentAdapter: CommentItemAdapter
+    private var currentBar : Snackbar? = null
+    private var currentException : PostExceptionData? = null
 
     // region lifecycle hooks
 
@@ -160,6 +162,8 @@ class DisplayPostFragment : Fragment() {
         displayPostVM.errorLiveData.nonNull().observe(this) { handleError(it) }
         displayPostVM.refreshingLiveData.nonNull().observe(this) {
             displayPostSwipeRefresh.isRefreshing = it
+            // hide all errors when refreshing
+            currentBar?.dismiss()
         }
     }
 
@@ -172,6 +176,12 @@ class DisplayPostFragment : Fragment() {
     private fun displayComments(commentList : List<CommentModel>) {
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList)
+
+        if (currentException is PostExceptionData.NoComments && commentList.isNotEmpty()) {
+            currentBar?.dismiss()
+            currentBar = null
+            currentException = null
+        }
     }
 
     private fun handleNavigation(navigationData : PostNavigationData) {
@@ -201,12 +211,13 @@ class DisplayPostFragment : Fragment() {
             is PostExceptionData.NetworkUnavailable -> {
                 snackbarMessage = resources.getString(R.string.network_unavailable)
                 displayLength = Snackbar.LENGTH_INDEFINITE
-                actionMessage = resources.getString(R.string.retry)
+                actionMessage = resources.getString(R.string.refresh)
                 action = { displayPostVM.refreshData() }
             }
         }
 
-        Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply{
+        currentException = error
+        currentBar = Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply{
             actionMessage?.let {
                 setAction(it) { action.invoke() }
             }

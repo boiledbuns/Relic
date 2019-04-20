@@ -10,24 +10,21 @@ class PostItemVH (
     private val postItemView : RelicPostItemView
 ) : RecyclerView.ViewHolder(postItemView) {
 
-    private var itemPosition = 0
     var itemFullName = ""
 
     fun initializeOnClicks(adapter : DisplaySubContract.PostItemAdapterDelegate) {
         itemView.apply {
-            setOnClickListener { adapter.onPostPressed(itemPosition) }
-            savedPostIconView.setOnClickListener { adapter.onPostSavePressed(itemPosition) }
-            postUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(itemPosition) }
-            postDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(itemPosition) }
-            postThumbnailView.setOnClickListener { adapter.onPostLinkPressed(itemPosition) }
+            setOnClickListener { adapter.onPostPressed(adapterPosition) }
+            savedPostIconView.setOnClickListener { adapter.onPostSavePressed(adapterPosition) }
+            postUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(adapterPosition) }
+            postDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(adapterPosition) }
+            postThumbnailView.setOnClickListener { adapter.onPostLinkPressed(adapterPosition) }
             postCommentView.setOnClickListener { }
         }
     }
 
-    fun bindPost(postModel : PostModel, position: Int) {
+    fun bindPost(postModel : PostModel) {
         postItemView.setPost(postModel)
-
-        itemPosition = position
         itemFullName = postModel.fullName
     }
 }

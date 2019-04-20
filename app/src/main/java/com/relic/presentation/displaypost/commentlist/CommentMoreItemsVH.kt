@@ -11,7 +11,7 @@ class CommentMoreItemsVH (
         // TODO once comment reply retrieval is completed
     }
 
-    fun bindLoadMore(commentModel : CommentModel, position : Int){
+    fun bindLoadMore(commentModel : CommentModel){
         moreCommentsItem.displayReplyDepth(commentModel.depth)
     }
 }

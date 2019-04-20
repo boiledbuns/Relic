@@ -73,6 +73,7 @@
     <string name="unknown_error">An unknown error occurred</string>
     <string name="no_comments">This post has no comments</string>
     <string name="retry">retry</string>
+    <string name="refresh">refresh</string>
 
     <!-- navigation menu -->
     <string name="preferences">preferences</string>
