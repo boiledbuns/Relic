@@ -13,6 +13,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.dagger.modules.UtilModule
 import com.relic.data.models.SubredditModel
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
@@ -29,6 +30,7 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
                 return DaggerVMComponent.builder()
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
+                        .utilModule(UtilModule(activity!!.application))
                         .build()
                         .getDisplaySubInfoVM().create(subName) as T
             }

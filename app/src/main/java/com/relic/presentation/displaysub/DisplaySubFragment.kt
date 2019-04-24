@@ -26,6 +26,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
@@ -61,6 +62,7 @@ class DisplaySubFragment : RelicFragment() {
                         .builder()
                         .repoModule(RepoModule(context!!))
                         .authModule(AuthModule(context!!))
+                        .utilModule(UtilModule(activity!!.application))
                         .build()
                         .getDisplaySubVM()
                         .create(PostRepository.PostSource.Subreddit(subName)) as T

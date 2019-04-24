@@ -14,6 +14,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.dagger.modules.UtilModule
 import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -44,6 +45,7 @@ class EditorView : RelicFragment() {
                 return DaggerVMComponent.builder()
                     .repoModule(RepoModule(context!!))
                     .authModule(AuthModule(context!!))
+                    .utilModule(UtilModule(activity!!.application))
                     .build()
                     .getEditorVM().create(subName, fullName, parentType) as T
             }

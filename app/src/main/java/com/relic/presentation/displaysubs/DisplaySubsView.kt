@@ -20,6 +20,7 @@ import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
+import com.relic.dagger.modules.UtilModule
 import com.relic.data.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.presentation.adapter.SearchItemAdapter
@@ -43,6 +44,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
                 return DaggerVMComponent.builder()
                         .authModule(AuthModule(activity!!.applicationContext))
                         .repoModule(RepoModule(activity!!.applicationContext))
+                        .utilModule(UtilModule(activity!!.application))
                         .build()
                         .getDisplaySubsVM()
                         .create() as T

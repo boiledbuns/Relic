@@ -13,6 +13,7 @@ import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.helper.ImageHelper
+import com.relic.network.NetworkUtil
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -22,15 +23,17 @@ open class DisplaySubVM (
     private val postSource: PostRepository.PostSource,
     private val subRepo: SubRepository,
     private var postRepo: PostRepository,
+    private var networkUtil : NetworkUtil,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, CoroutineScope {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
-        private val postRepo : PostRepository
+        private val postRepo : PostRepository,
+        private val networkUtil : NetworkUtil
     ) {
         fun create (postSource : PostRepository.PostSource) : DisplaySubVM {
-            return DisplaySubVM(postSource, subRepo, postRepo)
+            return DisplaySubVM(postSource, subRepo, postRepo, networkUtil)
         }
     }
 
@@ -54,7 +57,6 @@ open class DisplaySubVM (
     val errorLiveData : LiveData<SubExceptionData> = _errorLiveData
 
     init {
-        _refreshLiveData.postValue(true)
         retrieveMorePosts(true)
 
         // observe the list of posts stored locally
@@ -117,32 +119,41 @@ open class DisplaySubVM (
      * @param resetPosts : indicates whether the old posts should be cleared
      */
     override fun retrieveMorePosts(resetPosts: Boolean) {
-        GlobalScope.launch {
-            val request = async {
-                if (resetPosts) {
-                    postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                } else {
-                    // retrieve the "after" value for the next posting
-                    postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
+        if (networkUtil.checkConnection()) {
+            // only indicate refreshing if connected to network
+            _refreshLiveData.postValue(true)
+
+            GlobalScope.launch {
+                val request = async {
+                    if (resetPosts) {
+                        postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
+                    } else {
+                        // retrieve the "after" value for the next posting
+                        postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
+                    }
+                }
+
+                try {
+                    request.await()
+                    retrievalInProgress = false
+                    _refreshLiveData.postValue(false)
+
+                } catch (e : Exception) {
+                    retrievalInProgress = false
+                    _refreshLiveData.postValue(false)
+                    // display the associated error
+                    _errorLiveData.postValue(
+                        when (e) {
+                            is RelicRequestError -> SubExceptionData.NetworkUnavailable
+                            else -> SubExceptionData.UnexpectedException
+                        }
+                    )
                 }
             }
-
-            try {
-                request.await()
-                retrievalInProgress = false
-                _refreshLiveData.postValue(false)
-
-            } catch (e : Exception) {
-                retrievalInProgress = false
-                _refreshLiveData.postValue(false)
-                // display the associated error
-                _errorLiveData.postValue(
-                    when (e) {
-                        is RelicRequestError -> SubExceptionData.NetworkUnavailable
-                        else -> SubExceptionData.UnexpectedException
-                    }
-                )
-            }
+        }
+        else {
+            retrievalInProgress = false
+            _errorLiveData.postValue(SubExceptionData.NetworkUnavailable)
         }
     }
 
