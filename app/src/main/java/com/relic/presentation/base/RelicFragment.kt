@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.ActionBar
 import android.support.v7.widget.Toolbar
@@ -16,6 +17,7 @@ import com.relic.R
 
 open class RelicFragment: Fragment() {
     protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
+    protected var snackbar : Snackbar? = null
 
     private val connectivityManager: ConnectivityManager by lazy {
         requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

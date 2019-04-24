@@ -62,10 +62,12 @@ interface PostRepository {
      * @param sortType
      * @param sortScope
      */
+    @Throws(RelicRequestError::class)
     suspend fun retrieveSortedPosts(
         postSource: PostSource,
         sortType: SortType,
-        sortScope: SortScope)
+        sortScope: SortScope
+    )
 
     /**
      * //TODO tentative -> should expose or not

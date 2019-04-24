@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -22,6 +21,7 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.DisplayImageFragment
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.editor.EditorContract
@@ -30,7 +30,7 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
 
-class DisplayPostFragment : Fragment() {
+class DisplayPostFragment : RelicFragment() {
     companion object {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"
@@ -79,7 +79,6 @@ class DisplayPostFragment : Fragment() {
     private lateinit var rootView : View
     private lateinit var myToolbar: Toolbar
     private lateinit var commentAdapter: CommentItemAdapter
-    private var currentBar : Snackbar? = null
     private var currentException : PostExceptionData? = null
 
     // region lifecycle hooks
@@ -163,7 +162,7 @@ class DisplayPostFragment : Fragment() {
         displayPostVM.refreshingLiveData.nonNull().observe(this) {
             displayPostSwipeRefresh.isRefreshing = it
             // hide all errors when refreshing
-            currentBar?.dismiss()
+            snackbar?.dismiss()
         }
     }
 
@@ -177,9 +176,9 @@ class DisplayPostFragment : Fragment() {
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList)
 
-        if (currentException is PostExceptionData.NoComments && commentList.isNotEmpty()) {
-            currentBar?.dismiss()
-            currentBar = null
+        if (displayPostVM.errorLiveData.value is PostExceptionData.NoComments && commentList.isNotEmpty()) {
+            snackbar?.dismiss()
+            snackbar = null
             currentException = null
         }
     }
@@ -217,7 +216,7 @@ class DisplayPostFragment : Fragment() {
         }
 
         currentException = error
-        currentBar = Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply{
+        snackbar = Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply{
             actionMessage?.let {
                 setAction(it) { action.invoke() }
             }

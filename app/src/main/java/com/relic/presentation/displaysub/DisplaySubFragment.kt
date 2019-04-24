@@ -7,7 +7,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
@@ -111,8 +111,6 @@ class DisplaySubFragment : RelicFragment() {
             (activity as MainActivity).setSupportActionBar(this)
             setNavigationOnClickListener { activity?.onBackPressed() }
         }
-
-        root.findViewById<SwipeRefreshLayout>(R.id.subSwipeRefreshLayout).isRefreshing = true
 
         return root
     }
@@ -221,6 +219,11 @@ class DisplaySubFragment : RelicFragment() {
         displaySubVM.subredditLiveData.nonNull().observe(lifecycleOwner) { updateSubInfo(it) }
         displaySubVM.subNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
         displaySubVM.subInfoLiveData.nonNull().observe (lifecycleOwner) { setSubInfoData(it) }
+        displaySubVM.errorLiveData.nonNull().observe (lifecycleOwner) { handleError(it) }
+
+        displaySubVM.refreshLiveData.nonNull().observe (lifecycleOwner) {
+            subSwipeRefreshLayout.isRefreshing = it
+        }
     }
 
     // region LiveData handlers
@@ -232,7 +235,6 @@ class DisplaySubFragment : RelicFragment() {
 
         // unlock scrolling to allow more posts to be loaded
         scrollLocked = false
-        subSwipeRefreshLayout.isRefreshing = false
     }
 
     private fun updateSubInfo(subredditModel : SubredditModel) {
@@ -273,6 +275,30 @@ class DisplaySubFragment : RelicFragment() {
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }
+        }
+    }
+
+    private fun handleError(error : SubExceptionData) {
+        var message = resources.getString(R.string.unknown_error)
+        var displayLength = Snackbar.LENGTH_SHORT
+
+        var actionMessage : String? = null
+        var action : () -> Unit = {}
+
+        when (error) {
+            is SubExceptionData.NetworkUnavailable -> {
+                message = resources.getString(R.string.network_unavailable)
+                displayLength = Snackbar.LENGTH_INDEFINITE
+                actionMessage = resources.getString(R.string.refresh)
+                action = { displaySubVM.retrieveMorePosts(true) }
+            }
+        }
+
+        snackbar = Snackbar.make(displaySubRootView, message, displayLength).apply{
+            actionMessage?.let {
+                setAction(it) { action.invoke() }
+            }
+            show()
         }
     }
 
@@ -358,7 +384,6 @@ class DisplaySubFragment : RelicFragment() {
         postAdapter.clear()
 
         subAppBarLayout.setExpanded(true)
-        subSwipeRefreshLayout.isRefreshing = true
     }
 
     // endregion view functions

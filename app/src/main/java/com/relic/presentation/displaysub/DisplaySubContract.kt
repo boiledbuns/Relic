@@ -46,3 +46,9 @@ data class DisplaySubInfoData (
     var sortingMethod : PostRepository.SortType,
     var sortingScope : PostRepository.SortScope
 )
+
+sealed class SubExceptionData : Exception() {
+    object NoPosts : SubExceptionData()
+    object NetworkUnavailable : SubExceptionData()
+    object UnexpectedException : SubExceptionData()
+}

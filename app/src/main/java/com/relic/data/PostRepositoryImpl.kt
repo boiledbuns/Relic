@@ -155,6 +155,7 @@ class PostRepositoryImpl @Inject constructor(
         return appDB.postDao.getSinglePost(postFullName)
     }
 
+    @Throws(RelicRequestError::class)
     override suspend fun retrieveSortedPosts(
         postSource: PostRepository.PostSource,
         sortType: PostRepository.SortType,
@@ -187,11 +188,14 @@ class PostRepositoryImpl @Inject constructor(
                     url = ending,
                     authToken = checkToken()
                 )
+                val clear = launch { clearAllPostsFromSource(postSource) }
                 Log.d(TAG, "retrieve posts response :  $response")
 
                 val listingKey = getListingKey(postSource)
                 val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
                 Log.d(TAG, "retrieve more posts : after ${parsedData.listingEntity.afterPosting}")
+
+                clear.join()
                 launch { insertParsedPosts(parsedData) }
 
             } catch (e: Exception) {
@@ -199,7 +203,7 @@ class PostRepositoryImpl @Inject constructor(
                     is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
                     else -> Log.d(TAG, "Error retrieving sorted posts : $e")
                 }
-
+//                throw (e)
             }
         }
     }

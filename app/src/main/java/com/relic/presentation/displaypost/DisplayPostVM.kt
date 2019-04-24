@@ -52,10 +52,9 @@ class DisplayPostVM (
     val errorLiveData : LiveData<PostExceptionData> = _errorLiveData
 
     init {
-//        _refreshingLiveData.postValue(true)
-        observeLiveData()
-        // check internet connection and retrieve more comments if internet is available
+        _refreshingLiveData.postValue(true)
         refreshData()
+        observeLiveData()
     }
 
     /**

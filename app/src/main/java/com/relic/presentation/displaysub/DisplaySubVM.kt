@@ -11,12 +11,10 @@ import com.relic.data.SubRepository
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
+import com.relic.network.request.RelicRequestError
 import com.relic.presentation.helper.ImageHelper
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -39,37 +37,49 @@ open class DisplaySubVM (
     private val TAG = "DISPLAY_SUB_VM"
     private var currentSortingType = PostRepository.SortType.DEFAULT
     private var currentSortingScope = PostRepository.SortScope.NONE
-    private var retrievalInProgress = false
+    private var retrievalInProgress = true
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
-    val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
-
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
-    val postListLiveData : LiveData<List<PostModel>> = _postListMediator
-
     private val _navigationLiveData = SingleLiveData<SubNavigationData>()
-    val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
-
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
+    private val _refreshLiveData = MutableLiveData<Boolean>()
+    private val _errorLiveData = MutableLiveData<SubExceptionData>()
+
+    val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
+    val postListLiveData : LiveData<List<PostModel>> = _postListMediator
+    val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
+    val refreshLiveData : LiveData<Boolean> = _refreshLiveData
+    val errorLiveData : LiveData<SubExceptionData> = _errorLiveData
 
     init {
+        _refreshLiveData.postValue(true)
+        retrieveMorePosts(true)
+
         // observe the list of posts stored locally
         _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
-            // retrieve posts when the posts stored locally for this sub have been cleared
-            if (!retrievalInProgress && postModels != null && postModels.isEmpty()) {
-                Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
-                // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
-                GlobalScope.launch {
-                    postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                }
-                retrievalInProgress = true
-            } else {
-                Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")
-                _postListMediator.setValue(postModels)
-                retrievalInProgress = false
+            if (!retrievalInProgress) {
+                _postListMediator.postValue(postModels)
             }
         }
+
+        // observe the list of posts stored locally
+//        _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
+//            // retrieve posts when the posts stored locally for this sub have been cleared
+//            retrievalInProgress = if (!retrievalInProgress && postModels != null && postModels.isEmpty()) {
+//                Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
+//                // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
+//                GlobalScope.launch {
+//                    postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
+//                }
+//                true
+//            } else {
+//                Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")
+//                _postListMediator.setValue(postModels)
+//                false
+//            }
+//        }
 
         when (postSource) {
             is PostRepository.PostSource.Subreddit -> initializeSubredditInformation(postSource.subredditName)
@@ -108,12 +118,30 @@ open class DisplaySubVM (
      */
     override fun retrieveMorePosts(resetPosts: Boolean) {
         GlobalScope.launch {
-            if (resetPosts) {
-                // all we have to do is clear entries in room -> our observer for the posts will auto download new posts when it's empty
-                postRepo.clearAllPostsFromSource(postSource)
-            } else {
-                // retrieve the "after" value for the next posting
-                postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
+            val request = async {
+                if (resetPosts) {
+                    postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
+                } else {
+                    // retrieve the "after" value for the next posting
+                    postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
+                }
+            }
+
+            try {
+                request.await()
+                retrievalInProgress = false
+                _refreshLiveData.postValue(false)
+
+            } catch (e : Exception) {
+                retrievalInProgress = false
+                _refreshLiveData.postValue(false)
+                // display the associated error
+                _errorLiveData.postValue(
+                    when (e) {
+                        is RelicRequestError -> SubExceptionData.NetworkUnavailable
+                        else -> SubExceptionData.UnexpectedException
+                    }
+                )
             }
         }
     }
