@@ -98,23 +98,22 @@ class DisplaySubFragment : RelicFragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.display_sub, container, false)
-        val recyclerView = root.findViewById<RecyclerView>(R.id.subPostsRecyclerView)
-        val toolbar = root.findViewById<Toolbar>(R.id.subToolbar)
+        return inflater.inflate(R.layout.display_sub, container, false).apply {
+            (findViewById<RecyclerView>(R.id.subPostsRecyclerView)).apply {
+                adapter = postAdapter
+                layoutManager = LinearLayoutManager(context)
+            }
 
-        recyclerView.apply {
-            adapter = postAdapter
-            layoutManager = LinearLayoutManager(context)
+            (findViewById<Toolbar>(R.id.subToolbar)).apply {
+                (activity as MainActivity).setSupportActionBar(this)
+
+                title = subName
+                subtitle = "Sorting by new"
+                setNavigationOnClickListener { activity?.onBackPressed() }
+            }
+
+            initializeToolbar()
         }
-
-        toolbar.apply {
-            title = subName
-            subtitle = "Sorting by new"
-            (activity as MainActivity).setSupportActionBar(this)
-            setNavigationOnClickListener { activity?.onBackPressed() }
-        }
-
-        return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -221,7 +220,7 @@ class DisplaySubFragment : RelicFragment() {
         displaySubVM.subredditLiveData.nonNull().observe(lifecycleOwner) { updateSubInfo(it) }
         displaySubVM.subNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
         displaySubVM.subInfoLiveData.nonNull().observe (lifecycleOwner) { setSubInfoData(it) }
-        displaySubVM.errorLiveData.nonNull().observe (lifecycleOwner) { handleError(it) }
+        displaySubVM.errorLiveData.observe (lifecycleOwner) { handleError(it) }
 
         displaySubVM.refreshLiveData.nonNull().observe (lifecycleOwner) {
             subSwipeRefreshLayout.isRefreshing = it
@@ -280,28 +279,30 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : SubExceptionData) {
-        var message = resources.getString(R.string.unknown_error)
-        var displayLength = Snackbar.LENGTH_SHORT
+    private fun handleError(error : SubExceptionData?) {
+        error?.let {
+            var message = resources.getString(R.string.unknown_error)
+            var displayLength = Snackbar.LENGTH_SHORT
 
-        var actionMessage : String? = null
-        var action : () -> Unit = {}
+            var actionMessage: String? = null
+            var action: () -> Unit = {}
 
-        when (error) {
-            is SubExceptionData.NetworkUnavailable -> {
-                message = resources.getString(R.string.network_unavailable)
-                displayLength = Snackbar.LENGTH_INDEFINITE
-                actionMessage = resources.getString(R.string.refresh)
-                action = { displaySubVM.retrieveMorePosts(true) }
+            when (it) {
+                is SubExceptionData.NetworkUnavailable -> {
+                    message = resources.getString(R.string.network_unavailable)
+                    displayLength = Snackbar.LENGTH_INDEFINITE
+                    actionMessage = resources.getString(R.string.refresh)
+                    action = { displaySubVM.retrieveMorePosts(true) }
+                }
             }
-        }
 
-        snackbar = Snackbar.make(displaySubRootView, message, displayLength).apply{
-            actionMessage?.let {
-                setAction(it) { action.invoke() }
+            snackbar = Snackbar.make(displaySubRootView, message, displayLength).apply {
+                actionMessage?.let {
+                    setAction(it) { action.invoke() }
+                }
+                show()
             }
-            show()
-        }
+        } ?: snackbar?.dismiss()
     }
 
     private fun setSubInfoData(sortingInfo : DisplaySubInfoData) {
@@ -329,6 +330,15 @@ class DisplaySubFragment : RelicFragment() {
                 }
                 show(this@DisplaySubFragment.fragmentManager, TAG)
             }
+        }
+    }
+
+    private fun initializeToolbar() {
+        val pActivity = (activity as MainActivity)
+
+        pActivity.supportActionBar?.apply {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
         }
     }
 

@@ -112,4 +112,6 @@
     <!-- navigation -->
     <dimen name="nav_header_height">200dp</dimen>
 
+    <dimen name="comment_list_padding_bottom">50dp</dimen>
+
 </resources>

@@ -1,14 +1,17 @@
 package com.relic.presentation.displaysubs
 
+import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -62,7 +65,6 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        bindViewModel()
         setHasOptionsMenu(true)
         subAdapter = SubItemAdapter(OnClickSubItem())
 
@@ -90,6 +92,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
                 adapter = searchItemAdapter
                 layoutManager = LinearLayoutManager(context)
             }
+
 
 //            (displaySubsToolbar as Toolbar).also {
 //                it.setTitle(R.string.app_name)
@@ -153,7 +156,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
     // region view model binding and handlers
 
-    private fun bindViewModel() {
+    override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // allows the list to be updated as subreddits are retrieved from the network
         viewModel.subscribedSubsList.nonNull().observe(this) {
             subAdapter.setList(ArrayList(it))

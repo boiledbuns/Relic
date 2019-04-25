@@ -81,7 +81,7 @@ class DisplayPostFragment : RelicFragment() {
     private lateinit var rootView : View
     private lateinit var myToolbar: Toolbar
     private lateinit var commentAdapter: CommentItemAdapter
-    private var currentException : PostExceptionData? = null
+    private var previousError : PostExceptionData? = null
 
     // region lifecycle hooks
 
@@ -105,18 +105,9 @@ class DisplayPostFragment : RelicFragment() {
         rootView = inflater.inflate(R.layout.display_post, container, false)
 
         myToolbar = rootView.findViewById<Toolbar>(R.id.displayPostToolbar).apply {
-            title = subredditName
-
             (activity as MainActivity).setSupportActionBar(this)
-
-            if (enableVisitSub) setOnClickListener {
-                val subFragment = DisplaySubFragment.create(subredditName)
-                activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
-            }
-
-            setNavigationOnClickListener { activity?.onBackPressed() }
         }
+        initializeToolbar()
 
         rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
             commentAdapter = CommentItemAdapter(displayPostVM)
@@ -160,11 +151,9 @@ class DisplayPostFragment : RelicFragment() {
         displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
         displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
         displayPostVM.postNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
-        displayPostVM.errorLiveData.nonNull().observe(this) { handleError(it) }
+        displayPostVM.errorLiveData.observe(this) { handleError(it) }
         displayPostVM.refreshingLiveData.nonNull().observe(this) {
             displayPostSwipeRefresh.isRefreshing = it
-            // hide all errors when refreshing
-            snackbar?.dismiss()
         }
     }
 
@@ -177,12 +166,6 @@ class DisplayPostFragment : RelicFragment() {
     private fun displayComments(commentList : List<CommentModel>) {
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList)
-
-        if (displayPostVM.errorLiveData.value is PostExceptionData.NoComments && commentList.isNotEmpty()) {
-            snackbar?.dismiss()
-            snackbar = null
-            currentException = null
-        }
     }
 
     private fun handleNavigation(navigationData : PostNavigationData) {
@@ -192,41 +175,66 @@ class DisplayPostFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : PostExceptionData) {
-        // I do realize that error != exception, but still not convinced about the exception naming
-        var snackbarMessage = resources.getString(R.string.unknown_error)
-        var displayLength = Snackbar.LENGTH_SHORT
-
-        var actionMessage : String? = null
-        var action : () -> Unit = {}
-
-        when (error) {
-            is PostExceptionData.NoComments -> {
-                // TODO show the no comment image if this sub has no comments
-                // hide the loading icon if some comments have been loaded
-                snackbarMessage = resources.getString(R.string.no_comments)
-                displayLength = Snackbar.LENGTH_INDEFINITE
-                actionMessage = resources.getString(R.string.retry)
-                action = { displayPostVM.refreshData() }
-            }
-            is PostExceptionData.NetworkUnavailable -> {
-                snackbarMessage = resources.getString(R.string.network_unavailable)
-                displayLength = Snackbar.LENGTH_INDEFINITE
-                actionMessage = resources.getString(R.string.refresh)
-                action = { displayPostVM.refreshData() }
-            }
+    private fun handleError(error : PostExceptionData?) {
+        if (error == null) {
+            snackbar?.dismiss()
+            snackbar = null
+            previousError = null
         }
+        else if (previousError != error) {
+            // only need to update error if the error has changed
+            var snackbarMessage = resources.getString(R.string.unknown_error)
+            var displayLength = Snackbar.LENGTH_SHORT
 
-        currentException = error
-        snackbar = Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply{
-            actionMessage?.let {
-                setAction(it) { action.invoke() }
+            var actionMessage: String? = null
+            var action: () -> Unit = {}
+
+            when (error) {
+                is PostExceptionData.NoComments -> {
+                    // TODO show the no comment image if this sub has no comments
+                    // hide the loading icon if some comments have been loaded
+                    snackbarMessage = resources.getString(R.string.no_comments)
+                    displayLength = Snackbar.LENGTH_INDEFINITE
+                    actionMessage = resources.getString(R.string.refresh)
+                    action = { displayPostVM.refreshData() }
+                }
+                is PostExceptionData.NetworkUnavailable -> {
+                    snackbarMessage = resources.getString(R.string.network_unavailable)
+                    displayLength = Snackbar.LENGTH_INDEFINITE
+                    actionMessage = resources.getString(R.string.refresh)
+                    action = { displayPostVM.refreshData() }
+                }
             }
-            show()
+
+            snackbar = Snackbar.make(displayPostRootView, snackbarMessage, displayLength).apply {
+                actionMessage?.let {
+                    setAction(it) { action.invoke() }
+                }
+                show()
+            }
         }
     }
 
     // endregion live data handlers
+
+    private fun initializeToolbar() {
+        val pActivity = (activity as MainActivity)
+
+        pActivity.supportActionBar?.apply {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+
+            title = subredditName
+        }
+
+        myToolbar.apply {
+            if (enableVisitSub) setOnClickListener {
+                val subFragment = DisplaySubFragment.create(subredditName)
+                activity!!.supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
+            }
+        }
+    }
 
     /**
      * Attaches custom scroll listeners to allow more comments to be retrieved when the recycler

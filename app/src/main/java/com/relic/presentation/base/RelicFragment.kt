@@ -62,4 +62,10 @@ open class RelicFragment: Fragment() {
     protected fun checkInternetConnectivity() : Boolean {
         return connectivityManager.activeNetworkInfo?.isConnected ?: false
     }
+
+    override fun onDestroy() {
+        // need to clear delegate set on activity
+        (activity as MainActivity).clearItemSelectedDelegate()
+        super.onDestroy()
+    }
 }

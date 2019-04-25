@@ -11,9 +11,11 @@ import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
+import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +23,7 @@ class DisplayPostVM (
     private val postRepo : PostRepository,
     private val commentRepo: CommentRepository,
     private val listingRepo: ListingRepository,
+    private val networkUtil : NetworkUtil,
     private val subName: String,
     private val postFullname: String,
     private val postSource : PostRepository.PostSource
@@ -29,10 +32,11 @@ class DisplayPostVM (
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
         private val commentRepo: CommentRepository,
-        private val listingRepo: ListingRepository
+        private val listingRepo: ListingRepository,
+        private val networkUtil : NetworkUtil
     ) {
         fun create(subredditName : String, postFullname : String, postSource: PostRepository.PostSource) : DisplayPostVM {
-            return DisplayPostVM(postRepo, commentRepo, listingRepo, subredditName, postFullname, postSource)
+            return DisplayPostVM(postRepo, commentRepo, listingRepo, networkUtil, subredditName, postFullname, postSource)
         }
     }
 
@@ -51,54 +55,65 @@ class DisplayPostVM (
     val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
     val errorLiveData : LiveData<PostExceptionData> = _errorLiveData
 
+    private var retrievalInProgress = true
+
     init {
-        _refreshingLiveData.postValue(true)
-        refreshData()
         observeLiveData()
+        refreshData()
     }
 
     /**
      * Add sources and listeners to all local livedata
      */
     private fun observeLiveData() {
-        // retrieves the liveData post to be exposed to the view
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
             post?.let {
-                _postLiveData.postValue(it)
+                if (!retrievalInProgress) {
+                    _postLiveData.postValue(it)
+                    _refreshingLiveData.postValue(false)
+                    retrievalInProgress = false
 
-                if (post.commentCount == 0 && _refreshingLiveData.value == true) {
-                    publishException(PostExceptionData.NoComments)
+                    if (post.commentCount == 0) {
+                        _errorLiveData.postValue(PostExceptionData.NoComments)
+                    } else {
+                        _errorLiveData.postValue(null)
+                    }
                 }
             }
         }
 
-        // retrieve the comment list as liveData so that we can expose it to the view first
         _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { nullableComments ->
             nullableComments?.let { comments ->
-                _commentListLiveData.postValue(comments)
-                if (comments.isEmpty()) {
-                    // retrieve more comments if we detect that none are stored locally
-                    //commentRepo.retrieveComments(subName, postFullname, null)
-                    _postLiveData.value?.let {
-                        if (it.commentCount == 0) publishException(PostExceptionData.NoComments)
-                    }
-                } else {
-                    // TODO add additional actions to trigger when comments loaded
-                    _refreshingLiveData.postValue(false)
-                }
+                if (!retrievalInProgress) _commentListLiveData.postValue(comments)
             }
         }
     }
 
     override fun refreshData() {
-        _refreshingLiveData.postValue(true)
+        if (networkUtil.checkConnection()) {
+            _refreshingLiveData.postValue(true)
 
-        GlobalScope.launch {
-            postRepo.retrievePost(subName, postFullname, postSource) {
-                exception : RelicRequestError -> publishException(exception)
+            GlobalScope.launch {
+                val commentJob = launch { retrieveMoreComments(true) }
+                val postJob = launch {
+                    postRepo.retrievePost(subName, postFullname, postSource) { exception: RelicRequestError ->
+                        publishException(exception)
+                    }
+                }
+
+                try {
+                    joinAll(commentJob, postJob)
+                    retrievalInProgress = false
+                }
+                catch (e : Exception) {
+                    publishException(e)
+                }
             }
         }
-        retrieveMoreComments(true)
+        else {
+            _refreshingLiveData.postValue(false)
+            publishException(PostExceptionData.NetworkUnavailable)
+        }
     }
 
     override fun retrieveMoreComments(refresh: Boolean) {

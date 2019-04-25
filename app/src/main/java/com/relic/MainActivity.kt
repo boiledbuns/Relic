@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.widget.Toolbar
 
 import android.util.Log
 import android.view.GestureDetector
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     private lateinit var navDrawer: DrawerLayout
     private lateinit var relicGD: GestureDetectorCompat
 
+    private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,6 +109,12 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return itemSelectedDelegate?.let {
+            it (item)
+        } ?: super.onOptionsItemSelected(item)
+    }
+
     // region callback interface
 
     override fun onAuthenticated() {
@@ -155,6 +163,18 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     // endregion navigation view handlers
+
+    fun getNavDrawer() = navDrawer
+
+    // lets individual fragments supply the onItemSelected functions
+    fun setToolbar(toolbar: Toolbar, delegate : ((item: MenuItem?) -> Boolean)? = null) {
+        setSupportActionBar(toolbar)
+        itemSelectedDelegate = delegate
+    }
+
+    fun clearItemSelectedDelegate() {
+        itemSelectedDelegate = null
+    }
 }
 
 

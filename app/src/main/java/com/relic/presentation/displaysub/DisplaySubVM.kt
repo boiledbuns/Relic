@@ -22,8 +22,8 @@ import kotlin.coroutines.CoroutineContext
 open class DisplaySubVM (
     private val postSource: PostRepository.PostSource,
     private val subRepo: SubRepository,
-    private var postRepo: PostRepository,
-    private var networkUtil : NetworkUtil,
+    private val postRepo: PostRepository,
+    private val networkUtil : NetworkUtil,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, CoroutineScope {
 
@@ -66,23 +66,6 @@ open class DisplaySubVM (
             }
         }
 
-        // observe the list of posts stored locally
-//        _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
-//            // retrieve posts when the posts stored locally for this sub have been cleared
-//            retrievalInProgress = if (!retrievalInProgress && postModels != null && postModels.isEmpty()) {
-//                Log.d(TAG, "Local posts have been emptied -> retrieving more posts")
-//                // clears current posts for this subreddit and retrieves new ones based on current sorting method and scope
-//                GlobalScope.launch {
-//                    postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-//                }
-//                true
-//            } else {
-//                Log.d(TAG, postModels!!.size.toString() + " posts retrieved were from the network")
-//                _postListMediator.setValue(postModels)
-//                false
-//            }
-//        }
-
         when (postSource) {
             is PostRepository.PostSource.Subreddit -> initializeSubredditInformation(postSource.subredditName)
             is PostRepository.PostSource.Frontpage -> {}
@@ -118,7 +101,7 @@ open class DisplaySubVM (
      * Method to retrieve more posts
      * @param resetPosts : indicates whether the old posts should be cleared
      */
-    override fun retrieveMorePosts(resetPosts: Boolean) {
+    final override fun retrieveMorePosts(resetPosts: Boolean) {
         if (networkUtil.checkConnection()) {
             // only indicate refreshing if connected to network
             _refreshLiveData.postValue(true)
@@ -135,12 +118,9 @@ open class DisplaySubVM (
 
                 try {
                     request.await()
-                    retrievalInProgress = false
-                    _refreshLiveData.postValue(false)
-
+                    _errorLiveData.postValue(null)
                 } catch (e : Exception) {
-                    retrievalInProgress = false
-                    _refreshLiveData.postValue(false)
+
                     // display the associated error
                     _errorLiveData.postValue(
                         when (e) {
@@ -149,6 +129,9 @@ open class DisplaySubVM (
                         }
                     )
                 }
+
+                retrievalInProgress = false
+                _refreshLiveData.postValue(false)
             }
         }
         else {
