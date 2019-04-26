@@ -12,6 +12,9 @@ import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.data.models.SubredditModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DisplaySubsVM (
@@ -33,14 +36,13 @@ class DisplaySubsVM (
     private val TAG = "DISPLAY_SUBS_VM"
     private var refreshing: Boolean = false
 
-    private val _subscribedSubsList =  MediatorLiveData <List<SubredditModel>> ()
+    private val _subscribedSubsList = MediatorLiveData <List<SubredditModel>> ()
     val subscribedSubsList : LiveData<List<SubredditModel>> =  _subscribedSubsList
 
     private val _searchResults = MediatorLiveData <List<String>> ()
     val searchResults: LiveData<List<String>> = _searchResults
 
     val pinnedSubs : LiveData<List<SubredditModel>> = subRepository.pinnedsubs
-    val allSubscribedSubsLoaded : LiveData<Boolean> = subRepository.allSubscribedSubsLoaded
 
     init {
         _searchResults.value = null
@@ -55,21 +57,19 @@ class DisplaySubsVM (
     private fun initializeObservers() {
         //subscribedSubsList.addSource(subRepo.getSubscribedSubs(), subscribedSubsList::setValue);
         _subscribedSubsList.addSource <List<SubredditModel>> (subRepository.subscribedSubs) { subscribedSubs ->
-            Log.d(TAG, " subs loaded $subscribedSubs")
+
             //      if (subscribedSubs.isEmpty()) {
             //        // refresh the token even if the vm has already been initialized
             //        subRepo.retrieveAllSubscribedSubs();
             //        //authenticator.refreshToken(this);
             //      } else {
-            _subscribedSubsList.setValue(subscribedSubs)
+
+            if (!refreshing) {
+                Log.d(TAG, "subs loaded $subscribedSubs")
+                _subscribedSubsList.postValue(subscribedSubs)
+            }
             //      }
         }
-
-        //    // Observe changes to keys to request new data
-        //    subscribedSubsList.addSource(listingRepo.getKey(), (@Nullable String nextVal) -> {
-        //      // retrieve posts only if the "after" value is empty
-        //      subRepo.retrieveAllSubscribedSubs(nextVal);
-        //    });
     }
 
     /**
@@ -96,9 +96,11 @@ class DisplaySubsVM (
     }
 
     override fun onAuthenticated() {
-        //listingRepo.retrieveKey("SUB_REPO");
         Log.d(TAG, "On authenticated called")
-        subRepository.retrieveAllSubscribedSubs()
+
+        subRepository.retrieveAllSubscribedSubs {
+            refreshing = false
+        }
     }
 
     // Start of SubInfoDialogContract delegate methods

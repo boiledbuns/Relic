@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.relic.data.Authenticator;
 import com.relic.presentation.callbacks.AuthenticationCallback;
 import com.relic.presentation.displaysubs.DisplaySubsView;
+import com.relic.presentation.home.HomeFragment;
 
 
 public class LoginFragment extends Fragment {
@@ -64,9 +65,9 @@ public class LoginFragment extends Fragment {
 
     @Override
     public void onAuthenticated() {
-      // sends user to default view of subreddits
+      // sends user to main screen of the app
       parentActivity.getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_content_frame, new DisplaySubsView()).commit();
+          .replace(R.id.main_content_frame, new HomeFragment()).commit();
     }
   }
 

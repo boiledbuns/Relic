@@ -13,11 +13,6 @@ import java.util.List;
 public interface SubRepository {
 
   /**
-   * @return whether all subscribed subs have been retrieved as livedata
-   */
-  LiveData<Boolean> getAllSubscribedSubsLoaded();
-
-  /**
    * @return list of subscribed subs in the database as livedata
    */
   LiveData<List<SubredditModel>> getSubscribedSubs();
@@ -25,7 +20,7 @@ public interface SubRepository {
   /**
    * Fetches and stores more Subreddits from the Reddit API into the local database
    */
-  void retrieveAllSubscribedSubs();
+  void retrieveAllSubscribedSubs(SubsLoadedCallback callback);
 
   /**
    * @param subName "friendly" subreddit name for the subreddit to retrieve
@@ -55,4 +50,8 @@ public interface SubRepository {
   void pinSubreddit(String subredditName, boolean newPinnedStatus);
 
   LiveData<List<SubredditModel>> getPinnedsubs();
+}
+
+interface SubsLoadedCallback {
+    void callback ();
 }

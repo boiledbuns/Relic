@@ -15,6 +15,7 @@ import com.relic.presentation.preferences.PreferenceLink
 import com.relic.util.PreferencesManager
 import com.relic.util.PreferencesManagerImpl
 import kotlinx.android.synthetic.main.preferences_theme.*
+import ru.noties.markwon.Markwon
 
 class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 

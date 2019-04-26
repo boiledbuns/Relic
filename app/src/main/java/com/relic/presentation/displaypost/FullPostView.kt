@@ -9,6 +9,7 @@ import com.relic.R
 import com.relic.data.models.PostModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
+import ru.noties.markwon.Markwon
 
 class FullPostView @JvmOverloads constructor(
         context : Context,
@@ -19,6 +20,7 @@ class FullPostView @JvmOverloads constructor(
     private val TAG = "FULL_POST_VIEW"
     private lateinit var viewDelegate : DisplayPostContract.PostViewDelegate
     private var postDisplayType : DisplayPostType? = null
+    private val markwon = Markwon.create(context)
 
     init {
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
@@ -41,7 +43,7 @@ class FullPostView @JvmOverloads constructor(
             if (!authorFlair.isNullOrEmpty()) postAuthorFlairView.visibility = View.VISIBLE
 
             if (!selftext.isNullOrEmpty()) {
-                postSelfText.text = selftext
+                markwon.setMarkdown(postSelfText, selftext)
                 postSelfText.visibility = View.VISIBLE
             }
 

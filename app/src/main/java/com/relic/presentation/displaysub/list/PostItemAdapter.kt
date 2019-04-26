@@ -8,16 +8,22 @@ import com.relic.data.models.PostModel
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.*
+import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
         private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
 ) : RecyclerView.Adapter <PostItemVH> (), DisplaySubContract.PostItemAdapterDelegate {
+
     private var postList: List<PostModel> = ArrayList()
+    private lateinit var markwon : Markwon
 
     override fun getItemCount() = postList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
-        return PostItemVH(RelicPostItemView(parent.context)).apply {
+        markwon = Markwon.create(parent.context)
+        val postItemView = RelicPostItemView(parent.context)
+
+        return PostItemVH(postItemView).apply {
             initializeOnClicks(this@PostItemAdapter)
         }
     }

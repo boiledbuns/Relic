@@ -13,12 +13,14 @@ import com.relic.presentation.displaypost.commentlist.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.list.PostItemVH
 import com.relic.presentation.displayuser.DisplayUserContract
+import ru.noties.markwon.Markwon
 
 class ListingItemAdapter(
     private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
 ) : RecyclerView.Adapter <RecyclerView.ViewHolder> (),
     DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentAdapterDelegate {
 
+    private lateinit var markwon : Markwon
     private val VIEW_TYPE_POST = 0
     private val VIEW_TYPE_COMMENT = 1
 

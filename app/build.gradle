@@ -46,7 +46,7 @@ dependencies {
     def dagger_ver = "2.15"
     def shopify_livedata_ver = "1.0.1"
     def photoview_release_ver = "2.0.0"
-
+    def markwonVersion = "3.0.1"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -104,7 +104,9 @@ dependencies {
 
     implementation "com.shopify:livedata-ktx:$shopify_livedata_ver"
 
+    // view libs
     implementation "com.github.chrisbanes:PhotoView:$photoview_release_ver"
+    implementation "ru.noties.markwon:core:$markwonVersion"
 }
 
 allprojects {

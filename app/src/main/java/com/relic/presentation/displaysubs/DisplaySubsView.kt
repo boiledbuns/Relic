@@ -153,13 +153,14 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // allows the list to be updated as subreddits are retrieved from the network
         viewModel.subscribedSubsList.nonNull().observe(this) {
+            displaySubsBinding.displaySubsSwiperefreshlayout.isRefreshing = false
             subAdapter.setList(ArrayList(it))
         }
 
         // observe whether all subscribed subreddits have been loaded
-        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) {
-            if (it) handleOnAllSubsLoaded()
-        }
+//        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) {
+//            if (it) handleOnAllSubsLoaded()
+//        }
 
         viewModel.searchResults.nonNull().observe(this) { results ->
             searchItemAdapter.handleSearchResultsPayload(results)

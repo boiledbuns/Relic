@@ -11,6 +11,7 @@ import com.relic.R
 import com.relic.data.models.PostModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_span.view.*
+import ru.noties.markwon.Markwon
 
 class RelicPostItemView @JvmOverloads constructor(
         context: Context,
@@ -42,11 +43,7 @@ class RelicPostItemView @JvmOverloads constructor(
             resolveAttribute(R.attr.relicStickiedColor, typedVal, true)
             stickiedColor = typedVal.data
         }
-    }
 
-    // TODO add view action delegate for handling view options
-
-    init {
         LayoutInflater.from(context).inflate(R.layout.post_item_span, this, true)
     }
 

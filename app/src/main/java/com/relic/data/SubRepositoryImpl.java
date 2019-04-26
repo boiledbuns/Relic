@@ -38,8 +38,6 @@ public class SubRepositoryImpl implements SubRepository {
   private JSONParser parser;
   private Gson gson;
 
-  private MutableLiveData <Boolean> allSubscribedSubsLoaded;
-
   public SubRepositoryImpl(Context context, NetworkRequestManager networkRequestManager) {
     Authenticator auth = new Authenticator(context);
     requestManager = networkRequestManager;
@@ -50,7 +48,6 @@ public class SubRepositoryImpl implements SubRepository {
     // retrieve the auth token shared preferences
     authToken = checkToken();
     appDb = ApplicationDB.getDatabase(context);
-    initializeLivedata();
   }
 
   private String checkToken() {
@@ -62,20 +59,6 @@ public class SubRepositoryImpl implements SubRepository {
   }
 
   /**
-   * Initializes all the livedata that this repository exposes
-   */
-  private void initializeLivedata() {
-    allSubscribedSubsLoaded = new MutableLiveData<>();
-    allSubscribedSubsLoaded.setValue(true);
-  }
-
-
-  @Override
-  public LiveData<Boolean> getAllSubscribedSubsLoaded() {
-    return allSubscribedSubsLoaded;
-  }
-
-  /**
    * Returns the list of subscribed subs from the sqLite instance
    * @return list of subscribed subs in the database as livedata
    */
@@ -84,18 +67,18 @@ public class SubRepositoryImpl implements SubRepository {
     return appDb.getSubredditDao().getAllSubscribed();
   }
 
-  public void retrieveAllSubscribedSubs() {
-    Log.d(TAG, "retrieving all new subscrubed subs");
+  public void retrieveAllSubscribedSubs(SubsLoadedCallback callback) {
+    Log.d(TAG, "retrieving all new subscribed subs");
 
     // since refreshing, set all subs loaded to reflect that not all subs are loaded
-    allSubscribedSubsLoaded.setValue(false);
+//    allSubscribedSubsLoaded.setValue(false);
     // delete all locally stored subs
     new DeleteSubscribedSubsTask().execute(appDb);
 
-    retrieveMoreSubscribedSubs(null);
+    retrieveMoreSubscribedSubs(null, callback);
   }
 
-  public void retrieveMoreSubscribedSubs(String after) {
+  private void retrieveMoreSubscribedSubs(String after, SubsLoadedCallback callback) {
 //    String ending = "";
 //    if (after == null) {
 //      // if refreshing, set all subs loaded to reflect that not all subs are loaded
@@ -123,7 +106,7 @@ public class SubRepositoryImpl implements SubRepository {
                 insertSubsTask.subDB = appDb;
                 insertSubsTask.subs = parseSubreddits(response);
                 insertSubsTask.after = newAfter;
-                insertSubsTask.allSubbedSubsLoaded = allSubscribedSubsLoaded;
+                insertSubsTask.allSubsLoaded = callback;
                 insertSubsTask.execute();
               } catch (ParseException e) {
                 Log.e(TAG, "Error parsing the response: " + e.toString());
@@ -134,7 +117,7 @@ public class SubRepositoryImpl implements SubRepository {
               Log.d(TAG, "Trying again");
 
               // try to retrieve the subs again
-              retrieveMoreSubscribedSubs(after);
+              retrieveMoreSubscribedSubs(after, callback);
             },
             checkToken()
     ));
@@ -218,7 +201,7 @@ public class SubRepositoryImpl implements SubRepository {
     List<SubredditEntity> subs;
     //ListingEntity listingEntity;
     String after;
-    MutableLiveData <Boolean> allSubbedSubsLoaded;
+    SubsLoadedCallback allSubsLoaded;
 
     @Override
     protected Integer doInBackground(String... Strings) {
@@ -227,7 +210,7 @@ public class SubRepositoryImpl implements SubRepository {
 //        // checks the after value of the listing for the current subs and update the local listing
 //        subDB.getListingDAO().insertListing(listingEntity);
         // retrieve more subs without refreshing if the string is null
-        subRepo.retrieveMoreSubscribedSubs(after);
+        subRepo.retrieveMoreSubscribedSubs(after, allSubsLoaded);
       }
       return null;
     }
@@ -236,7 +219,7 @@ public class SubRepositoryImpl implements SubRepository {
     protected void onPostExecute(Integer integer) {
       // if no after value, set value to true to reflect all subs have been loaded
       if (after == null) {
-        allSubbedSubsLoaded.setValue(true);
+          allSubsLoaded.callback();
       }
     }
   }
