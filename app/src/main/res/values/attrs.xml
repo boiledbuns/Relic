@@ -3,5 +3,6 @@
     <attr name="relicBackgroundColor" format="color"/>
     <attr name="relicBackgroundColorB" format="color"/>
     <attr name="relicStickiedColor" format="color"/>
+    <attr name="relicTitleColor" format="color"/>
 
 </resources>

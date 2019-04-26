@@ -165,16 +165,6 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     // endregion navigation view handlers
 
     fun getNavDrawer() = navDrawer
-
-    // lets individual fragments supply the onItemSelected functions
-    fun setToolbar(toolbar: Toolbar, delegate : ((item: MenuItem?) -> Boolean)? = null) {
-        setSupportActionBar(toolbar)
-        itemSelectedDelegate = delegate
-    }
-
-    fun clearItemSelectedDelegate() {
-        itemSelectedDelegate = null
-    }
 }
 
 

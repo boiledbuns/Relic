@@ -12,6 +12,7 @@
 
         <item name="android:textColor">@color/paleGray</item>
         <item name="relicStickiedColor">@color/stickied</item>
+        <item name="relicTitleColor">@color/white</item>
     </style>
 
     <style name="RelicThemeLight" parent="Theme.AppCompat.NoActionBar">
@@ -21,6 +22,7 @@
 
         <item name="android:textColor">@color/paleGray</item>
         <item name="relicStickiedColor">@color/stickied</item>
+        <item name="relicTitleColor">@color/paleGray</item>
     </style>
 
     <style name="ThemeDark" parent="Theme.AppCompat.NoActionBar">

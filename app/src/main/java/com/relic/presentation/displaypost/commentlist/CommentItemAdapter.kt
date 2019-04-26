@@ -17,6 +17,10 @@ class CommentItemAdapter (
     private val VIEW_TYPE_COMMENT = 0
     private val VIEW_TYPE_LOAD_MORE = 1
 
+    init {
+        
+    }
+
     override fun getItemCount(): Int = commentList.size
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {

@@ -94,4 +94,14 @@
         android:src="@drawable/ic_add"
         android:layout_margin="16dp"/>
 
+    <ProgressBar
+        android:id="@+id/displaySubProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="true"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
 </android.support.design.widget.CoordinatorLayout>

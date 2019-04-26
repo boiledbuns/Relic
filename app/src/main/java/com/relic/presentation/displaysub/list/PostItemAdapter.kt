@@ -2,10 +2,12 @@ package com.relic.presentation.displaysub.list
 
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.ViewGroup
 import com.relic.data.models.PostModel
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
+import kotlinx.coroutines.*
 
 class PostItemAdapter (
         private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
@@ -27,34 +29,20 @@ class PostItemAdapter (
     fun clear() { setPostList(emptyList()) }
 
     fun setPostList(newPostList: List<PostModel>) {
-        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int {
-                return postList.size
-            }
-
-            override fun getNewListSize(): Int {
-                return newPostList.size
-            }
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return postList[oldItemPosition].fullName == newPostList[newItemPosition].fullName
-            }
-
-            override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int
-            ): Boolean {
-                val oldPost = postList[oldItemPosition]
-                val newPost = newPostList[newItemPosition]
-
-                return oldPost.fullName == newPost.fullName && oldPost.isVisited == newPost.isVisited
-            }
-        }).dispatchUpdatesTo(this)
-
+//        GlobalScope.launch {
+//            val diff = calculateDiff(newPostList)
+//
+//            GlobalScope.launch(Dispatchers.Main) {
+//                diff.dispatchUpdatesTo(this@PostItemAdapter)
+//                postList = newPostList
+//                Log.d("post_item_adapter", "post item test")
+//            }
+//        }
+        calculateDiff(newPostList).dispatchUpdatesTo(this)
         postList = newPostList
     }
 
-    // start region for onclick handlers
+    // region onclick handlers
 
     override fun onPostPressed (itemPosition : Int) {
         postList[itemPosition].also {
@@ -109,5 +97,31 @@ class PostItemAdapter (
     }
 
     // end region for onclick handlers
+
+    private fun calculateDiff (newPostList: List<PostModel>) : DiffUtil.DiffResult {
+        return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int {
+                return postList.size
+            }
+
+            override fun getNewListSize(): Int {
+                return newPostList.size
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return postList[oldItemPosition].fullName == newPostList[newItemPosition].fullName
+            }
+
+            override fun areContentsTheSame(
+                oldItemPosition: Int,
+                newItemPosition: Int
+            ): Boolean {
+                val oldPost = postList[oldItemPosition]
+                val newPost = newPostList[newItemPosition]
+
+                return oldPost.fullName == newPost.fullName && oldPost.isVisited == newPost.isVisited
+            }
+        })
+    }
 }
 

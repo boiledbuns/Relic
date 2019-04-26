@@ -68,23 +68,22 @@ class DisplayPostVM (
     private fun observeLiveData() {
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
             post?.let {
-                if (!retrievalInProgress) {
-                    _postLiveData.postValue(it)
-                    _refreshingLiveData.postValue(false)
-                    retrievalInProgress = false
+                _postLiveData.postValue(it)
 
-                    if (post.commentCount == 0) {
-                        _errorLiveData.postValue(PostExceptionData.NoComments)
-                    } else {
-                        _errorLiveData.postValue(null)
-                    }
+                if (post.commentCount == 0) {
+                    _errorLiveData.postValue(PostExceptionData.NoComments)
+                } else {
+                    _errorLiveData.postValue(null)
                 }
             }
         }
 
         _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { nullableComments ->
             nullableComments?.let { comments ->
-                if (!retrievalInProgress) _commentListLiveData.postValue(comments)
+                if (!retrievalInProgress) {
+                    _commentListLiveData.postValue(comments)
+                    _refreshingLiveData.postValue(false)
+                }
             }
         }
     }
@@ -107,12 +106,14 @@ class DisplayPostVM (
                 }
                 catch (e : Exception) {
                     publishException(e)
+                    retrievalInProgress = false
                 }
             }
         }
         else {
             _refreshingLiveData.postValue(false)
             publishException(PostExceptionData.NetworkUnavailable)
+            retrievalInProgress = false
         }
     }
 
@@ -263,11 +264,11 @@ class DisplayPostVM (
             // check url ending to see if it's an image
             if (it.url != null) {
                 val lastThree = it.url.substring(it.url.length - 3)
-                type = if (validImageEndings.contains(lastThree)) {
-                    DisplayPostType.Image
+                if (validImageEndings.contains(lastThree)) {
+                    type = DisplayPostType.Image
                 }
-                else {
-                    DisplayPostType.Link
+                else if (!it.self) {
+                    type = DisplayPostType.Link
                 }
             }
 

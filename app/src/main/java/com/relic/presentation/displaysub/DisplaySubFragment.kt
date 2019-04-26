@@ -236,6 +236,7 @@ class DisplaySubFragment : RelicFragment() {
 
         // unlock scrolling to allow more posts to be loaded
         scrollLocked = false
+        displaySubProgress.visibility = View.GONE
     }
 
     private fun updateSubInfo(subredditModel : SubredditModel) {
@@ -352,7 +353,7 @@ class DisplaySubFragment : RelicFragment() {
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
                     // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
                     scrollLocked = true
-                    // TODO : add animation for loading posts
+                    displaySubProgress.visibility = View.VISIBLE
 
                     // fetch the next post listing
                     displaySubVM.retrieveMorePosts(false)

@@ -144,9 +144,9 @@ object CommentDeserializer : Contract.CommentDeserializer {
 
                 // get the gildings
                 (commentPOJO["gildings"] as JSONObject?)?.let { gilding ->
-                    platinum = (gilding["gid_1"] as Long).toInt()
-                    gold = (gilding["gid_2"] as Long).toInt()
-                    silver = (gilding["gid_3"] as Long).toInt()
+                    gilding["gid_1"]?.let { platinum = it as Int }
+                    gilding["gid_2"]?.let { gold = it as Int }
+                    gilding["gid_3"]?.let { silver = it as Int }
                 }
 
                 // have to do this because Reddit has a decided this can be boolean or string

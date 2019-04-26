@@ -27,7 +27,6 @@ public class PostModel extends ListingItem implements Post {
   private boolean archived;
   private int viewCount;
 
-
   public PostModel() {}
 
   //  public String subName;
@@ -192,4 +191,6 @@ public class PostModel extends ListingItem implements Post {
   public int platinum;
   public int gold;
   public int silver;
+  public boolean self;
+
 }

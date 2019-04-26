@@ -6,15 +6,13 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.relic.MainActivity
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysubs.DisplaySubsView
 import com.relic.presentation.home.frontpage.FrontpageFragment
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.home.*
 import kotlinx.android.synthetic.main.home.view.*
 
@@ -44,10 +42,12 @@ class HomeFragment : RelicFragment() {
             homeTabLayout.setupWithViewPager(homeViewPager)
 
             (homeToolbarView as Toolbar).let { toolbar ->
-                (activity as MainActivity).setToolbar(toolbar) { item -> onOptionsItemSelected(item) }
+                (activity as MainActivity).setSupportActionBar(toolbar)
+                initializeToolbar()
+                toolbar.setNavigationOnClickListener {
+                    (activity as MainActivity).getNavDrawer().openDrawer(Gravity.START)
+                }
             }
-
-            initializeToolbar()
         }
     }
 

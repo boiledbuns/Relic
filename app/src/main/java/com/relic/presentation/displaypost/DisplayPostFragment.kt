@@ -221,13 +221,14 @@ class DisplayPostFragment : RelicFragment() {
         val pActivity = (activity as MainActivity)
 
         pActivity.supportActionBar?.apply {
+            title = subredditName
+
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-
-            title = subredditName
         }
 
         myToolbar.apply {
+            setNavigationOnClickListener { activity?.onBackPressed() }
             if (enableVisitSub) setOnClickListener {
                 val subFragment = DisplaySubFragment.create(subredditName)
                 activity!!.supportFragmentManager.beginTransaction()
