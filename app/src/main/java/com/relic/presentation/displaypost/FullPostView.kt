@@ -72,10 +72,11 @@ class FullPostView @JvmOverloads constructor(
     }
 
     private fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
-        postImageView.setOnClickListener { viewDelegate.onImagePressed() }
+        postImageView.setOnClickListener { viewDelegate.onLinkPressed() }
         postUpvoteView.setOnClickListener { viewDelegate.onPostVoted(1) }
         postDownvoteView.setOnClickListener { viewDelegate.onPostVoted(-1) }
         postReplyView.setOnClickListener { viewDelegate.onReplyPressed() }
+        postLinkCard.setOnClickListener { viewDelegate.onLinkPressed() }
     }
 
     private fun loadLinks(postModel : PostModel) {

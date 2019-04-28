@@ -24,7 +24,7 @@ interface DisplayPostContract {
         fun onExpandReplies(commentId: String, expanded : Boolean)
         fun onPostVoted(voteValue: Int)
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
-        fun onImagePressed()
+        fun onLinkPressed()
         fun onReplyPressed()
     }
 
@@ -43,6 +43,10 @@ sealed class PostNavigationData {
 
     data class ToReply(
             val parentFullname: String
+    ) : PostNavigationData()
+
+    data class ToURL(
+        val url: String
     ) : PostNavigationData()
 }
 

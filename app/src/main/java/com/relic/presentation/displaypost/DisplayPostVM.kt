@@ -243,8 +243,12 @@ class DisplayPostVM (
         return newUserUpvoteValue
     }
 
-    override fun onImagePressed() {
-        _navigationLiveData.value = PostNavigationData.ToImage(_postLiveData.value!!.url)
+    override fun onLinkPressed() {
+        _navigationLiveData.value = when (determineType()) {
+            is DisplayPostType.Image -> PostNavigationData.ToImage(_postLiveData.value!!.url)
+            is DisplayPostType.Link -> PostNavigationData.ToURL(_postLiveData.value!!.url)
+            else -> null
+        }
         _navigationLiveData.value = null
     }
 

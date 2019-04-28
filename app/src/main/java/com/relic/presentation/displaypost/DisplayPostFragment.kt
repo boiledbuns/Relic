@@ -3,6 +3,8 @@ package com.relic.presentation.displaypost
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.SwipeRefreshLayout
@@ -172,6 +174,12 @@ class DisplayPostFragment : RelicFragment() {
         when (navigationData) {
             is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
             is PostNavigationData.ToReply -> openPostReplyEditor(navigationData.parentFullname)
+            is PostNavigationData.ToURL -> {
+                Intent(Intent.ACTION_VIEW).apply{
+                    data = Uri.parse(navigationData.url)
+                    startActivity(this)
+                }
+            }
         }
     }
 

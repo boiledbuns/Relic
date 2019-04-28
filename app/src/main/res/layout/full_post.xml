@@ -6,14 +6,18 @@
     android:id="@+id/fullPostRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone">
+    android:visibility="gone"
+    tools:visibility="visible">
 
     <!-- image displayed if the post is an image link -->
     <ImageView
         android:id="@+id/postImageView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/displaypost_image_height"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/postContentView"
+        tools:visibility="visible"/>
 
     <!-- groups post data together -->
     <android.support.constraint.ConstraintLayout
@@ -33,6 +37,7 @@
             android:textSize="@dimen/title_size_s"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/postTitleView"
+            app:layout_constraintStart_toStartOf="parent"
             tools:text="u/test_author"/>
 
         <TextView
@@ -45,6 +50,7 @@
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/postAuthorView"
             app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
             tools:text="Post Title"/>
 
         <android.support.constraint.Barrier
@@ -71,7 +77,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/postTagView"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintHorizontal_bias="0"/>
+            app:layout_constraintHorizontal_bias="0"
+            tools:visibility="visible"/>
 
         <TextView
             android:id="@+id/postTagView"
@@ -88,7 +95,8 @@
             app:layout_constraintStart_toEndOf="@id/postNSFWView"
             app:layout_constraintEnd_toStartOf="@id/postAuthorFlairView"
             app:layout_constraintHorizontal_chainStyle="packed"
-            tools:text="tag"/>
+            tools:text="tag"
+            tools:visibility="visible"/>
 
         <TextView
             android:id="@+id/postAuthorFlairView"
@@ -104,7 +112,8 @@
             app:layout_constraintStart_toEndOf="@id/postTagView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
-            tools:text="author flair"/>
+            tools:text="author flair"
+            tools:visibility="visible"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/postTagsBottomBarrier"
@@ -121,29 +130,32 @@
             android:layout_height="@dimen/card_thumbnail_size"
             android:layout_marginTop="@dimen/padding_s"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/postTagsBottomBarrier">
+            app:layout_constraintTop_toBottomOf="@id/postTagsBottomBarrier"
+            tools:visibility="visible">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/padding_m">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/postLinkUrl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/padding_m"
                     android:layout_marginEnd="@dimen/card_thumbnail_size"
                     android:ellipsize="end"
                     android:maxLines="3"
                     android:padding="@dimen/card_padding_small"
-                    android:textSize="@dimen/title_size_s"/>
+                    android:textSize="@dimen/title_size_s"
+                    tools:text="@tools:sample/lorem/random"/>
 
                 <ImageView
                     android:id="@+id/postLinkThumbnail"
                     android:layout_width="@dimen/card_thumbnail_size"
                     android:layout_height="@dimen/card_thumbnail_size"
-                    android:layout_alignParentEnd="true"/>
+                    android:layout_alignParentEnd="true"
+                    tools:background="@color/paleGray"/>
 
             </RelativeLayout>
 
@@ -165,7 +177,9 @@
             android:lineSpacingMultiplier="@dimen/line_spacing_s"
             android:textSize="@dimen/title_size_s"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/postLinkCardBarrier"/>
+            app:layout_constraintTop_toBottomOf="@id/postLinkCardBarrier"
+            tools:visibility="visible"
+            tools:text="@tools:sample/lorem/random"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/postSelfTextBarrier"
