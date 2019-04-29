@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="@dimen/padding_l"
-    android:paddingEnd="@dimen/padding_l"
-    android:background="@color/backgroundSecondary">
+    android:paddingEnd="@dimen/padding_l">
 
     <!-- link karma box -->
     <LinearLayout

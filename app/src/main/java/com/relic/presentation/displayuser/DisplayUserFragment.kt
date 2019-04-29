@@ -73,11 +73,7 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.display_user, container, false).apply {
-            (userToolbar as Toolbar).apply {
-                title = getString(R.string.user_prefix_label, username)
-                (activity as MainActivity).setSupportActionBar(this)
-
-            }
+            initializeToolbar(userToolbar as Toolbar)
 
             userViewPager.adapter = pagerAdapter
             userViewPager.offscreenPageLimit = 1
@@ -89,12 +85,12 @@ class DisplayUserFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         bindViewModel(viewLifecycleOwner)
-        (userToolbar as Toolbar).setNavigationOnClickListener { activity?.onBackPressed() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
 
+        menu?.clear()
         inflater?.inflate(R.menu.display_user_menu, menu)
 
         // have to first get the reference to the menu in charge of sorting
@@ -138,6 +134,22 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     // region livedata handlers
+
+    private fun initializeToolbar(toolbar : Toolbar) {
+        val pActivity = (activity as MainActivity)
+
+        toolbar.apply {
+            title = getString(R.string.user_prefix_label, username)
+            pActivity.setSupportActionBar(this)
+        }
+
+        pActivity.supportActionBar?.apply {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
+
+        toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+    }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { userUserPreview.setUser(it) }

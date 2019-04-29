@@ -11,11 +11,34 @@
     android:padding="@dimen/displaypost_rvpadding"
     android:background="?attr/colorPrimary">
 
+    <ImageView
+        android:id="@+id/indentCommentIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_comment_indent"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/padding_xl"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible"/>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier_indent_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="indentCommentIcon"
+        app:barrierDirection="end"/>
+
     <LinearLayout
         android:id="@+id/parentBlock"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/padding_s"
+        android:layout_marginStart="@dimen/padding_m"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        app:layout_constraintEnd_toEndOf="parent"
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
@@ -33,8 +56,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="@dimen/text_l"
-            android:layout_marginEnd="@dimen/displaypost_paddingside"
-            tools:text="Blah Blah Blah here is my title"/>
+            tools:text="Blah Blah Blah here is my title super long idc show me"/>
 
         <TextView
             android:id="@+id/parentAuthor"
@@ -43,29 +65,24 @@
             android:layout_marginEnd="@dimen/displaypost_paddingside"
             android:layout_marginBottom="@dimen/padding_s"
             tools:text="u/random_person"/>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:background="#c0c0c0"/>
-
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/indentCommentIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_comment_indent"
-        android:visibility="gone"
+    <View
+        android:id="@+id/parent_separator"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"
         app:layout_constraintTop_toBottomOf="@id/parentBlock"
-        tools:visibility="visible"/>
+        android:layout_marginStart="@dimen/padding_m"
+        android:layout_marginEnd="@dimen/padding_m"
+        android:paddingBottom="@dimen/padding_m"/>
 
     <android.support.constraint.Barrier
-        android:id="@+id/barrier_indent_icon"
+        android:id="@+id/parent_block_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="indentCommentIcon"
-        app:barrierDirection="end"/>
+        app:constraint_referenced_ids="parent_separator"
+        app:barrierDirection="bottom"/>
 
     <!-- region comment info -->
 
@@ -74,8 +91,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toBottomOf="@id/parentBlock"
-        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/commentAuthorView"
         tools:text="100"/>
 
@@ -84,7 +101,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
         app:layout_constraintStart_toEndOf="@id/commentScoreView"
         app:layout_constraintEnd_toStartOf="@id/commentFlairView"
         tools:text="user_name"/>
@@ -96,7 +113,7 @@
         android:layout_marginEnd="@dimen/displaypost_paddingside"
         app:layout_constraintStart_toEndOf="@id/commentAuthorView"
         app:layout_constraintEnd_toStartOf="@id/commentCreatedView"
-        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
         tools:text="flair_boi"/>
 
     <TextView
@@ -104,7 +121,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
         app:layout_constraintStart_toEndOf="@id/commentFlairView"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="24 hours ago"/>
@@ -118,7 +135,6 @@
         android:layout_marginTop="@dimen/text_spacing_s"
         android:textSize="@dimen/text_m"
         app:layout_constraintTop_toBottomOf="@id/commentAuthorView"
-        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible"
         tools:text="@tools:sample/lorem/random" />

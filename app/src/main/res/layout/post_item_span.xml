@@ -76,6 +76,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/titleView"
                 android:layout_marginBottom="@dimen/padding_xxs"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
                 tools:text="u/dank_monkey"/>
 
             <!-- TODO add style for tags -->
@@ -132,7 +135,10 @@
             <ImageView
                 android:id="@+id/postItemThumbnailView"
                 android:layout_width="@dimen/postitem_image_width"
-                android:layout_height="@dimen/postitem_image_width"/>
+                android:layout_height="@dimen/postitem_image_width"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"/>
 
         </android.support.v7.widget.CardView>
 

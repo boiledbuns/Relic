@@ -105,15 +105,7 @@ class DisplaySubFragment : RelicFragment() {
                 layoutManager = LinearLayoutManager(context)
             }
 
-            (findViewById<Toolbar>(R.id.subToolbar)).apply {
-                (activity as MainActivity).setSupportActionBar(this)
-
-                title = subName
-                subtitle = "Sorting by new"
-                setNavigationOnClickListener { activity?.onBackPressed() }
-            }
-
-            initializeToolbar()
+            initializeToolbar(findViewById<Toolbar>(R.id.subToolbar))
         }
     }
 
@@ -339,8 +331,16 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun initializeToolbar() {
+    private fun initializeToolbar(toolbar: Toolbar) {
         val pActivity = (activity as MainActivity)
+
+        toolbar.apply {
+            (activity as MainActivity).setSupportActionBar(this)
+
+            title = subName
+            subtitle = "Sorting by new"
+            setNavigationOnClickListener { activity?.onBackPressed() }
+        }
 
         pActivity.supportActionBar?.apply {
             setHomeButtonEnabled(true)

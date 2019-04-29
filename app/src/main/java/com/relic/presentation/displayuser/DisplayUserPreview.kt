@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.display_user_preview.view.*
 
 class DisplayUserPreview : BottomSheetDialogFragment() {
 
+    private val TAG = "DISPLAY_USER_PREVIEW"
+
     private lateinit var displayUserVM : DisplayUserVM
     private lateinit var username : String
 
@@ -31,7 +33,7 @@ class DisplayUserPreview : BottomSheetDialogFragment() {
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
 
-        displayUserVM = ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
+        displayUserVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return DaggerVMComponent.builder()
                     .repoModule(RepoModule(context!!))
@@ -46,6 +48,13 @@ class DisplayUserPreview : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.display_user_preview, container, false).apply {
             userPreviewUser.text = resources.getString(R.string.user_prefix_label, username)
+            userPreviewUser.setOnClickListener {
+                dismiss()
+
+                val fullUserFrag = DisplayUserFragment.create(username)
+                activity!!.supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, fullUserFrag).addToBackStack(TAG).commit()
+            }
         }
     }
 

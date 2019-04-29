@@ -5,9 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/backgroundSecondary"
     android:paddingTop="@dimen/padding_m"
-    android:paddingBottom="@dimen/padding_m">
+    android:paddingBottom="@dimen/padding_l"
+    android:background="@color/backgroundSecondary">
 
     <TextView
         android:id="@+id/userPreviewUser"
@@ -15,15 +15,26 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         android:gravity="center"
-        android:textSize="@dimen/title_text_l"
-        android:textColor="?attr/relicTitleColor"
-        tools:text="u/dank_monkey"/>
+        android:textSize="@dimen/title_text_m"
+        tools:text="u/dank_monkey"
+        android:textStyle="bold"/>
+
+    <View
+        android:id="@+id/userPreviewRule"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/primaryText"
+        app:layout_constraintTop_toBottomOf="@id/userPreviewUser"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/text_spacing_m"
+        android:layout_marginStart="@dimen/padding_m"
+        android:layout_marginEnd="@dimen/padding_m"/>
 
     <com.relic.presentation.displayuser.UserPreviewView
         android:id="@+id/userPreviewUserPreview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/userPreviewUser"
-        android:layout_marginTop="@dimen/padding_s"/>
+        app:layout_constraintTop_toBottomOf="@id/userPreviewRule"
+        android:layout_marginTop="@dimen/padding_m"/>
 
 </android.support.constraint.ConstraintLayout>
