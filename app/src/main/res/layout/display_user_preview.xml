@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/backgroundSecondary"
+    android:paddingTop="@dimen/padding_m"
+    android:paddingBottom="@dimen/padding_m">
+
+    <TextView
+        android:id="@+id/userPreviewUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:textSize="@dimen/title_text_l"
+        android:textColor="?attr/relicTitleColor"
+        tools:text="u/dank_monkey"/>
+
+    <com.relic.presentation.displayuser.UserPreviewView
+        android:id="@+id/userPreviewUserPreview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/userPreviewUser"
+        android:layout_marginTop="@dimen/padding_s"/>
+
+</android.support.constraint.ConstraintLayout>

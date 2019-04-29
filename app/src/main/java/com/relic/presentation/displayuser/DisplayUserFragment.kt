@@ -76,6 +76,7 @@ class DisplayUserFragment : RelicFragment() {
             (userToolbar as Toolbar).apply {
                 title = getString(R.string.user_prefix_label, username)
                 (activity as MainActivity).setSupportActionBar(this)
+
             }
 
             userViewPager.adapter = pagerAdapter
@@ -139,16 +140,8 @@ class DisplayUserFragment : RelicFragment() {
     // region livedata handlers
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { updateUserInfo(it) }
+        displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { userUserPreview.setUser(it) }
         displayUserVM.navigationLiveData.nonNull().observe (lifecycleOwner) { handleNavigation(it) }
-    }
-
-    private fun updateUserInfo(userModel: UserModel) {
-        linkKarma.text = userModel.linkKarma.toString()
-        commentKarma.text = userModel.commentKarma.toString()
-        totalKarma.text = (userModel.linkKarma + userModel.commentKarma).toString()
-
-        userCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
     }
 
     private fun handleNavigation(navEvent : RelicEvent<SubNavigationData>) {
@@ -185,17 +178,6 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     // endregion livedata handlers
-
-    private fun getUserCreatedString(created : Long) : String {
-        // initialize the date formatter and date for "now"
-        val formatter = SimpleDateFormat("MMM dd',' YYYY", Locale.CANADA)
-        val createdDate = Date(created * 1000)
-
-        val userAge = DateHelper.getDateDifferenceString(createdDate, Date())
-        val userCreationDate = formatter.format(createdDate)
-
-        return resources.getString(R.string.account_age, userAge, userCreationDate)
-    }
 
     companion object {
         val ARG_USERNAME = "arg_username"

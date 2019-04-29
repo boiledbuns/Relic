@@ -279,9 +279,8 @@ class DisplaySubFragment : RelicFragment() {
                 startActivity(openInBrowser)
             }
             is SubNavigationData.DisplayUserPreview -> {
-                val userPreview = DisplayUserPreview.create(subNavigationData.username)
-                activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, userPreview).addToBackStack(TAG).commit()
+                DisplayUserPreview.create(subNavigationData.username)
+                    .show(this@DisplaySubFragment.fragmentManager, TAG)
             }
         }
     }
