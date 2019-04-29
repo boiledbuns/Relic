@@ -35,6 +35,7 @@ import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
+import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
@@ -276,6 +277,11 @@ class DisplaySubFragment : RelicFragment() {
             is SubNavigationData.ToExternal -> {
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
+            }
+            is SubNavigationData.DisplayUserPreview -> {
+                val userPreview = DisplayUserPreview.create(subNavigationData.username)
+                activity!!.supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, userPreview).addToBackStack(TAG).commit()
             }
         }
     }

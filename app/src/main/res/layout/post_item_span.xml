@@ -43,7 +43,7 @@
         android:id="@+id/pinnedIconView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/postitem_saved"
+        android:layout_toStartOf="@id/savedPostIconView"
         android:src="@drawable/ic_pinned"
         android:visibility="gone"
         android:layout_marginEnd="@dimen/padding_s"/>
@@ -65,47 +65,60 @@
                 android:id="@+id/titleView"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_marginBottom="@dimen/padding_xs"
                 android:textSize="@dimen/text_l"
                 android:textStyle="bold"
                 tools:text="@string/long_placeholder_text"/>
 
             <!-- TODO add style for tags -->
             <TextView
-                android:id="@+id/postItemNSFWView"
+                android:id="@+id/postItemAuthorView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/titleView"
+                android:layout_marginBottom="@dimen/padding_xxs"
+                tools:text="u/dank_monkey"/>
+
+            <!-- TODO add style for tags -->
+            <TextView
+                android:id="@+id/postItemNSFWView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/postItemAuthorView"
                 android:visibility="gone"
                 android:text="@string/nsfw"
                 android:layout_marginEnd="@dimen/padding_s"
                 android:background="@drawable/tag"
                 android:backgroundTint="@color/warning"
                 android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"/>
+                android:textColor="@color/negative_text"
+                tools:visibility="visible"/>
 
             <TextView
                 android:id="@+id/postItemTagView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/titleView"
+                android:layout_below="@id/postItemAuthorView"
                 android:layout_toEndOf="@id/postItemNSFWView"
                 android:visibility="gone"
                 android:layout_marginEnd="@dimen/padding_s"
                 android:background="@drawable/tag"
                 android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"/>
+                android:textColor="@color/negative_text"
+                tools:visibility="visible"
+                tools:text="tag"/>
 
             <TextView
                 android:id="@+id/postItemAuthorFlairView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/titleView"
+                android:layout_below="@id/postItemAuthorView"
                 android:layout_toEndOf="@id/postItemTagView"
                 android:visibility="gone"
                 android:background="@drawable/tag"
                 android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"/>
+                android:textColor="@color/negative_text"
+                tools:visibility="visible"
+                tools:text="author flair"/>
 
         </RelativeLayout>
 
@@ -117,7 +130,7 @@
             app:cardCornerRadius="2dp">
 
             <ImageView
-                android:id="@+id/postThumbnailView"
+                android:id="@+id/postItemThumbnailView"
                 android:layout_width="@dimen/postitem_image_width"
                 android:layout_height="@dimen/postitem_image_width"/>
 
@@ -138,7 +151,7 @@
 
     <!-- buttons and options -->
     <ImageView
-        android:id="@+id/postUpvoteView"
+        android:id="@+id/postItemUpvoteView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
@@ -146,37 +159,37 @@
         android:src="@drawable/ic_upvote"/>
 
     <TextView
-        android:id="@+id/postScore"
+        android:id="@+id/postItemScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postUpvoteView"
+        android:layout_toRightOf="@id/postItemUpvoteView"
         android:layout_marginEnd="@dimen/padding_m"/>
 
     <ImageView
-        android:id="@+id/postDownvoteView"
+        android:id="@+id/postItemDownvoteView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postScore"
+        android:layout_toRightOf="@id/postItemScore"
         android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_downvote"/>
 
     <ImageView
-        android:id="@+id/postCommentView"
+        android:id="@+id/postItemCommentView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
         android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postDownvoteView"
+        android:layout_toRightOf="@id/postItemDownvoteView"
         android:layout_marginEnd="@dimen/padding_m"
         android:src="@drawable/ic_comment"/>
 
     <TextView
-        android:id="@+id/postCommentCountView"
+        android:id="@+id/postItemCommentCountView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postCommentView"/>
+        android:layout_toRightOf="@id/postItemCommentView"/>
 
 </RelativeLayout>
 

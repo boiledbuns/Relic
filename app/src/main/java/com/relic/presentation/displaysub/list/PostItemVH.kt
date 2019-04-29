@@ -16,10 +16,11 @@ class PostItemVH (
         itemView.apply {
             setOnClickListener { adapter.onPostPressed(adapterPosition) }
             savedPostIconView.setOnClickListener { adapter.onPostSavePressed(adapterPosition) }
-            postUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(adapterPosition) }
-            postDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(adapterPosition) }
-            postThumbnailView.setOnClickListener { adapter.onPostLinkPressed(adapterPosition) }
-            postCommentView.setOnClickListener { }
+            postItemUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(adapterPosition) }
+            postItemDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(adapterPosition) }
+            postItemThumbnailView.setOnClickListener { adapter.onPostLinkPressed(adapterPosition) }
+            postItemCommentView.setOnClickListener { }
+            postItemAuthorView.setOnClickListener { adapter.onUserPressed(adapterPosition) }
         }
     }
 

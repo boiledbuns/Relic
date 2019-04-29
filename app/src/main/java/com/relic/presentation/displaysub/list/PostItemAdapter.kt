@@ -99,7 +99,11 @@ class PostItemAdapter (
     }
 
     override fun onPostLinkPressed (itemPosition : Int) {
-        postAdapterDelegate.onThumbnailClicked(postList[itemPosition].url)
+        postAdapterDelegate.onLinkPressed(postList[itemPosition].url)
+    }
+
+    override fun onUserPressed(itemPosition: Int) {
+        postAdapterDelegate.previewUser(postList[itemPosition].author)
     }
 
     // end region for onclick handlers

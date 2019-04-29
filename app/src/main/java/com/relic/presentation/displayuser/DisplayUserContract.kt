@@ -13,6 +13,7 @@ interface DisplayUserContract {
         fun voteOnListing(listingItem : ListingItem, newVote : Int)
         fun saveListing(listingItem : ListingItem)
         fun onThumbnailClicked(listingItem : ListingItem)
+        fun onUserClicked(listingItem : ListingItem)
     }
 }
 

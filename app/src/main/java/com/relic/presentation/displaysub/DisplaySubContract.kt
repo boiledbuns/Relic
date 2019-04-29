@@ -13,7 +13,8 @@ interface DisplaySubContract {
         fun visitPost(postFullname: String, subreddit : String)
         fun voteOnPost(postFullname: String, voteValue: Int)
         fun savePost(postFullname: String, save: Boolean)
-        fun onThumbnailClicked(postThumbnailUrl: String)
+        fun onLinkPressed(url: String)
+        fun previewUser(username : String)
     }
 
     interface PostItemAdapterDelegate {
@@ -22,6 +23,7 @@ interface DisplaySubContract {
         fun onPostUpvotePressed(itemPosition : Int)
         fun onPostDownvotePressed(itemPosition : Int)
         fun onPostLinkPressed(itemPosition : Int)
+        fun onUserPressed(itemPosition : Int)
     }
 }
 
@@ -39,6 +41,10 @@ sealed class SubNavigationData {
 
     data class ToExternal (
         val url : String
+    ) : SubNavigationData ()
+
+    data class DisplayUserPreview (
+        val username : String
     ) : SubNavigationData ()
 }
 

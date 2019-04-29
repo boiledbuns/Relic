@@ -288,5 +288,8 @@ class DisplayUserVM(
         }
     }
 
+    override fun onUserClicked(listingItem: ListingItem) {
+        // TODO only open another user if it's not the current user being displayed
+    }
     // endregion post adapter delegate
 }

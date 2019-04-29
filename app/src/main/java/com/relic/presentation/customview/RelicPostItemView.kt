@@ -62,15 +62,16 @@ class RelicPostItemView @JvmOverloads constructor(
             }
 
             if (!postModel.thumbnail.isNullOrBlank()) {
-                postThumbnailView.visibility = View.VISIBLE
+                postItemThumbnailView.visibility = View.VISIBLE
                 setThumbnail(postModel.thumbnail)
             } else {
-                postThumbnailView.visibility = View.GONE
+                postItemThumbnailView.visibility = View.GONE
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
             postDateView.text = postModel.created
             titleView.text = postModel.title
+            postItemAuthorView.text = resources.getString(R.string.user_prefix_label, postModel.author)
             setPostTags(postModel)
 
             if (!postModel.htmlSelfText.isNullOrEmpty()) {
@@ -83,29 +84,29 @@ class RelicPostItemView @JvmOverloads constructor(
 
             when (postModel.userUpvoted) {
                 1 -> {
-                    postUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                    postDownvoteView.setImageResource(R.drawable.ic_downvote)
+                    postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)
+                    postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
                 }
                 0 -> {
-                    postUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    postDownvoteView.setImageResource(R.drawable.ic_downvote)
+                    postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
+                    postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
                 }
                 -1 -> {
-                    postUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    postDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+                    postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
+                    postItemDownvoteView.setImageResource(R.drawable.ic_downvote_active)
                 }
             }
 
-            postScore.text = postModel.score.toString()
-            postCommentCountView.text = postModel.commentCount.toString()
+            postItemScore.text = postModel.score.toString()
+            postItemCommentCountView.text = postModel.commentCount.toString()
         }
     }
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {
             Log.d(TAG, "URL = $thumbnailUrl")
-            Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postThumbnailView)
-            postThumbnailView.visibility = View.VISIBLE
+            Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postItemThumbnailView)
+            postItemThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
             Log.d(TAG, "Issue loading image " + e.toString())
         }

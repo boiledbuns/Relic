@@ -219,16 +219,21 @@ open class DisplaySubVM (
         postRepo.postGateway.savePost(postFullname, save)
     }
 
-    override fun onThumbnailClicked(postThumbnailUrl: String) {
-        val isImage = ImageHelper.isValidImage(postThumbnailUrl)
+    override fun onLinkPressed(url: String) {
+        val isImage = ImageHelper.isValidImage(url)
 
         val subNavigation : SubNavigationData = if (isImage) {
-            SubNavigationData.ToImage(postThumbnailUrl)
+            SubNavigationData.ToImage(url)
         } else {
-            SubNavigationData.ToExternal(postThumbnailUrl)
+            SubNavigationData.ToExternal(url)
         }
 
         _navigationLiveData.value = subNavigation
+    }
+
+    override fun previewUser(username: String) {
+        SubNavigationData.DisplayUserPreview(username)
+        _navigationLiveData.value = null
     }
 
     // endregion view action delegate

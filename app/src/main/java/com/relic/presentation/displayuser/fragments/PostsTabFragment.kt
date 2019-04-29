@@ -107,7 +107,9 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
 
     override fun savePost(postFullname: String, save: Boolean) {}
 
-    override fun onThumbnailClicked(postThumbnailUrl: String) {}
+    override fun onLinkPressed(url: String) {}
+
+    override fun previewUser(username: String) {}
 
     // endregion delegate functions
 

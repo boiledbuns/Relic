@@ -141,6 +141,10 @@ class ListingItemAdapter(
         actionDelegate.onThumbnailClicked(listingItems[itemPosition])
     }
 
+    override fun onUserPressed(itemPosition: Int) {
+        actionDelegate.onUserClicked(listingItems[itemPosition])
+    }
+
     // end region for onclick handlers
 
     // TODO consider refactoring onclicks for both posts and comments to consolidate them into a single interface
