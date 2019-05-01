@@ -23,6 +23,15 @@
                        android:resource="@xml/subreddit_searchable"/>
         </activity>
 
+        <activity android:name=".LinkHandlerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="www.reddit.com"/>
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".presentation.preferences.PreferencesActivity"
             android:parentActivityName=".MainActivity">

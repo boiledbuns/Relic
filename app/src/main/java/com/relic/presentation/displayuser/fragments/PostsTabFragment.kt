@@ -29,7 +29,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        postsTabVM = ViewModelProviders.of(requireActivity()).get(DisplayUserVM::class.java)
+        postsTabVM = ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
 
         userPostsAdapter = ListingItemAdapter(postsTabVM)
 

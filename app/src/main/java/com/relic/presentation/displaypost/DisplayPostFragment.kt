@@ -8,11 +8,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
-import com.relic.MainActivity
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
@@ -108,7 +108,7 @@ class DisplayPostFragment : RelicFragment() {
         rootView = inflater.inflate(R.layout.display_post, container, false)
 
         myToolbar = rootView.findViewById<Toolbar>(R.id.displayPostToolbar).apply {
-            (activity as MainActivity).setSupportActionBar(this)
+            (activity as AppCompatActivity).setSupportActionBar(this)
         }
         initializeToolbar()
 
@@ -231,7 +231,7 @@ class DisplayPostFragment : RelicFragment() {
     // endregion live data handlers
 
     private fun initializeToolbar() {
-        val pActivity = (activity as MainActivity)
+        val pActivity = (activity as AppCompatActivity)
 
         pActivity.supportActionBar?.apply {
             title = subredditName

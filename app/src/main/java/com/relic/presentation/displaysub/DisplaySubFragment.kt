@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
@@ -20,7 +21,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.relic.MainActivity
 
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
@@ -332,10 +332,10 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     private fun initializeToolbar(toolbar: Toolbar) {
-        val pActivity = (activity as MainActivity)
+        val pActivity = (activity as AppCompatActivity)
 
         toolbar.apply {
-            (activity as MainActivity).setSupportActionBar(this)
+            pActivity.setSupportActionBar(this)
 
             title = subName
             subtitle = "Sorting by new"

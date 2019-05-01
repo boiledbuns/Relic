@@ -2,13 +2,11 @@ package com.relic
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.RectF
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.widget.DrawerLayout
-import android.support.v7.widget.Toolbar
 
 import android.util.Log
 import android.view.GestureDetector
@@ -31,9 +29,6 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), AuthenticationCallback {
     internal val TAG = "MAIN_ACTIVITY"
-
-    private val titleTW: TextView? = null
-    private val subtitleTW: TextView? = null
 
     @Inject
     internal lateinit var auth: Authenticator
@@ -80,12 +75,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
             navDrawer.closeDrawers()
         }
 
-        relicGD = GestureDetectorCompat(this, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-
-                return super.onScroll(e1, e2, distanceX, distanceY)
-            }
-        })
+        relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

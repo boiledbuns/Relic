@@ -7,32 +7,28 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
-import com.relic.MainActivity
 import com.relic.R
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
-import com.relic.data.models.UserModel
 import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
-import com.relic.presentation.helper.DateHelper
 import com.relic.util.RelicEvent
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
 import kotlinx.android.synthetic.main.display_user.view.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class DisplayUserFragment : RelicFragment() {
@@ -47,7 +43,7 @@ class DisplayUserFragment : RelicFragment() {
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
 
-        displayUserVM = ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
+        displayUserVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return DaggerVMComponent.builder()
                     .repoModule(RepoModule(context!!))
@@ -136,7 +132,7 @@ class DisplayUserFragment : RelicFragment() {
     // region livedata handlers
 
     private fun initializeToolbar(toolbar : Toolbar) {
-        val pActivity = (activity as MainActivity)
+        val pActivity = (activity as AppCompatActivity)
 
         toolbar.apply {
             title = getString(R.string.user_prefix_label, username)
