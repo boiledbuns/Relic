@@ -270,7 +270,7 @@ class DisplaySubFragment : RelicFragment() {
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }
-            is SubNavigationData.DisplayUserPreview -> {
+            is SubNavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(subNavigationData.username)
                     .show(this@DisplaySubFragment.fragmentManager, TAG)
             }

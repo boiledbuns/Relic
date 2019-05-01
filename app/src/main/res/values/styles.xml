@@ -10,7 +10,10 @@
         <item name="relicBackgroundColor">@color/paleDarkGray</item>
         <item name="relicBackgroundColorB">@color/backgroundSecondaryB</item>
 
+
         <item name="android:textColor">@color/paleGray</item>
+        <item name="android:navigationBarColor">@color/paleDarkGray</item>
+
         <item name="relicStickiedColor">@color/stickied</item>
         <item name="relicTitleColor">@color/white</item>
     </style>

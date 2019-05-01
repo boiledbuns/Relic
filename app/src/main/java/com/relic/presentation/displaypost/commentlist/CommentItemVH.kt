@@ -34,6 +34,7 @@ class CommentItemVH (
                 commentsExpanded = !commentsExpanded
             }
 
+            commentAuthorView.setOnClickListener { adapter.previewUser(adapterPosition) }
             setOnClickListener { adapter.visitComment(adapterPosition) }
         }
     }

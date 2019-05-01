@@ -29,6 +29,7 @@
         app:constraint_referenced_ids="indentCommentIcon"
         app:barrierDirection="end"/>
 
+    <!-- region display parent - TODO consider extracting this out into another view-->
     <LinearLayout
         android:id="@+id/parentBlock"
         android:layout_width="0dp"
@@ -64,6 +65,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/displaypost_paddingside"
             android:layout_marginBottom="@dimen/padding_s"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
             tools:text="u/random_person"/>
     </LinearLayout>
 
@@ -71,11 +75,15 @@
         android:id="@+id/parent_separator"
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="#c0c0c0"
+        android:background="@color/primaryText"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/parentBlock"
         android:layout_marginStart="@dimen/padding_m"
         android:layout_marginEnd="@dimen/padding_m"
-        android:paddingBottom="@dimen/padding_m"/>
+        android:paddingBottom="@dimen/padding_m"
+        tools:visibility="visible"/>
+
+    <!-- endregion display parent -->
 
     <android.support.constraint.Barrier
         android:id="@+id/parent_block_barrier"
@@ -135,6 +143,7 @@
         android:layout_marginTop="@dimen/text_spacing_s"
         android:textSize="@dimen/text_m"
         app:layout_constraintTop_toBottomOf="@id/commentAuthorView"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible"
         tools:text="@tools:sample/lorem/random" />

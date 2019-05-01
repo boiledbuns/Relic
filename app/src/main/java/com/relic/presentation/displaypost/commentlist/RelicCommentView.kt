@@ -26,6 +26,7 @@ class RelicCommentView (
         displayParent = display
         if (displayParent) {
             parentBlock.visibility = View.VISIBLE
+            parent_separator.visibility = View.VISIBLE
             indentCommentIcon.visibility = View.VISIBLE
             // width, height
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {

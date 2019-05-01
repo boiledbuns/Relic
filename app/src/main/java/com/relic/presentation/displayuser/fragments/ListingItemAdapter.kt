@@ -166,5 +166,9 @@ class ListingItemAdapter(
          actionDelegate.visitListing(listingItems[itemPosition])
     }
 
+    override fun previewUser(itemPosition: Int) {
+        actionDelegate.onUserClicked(listingItems[itemPosition])
+    }
+
     // endregion comment adapter delegate
 }

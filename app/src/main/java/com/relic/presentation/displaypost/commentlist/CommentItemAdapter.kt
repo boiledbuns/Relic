@@ -77,6 +77,10 @@ class CommentItemAdapter (
 
     override fun visitComment(itemPosition: Int) {}
 
+    override fun previewUser(itemPosition: Int) {
+        actionDelegate.onUserPressed(commentList[itemPosition])
+    }
+
     // end region onclick handler
 
     class CalculateDiffTask(

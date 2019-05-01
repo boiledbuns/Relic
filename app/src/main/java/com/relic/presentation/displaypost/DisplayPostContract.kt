@@ -26,6 +26,7 @@ interface DisplayPostContract {
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onLinkPressed()
         fun onReplyPressed()
+        fun onUserPressed(commentModel: CommentModel)
     }
 
     interface CommentAdapterDelegate {
@@ -33,6 +34,7 @@ interface DisplayPostContract {
         fun voteOnComment(itemPosition : Int, voteValue : Int)
         fun replyToComment(itemPosition : Int)
         fun visitComment(itemPosition : Int)
+        fun previewUser(itemPosition : Int)
     }
 }
 
@@ -47,6 +49,10 @@ sealed class PostNavigationData {
 
     data class ToURL(
         val url: String
+    ) : PostNavigationData()
+
+    data class ToUserPreview(
+        val username: String
     ) : PostNavigationData()
 }
 

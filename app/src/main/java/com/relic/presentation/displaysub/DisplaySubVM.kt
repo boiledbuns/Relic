@@ -232,7 +232,7 @@ open class DisplaySubVM (
     }
 
     override fun previewUser(username: String) {
-        _navigationLiveData.value = SubNavigationData.DisplayUserPreview(username)
+        _navigationLiveData.value = SubNavigationData.ToUserPreview(username)
     }
 
     // endregion view action delegate

@@ -4,19 +4,19 @@
 This is an Android Reddit client I've been working on for a few months now. I started this project with the intention of improving my skills as a mobile developer and designer
 
 ## project roadmap - features
-[x] display individual subreddits
-[x] display individual posts
-[x] display individual users
-[] display user previews
-[] setup the app to handle reddit links
-[] searching for subs, posts, and users
-[] background post retrieval
-[] allow custom theme creation and import
-[] post and comment filtering
+- [x] display individual subreddits
+- [x] display individual posts
+- [x] display individual users
+- [x] display user previews
+- [] setup the app to handle reddit links
+- [] searching for subs, posts, and users
+- [] background post retrieval
+- [] allow custom theme creation and import
+- [] post and comment filtering
 
 ## project roadmap - maintenance, cleanup, and performance
-[] speed up recyclerviews (ie. currently drops frame)
-[] replace global scope with per view scoping for coroutines
+- [] speed up recyclerviews (ie. currently drops frame)
+- [] replace global scope with per view scoping for coroutines
 
 ## Development setup
 1. Clone the repo

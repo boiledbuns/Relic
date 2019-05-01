@@ -27,6 +27,7 @@ import com.relic.presentation.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.displaysub.DisplaySubFragment
+import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
 import com.shopify.livedataktx.nonNull
@@ -179,6 +180,10 @@ class DisplayPostFragment : RelicFragment() {
                     data = Uri.parse(navigationData.url)
                     startActivity(this)
                 }
+            }
+            is PostNavigationData.ToUserPreview -> {
+                DisplayUserPreview.create(navigationData.username)
+                    .show(fragmentManager, TAG)
             }
         }
     }

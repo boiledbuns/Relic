@@ -43,7 +43,7 @@ sealed class SubNavigationData {
         val url : String
     ) : SubNavigationData ()
 
-    data class DisplayUserPreview (
+    data class ToUserPreview (
         val username : String
     ) : SubNavigationData ()
 }

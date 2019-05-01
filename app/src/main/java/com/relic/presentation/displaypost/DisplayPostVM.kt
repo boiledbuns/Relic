@@ -257,6 +257,10 @@ class DisplayPostVM (
         _navigationLiveData.value = null
     }
 
+    override fun onUserPressed(commentModel: CommentModel) {
+        _navigationLiveData.value = PostNavigationData.ToUserPreview(commentModel.author)
+    }
+
     // endregion view action delegate
 
     // region helpers
