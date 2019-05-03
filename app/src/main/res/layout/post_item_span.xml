@@ -69,17 +69,25 @@
                 android:textStyle="bold"
                 tools:text="@string/long_placeholder_text"/>
 
-            <!-- TODO add style for tags -->
             <TextView
                 android:id="@+id/postItemAuthorView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/titleView"
                 android:layout_marginBottom="@dimen/padding_xxs"
+                android:layout_marginEnd="@dimen/padding_m"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
                 tools:text="u/dank_monkey"/>
+
+            <TextView
+                android:id="@+id/postItemAuthorFlairView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleView"
+                android:layout_toEndOf="@id/postItemAuthorView"
+                tools:text="author flair"/>
 
             <!-- TODO add style for tags -->
             <TextView
@@ -111,7 +119,7 @@
                 tools:text="tag"/>
 
             <TextView
-                android:id="@+id/postItemAuthorFlairView"
+                android:id="@+id/postItemLinkDomain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/postItemAuthorView"
@@ -121,7 +129,7 @@
                 android:textSize="@dimen/text_m2"
                 android:textColor="@color/negative_text"
                 tools:visibility="visible"
-                tools:text="author flair"/>
+                tools:text="v.reddit"/>
 
         </RelativeLayout>
 

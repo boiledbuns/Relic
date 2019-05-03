@@ -89,6 +89,10 @@
     <string name="total_karma">total karma</string>
     <string name="account_age">created %s (%s)</string>
 
+    <!-- image loading -->
+    <string name="loading">loading %s</string>
+    <string name="loading_error">failed to load %s</string>
+
     <string-array name="theme_names">
         <item>Dark</item>
         <item>Light</item>

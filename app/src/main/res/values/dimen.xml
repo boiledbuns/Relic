@@ -114,4 +114,6 @@
 
     <dimen name="comment_list_padding_bottom">50dp</dimen>
 
+    <dimen name="loading_size">90dp</dimen>
+
 </resources>

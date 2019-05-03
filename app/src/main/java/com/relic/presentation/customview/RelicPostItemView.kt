@@ -64,8 +64,11 @@ class RelicPostItemView @JvmOverloads constructor(
             if (!postModel.thumbnail.isNullOrBlank()) {
                 postItemThumbnailView.visibility = View.VISIBLE
                 setThumbnail(postModel.thumbnail)
+                postItemLinkDomain.visibility = View.VISIBLE
+                postItemLinkDomain.text = postModel.domain
             } else {
                 postItemThumbnailView.visibility = View.GONE
+                postItemLinkDomain.visibility = View.GONE
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
