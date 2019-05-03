@@ -13,6 +13,8 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
+import com.relic.util.MediaHelper
+import com.relic.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.joinAll
@@ -41,7 +43,6 @@ class DisplayPostVM (
     }
 
     private val TAG = "DISPLAYPOST_VM"
-    private val validImageEndings = listOf("jpg", "png", "gif")
 
     private val _postLiveData = MediatorLiveData<PostModel> ()
     private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()
@@ -244,12 +245,16 @@ class DisplayPostVM (
     }
 
     override fun onLinkPressed() {
-        _navigationLiveData.value = when (determineType()) {
-            is DisplayPostType.Image -> PostNavigationData.ToImage(_postLiveData.value!!.url)
-            is DisplayPostType.Link -> PostNavigationData.ToURL(_postLiveData.value!!.url)
-            else -> null
+        postLiveData.value?.let {
+            val mediaType = MediaHelper.determineType(it)
+            _navigationLiveData.value = when (mediaType) {
+                is MediaType.Image, MediaType.Gfycat -> PostNavigationData.ToMedia(mediaType, _postLiveData.value!!.url)
+                is MediaType.Link -> PostNavigationData.ToURL(_postLiveData.value!!.url)
+                else -> null
+            }
+            _navigationLiveData.value = null
         }
-        _navigationLiveData.value = null
+
     }
 
     override fun onReplyPressed() {
@@ -262,29 +267,4 @@ class DisplayPostVM (
     }
 
     // endregion view action delegate
-
-    // region helpers
-
-    fun determineType(): DisplayPostType? {
-        var type : DisplayPostType? = null
-
-        _postLiveData.value?.let {
-            // check url ending to see if it's an image
-            if (it.url != null) {
-                val lastThree = it.url.substring(it.url.length - 3)
-                if (validImageEndings.contains(lastThree)) {
-                    type = DisplayPostType.Image
-                }
-                else if (!it.self) {
-                    type = DisplayPostType.Link
-                }
-            }
-
-        }
-
-        return type
-    }
-
-    // endregion helpers
-
 }

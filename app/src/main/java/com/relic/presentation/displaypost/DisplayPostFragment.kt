@@ -23,13 +23,16 @@ import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
 import com.relic.network.NetworkRequestManager
-import com.relic.presentation.DisplayImageFragment
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
+import com.relic.presentation.media.DisplayGfycatFragment
+import com.relic.util.MediaHelper.determineType
+import com.relic.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
@@ -163,7 +166,7 @@ class DisplayPostFragment : RelicFragment() {
     // region live data handlers
 
     private fun displayPost (postModel : PostModel) {
-        fullPostView.setPost(postModel, displayPostVM.determineType(), displayPostVM)
+        fullPostView.setPost(postModel, determineType(postModel), displayPostVM)
     }
 
     private fun displayComments(commentList : List<CommentModel>) {
@@ -173,7 +176,7 @@ class DisplayPostFragment : RelicFragment() {
 
     private fun handleNavigation(navigationData : PostNavigationData) {
         when (navigationData) {
-            is PostNavigationData.ToImage -> openImage(navigationData.imageUrl)
+            is PostNavigationData.ToMedia -> openMedia(navigationData)
             is PostNavigationData.ToReply -> openPostReplyEditor(navigationData.parentFullname)
             is PostNavigationData.ToURL -> {
                 Intent(Intent.ACTION_VIEW).apply{
@@ -275,11 +278,14 @@ class DisplayPostFragment : RelicFragment() {
         }
     }
 
-    private fun openImage(imageUrl : String) {
-        val displayImageFragment = DisplayImageFragment.create(imageUrl)
+    private fun openMedia(navMediaData : PostNavigationData.ToMedia) {
+        val displayFragment = when (navMediaData.mediaType)  {
+            MediaType.Gfycat -> DisplayGfycatFragment.create(navMediaData.mediaUrl)
+            else -> DisplayImageFragment.create(navMediaData.mediaUrl)
+        }
         activity!!.supportFragmentManager
                 .beginTransaction()
-                .add(R.id.main_content_frame, displayImageFragment)
+                .add(R.id.main_content_frame, displayFragment)
                 .addToBackStack(TAG)
                 .commit()
     }

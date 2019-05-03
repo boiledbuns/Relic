@@ -1,6 +1,7 @@
 package com.relic.dagger.modules
 
 import android.app.Application
+import com.gfycat.core.GfyCore
 import com.relic.network.NetworkUtil
 import com.relic.network.NetworkUtilImpl
 import dagger.Module
@@ -15,7 +16,7 @@ class UtilModule @Inject constructor(
 
     @Provides
     @Singleton
-    fun provideSubRepository() : NetworkUtil {
+    fun provideNetworkUtil() : NetworkUtil {
         return NetworkUtilImpl(appContext)
     }
 }

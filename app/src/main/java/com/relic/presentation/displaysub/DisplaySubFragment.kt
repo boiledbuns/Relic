@@ -30,7 +30,7 @@ import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
-import com.relic.presentation.DisplayImageFragment
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter

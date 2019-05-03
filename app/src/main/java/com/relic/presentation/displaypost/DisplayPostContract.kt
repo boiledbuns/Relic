@@ -1,6 +1,7 @@
 package com.relic.presentation.displaypost
 
 import com.relic.data.models.CommentModel
+import com.relic.util.MediaType
 
 const val UPVOTE_PRESSED = 1
 const val DOWNVOTE_PRESSED = -1
@@ -39,12 +40,13 @@ interface DisplayPostContract {
 }
 
 sealed class PostNavigationData {
-    data class ToImage(
-            val imageUrl: String
+    data class ToMedia(
+        val mediaType: MediaType,
+        val mediaUrl: String
     ) : PostNavigationData()
 
     data class ToReply(
-            val parentFullname: String
+        val parentFullname: String
     ) : PostNavigationData()
 
     data class ToURL(
@@ -60,9 +62,4 @@ sealed class PostExceptionData : Exception() {
     object NoComments : PostExceptionData()
     object NetworkUnavailable : PostExceptionData()
     object UnexpectedException : PostExceptionData()
-}
-
-sealed class DisplayPostType {
-    object Image : DisplayPostType()
-    object Link : DisplayPostType()
 }

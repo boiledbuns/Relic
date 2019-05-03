@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.data.models.PostModel
+import com.relic.util.MediaType
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
 import ru.noties.markwon.Markwon
@@ -19,14 +20,14 @@ class FullPostView @JvmOverloads constructor(
 
     private val TAG = "FULL_POST_VIEW"
     private lateinit var viewDelegate : DisplayPostContract.PostViewDelegate
-    private var postDisplayType : DisplayPostType? = null
+    private var postDisplayType : MediaType? = null
     private val markwon = Markwon.create(context)
 
     init {
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
-    fun setPost(postModel : PostModel, displayType : DisplayPostType?, delegate : DisplayPostContract.PostViewDelegate) {
+    fun setPost(postModel : PostModel, displayType : MediaType?, delegate : DisplayPostContract.PostViewDelegate) {
         viewDelegate = delegate
         postDisplayType = displayType
 
@@ -81,11 +82,15 @@ class FullPostView @JvmOverloads constructor(
 
     private fun loadLinks(postModel : PostModel) {
         when (postDisplayType) {
-            DisplayPostType.Image -> {
+            MediaType.Image -> {
                 Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
                 postImageView.visibility = View.VISIBLE
             }
-            DisplayPostType.Link -> {
+            MediaType.Gfycat -> {
+                Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postImageView)
+                postImageView.visibility = View.VISIBLE
+            }
+            else -> {
                 Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
                 postLinkUrl.text = postModel.url
                 postLinkCard.visibility = View.VISIBLE

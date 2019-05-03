@@ -1,25 +1,20 @@
-package com.relic.presentation
+package com.relic.presentation.media
 
-import android.content.res.Resources
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
+import com.gfycat.core.GfyCore
 
 import com.relic.R
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.display_image.*
-import kotlinx.android.synthetic.main.display_image.view.*
 import java.lang.Exception
 
 class DisplayImageFragment : Fragment() {
-    private val IMAGE_KEY = "image_url"
-
-    private lateinit var rootView : View
     private var imageUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,9 +61,11 @@ class DisplayImageFragment : Fragment() {
     }
 
     companion object {
-        fun create(thumbnailUrl : String) : DisplayImageFragment{
+        private val IMAGE_KEY = "image_url"
+
+        fun create(thumbnailUrl : String) : DisplayImageFragment {
             val bundle = Bundle()
-            bundle.putString("image_url", thumbnailUrl)
+            bundle.putString(IMAGE_KEY, thumbnailUrl)
 
             return DisplayImageFragment().apply {
                 arguments = bundle
