@@ -11,7 +11,7 @@ class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), DisplayPostContract.CommentAdapterDelegate {
 
-    private var commentList : MutableList<CommentModel> = ArrayList()
+    private var commentList : List<CommentModel> = ArrayList()
 
     private val TAG = "COMMENT_ADAPTER"
     private val VIEW_TYPE_COMMENT = 0
@@ -51,6 +51,10 @@ class CommentItemAdapter (
     }
 
     fun setComments(newComments: List<CommentModel>) {
+        if (commentList.isEmpty()) {
+            commentList = newComments
+            notifyDataSetChanged()
+        }
         CalculateDiffTask(this, commentList, newComments).execute()
     }
 
@@ -118,11 +122,7 @@ class CommentItemAdapter (
 
         override fun onPostExecute(result: Unit?) {
             diff.dispatchUpdatesTo(adapter)
-
-            adapter.commentList.apply {
-                clear()
-                addAll(newComments)
-            }
+            adapter.commentList = newComments
         }
     }
 
