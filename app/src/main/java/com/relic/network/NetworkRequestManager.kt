@@ -26,7 +26,8 @@ class NetworkRequestManager (
     suspend fun processRequest (
         method: Int,
         url: String,
-        authToken: String? = null
+        authToken: String? = null,
+        data: MutableMap<String, String>? = null
     ) : String = suspendCoroutine { cont ->
 
         val relicRequest = RelicOAuthRequest(
@@ -37,7 +38,8 @@ class NetworkRequestManager (
             Response.ErrorListener { e: VolleyError ->
                 cont.resumeWithException(e)
             },
-            authToken ?: checkToken()
+            authToken ?: checkToken(),
+            data
         )
 
         volleyQueue.add(relicRequest)

@@ -28,4 +28,7 @@ public abstract class CommentDao {
 
     @Query("DELETE from CommentEntity WHERE parentPostId = :postId")
     public abstract void deletePostComments(String postId);
+
+    @Query("DELETE from CommentEntity WHERE fullName = :commentFullName")
+    public abstract void deleteComment(String commentFullName);
 }

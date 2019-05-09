@@ -145,6 +145,8 @@ class ListingItemAdapter(
         actionDelegate.onUserClicked(listingItems[itemPosition])
     }
 
+    override fun loadMoreComments(itemPosition: Int, displayReplies: Boolean) { }
+
     // end region for onclick handlers
 
     // TODO consider refactoring onclicks for both posts and comments to consolidate them into a single interface

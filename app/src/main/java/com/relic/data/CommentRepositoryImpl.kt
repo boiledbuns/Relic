@@ -4,11 +4,9 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.os.AsyncTask
-import android.text.Html
 import android.util.Log
 import com.android.volley.VolleyError
 
-import com.google.gson.GsonBuilder
 import com.relic.R
 import com.relic.data.deserializer.CommentDeserializer
 import com.relic.data.deserializer.ParsedCommentData
@@ -22,12 +20,6 @@ import kotlinx.coroutines.*
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
-import org.json.simple.parser.ParseException
-
-import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Date
-import java.util.Locale
 import kotlin.math.pow
 
 class CommentRepositoryImpl(
@@ -103,6 +95,7 @@ class CommentRepositoryImpl(
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
+            Log.d(TAG, "${response}")
             val parsedData = parseCommentRequestResponse(
                 postFullName = postFullName,
                 response = response
@@ -123,23 +116,58 @@ class CommentRepositoryImpl(
         }
     }
 
-    override suspend fun retrieveCommentChildren(commentModel: CommentModel) {
-//        val url = "${ENDPOINT}api/morechildren?api_type=json&link_id=${commentModel.fullName}&id=${commentModel.replyLink}"
-        val url = "${ENDPOINT}api/morechildren?api_type=json&link_id=${commentModel.getFullName()}&children=${commentModel.replyLink}"
+    override suspend fun retrieveCommentChildren(moreChildrenComment: CommentModel) {
+        val removedQuotations = moreChildrenComment.body.replace("\"", "")
+        val idList = removedQuotations.subSequence(1, removedQuotations.length - 1)
+
+        val postData = HashMap<String, String>()
+        postData["api_type"] = "json"
+        postData["children"] = idList.toString()
+        postData["limit_children"] = "false"
+        postData["link_id"] = "t3_" + moreChildrenComment.parentPostId
+        postData["sort"] = "confidence"
+        val url = "${ENDPOINT}api/morechildren"
 
         try {
-            val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
-            val parsedData = parseCommentRequestResponse(
-                postFullName = commentModel.getFullName(),
-                response = response
-            )
+            val response = requestManager.processRequest(RelicOAuthRequest.POST, url, authToken!!, postData)
+            Log.d(TAG, "${response}")
+
+            // these comments come in a weird format: so we'll have to do part of the parsing here
+            // the comment data is nested as the first element within an array
+            val requestJson = (jsonParser.parse(response) as JSONObject)["json"] as JSONObject
+            val requestData = requestJson["data"] as JSONObject
+            val requestComments = requestData["things"] as JSONArray
+
+            // calculate the depth of the comments (should be the same as the "load more")
+            val depth = moreChildrenComment.depth
+            val scale = 10f.pow(-(depth))
+            var commentCount = 0
+
+            Log.d(TAG, "load more scale ${moreChildrenComment.position}")
+
+            val commentEntities = requestComments.fold(mutableListOf<CommentEntity>()) { accum, requestComment : Any? ->
+                val unmarshalledComments = CommentDeserializer.unmarshallComment(
+                    requestComment as JSONObject,
+                    moreChildrenComment.depth.toFloat()
+                )
+
+                unmarshalledComments.forEach { commentEntity ->
+                    commentEntity.position = moreChildrenComment.position + commentCount*scale
+                    commentCount += 1
+                    Log.d(TAG, "load more scale ${commentEntity.position}")
+                }
+                accum.apply { addAll(unmarshalledComments) }
+            }
 
             coroutineScope {
-                launch (Dispatchers.IO) { insertComments(parsedData.commentList, parsedData.listingEntity) }
+                launch (Dispatchers.IO) {
+                    appDB.commentDAO.deleteComment(moreChildrenComment.fullName)
+                    appDB.commentDAO.insertComments(commentEntities)
+                }
             }
         } catch (e : Exception) {
             when (e) {
-                is VolleyError -> Log.d(TAG, "Error with request : at $url \n ${e.localizedMessage}")
+                is VolleyError -> Log.d(TAG, "Error with request : at $url \n ${e.networkResponse.statusCode} : ${e.message}")
                 else -> Log.d(TAG, "Error parsing JSON return " + e.message)
             }
         }

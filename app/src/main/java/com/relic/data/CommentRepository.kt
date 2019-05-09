@@ -23,7 +23,7 @@ interface CommentRepository {
      */
     suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean)
 
-    suspend fun retrieveCommentChildren(commentModel: CommentModel)
+    suspend fun retrieveCommentChildren(moreChildrenComment: CommentModel)
 
     /**
      * clears all locally stored comments

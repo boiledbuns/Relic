@@ -36,6 +36,7 @@ interface DisplayPostContract {
         fun replyToComment(itemPosition : Int)
         fun visitComment(itemPosition : Int)
         fun previewUser(itemPosition : Int)
+        fun loadMoreComments(itemPosition: Int, displayReplies : Boolean)
     }
 }
 

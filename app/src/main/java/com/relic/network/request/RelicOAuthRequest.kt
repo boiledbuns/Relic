@@ -9,12 +9,14 @@ import java.util.HashMap
 /**
  * Volley String request with custom values configured for this application
  */
-class RelicOAuthRequest(
+
+class RelicOAuthRequest @JvmOverloads constructor(
         method: Int,
         url: String,
         var listener: Response.Listener<String>,
         errorListener: Response.ErrorListener,
-        private val authToken: String
+        private val authToken: String,
+        private val data: MutableMap<String, String>? = null
 ) : StringRequest(method, url, listener, errorListener) {
 
     companion object {
@@ -33,5 +35,9 @@ class RelicOAuthRequest(
         headers["User-Agent"] = userAgent
 
         return headers
+    }
+
+    override fun getParams(): MutableMap<String, String> {
+        return data ?: HashMap()
     }
 }

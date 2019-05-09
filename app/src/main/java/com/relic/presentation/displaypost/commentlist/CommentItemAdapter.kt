@@ -38,10 +38,9 @@ class CommentItemAdapter (
         return when (viewType) {
             VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context)).apply {
                 initializeOnClicks(this@CommentItemAdapter)
-                adapterPosition
             }
             else -> CommentMoreItemsVH(RelicCommentMoreItemsView(parent.context)).apply {
-                initializeOnclicks(this@CommentItemAdapter)
+                initializeOnClicks(this@CommentItemAdapter)
             }
         }
     }
@@ -58,7 +57,7 @@ class CommentItemAdapter (
         CalculateDiffTask(this, commentList, newComments).execute()
     }
 
-    // region onclick handler
+    // region OnClick handlers
 
     override fun displayCommentReplies(itemId : String, commentExpanded : Boolean) {
         actionDelegate.onExpandReplies(itemId, commentExpanded)
@@ -85,7 +84,11 @@ class CommentItemAdapter (
         actionDelegate.onUserPressed(commentList[itemPosition])
     }
 
-    // end region onclick handler
+    override fun loadMoreComments(itemPosition: Int, displayReplies : Boolean) {
+        actionDelegate.onExpandReplies(commentList[itemPosition].fullName, displayReplies)
+    }
+
+    // endregion OnClick handlers
 
     class CalculateDiffTask(
         val adapter : CommentItemAdapter,
