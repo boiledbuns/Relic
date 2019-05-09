@@ -18,6 +18,10 @@ class RelicCommentMoreItemsView(
         LayoutInflater.from(context).inflate(R.layout.relic_more_comments_item, this)
     }
 
+    fun displayLoadMore(replyCount : Int) {
+        loadMoreItemText.text = resources.getString(R.string.load_comments, replyCount)
+    }
+
     fun displayReplyDepth(depth : Int) {
         // width, height
         val indentParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {

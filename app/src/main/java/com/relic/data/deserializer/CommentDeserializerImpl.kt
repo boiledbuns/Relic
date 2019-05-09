@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
+import com.relic.data.models.CommentModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -78,6 +79,57 @@ object CommentDeserializer : Contract.CommentDeserializer {
         return ParsedCommentData(listing, commentList, commentChildren.size)
     }
 
+    /**
+     * Only use this method to parse the return from "morechildren" since it uses a different
+     * format than the traditional method for retrieving comments
+     *
+     */
+    @Throws(ParseException::class)
+    override suspend fun parseMoreComments(
+        moreChildrenComment: CommentModel,
+        requestJson: JSONObject
+    ) : List<CommentEntity> {
+        //
+
+        val requestData = requestJson["data"] as JSONObject
+        val requestComments = requestData["things"] as JSONArray
+
+        // calculate the depth of the comments (should be the same as the "load more")
+        val depth = moreChildrenComment.depth
+        val scale = 10f.pow(-(depth))
+        var commentCount = 0
+
+        Log.d(TAG, "load more scale ${moreChildrenComment.position}")
+
+        return requestComments.fold(mutableListOf()) { accum, requestComment : Any? ->
+            val commentJson = requestComment as JSONObject
+            val childKind = commentJson["kind"] as String?
+
+            val unmarshalledComments = if (childKind == "more") {
+                // means there is a "more object"
+                val moreData = (commentJson["data"] as JSONObject)
+
+                val moreComment = unmarshallMore(
+                    moreData,
+                    moreChildrenComment.parentPostId,
+                    moreChildrenComment.position + commentCount*scale
+                )
+                commentCount += 1
+                listOf(moreComment)
+            } else {
+                unmarshallComment(commentJson, moreChildrenComment.depth.toFloat()).apply {
+                    forEach { commentEntity ->
+                        commentEntity.position = moreChildrenComment.position + commentCount*scale
+                        commentCount += 1
+                        Log.d(TAG, "load more scale ${commentEntity.position}")
+                    }
+                }
+            }
+
+            accum.apply { addAll(unmarshalledComments) }
+        }
+    }
+
     private fun unmarshallMore(
         moreJsonObject : JSONObject,
         postFullName : String,
@@ -90,10 +142,11 @@ object CommentDeserializer : Contract.CommentDeserializer {
             created = CommentEntity.MORE_CREATED
             position = commentPosition
             depth = (moreJsonObject["depth"] as Long).toInt()
-            replyCount = (moreJsonObject["count"] as Long).toInt()
 
             val childrenLinks = moreJsonObject["children"] as JSONArray
             body_html = childrenLinks.toString()
+            // reply count for "more" item will hold the number of comments to load
+            replyCount = childrenLinks.size
         }
     }
 

@@ -38,7 +38,7 @@
 
     <string name="nsfw">NSFW</string>
     <string name="reply">reply</string>
-    <string name="load_comments">load more comments…</string>
+    <string name="load_comments">load %d more comments…</string>
     <string name="empty_parent_body">This post has no text body</string>
 
     <string name="subscribers">Size</string>

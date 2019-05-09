@@ -20,7 +20,6 @@ import kotlinx.coroutines.*
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
-import kotlin.math.pow
 
 class CommentRepositoryImpl(
         private val viewContext: Context,
@@ -120,44 +119,20 @@ class CommentRepositoryImpl(
         val removedQuotations = moreChildrenComment.body.replace("\"", "")
         val idList = removedQuotations.subSequence(1, removedQuotations.length - 1)
 
-        val postData = HashMap<String, String>()
-        postData["api_type"] = "json"
-        postData["children"] = idList.toString()
-        postData["limit_children"] = "false"
-        postData["link_id"] = "t3_" + moreChildrenComment.parentPostId
-        postData["sort"] = "confidence"
+        val postData = HashMap<String, String>().apply {
+            put("api_type", "json")
+            put("children", idList.toString())
+            put("limit_children", "false")
+            put("link_id", "t3_" + moreChildrenComment.parentPostId)
+            put("sort", "confidence")
+        }
+
         val url = "${ENDPOINT}api/morechildren"
+        val response = requestManager.processRequest(RelicOAuthRequest.POST, url, authToken!!, postData)
 
         try {
-            val response = requestManager.processRequest(RelicOAuthRequest.POST, url, authToken!!, postData)
-            Log.d(TAG, "${response}")
-
-            // these comments come in a weird format: so we'll have to do part of the parsing here
-            // the comment data is nested as the first element within an array
             val requestJson = (jsonParser.parse(response) as JSONObject)["json"] as JSONObject
-            val requestData = requestJson["data"] as JSONObject
-            val requestComments = requestData["things"] as JSONArray
-
-            // calculate the depth of the comments (should be the same as the "load more")
-            val depth = moreChildrenComment.depth
-            val scale = 10f.pow(-(depth))
-            var commentCount = 0
-
-            Log.d(TAG, "load more scale ${moreChildrenComment.position}")
-
-            val commentEntities = requestComments.fold(mutableListOf<CommentEntity>()) { accum, requestComment : Any? ->
-                val unmarshalledComments = CommentDeserializer.unmarshallComment(
-                    requestComment as JSONObject,
-                    moreChildrenComment.depth.toFloat()
-                )
-
-                unmarshalledComments.forEach { commentEntity ->
-                    commentEntity.position = moreChildrenComment.position + commentCount*scale
-                    commentCount += 1
-                    Log.d(TAG, "load more scale ${commentEntity.position}")
-                }
-                accum.apply { addAll(unmarshalledComments) }
-            }
+            val commentEntities = CommentDeserializer.parseMoreComments(moreChildrenComment, requestJson)
 
             coroutineScope {
                 launch (Dispatchers.IO) {

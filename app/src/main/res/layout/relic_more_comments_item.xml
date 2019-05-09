@@ -9,8 +9,8 @@
     android:background="?attr/colorPrimary">
 
     <TextView
+        android:id="@+id/loadMoreItemText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/load_comments"/>
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
