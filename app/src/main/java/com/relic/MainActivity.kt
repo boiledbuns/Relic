@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     private lateinit var relicGD: GestureDetectorCompat
 
     private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
+    private var username :String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,22 +61,44 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
         navigationView = findViewById(R.id.navigationView)
         navDrawer = findViewById(R.id.navigationDrawer)
+        username = auth.user
+        initNavDrawer()
+
+        relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
+    }
+
+    fun updateUser(newUser: String) {
+        username = newUser
+        navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).text = newUser
+    }
+
+    private fun initNavDrawer() {
         navigationView.setNavigationItemSelectedListener { handleNavMenuOnclick(it) }
 
         // TODO remove hardcoded username and switch to username used by currently logged in user
-        navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).setOnClickListener {
-            val displayUserFrag = DisplayUserFragment.create("boiledbuns")
+        navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).apply {
+            if (username == null) {
+                text = resources.getString(R.string.log_in)
+                setOnClickListener {
+                    // TODO add transition to login activity
+                    navDrawer.closeDrawers()
+                }
+            }
+            else {
+                text = username
+                setOnClickListener {
+                    val displayUserFrag = DisplayUserFragment.create(text.toString())
 
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.main_content_frame, displayUserFrag)
-                .addToBackStack(TAG)
-                .commit()
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.main_content_frame, displayUserFrag)
+                        .addToBackStack(TAG)
+                        .commit()
 
-            navDrawer.closeDrawers()
+                    navDrawer.closeDrawers()
+                }
+            }
         }
-
-        relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

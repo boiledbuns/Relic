@@ -37,9 +37,12 @@ public class Authenticator {
   private final String DURATION="permanent";
 
   private String preference;
+    private String redirectCode;
+
+    // keys for shared preferences
+    private String KEY_USERNAME = "PREF_USERNAME";
   private String tokenKey;
   private String refreshTokenKey;
-  private String redirectCode;
 
   private String responseType = "code";
   private String state = "random0101"; // any random value
@@ -49,6 +52,7 @@ public class Authenticator {
   private Context appContext;
   private RequestQueue requestQueue;
   private Date lastRefresh;
+
 
 
   /**
@@ -168,6 +172,21 @@ public class Authenticator {
         .contains(tokenKey);
   }
 
+    public void initializeUser(String username) {
+        // stores the current user in shared preferences
+        SharedPreferences.Editor prefEditor = appContext
+            .getSharedPreferences(KEY_USERNAME, Context.MODE_PRIVATE).edit();
+
+        prefEditor.putString(KEY_USERNAME, username).apply();
+    }
+
+    public String getUser() {
+        // stores the current user in shared preferences
+        SharedPreferences prefEditor = appContext
+            .getSharedPreferences(KEY_USERNAME, Context.MODE_PRIVATE);
+
+        return prefEditor.getString(KEY_USERNAME, null);
+    }
 
   /**
    * parses the successful auth response to store the oauth and refresh token in the shared
@@ -181,8 +200,8 @@ public class Authenticator {
       Log.d(TAG, "" + data.get("scope").toString());
 
       // stores the token in shared preferences
-      SharedPreferences.Editor prefEditor = appContext.
-          getSharedPreferences("auth", Context.MODE_PRIVATE).edit();
+      SharedPreferences.Editor prefEditor = appContext
+          .getSharedPreferences("auth", Context.MODE_PRIVATE).edit();
 
       // checks if there is an refresh token to be stored
       if (data.containsKey(refreshTokenKey)) {
@@ -198,7 +217,6 @@ public class Authenticator {
       Toast.makeText(appContext, "yikes", Toast.LENGTH_SHORT).show();
     }
   }
-
 
   class RedditGetTokenRequest extends StringRequest {
     private String code;

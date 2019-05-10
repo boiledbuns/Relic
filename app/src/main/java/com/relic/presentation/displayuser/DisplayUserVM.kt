@@ -14,7 +14,6 @@ import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.util.RelicEvent

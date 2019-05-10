@@ -97,4 +97,7 @@
         <item>Dark</item>
         <item>Light</item>
     </string-array>
+
+    <string name="log_in">log in</string>
+
 </resources>

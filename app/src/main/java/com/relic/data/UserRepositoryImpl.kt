@@ -7,6 +7,9 @@ import com.relic.data.models.UserModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import org.json.simple.JSONObject
+import org.json.simple.parser.JSONParser
 
 class UserRepositoryImpl (
     private val appContext: Context,
@@ -19,6 +22,7 @@ class UserRepositoryImpl (
     }
 
     private val userDeserializer = UserDeserializerImpl(appContext)
+    private val jsonParser: JSONParser = JSONParser()
 
     override suspend fun retrieveUser(username: String): UserModel? {
         val userEndpoint = "$ENDPOINT/user/$username/about"
@@ -51,6 +55,29 @@ class UserRepositoryImpl (
         }
 
         return userModel
+    }
+
+    override suspend fun retrieveSelf(): String? {
+        val selfEndpoint = "$ENDPOINT/api/v1/me"
+        var username : String? = null
+
+        runBlocking {
+            try {
+                // create the new request and submit it
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = selfEndpoint
+                )
+
+                val responseJson = jsonParser.parse(response) as JSONObject
+                username = responseJson["name"] as String
+
+            } catch (e: Exception) {
+                Log.d(TAG, "Error retrieving user from ($selfEndpoint) " + e.message)
+            }
+        }
+
+        return username
     }
 
 }
