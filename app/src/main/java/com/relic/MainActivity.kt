@@ -19,11 +19,16 @@ import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
+import com.relic.presentation.login.LoginActivity
+import com.relic.presentation.login.LoginActivity.Companion.KEY_RESULT_LOGIN
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.util.PreferencesManagerImpl
 import com.relic.util.RequestCodes
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 import javax.inject.Inject
 
@@ -45,6 +50,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
         setTheme()
         setContentView(R.layout.activity_main)
+        initializeDefaultView()
 
         (application as RelicApp).appComponent.inject(this)
 
@@ -52,24 +58,12 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         VolleyQueue.get(applicationContext)
         auth.refreshToken { this.initializeDefaultView() }
 
-        if (!auth.isAuthenticated) {
-            // create the login fragment for the user if not authenticated
-            val loginFragment = LoginFragment()
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, loginFragment).commit()
-        }
-
         navigationView = findViewById(R.id.navigationView)
         navDrawer = findViewById(R.id.navigationDrawer)
         username = auth.user
         initNavDrawer()
 
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
-    }
-
-    fun updateUser(newUser: String) {
-        username = newUser
-        navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).text = newUser
     }
 
     private fun initNavDrawer() {
@@ -80,7 +74,8 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
             if (username == null) {
                 text = resources.getString(R.string.log_in)
                 setOnClickListener {
-                    // TODO add transition to login activity
+                    // create the login activity for the user
+                    LoginActivity.startForResult(this@MainActivity)
                     navDrawer.closeDrawers()
                 }
             }
@@ -108,6 +103,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                     handlePreferenceChanges(it)
                 }
             }
+            RequestCodes.CHANGED_ACCOUNT -> { }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -132,7 +128,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
     override fun onAuthenticated() {
         // sends user to default view of subreddits
-        initializeDefaultView()
+//        initializeDefaultView()
     }
 
     // endregion callback interface

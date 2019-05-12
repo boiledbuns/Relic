@@ -36,6 +36,11 @@
             android:name=".presentation.preferences.PreferencesActivity"
             android:parentActivityName=".MainActivity">
         </activity>
+
+        <activity
+            android:name=".presentation.login.LoginActivity"
+            android:parentActivityName=".MainActivity">
+        </activity>
     </application>
 
 </manifest>
