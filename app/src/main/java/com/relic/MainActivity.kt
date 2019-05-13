@@ -1,10 +1,13 @@
 package com.relic
 
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.design.widget.NavigationView
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v4.widget.DrawerLayout
 
@@ -13,33 +16,47 @@ import android.view.GestureDetector
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.TextView
+import com.relic.dagger.DaggerVMComponent
+import com.relic.dagger.modules.AuthModule
+import com.relic.dagger.modules.RepoModule
+import com.relic.dagger.modules.UtilModule
 
 import com.relic.data.Authenticator
-import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
-import com.relic.presentation.login.LoginActivity.Companion.KEY_RESULT_LOGIN
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.util.PreferencesManagerImpl
 import com.relic.util.RequestCodes
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import com.shopify.livedataktx.nonNull
+import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.activity_main.*
 
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), AuthenticationCallback {
     internal val TAG = "MAIN_ACTIVITY"
 
+    private val mainVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return DaggerVMComponent.builder()
+                    .repoModule(RepoModule(this@MainActivity))
+                    .authModule(AuthModule(this@MainActivity))
+                    .utilModule(UtilModule(this@MainActivity.application))
+                    .build()
+                    .getMainVM()
+                    .create() as T
+            }
+        }).get(MainVM::class.java)
+    }
+
     @Inject
     internal lateinit var auth: Authenticator
 
-    private lateinit var navigationView: NavigationView
-    private lateinit var navDrawer: DrawerLayout
     private lateinit var relicGD: GestureDetectorCompat
 
     private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
@@ -54,16 +71,16 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
         (application as RelicApp).appComponent.inject(this)
 
-        // initialize the request queue and authenticator instance
-        VolleyQueue.get(applicationContext)
-        auth.refreshToken { this.initializeDefaultView() }
-
-        navigationView = findViewById(R.id.navigationView)
-        navDrawer = findViewById(R.id.navigationDrawer)
-        username = auth.user
+        bindViewModel(this)
         initNavDrawer()
 
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
+    }
+
+    private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
+        mainVM.userLiveData.nonNull().observe (lifecycleOwner) { user ->
+            navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).text = user.name
+        }
     }
 
     private fun initNavDrawer() {
@@ -72,15 +89,13 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         // TODO remove hardcoded username and switch to username used by currently logged in user
         navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).apply {
             if (username == null) {
-                text = resources.getString(R.string.log_in)
                 setOnClickListener {
                     // create the login activity for the user
                     LoginActivity.startForResult(this@MainActivity)
-                    navDrawer.closeDrawers()
+                    navigationDrawer.closeDrawers()
                 }
             }
             else {
-                text = username
                 setOnClickListener {
                     val displayUserFrag = DisplayUserFragment.create(text.toString())
 
@@ -90,7 +105,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                         .addToBackStack(TAG)
                         .commit()
 
-                    navDrawer.closeDrawers()
+                    navigationDrawer.closeDrawers()
                 }
             }
         }
@@ -103,7 +118,9 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                     handlePreferenceChanges(it)
                 }
             }
-            RequestCodes.CHANGED_ACCOUNT -> { }
+            RequestCodes.CHANGED_ACCOUNT -> {
+                mainVM.onUserSelected()
+            }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -167,13 +184,13 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
             R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 
-        navDrawer.closeDrawers()
+        navigationDrawer.closeDrawers()
         return true
     }
 
     // endregion navigation view handlers
 
-    fun getNavDrawer() = navDrawer
+    fun getNavDrawer(): DrawerLayout = navigationDrawer!!
 }
 
 

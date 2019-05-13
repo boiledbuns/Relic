@@ -42,11 +42,13 @@ class UserDeserializerImpl(
 
         return UserModel().apply {
             userData?.let {
+                (it["name"] as String?)?.let { name = it }
                 (it["gold_expiration"] as String?)?.let { goldExpiration = it }
                 (it["icon_img"] as String?)?.let { iconImg = it }
                 (it["link_karma"] as Long?)?.let { linkKarma = it.toInt() }
 
                 (it["comment_karma"] as Long?)?.let { commentKarma = it.toInt() }
+                isMod = (it["is_mod"] as Boolean?) ?: false
 
                 (it["coins"] as Long?)?.let { coins = it.toInt() }
                 (it["created"] as Double?)?.let { created = it.toString() }

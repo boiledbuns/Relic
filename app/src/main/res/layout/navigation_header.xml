@@ -15,9 +15,11 @@
         android:layout_marginTop="@dimen/padding_l"
         android:textStyle="bold"
         android:textSize="@dimen/text_l"
+        android:text="@string/log_in"
         tools:text="u/boiledbuns"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/linkKarma"/>
+        app:layout_constraintBottom_toTopOf="@id/linkKarma"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:text="Link Karma: 400"
@@ -26,7 +28,8 @@
         android:layout_height="wrap_content"
         tools:text="Link Karma: 400"
         app:layout_constraintTop_toBottomOf="@id/username"
-        app:layout_constraintBottom_toTopOf="@id/commentKarma"/>
+        app:layout_constraintBottom_toTopOf="@id/commentKarma"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:text="Comment Karma: 20"
@@ -35,6 +38,7 @@
         android:layout_height="wrap_content"
         tools:text="Comment Karma: 20"
         app:layout_constraintTop_toBottomOf="@id/linkKarma"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

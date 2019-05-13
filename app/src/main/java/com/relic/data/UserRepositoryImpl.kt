@@ -16,10 +16,13 @@ class UserRepositoryImpl (
     private val requestManager: NetworkRequestManager
 ): UserRepository {
 
-    companion object {
-        private const val ENDPOINT = "https://oauth.reddit.com"
-        private const val TAG = "USER_REPO"
-    }
+    private val ENDPOINT = "https://oauth.reddit.com"
+    private val TAG = "USER_REPO"
+
+    private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
+    private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
+
+    private val KEY_USERNAMES = "PREF_USERNAMES"
 
     private val userDeserializer = UserDeserializerImpl(appContext)
     private val jsonParser: JSONParser = JSONParser()
@@ -80,4 +83,39 @@ class UserRepositoryImpl (
         return username
     }
 
+    override suspend fun addAuthenticatedAccount(username: String) {
+        coroutineScope {
+            appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
+                // get list of authenticated accounts
+                val accounts = sp.getStringSet(KEY_USERNAMES, HashSet())!!
+                // user should not be logging in to already logged in account
+                if (accounts.contains(username)) {
+                    throw UserRepoException.UserAlreadyAuthenticated
+                }
+                else {
+                    accounts.add(username)
+                    // stores the selected user in shared preferences
+                    sp.edit().putStringSet(KEY_USERNAMES, accounts).apply()
+                }
+            }
+        }
+    }
+
+    override suspend fun setCurrentAccount(username: String) {
+        coroutineScope {
+            appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
+                // checks if account being set has been authenticated
+                val accounts = sp.getStringSet(KEY_USERNAMES, HashSet())!!
+                if (accounts.contains(username)) {
+                    sp.edit().putString(KEY_CURR_ACCOUNT, username)?.apply()
+                } else {
+                    throw UserRepoException.UserNotAuthenticated
+                }
+            }
+        }
+    }
+
+    override fun getCurrentAccount(): String? = appContext
+        .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
+        .getString(KEY_CURR_ACCOUNT, null)
 }

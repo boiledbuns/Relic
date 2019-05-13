@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -18,9 +19,12 @@ import com.relic.data.UserRepositoryImpl
 import com.relic.network.NetworkRequestManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AuthenticationCallback
+import kotlinx.android.synthetic.main.web_auth.*
 import kotlinx.coroutines.*
 
-class SignInFragment: RelicFragment() {
+class SignInFragment: RelicFragment(), CoroutineScope {
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
     lateinit var auth : Authenticator
     lateinit var userRepo : UserRepository
@@ -50,24 +54,34 @@ class SignInFragment: RelicFragment() {
     }
 
     private inner class LoginClient : WebViewClient(), AuthenticationCallback {
+        private val redirectHost = "github.com"
 
-        override fun shouldOverrideUrlLoading(webView: WebView, url: String): Boolean {
-            val checkUrl = auth.redirect
+        override fun shouldOverrideUrlLoading(webView: WebView, request : WebResourceRequest): Boolean {
+            var override = false
             // closes the login fragment once the user has successfully been authenticated
-            if (url.substring(0, checkUrl.length) == checkUrl) {
-
+            if (request.url.host == redirectHost) {
                 Toast.makeText(context, "You've been authenticated!", Toast.LENGTH_SHORT).show()
                 // retrieves the access token using the redirect url
-                Log.d(TAG, url)
-                auth.retrieveAccessToken(url, this)
+                auth.retrieveAccessToken(request.url.toString(), this)
+                override = true
             }
-            return false
+            return override
         }
 
         override fun onAuthenticated() {
-            activity?.apply {
-                setResult(Activity.RESULT_OK, Intent())
-                onBackPressed()
+            launch (Dispatchers.IO) {
+                userRepo.retrieveSelf()!!.let { name ->
+                    userRepo.addAuthenticatedAccount(name)
+                    userRepo.setCurrentAccount(name)
+                }
+
+
+                activity?.setResult(Activity.RESULT_OK, Intent())
+                withContext(Dispatchers.Main) {
+                    Log.d(TAG, "ok looks gucci $activity")
+                    auth_web_view.destroy()
+                    activity?.finish()
+                }
             }
         }
     }

@@ -2,6 +2,8 @@ package com.relic.data.models;
 
 public class UserModel {
 
+    public String name;
+
     public String goldExpiration;
     public String iconImg;
     public int linkKarma;
@@ -12,7 +14,4 @@ public class UserModel {
 
     public boolean isFriend;
     public boolean isMod;
-
-    public boolean enableOver18;
-
 }

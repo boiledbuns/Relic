@@ -7,10 +7,16 @@ import android.support.v7.app.AppCompatActivity
 
 import com.relic.R
 import com.relic.util.RequestCodes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlin.coroutines.CoroutineContext
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), CoroutineScope {
     internal val TAG = "LOGIN_ACTIVITY"
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

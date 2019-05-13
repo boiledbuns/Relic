@@ -1,6 +1,7 @@
 package com.relic.dagger
 
 import android.arch.lifecycle.ViewModelProvider
+import com.relic.MainVM
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
@@ -17,6 +18,8 @@ import javax.inject.Singleton
 @Singleton
 @Component( modules = [RepoModule::class, AuthModule::class, UtilModule::class])
 interface VMComponent {
+
+    fun getMainVM() : MainVM.Factory
 
     fun getDisplayPostVM() : DisplayPostVM.Factory
 
