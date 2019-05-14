@@ -1,19 +1,19 @@
 package com.relic
 
 import android.arch.lifecycle.*
-import android.util.Log
 import com.relic.data.Authenticator
 import com.relic.data.UserRepository
 import com.relic.data.models.UserModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class MainVM(
-    val auth : Authenticator,
-    val userRepo : UserRepository
-) : MainContract.VM, ViewModel() {
+    private val auth : Authenticator,
+    private val userRepo : UserRepository
+) : MainContract.VM, CoroutineScope, ViewModel() {
     val TAG = "MAIN_VM"
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
     class Factory @Inject constructor(
         private val auth : Authenticator,
@@ -24,15 +24,21 @@ class MainVM(
         }
     }
 
-    private val _userLiveData = MutableLiveData<UserModel>()
+    private val _userLiveData = MediatorLiveData<UserModel>()
     val userLiveData : LiveData<UserModel> = _userLiveData
 
     init {
-
+        launch (Dispatchers.Main){
+            // TODO store user locally
+            userRepo.getCurrentAccount()?.let { username ->
+                val user = userRepo.retrieveUser(username)
+                _userLiveData.postValue(user)
+            }
+        }
     }
 
     override fun onUserSelected() {
-        GlobalScope.launch {
+        launch {
             val name = userRepo.getCurrentAccount()
             if (name == null) {
                 // no account currently selected

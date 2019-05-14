@@ -6,8 +6,9 @@ import com.relic.data.deserializer.UserDeserializerImpl
 import com.relic.data.models.UserModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 
@@ -64,7 +65,7 @@ class UserRepositoryImpl (
         val selfEndpoint = "$ENDPOINT/api/v1/me"
         var username : String? = null
 
-        runBlocking {
+        withContext (Dispatchers.IO){
             try {
                 // create the new request and submit it
                 val response = requestManager.processRequest(

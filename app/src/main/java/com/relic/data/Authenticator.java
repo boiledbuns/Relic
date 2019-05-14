@@ -214,6 +214,7 @@ public class Authenticator {
       callback.onAuthenticated();
 
     } catch (ParseException e) {
+        // TODO remove toast code. It has no business being here
       Toast.makeText(appContext, "yikes", Toast.LENGTH_SHORT).show();
     }
   }

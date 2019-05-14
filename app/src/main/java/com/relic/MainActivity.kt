@@ -22,6 +22,7 @@ import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 
 import com.relic.data.Authenticator
+import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
@@ -34,6 +35,8 @@ import com.relic.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.navigation_header.*
+import kotlinx.android.synthetic.main.navigation_header.view.*
 
 import javax.inject.Inject
 
@@ -60,7 +63,6 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     private lateinit var relicGD: GestureDetectorCompat
 
     private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
-    private var username :String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,9 +80,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.nonNull().observe (lifecycleOwner) { user ->
-            navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).text = user.name
-        }
+        mainVM.userLiveData.nonNull().observe (lifecycleOwner) { setUser(it)}
     }
 
     private fun initNavDrawer() {
@@ -88,15 +88,8 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
         // TODO remove hardcoded username and switch to username used by currently logged in user
         navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).apply {
-            if (username == null) {
-                setOnClickListener {
-                    // create the login activity for the user
-                    LoginActivity.startForResult(this@MainActivity)
-                    navigationDrawer.closeDrawers()
-                }
-            }
-            else {
-                setOnClickListener {
+            setOnClickListener {
+                mainVM.userLiveData.value?.let {
                     val displayUserFrag = DisplayUserFragment.create(text.toString())
 
                     supportFragmentManager
@@ -104,9 +97,11 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                         .replace(R.id.main_content_frame, displayUserFrag)
                         .addToBackStack(TAG)
                         .commit()
-
-                    navigationDrawer.closeDrawers()
+                } ?: run {
+                    LoginActivity.startForResult(this@MainActivity)
                 }
+
+                navigationDrawer.closeDrawers()
             }
         }
     }
@@ -175,6 +170,12 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     private fun handlePreferenceChanges(changedPreferenceLinks : ArrayList <PreferenceLink> ) {
         // TODO handle each set of changed preferences properly when we add new ones
         recreate()
+    }
+
+    private fun setUser(userModel : UserModel) {
+        username.text = userModel.name
+        linkKarma.text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
+        commentKarma.text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
     }
 
     // region navigation view handlers

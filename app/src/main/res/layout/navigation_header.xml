@@ -22,7 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
-        android:text="Link Karma: 400"
         android:id="@+id/linkKarma"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,7 +31,6 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
-        android:text="Comment Karma: 20"
         android:id="@+id/commentKarma"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

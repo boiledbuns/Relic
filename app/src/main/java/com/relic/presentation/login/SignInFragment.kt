@@ -3,8 +3,8 @@ package com.relic.presentation.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentActivity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +39,7 @@ class SignInFragment: RelicFragment(), CoroutineScope {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // TODO add exit option to allow user to go back
         return inflater.inflate(R.layout.web_auth, container, false)?.apply {
             val webView = findViewById<WebView>(R.id.auth_web_view)
             // sets client to allow view to open in app
@@ -69,18 +70,24 @@ class SignInFragment: RelicFragment(), CoroutineScope {
         }
 
         override fun onAuthenticated() {
-            launch (Dispatchers.IO) {
+            val handler = CoroutineExceptionHandler { _, e ->
+                // TODO add option to show more details and retry
+                Snackbar.make(
+                    web_auth_rootview,
+                    "Authentication unsuccessful",
+                    Snackbar.LENGTH_INDEFINITE
+                ).show()
+            }
+
+            launch(Dispatchers.Main + handler) {
                 userRepo.retrieveSelf()!!.let { name ->
                     userRepo.addAuthenticatedAccount(name)
                     userRepo.setCurrentAccount(name)
                 }
 
-
-                activity?.setResult(Activity.RESULT_OK, Intent())
-                withContext(Dispatchers.Main) {
-                    Log.d(TAG, "ok looks gucci $activity")
-                    auth_web_view.destroy()
-                    activity?.finish()
+                activity?.apply {
+                    setResult(Activity.RESULT_OK, Intent())
+                    onBackPressed()
                 }
             }
         }
