@@ -1,11 +1,15 @@
 package com.relic.data
 
+import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
+import com.relic.data.deserializer.AccountDeserializerImpl
+import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.UserDeserializerImpl
 import com.relic.data.models.UserModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -22,10 +26,13 @@ class UserRepositoryImpl (
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
-
     private val KEY_USERNAMES = "PREF_USERNAMES"
 
+    private val appDB = ApplicationDB.getDatabase(appContext)
+    private val accountDao = appDB.accountDao
+
     private val userDeserializer = UserDeserializerImpl(appContext)
+    private val accountDeserializer : Contract.AccountDeserializer = AccountDeserializerImpl(appContext)
     private val jsonParser: JSONParser = JSONParser()
 
     override suspend fun retrieveUser(username: String): UserModel? {
@@ -119,4 +126,26 @@ class UserRepositoryImpl (
     override fun getCurrentAccount(): String? = appContext
         .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
         .getString(KEY_CURR_ACCOUNT, null)
+
+    override suspend fun getAuthenticatedAccounts(): LiveData<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override suspend fun retrieveAccount(name : String) {
+        val prefEndpoint = "$ENDPOINT/api/v1/me/prefs"
+
+        coroutineScope {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = prefEndpoint
+            )
+
+            Log.d(TAG, response)
+            val accountEntity = accountDeserializer.parseUser(response)
+            withContext(Dispatchers.IO) {
+                accountDao.insertAuthenticatedUser(accountEntity)
+            }
+        }
+    }
+
 }

@@ -1,10 +1,7 @@
 package com.relic.data.deserializer
 
 import com.relic.data.PostRepository
-import com.relic.data.entities.CommentEntity
-import com.relic.data.entities.ListingEntity
-import com.relic.data.entities.PostEntity
-import com.relic.data.entities.PostSourceEntity
+import com.relic.data.entities.*
 import com.relic.data.models.CommentModel
 import com.relic.data.models.UserModel
 import org.json.simple.JSONObject
@@ -43,6 +40,10 @@ interface Contract {
 
     interface UserDeserializer {
         suspend fun parseUser(userResponse: String, trophiesResponse : String) : UserModel
+    }
+
+    interface AccountDeserializer {
+        suspend fun parseUser(accountResponse : String) : AccountEntity
     }
 
 }

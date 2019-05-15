@@ -1,5 +1,6 @@
 package com.relic.data
 
+import android.arch.lifecycle.LiveData
 import com.relic.data.models.UserModel
 
 interface UserRepository {
@@ -20,11 +21,18 @@ interface UserRepository {
     suspend fun setCurrentAccount(username : String)
 
     /**
+     * sets an account from the list of authenticated account as the current one
+     */
+    suspend fun getAuthenticatedAccounts() : LiveData<String>
+
+    /**
      * gets the current account in use
      */
     fun getCurrentAccount() : String?
 
     // endregion user authenticated functions
+
+    suspend fun retrieveAccount(name : String)
 }
 
 sealed class UserRepoException : Exception() {

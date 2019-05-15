@@ -5,17 +5,20 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.relic.data.dao.AccountDao;
 import com.relic.data.dao.CommentDao;
 import com.relic.data.dao.ListingDao;
 import com.relic.data.dao.PostDao;
 import com.relic.data.dao.PostSourceDao;
 import com.relic.data.dao.SubredditDao;
 import com.relic.data.dao.UserPostingDao;
+import com.relic.data.entities.AccountEntity;
 import com.relic.data.entities.CommentEntity;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
 import com.relic.data.entities.PostSourceEntity;
 import com.relic.data.entities.SubredditEntity;
+import com.relic.data.models.AccountModel;
 
 @Database(
     entities = {
@@ -23,7 +26,8 @@ import com.relic.data.entities.SubredditEntity;
         PostEntity.class,
         PostSourceEntity.class,
         ListingEntity.class,
-        CommentEntity.class
+        CommentEntity.class,
+        AccountEntity.class
     },
     version = 7,
     exportSchema = false
@@ -37,6 +41,7 @@ public abstract class ApplicationDB extends RoomDatabase{
   public abstract ListingDao getListingDAO();
   public abstract CommentDao getCommentDAO();
   public abstract UserPostingDao getUserPostingDao();
+  public abstract AccountDao getAccountDao();
 
     public static ApplicationDB getDatabase(Context context) {
     if(INSTANCE == null) {

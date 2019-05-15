@@ -31,8 +31,10 @@ class MainVM(
         launch (Dispatchers.Main){
             // TODO store user locally
             userRepo.getCurrentAccount()?.let { username ->
-                val user = userRepo.retrieveUser(username)
-                _userLiveData.postValue(user)
+                userRepo.retrieveUser(username)?.let { user ->
+                    _userLiveData.postValue(user)
+                    userRepo.retrieveAccount(user.name)
+                }
             }
         }
     }
@@ -43,9 +45,8 @@ class MainVM(
             if (name == null) {
                 // no account currently selected
             } else {
-                userRepo.retrieveUser(name).apply {
-                    _userLiveData.postValue(this)
-                }
+                val user = userRepo.retrieveUser(name)
+                _userLiveData.postValue(user)
             }
         }
     }

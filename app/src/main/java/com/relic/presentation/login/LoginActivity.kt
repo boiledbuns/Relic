@@ -30,7 +30,6 @@ class LoginActivity : AppCompatActivity(), CoroutineScope {
     }
 
     companion object {
-        val KEY_RESULT_LOGIN = "key_result_login"
 
         fun startForResult(fromActivity : Activity) {
             Intent(fromActivity, LoginActivity::class.java).let { intent ->
