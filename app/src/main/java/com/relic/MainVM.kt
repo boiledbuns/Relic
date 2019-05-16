@@ -1,10 +1,13 @@
 package com.relic
 
 import android.arch.lifecycle.*
+import android.util.Log
 import com.relic.data.Authenticator
 import com.relic.data.UserRepository
 import com.relic.data.models.UserModel
+import com.relic.data.repository.RepoError
 import kotlinx.coroutines.*
+import java.lang.Exception
 import javax.inject.Inject
 
 class MainVM(
@@ -28,14 +31,23 @@ class MainVM(
     val userLiveData : LiveData<UserModel> = _userLiveData
 
     init {
-        launch (Dispatchers.Main){
-            // TODO store user locally
+        val handler = CoroutineExceptionHandler { _, e ->
+            // TODO handle exception
+            Log.d(TAG, "caught exception $e")
+        }
+
+        launch(Dispatchers.Main + handler) {
             userRepo.getCurrentAccount()?.let { username ->
-                userRepo.retrieveUser(username)?.let { user ->
-                    _userLiveData.postValue(user)
-                    userRepo.retrieveAccount(user.name)
+                // retrieve current user
+                val user = userRepo.retrieveUser(username)
+                _userLiveData.postValue(user)
+                Log.d(TAG, "user $user")
+
+            user?.let {
+                    userRepo.retrieveAccount(it.name)
                 }
             }
+
         }
     }
 

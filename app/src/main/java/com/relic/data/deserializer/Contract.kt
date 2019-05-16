@@ -43,7 +43,7 @@ interface Contract {
     }
 
     interface AccountDeserializer {
-        suspend fun parseUser(accountResponse : String) : AccountEntity
+        suspend fun parseAccount(accountResponse : String) : AccountEntity
     }
 
 }
@@ -59,3 +59,5 @@ data class ParsedPostsData(
     val commentEntities : List<CommentEntity>,
     val listingEntity: ListingEntity
 )
+
+class DeserializationException(message : String, cause : Throwable) : Exception(message, cause)

@@ -23,6 +23,7 @@ class NetworkRequestManager (
         volleyQueue.add(relicRequest)
     }
 
+    @Throws(VolleyError::class)
     suspend fun processRequest (
         method: Int,
         url: String,
@@ -37,6 +38,7 @@ class NetworkRequestManager (
             },
             Response.ErrorListener { e: VolleyError ->
                 cont.resumeWithException(e)
+
             },
             authToken ?: checkToken(),
             data

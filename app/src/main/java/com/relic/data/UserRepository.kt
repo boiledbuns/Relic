@@ -2,6 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import com.relic.data.models.UserModel
+import com.relic.data.repository.RepoError
 
 interface UserRepository {
     suspend fun retrieveUser(username : String) : UserModel?
@@ -32,6 +33,7 @@ interface UserRepository {
 
     // endregion user authenticated functions
 
+    @Throws(RepoError::class)
     suspend fun retrieveAccount(name : String)
 }
 

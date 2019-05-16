@@ -3,18 +3,20 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
+import com.android.volley.AuthFailureError
+import com.android.volley.VolleyError
 import com.relic.data.deserializer.AccountDeserializerImpl
 import com.relic.data.deserializer.Contract
+import com.relic.data.deserializer.DeserializationException
 import com.relic.data.deserializer.UserDeserializerImpl
 import com.relic.data.models.UserModel
+import com.relic.data.repository.RepoError
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
+import kotlin.coroutines.coroutineContext
 
 class UserRepositoryImpl (
     private val appContext: Context,
@@ -46,22 +48,23 @@ class UserRepositoryImpl (
                 // create the new request and submit it
                 val userResponse = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
-                    url = userEndpoint
+                    url = userEndpoint,
+                    authToken = Authenticator.checkToken(appContext)
                 )
 
                 // create the new request and submit it
                 val trophiesResponse = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
-                    url = trophiesEndpoint
+                    url = trophiesEndpoint,
+                    authToken = Authenticator.checkToken(appContext)
                 )
 
                 Log.d(TAG, "more posts $userResponse")
                 Log.d(TAG, "trophies $trophiesResponse")
 
                 userModel = userDeserializer.parseUser(userResponse, trophiesResponse)
-
             } catch (e: Exception) {
-                Log.d(TAG, "Error retrieving user from ($userEndpoint) " + e.message)
+                throw transformException("retrieving user from $userEndpoint", e)
             }
         }
 
@@ -82,9 +85,8 @@ class UserRepositoryImpl (
 
                 val responseJson = jsonParser.parse(response) as JSONObject
                 username = responseJson["name"] as String
-
             } catch (e: Exception) {
-                Log.d(TAG, "Error retrieving user from ($selfEndpoint) " + e.message)
+                throw transformException("Error retrieving self from $selfEndpoint", e)
             }
         }
 
@@ -133,19 +135,41 @@ class UserRepositoryImpl (
 
     override suspend fun retrieveAccount(name : String) {
         val prefEndpoint = "$ENDPOINT/api/v1/me/prefs"
-
         coroutineScope {
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = prefEndpoint
-            )
+            val retrieveResult = launch {
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = prefEndpoint,
+                    authToken = Authenticator.checkToken(appContext)
+                )
+                Log.d(TAG, response)
 
-            Log.d(TAG, response)
-            val accountEntity = accountDeserializer.parseUser(response)
-            withContext(Dispatchers.IO) {
-                accountDao.insertAuthenticatedUser(accountEntity)
+                val accountEntity = accountDeserializer.parseAccount(response)
+                withContext(Dispatchers.IO) {
+                    accountDao.insertAuthenticatedUser(accountEntity)
+                }
+            }
+
+            try {
+                retrieveResult.join()
+            } catch (e : Exception) {
+                throw transformException("retrieving account from endpoint $prefEndpoint", e)
             }
         }
     }
 
+    /**
+     * Transforms library specific exceptions into more generic exceptions tied to repo interface
+     * A bit overkill, but I'd prefer to have finer control over exception structure
+     */
+    private fun transformException(method : String, e : Throwable) : RepoError {
+        Log.d(TAG, e.toString())
+        val message = when (e) {
+            is DeserializationException -> "Error deserializing response from server"
+            is VolleyError -> "Error retrieving response from server"
+            else -> "Uncaught exception "
+        }
+
+        return RepoError(message, e)
+    }
 }

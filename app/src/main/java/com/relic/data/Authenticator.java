@@ -291,4 +291,13 @@ public class Authenticator {
     }
   }
 
+  public static String checkToken(Context appContext) {
+    // retrieve the auth token shared preferences
+    String authKey = appContext.getResources().getString(R.string.AUTH_PREF);
+    String tokenKey = appContext.getResources().getString(R.string.TOKEN_KEY);
+    return appContext
+        .getSharedPreferences(authKey, Context.MODE_PRIVATE)
+        .getString(tokenKey, "");
+  }
+
 }

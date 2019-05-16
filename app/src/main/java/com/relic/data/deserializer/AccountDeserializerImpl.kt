@@ -3,7 +3,10 @@ package com.relic.data.deserializer
 import android.content.Context
 import android.util.Log
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonSyntaxException
 import com.relic.data.entities.AccountEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 
@@ -15,16 +18,20 @@ class AccountDeserializerImpl(
     private val gson = GsonBuilder().create()
     private val jsonParser: JSONParser = JSONParser()
 
-    override suspend fun parseUser(accountResponse: String): AccountEntity {
-        val account = jsonParser.parse(accountResponse) as JSONObject
-
+    override suspend fun parseAccount(accountResponse: String): AccountEntity {
 //        Log.d(TAG, accountResponse)
 //        Log.d(TAG, account.keys.toString())
 //        for (key in account.keys){
 //            Log.d(TAG, key.toString() + " " + account[key].toString())
 //        }
-
-        return gson.fromJson(accountResponse, AccountEntity::class.java)
+        return withContext(Dispatchers.Default) {
+            try {
+                gson.fromJson(accountResponse, AccountEntity::class.java)
+            }
+            catch (e : JsonSyntaxException){
+                throw DeserializationException("error parsing account", e)
+            }
+        }
     }
 
 }
