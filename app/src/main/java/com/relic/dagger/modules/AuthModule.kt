@@ -1,7 +1,7 @@
 package com.relic.dagger.modules
 
 import android.content.Context
-import com.relic.data.auth.AuthenticatorImpl
+import com.relic.data.auth.AuthImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -11,8 +11,8 @@ class AuthModule (private val applicationContext : Context) {
 
     @Provides
     @Singleton
-    fun provideAuthModule() : AuthenticatorImpl {
-        return AuthenticatorImpl(applicationContext)
+    fun provideAuthModule() : AuthImpl {
+        return AuthImpl(applicationContext)
     }
 }
 

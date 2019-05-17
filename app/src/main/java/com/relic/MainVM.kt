@@ -2,7 +2,7 @@ package com.relic
 
 import android.arch.lifecycle.*
 import android.util.Log
-import com.relic.data.auth.AuthenticatorImpl
+import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
@@ -11,7 +11,7 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class MainVM(
-    private val auth : AuthenticatorImpl,
+    private val auth : AuthImpl,
     private val userRepo : UserRepository
 ) : MainContract.VM, CoroutineScope, ViewModel() {
     val TAG = "MAIN_VM"
@@ -22,7 +22,7 @@ class MainVM(
     }
 
     class Factory @Inject constructor(
-        private val auth : AuthenticatorImpl,
+        private val auth : AuthImpl,
         private val userRepo : UserRepository
     ) {
         fun create () : MainVM {
@@ -37,31 +37,34 @@ class MainVM(
     val userLiveData : LiveData<UserModel> = _userLiveData
 
     init {
-        launch(Dispatchers.Main) {
-            // TODO convert callback to suspend
-            auth.refreshToken(AuthenticationCallback { Log.d(TAG, "Token refreshed") })
-
-            userRepo.getCurrentAccount()?.let { username ->
-                // retrieve current user
-                val user = userRepo.retrieveUser(username)
-                _userLiveData.postValue(user)
-                Log.d(TAG, "user $user")
-
-            user?.let {
-                    userRepo.retrieveAccount(it.name)
-                }
-            }
-        }
+        auth.refreshToken(AuthenticationCallback {
+            Log.d(TAG, "Token refreshed")
+            onAuthenticated()
+        })
     }
 
     override fun onUserSelected() {
         launch(Dispatchers.Main) {
-            val name = userRepo.getCurrentAccount()
-            if (name == null) {
+            val user = userRepo.retrieveCurrentUser()
+            if (user == null) {
                 // no account currently selected
             } else {
-                val user = userRepo.retrieveUser(name)
+                val user = userRepo.retrieveUser(user.name)
                 _userLiveData.postValue(user)
+            }
+        }
+    }
+
+    private fun onAuthenticated() {
+        launch(Dispatchers.Main) {
+            userRepo.retrieveCurrentUser()?.let { user ->
+                // retrieve current user
+                _userLiveData.postValue(user)
+                Log.d(TAG, "user $user")
+
+                user?.let {
+                    userRepo.retrieveAccount(it.name)
+                }
             }
         }
     }

@@ -4,14 +4,13 @@ import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
 import com.android.volley.VolleyError
-import com.relic.data.auth.AuthenticatorImpl
+import com.relic.data.auth.AuthImpl
 import com.relic.data.deserializer.AccountDeserializerImpl
 import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.DeserializationException
 import com.relic.data.deserializer.UserDeserializerImpl
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
-import com.relic.data.repository.RepoError
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
@@ -28,7 +27,6 @@ class UserRepositoryImpl (
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
-    private val KEY_USERNAMES = "PREF_USERNAMES"
 
     private val appDB = ApplicationDB.getDatabase(appContext)
     private val accountDao = appDB.accountDao
@@ -37,41 +35,7 @@ class UserRepositoryImpl (
     private val accountDeserializer : Contract.AccountDeserializer = AccountDeserializerImpl(appContext)
     private val jsonParser: JSONParser = JSONParser()
 
-    override suspend fun retrieveUser(username: String): UserModel? {
-        val userEndpoint = "$ENDPOINT/user/$username/about"
-        val trophiesEndpoint = "$ENDPOINT/api/v1/user/$username/trophies"
-
-        var userModel : UserModel? = null
-
-        coroutineScope {
-            try {
-                // create the new request and submit it
-                val userResponse = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = userEndpoint,
-                    authToken = AuthenticatorImpl.checkToken(appContext)
-                )
-
-                // create the new request and submit it
-                val trophiesResponse = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = trophiesEndpoint,
-                    authToken = AuthenticatorImpl.checkToken(appContext)
-                )
-
-                Log.d(TAG, "more posts $userResponse")
-                Log.d(TAG, "trophies $trophiesResponse")
-
-                userModel = userDeserializer.parseUser(userResponse, trophiesResponse)
-            } catch (e: Exception) {
-                throw transformException("retrieving user from $userEndpoint", e)
-            }
-        }
-
-        return userModel
-    }
-
-    override suspend fun retrieveSelf(): String? {
+    override suspend fun retrieveUsername(): String? {
         val selfEndpoint = "$ENDPOINT/api/v1/me"
         var username : String? = null
 
@@ -93,41 +57,54 @@ class UserRepositoryImpl (
         return username
     }
 
-    override suspend fun addAuthenticatedAccount(username: String) {
+    override suspend fun retrieveUser(username: String): UserModel? {
+        val userEndpoint = "$ENDPOINT/user/$username/about"
+        val trophiesEndpoint = "$ENDPOINT/api/v1/user/$username/trophies"
+
+        var userModel : UserModel? = null
+
         coroutineScope {
-            appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
-                // get list of authenticated accounts
-                val accounts = sp.getStringSet(KEY_USERNAMES, HashSet())!!
-                // user should not be logging in to already logged in account
-                if (accounts.contains(username)) {
-                    throw UserRepoException.UserAlreadyAuthenticated
-                }
-                else {
-                    accounts.add(username)
-                    // stores the selected user in shared preferences
-                    sp.edit().putStringSet(KEY_USERNAMES, accounts).apply()
-                }
+            try {
+                // create the new request and submit it
+                val userResponse = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = userEndpoint,
+                    authToken = AuthImpl.checkToken(appContext)
+                )
+
+                // create the new request and submit it
+                val trophiesResponse = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = trophiesEndpoint,
+                    authToken = AuthImpl.checkToken(appContext)
+                )
+
+                Log.d(TAG, "more posts $userResponse")
+                Log.d(TAG, "trophies $trophiesResponse")
+
+                userModel = userDeserializer.parseUser(userResponse, trophiesResponse)
+            } catch (e: Exception) {
+                throw transformException("retrieving user from $userEndpoint", e)
             }
         }
+
+        return userModel
+    }
+
+    override suspend fun retrieveCurrentUser(): UserModel? {
+        val name = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
+            .getString(KEY_CURR_ACCOUNT, null)
+
+        return retrieveUser(name)
     }
 
     override suspend fun setCurrentAccount(username: String) {
         coroutineScope {
             appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
-                // checks if account being set has been authenticated
-                val accounts = sp.getStringSet(KEY_USERNAMES, HashSet())!!
-                if (accounts.contains(username)) {
-                    sp.edit().putString(KEY_CURR_ACCOUNT, username)?.apply()
-                } else {
-                    throw UserRepoException.UserNotAuthenticated
-                }
+                sp.edit().putString(KEY_CURR_ACCOUNT, username)?.apply()
             }
         }
     }
-
-    override fun getCurrentAccount(): String? = appContext
-        .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
-        .getString(KEY_CURR_ACCOUNT, null)
 
     override suspend fun getAccounts(): LiveData<List<AccountModel>> {
         return accountDao.getAccounts()
@@ -140,7 +117,7 @@ class UserRepositoryImpl (
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
                     url = prefEndpoint,
-                    authToken = AuthenticatorImpl.checkToken(appContext)
+                    authToken = AuthImpl.checkToken(appContext)
                 )
                 Log.d(TAG, response)
 
@@ -162,14 +139,12 @@ class UserRepositoryImpl (
      * Transforms library specific exceptions into more generic exceptions tied to repo interface
      * A bit overkill, but I'd prefer to have finer control over exception structure
      */
-    private fun transformException(method : String, e : Throwable) : RepoError {
+    private fun transformException(method : String, e : Throwable) : UserRepoError {
         Log.d(TAG, e.toString())
-        val message = when (e) {
-            is DeserializationException -> "Error deserializing response from server"
-            is VolleyError -> "Error retrieving response from server"
-            else -> "Uncaught exception"
+        return when (e) {
+            is VolleyError-> UserRepoError.Retrieval(method, e)
+            is DeserializationException -> UserRepoError.Deserialization(method, e)
+            else -> UserRepoError.Unknown(e)
         }
-
-        return RepoError(message, e)
     }
 }

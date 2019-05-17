@@ -9,7 +9,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.relic.R;
-import com.relic.data.auth.AuthenticatorImpl;
+import com.relic.data.auth.AuthImpl;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.gateway.SubGateway;
 import com.relic.data.gateway.SubGatewayImpl;
@@ -40,7 +40,7 @@ public class SubRepositoryImpl implements SubRepository {
   private Gson gson;
 
   public SubRepositoryImpl(Context context, NetworkRequestManager networkRequestManager) {
-    AuthenticatorImpl auth = new AuthenticatorImpl(context);
+    AuthImpl auth = new AuthImpl(context);
     requestManager = networkRequestManager;
     this.context = context;
     parser = new JSONParser();

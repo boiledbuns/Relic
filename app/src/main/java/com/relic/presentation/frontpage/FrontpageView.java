@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.relic.R;
-import com.relic.data.auth.AuthenticatorImpl;
+import com.relic.data.auth.AuthImpl;
 import com.relic.data.PostRepository;
 import com.relic.data.PostRepositoryImpl;
 import com.relic.network.NetworkRequestManager;
@@ -30,7 +30,7 @@ public class FrontpageView extends Fragment {
 
     // initializes the instance of the post repo and injects it into the ViewModel
     PostRepository postRepo = new PostRepositoryImpl(getContext(), new NetworkRequestManager(getContext()));
-    AuthenticatorImpl auth = new AuthenticatorImpl(getContext());
+    AuthImpl auth = new AuthImpl(getContext());
 
     viewModel = ViewModelProviders.of(this).get(FrontpageVM.class);
     viewModel.init(postRepo, auth);

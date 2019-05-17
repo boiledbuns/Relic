@@ -11,6 +11,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.relic.R
+import com.relic.data.Auth
 import com.relic.network.VolleyQueue
 import com.relic.presentation.callbacks.AuthenticationCallback
 
@@ -25,7 +26,7 @@ import java.util.HashMap
 /**
  * Singleton instance of the authenticator because we should be able to
  */
-class AuthenticatorImpl (private val appContext: Context) {
+class AuthImpl (private val appContext: Context) : Auth {
     private val TAG = "AUTHENTICATOR"
 
     private val preference: String
@@ -114,9 +115,9 @@ class AuthenticatorImpl (private val appContext: Context) {
 
 
     /**
-     * Refreshes the current access token using the refresh token by getting a new one
+     * gets a new current access token using the refresh token
      */
-    fun refreshToken(callback: AuthenticationCallback) {
+    override fun refreshToken(callback: AuthenticationCallback) {
         requestQueue.add(
             RedditGetRefreshRequest(
                 Request.Method.POST,

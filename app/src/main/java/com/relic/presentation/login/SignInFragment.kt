@@ -13,7 +13,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.relic.R
-import com.relic.data.auth.AuthenticatorImpl
+import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.data.UserRepositoryImpl
 import com.relic.network.NetworkRequestManager
@@ -26,14 +26,14 @@ class SignInFragment: RelicFragment(), CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
-    lateinit var auth : AuthenticatorImpl
+    lateinit var auth : AuthImpl
     lateinit var userRepo : UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         (activity as FragmentActivity).let {
-            auth = AuthenticatorImpl(it)
+            auth = AuthImpl(it)
             userRepo = UserRepositoryImpl(it, NetworkRequestManager(it))
         }
     }
@@ -80,9 +80,9 @@ class SignInFragment: RelicFragment(), CoroutineScope {
             }
 
             launch(Dispatchers.Main + handler) {
-                userRepo.retrieveSelf()!!.let { name ->
-                    userRepo.addAuthenticatedAccount(name)
+                userRepo.retrieveUsername()?.let { name ->
                     userRepo.setCurrentAccount(name)
+                    userRepo.retrieveCurrentUser()
                 }
 
                 activity?.apply {

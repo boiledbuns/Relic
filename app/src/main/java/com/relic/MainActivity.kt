@@ -21,7 +21,7 @@ import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 
-import com.relic.data.auth.AuthenticatorImpl
+import com.relic.data.auth.AuthImpl
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.AuthenticationCallback
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     @Inject
-    internal lateinit var auth: AuthenticatorImpl
+    internal lateinit var auth: AuthImpl
 
     private lateinit var relicGD: GestureDetectorCompat
 
