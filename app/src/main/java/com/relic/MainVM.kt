@@ -4,6 +4,7 @@ import android.arch.lifecycle.*
 import android.util.Log
 import com.relic.data.Authenticator
 import com.relic.data.UserRepository
+import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
 import com.relic.data.repository.RepoError
 import kotlinx.coroutines.*
@@ -16,7 +17,10 @@ class MainVM(
 ) : MainContract.VM, CoroutineScope, ViewModel() {
     val TAG = "MAIN_VM"
 
-    override val coroutineContext = Dispatchers.Main + SupervisorJob()
+    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
+        // TODO handle exception
+        Log.d(TAG, "caught exception $e")
+    }
 
     class Factory @Inject constructor(
         private val auth : Authenticator,
@@ -27,16 +31,17 @@ class MainVM(
         }
     }
 
+    private val _accountsLiveData = MediatorLiveData<List<AccountModel>>()
     private val _userLiveData = MediatorLiveData<UserModel>()
+
+    val accountsLiveData : LiveData<List<AccountModel>> = _accountsLiveData
     val userLiveData : LiveData<UserModel> = _userLiveData
 
     init {
-        val handler = CoroutineExceptionHandler { _, e ->
-            // TODO handle exception
-            Log.d(TAG, "caught exception $e")
-        }
+        launch(Dispatchers.Main) {
+            // TODO convert callback to suspend
+            auth.refreshToken {  }
 
-        launch(Dispatchers.Main + handler) {
             userRepo.getCurrentAccount()?.let { username ->
                 // retrieve current user
                 val user = userRepo.retrieveUser(username)
@@ -47,12 +52,11 @@ class MainVM(
                     userRepo.retrieveAccount(it.name)
                 }
             }
-
         }
     }
 
     override fun onUserSelected() {
-        launch {
+        launch(Dispatchers.Main) {
             val name = userRepo.getCurrentAccount()
             if (name == null) {
                 // no account currently selected

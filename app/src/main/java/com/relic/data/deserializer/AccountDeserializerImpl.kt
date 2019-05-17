@@ -19,6 +19,7 @@ class AccountDeserializerImpl(
     private val jsonParser: JSONParser = JSONParser()
 
     override suspend fun parseAccount(accountResponse: String): AccountEntity {
+//        val account = jsonParser.parse(accountResponse) as JSONObject
 //        Log.d(TAG, accountResponse)
 //        Log.d(TAG, account.keys.toString())
 //        for (key in account.keys){

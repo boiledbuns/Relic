@@ -22,6 +22,7 @@ import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 
 import com.relic.data.Authenticator
+import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.displayuser.DisplayUserFragment
@@ -80,7 +81,8 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.nonNull().observe (lifecycleOwner) { setUser(it)}
+        mainVM.userLiveData.nonNull().observe (lifecycleOwner) { setUser(it) }
+        mainVM.accountsLiveData.nonNull().observe (lifecycleOwner) { setAccounts(it) }
     }
 
     private fun initNavDrawer() {
@@ -172,11 +174,19 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         recreate()
     }
 
+    // region livedata handlers
+
     private fun setUser(userModel : UserModel) {
         username.text = userModel.name
         linkKarma.text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
         commentKarma.text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
     }
+
+    private fun setAccounts(accounts: List<AccountModel>) {
+        // TODO modify the way accounts are displayed based on number of logged in accounts
+    }
+
+    // endregion livedata handlers
 
     // region navigation view handlers
 

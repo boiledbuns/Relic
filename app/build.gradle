@@ -65,7 +65,6 @@ dependencies {
     implementation "com.android.support:exifinterface:$compile_ver"
     //implementation 'com.android.support:design:27.1.1'
     implementation "com.android.support:design:$compile_ver"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_ver"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_ver"
 
     // Dagger 2

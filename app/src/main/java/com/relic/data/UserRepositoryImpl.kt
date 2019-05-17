@@ -3,12 +3,12 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
-import com.android.volley.AuthFailureError
 import com.android.volley.VolleyError
 import com.relic.data.deserializer.AccountDeserializerImpl
 import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.DeserializationException
 import com.relic.data.deserializer.UserDeserializerImpl
+import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
 import com.relic.data.repository.RepoError
 import com.relic.network.NetworkRequestManager
@@ -16,7 +16,6 @@ import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
-import kotlin.coroutines.coroutineContext
 
 class UserRepositoryImpl (
     private val appContext: Context,
@@ -129,8 +128,8 @@ class UserRepositoryImpl (
         .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
         .getString(KEY_CURR_ACCOUNT, null)
 
-    override suspend fun getAuthenticatedAccounts(): LiveData<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun getAccounts(): LiveData<List<AccountModel>> {
+        return accountDao.getAccounts()
     }
 
     override suspend fun retrieveAccount(name : String) {
@@ -146,7 +145,7 @@ class UserRepositoryImpl (
 
                 val accountEntity = accountDeserializer.parseAccount(response)
                 withContext(Dispatchers.IO) {
-                    accountDao.insertAuthenticatedUser(accountEntity)
+                    accountDao.insertAccount(accountEntity)
                 }
             }
 
@@ -167,7 +166,7 @@ class UserRepositoryImpl (
         val message = when (e) {
             is DeserializationException -> "Error deserializing response from server"
             is VolleyError -> "Error retrieving response from server"
-            else -> "Uncaught exception "
+            else -> "Uncaught exception"
         }
 
         return RepoError(message, e)

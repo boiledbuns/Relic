@@ -1,12 +1,15 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
+import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
 import com.relic.data.repository.RepoError
 
 interface UserRepository {
+    @Throws(RepoError::class)
     suspend fun retrieveUser(username : String) : UserModel?
 
+    @Throws(RepoError::class)
     suspend fun retrieveSelf() : String?
 
     // region user authenticated functions
@@ -24,7 +27,7 @@ interface UserRepository {
     /**
      * sets an account from the list of authenticated account as the current one
      */
-    suspend fun getAuthenticatedAccounts() : LiveData<String>
+    suspend fun getAccounts() : LiveData<List<AccountModel>>
 
     /**
      * gets the current account in use

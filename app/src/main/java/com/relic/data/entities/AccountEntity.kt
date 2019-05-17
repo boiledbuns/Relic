@@ -22,7 +22,7 @@ class AccountEntity {
     var search_include_over_18 : Boolean = false
 
     @ColumnInfo(name = "defaultCommentSort")
-    var default_comment_sort : Boolean = false
+    var default_comment_sort : String = ""
 
     @ColumnInfo(name = "minLinkScore")
     var min_link_score : Int = 0
@@ -41,6 +41,4 @@ class AccountEntity {
 
     @ColumnInfo(name = "acceptPMs")
     var accept_pms : String = ""
-
-
 }

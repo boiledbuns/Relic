@@ -30,6 +30,8 @@
     <color name="edited">#ff5722</color>
 
     <color name="discussion_tag">#1A8B0C</color>
+    <!-- TODO add ability to customize tag colour based on favourite domains-->
+    <color name="domain_tag">#03A9F4</color>
     <color name="negative_text">#ffffff</color>
 
     <color name="positive">#1A8B0C</color>

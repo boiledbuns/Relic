@@ -113,6 +113,7 @@
                 android:visibility="gone"
                 android:layout_marginEnd="@dimen/padding_s"
                 android:background="@drawable/tag"
+                android:backgroundTint="@color/discussion_tag"
                 android:textSize="@dimen/text_m2"
                 android:textColor="@color/negative_text"
                 tools:visibility="visible"
@@ -125,9 +126,10 @@
                 android:layout_below="@id/postItemAuthorView"
                 android:layout_toEndOf="@id/postItemTagView"
                 android:visibility="gone"
-                android:background="@drawable/tag"
                 android:textSize="@dimen/text_m2"
                 android:textColor="@color/negative_text"
+                android:background="@drawable/tag"
+                android:backgroundTint="@color/domain_tag"
                 tools:visibility="visible"
                 tools:text="v.reddit"/>
 
