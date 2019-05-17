@@ -21,7 +21,7 @@ import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 
-import com.relic.data.Authenticator
+import com.relic.data.auth.AuthenticatorImpl
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
 import com.relic.presentation.callbacks.AuthenticationCallback
@@ -37,7 +37,6 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.navigation_header.*
-import kotlinx.android.synthetic.main.navigation_header.view.*
 
 import javax.inject.Inject
 
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     @Inject
-    internal lateinit var auth: Authenticator
+    internal lateinit var auth: AuthenticatorImpl
 
     private lateinit var relicGD: GestureDetectorCompat
 

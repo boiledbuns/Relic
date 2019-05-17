@@ -5,28 +5,24 @@ import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 
-import com.relic.data.Authenticator
+import com.relic.data.auth.AuthenticatorImpl
 import com.relic.data.ListingRepository
 import com.relic.data.SubRepository
 import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.data.models.SubredditModel
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DisplaySubsVM (
         private val subRepository: SubRepository,
         private val listingRepository: ListingRepository,
-        private val authenticator: Authenticator
+        private val authenticator: AuthenticatorImpl
 ) : ViewModel(), DisplaySubsContract.VM, AuthenticationCallback, SubInfoDialogContract.Delegate {
 
     class Factory @Inject constructor(
             private val subRepository: SubRepository,
             private val listingRepository: ListingRepository,
-            private val authenticator: Authenticator
+            private val authenticator: AuthenticatorImpl
     ) {
         fun create() : DisplaySubsVM{
             return DisplaySubsVM(subRepository, listingRepository, authenticator)

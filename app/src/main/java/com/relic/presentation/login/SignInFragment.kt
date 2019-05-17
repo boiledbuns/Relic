@@ -13,7 +13,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.relic.R
-import com.relic.data.Authenticator
+import com.relic.data.auth.AuthenticatorImpl
 import com.relic.data.UserRepository
 import com.relic.data.UserRepositoryImpl
 import com.relic.network.NetworkRequestManager
@@ -26,14 +26,14 @@ class SignInFragment: RelicFragment(), CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
-    lateinit var auth : Authenticator
+    lateinit var auth : AuthenticatorImpl
     lateinit var userRepo : UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         (activity as FragmentActivity).let {
-            auth = Authenticator(it)
+            auth = AuthenticatorImpl(it)
             userRepo = UserRepositoryImpl(it, NetworkRequestManager(it))
         }
     }

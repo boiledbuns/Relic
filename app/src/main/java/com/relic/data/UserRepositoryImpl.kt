@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
 import com.android.volley.VolleyError
+import com.relic.data.auth.AuthenticatorImpl
 import com.relic.data.deserializer.AccountDeserializerImpl
 import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.DeserializationException
@@ -48,14 +49,14 @@ class UserRepositoryImpl (
                 val userResponse = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
                     url = userEndpoint,
-                    authToken = Authenticator.checkToken(appContext)
+                    authToken = AuthenticatorImpl.checkToken(appContext)
                 )
 
                 // create the new request and submit it
                 val trophiesResponse = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
                     url = trophiesEndpoint,
-                    authToken = Authenticator.checkToken(appContext)
+                    authToken = AuthenticatorImpl.checkToken(appContext)
                 )
 
                 Log.d(TAG, "more posts $userResponse")
@@ -139,7 +140,7 @@ class UserRepositoryImpl (
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
                     url = prefEndpoint,
-                    authToken = Authenticator.checkToken(appContext)
+                    authToken = AuthenticatorImpl.checkToken(appContext)
                 )
                 Log.d(TAG, response)
 

@@ -2,17 +2,16 @@ package com.relic
 
 import android.arch.lifecycle.*
 import android.util.Log
-import com.relic.data.Authenticator
+import com.relic.data.auth.AuthenticatorImpl
 import com.relic.data.UserRepository
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
-import com.relic.data.repository.RepoError
+import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.*
-import java.lang.Exception
 import javax.inject.Inject
 
 class MainVM(
-    private val auth : Authenticator,
+    private val auth : AuthenticatorImpl,
     private val userRepo : UserRepository
 ) : MainContract.VM, CoroutineScope, ViewModel() {
     val TAG = "MAIN_VM"
@@ -23,7 +22,7 @@ class MainVM(
     }
 
     class Factory @Inject constructor(
-        private val auth : Authenticator,
+        private val auth : AuthenticatorImpl,
         private val userRepo : UserRepository
     ) {
         fun create () : MainVM {
@@ -40,7 +39,7 @@ class MainVM(
     init {
         launch(Dispatchers.Main) {
             // TODO convert callback to suspend
-            auth.refreshToken {  }
+            auth.refreshToken(AuthenticationCallback { Log.d(TAG, "Token refreshed") })
 
             userRepo.getCurrentAccount()?.let { username ->
                 // retrieve current user
