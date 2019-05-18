@@ -106,7 +106,7 @@ class UserRepositoryImpl (
         }
     }
 
-    override suspend fun getAccounts(): LiveData<List<AccountModel>> {
+    override fun getAccounts(): LiveData<List<AccountModel>> {
         return accountDao.getAccounts()
     }
 
@@ -121,7 +121,10 @@ class UserRepositoryImpl (
                 )
                 Log.d(TAG, response)
 
-                val accountEntity = accountDeserializer.parseAccount(response)
+                val accountEntity = accountDeserializer.parseAccount(response).apply{
+                    // need to manually specify name here
+                    this.name = name
+                }
                 withContext(Dispatchers.IO) {
                     accountDao.insertAccount(accountEntity)
                 }

@@ -15,6 +15,9 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
@@ -24,7 +27,6 @@ import com.relic.dagger.modules.UtilModule
 import com.relic.data.auth.AuthImpl
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
-import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
@@ -40,7 +42,7 @@ import kotlinx.android.synthetic.main.navigation_header.*
 
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), AuthenticationCallback {
+class MainActivity : AppCompatActivity() {
     internal val TAG = "MAIN_ACTIVITY"
 
     private val mainVM by lazy {
@@ -64,6 +66,9 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
     private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
 
+
+    // region lifecycle hooks
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,15 +85,15 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.nonNull().observe (lifecycleOwner) { setUser(it) }
+        mainVM.userLiveData.observe (lifecycleOwner) { setUser(it) }
         mainVM.accountsLiveData.nonNull().observe (lifecycleOwner) { setAccounts(it) }
     }
 
     private fun initNavDrawer() {
         navigationView.setNavigationItemSelectedListener { handleNavMenuOnclick(it) }
 
-        // TODO remove hardcoded username and switch to username used by currently logged in user
-        navigationView.getHeaderView(0).findViewById<TextView>(R.id.username).apply {
+        // init onclick for user in nav header
+        navigationView.getHeaderView(0).findViewById<TextView>(R.id.navHeaderUsername).apply {
             setOnClickListener {
                 mainVM.userLiveData.value?.let {
                     val displayUserFrag = DisplayUserFragment.create(text.toString())
@@ -105,6 +110,18 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                 navigationDrawer.closeDrawers()
             }
         }
+
+        // init onclick for "preferences" selector in nav header
+        navigationView.getHeaderView(0).findViewById<ImageView>(R.id.navUserDropdownIc).setOnClickListener {
+            navHeaderDropdown.visibility = when (navHeaderDropdown.visibility)  {
+                View.VISIBLE -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+        // init onclick for "preferences" selector in nav header
+        navigationView.getHeaderView(0).findViewById<TextView>(R.id.navHeaderAddAccount).setOnClickListener {
+            LoginActivity.startForResult(this@MainActivity)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -115,7 +132,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
                 }
             }
             RequestCodes.CHANGED_ACCOUNT -> {
-                mainVM.onUserSelected()
+                mainVM.onAccountSelected()
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
@@ -137,14 +154,7 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
         } ?: super.onOptionsItemSelected(item)
     }
 
-    // region callback interface
-
-    override fun onAuthenticated() {
-        // sends user to default view of subreddits
-//        initializeDefaultView()
-    }
-
-    // endregion callback interface
+    // endregion lifecycle hooks
 
     private fun initializeDefaultView() {
         // get the number of additional (non default) fragments in the stack
@@ -175,14 +185,45 @@ class MainActivity : AppCompatActivity(), AuthenticationCallback {
 
     // region livedata handlers
 
-    private fun setUser(userModel : UserModel) {
-        username.text = userModel.name
-        linkKarma.text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
-        commentKarma.text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
+    private fun setUser(userModel : UserModel?) {
+        if (userModel != null) {
+            navHeaderUsername.text = userModel.name
+            linkKarma.text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
+            commentKarma.text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
+            navUserDropdownIc.visibility = View.VISIBLE
+        }
+        else {
+            navUserDropdownIc.visibility = View.GONE
+        }
     }
 
     private fun setAccounts(accounts: List<AccountModel>) {
-        // TODO modify the way accounts are displayed based on number of logged in accounts
+        navHeaderAccounts.removeAllViews()
+
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            val left = resources.getDimension(R.dimen.padding_xl).toInt()
+            val top = resources.getDimension(R.dimen.padding_l).toInt()
+            setMargins(left, top, left, 0)
+        }
+
+        // create option to change account for each available account
+        for (account in accounts) {
+            TextView(this).apply {
+                text = account.name
+                layoutParams = params
+                navHeaderAccounts.addView(this)
+
+                setOnClickListener {
+                    // selected account should be changed via preferences
+                    // all we need to do is let vm know that it's happened
+                    // TODO consider switching to preference listener for a cleaner class
+                    mainVM.onAccountSelected()
+                }
+            }
+        }
     }
 
     // endregion livedata handlers

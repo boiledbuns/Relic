@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -41,10 +42,14 @@ class SignInFragment: RelicFragment(), CoroutineScope {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // TODO add exit option to allow user to go back
         return inflater.inflate(R.layout.web_auth, container, false)?.apply {
-            val webView = findViewById<WebView>(R.id.auth_web_view)
-            // sets client to allow view to open in app
-            webView.webViewClient = LoginClient()
-            webView.loadUrl(auth.url)
+            findViewById<WebView>(R.id.auth_web_view).apply {
+                // need to clear these so previous logins don't interfere w/ new ones
+                CookieManager.getInstance().removeAllCookies {
+                    // sets client to allow view to open in app
+                    webViewClient = LoginClient()
+                    loadUrl(auth.url)
+                }
+            }
         }
     }
 

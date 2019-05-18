@@ -39,32 +39,26 @@ class MainVM(
     init {
         auth.refreshToken(AuthenticationCallback {
             Log.d(TAG, "Token refreshed")
-            onAuthenticated()
+            retrieveUser()
         })
-    }
 
-    override fun onUserSelected() {
-        launch(Dispatchers.Main) {
-            val user = userRepo.retrieveCurrentUser()
-            if (user == null) {
-                // no account currently selected
-            } else {
-                val user = userRepo.retrieveUser(user.name)
-                _userLiveData.postValue(user)
-            }
+        _accountsLiveData.addSource(userRepo.getAccounts()) { accounts ->
+            _accountsLiveData.postValue(accounts)
         }
     }
 
-    private fun onAuthenticated() {
-        launch(Dispatchers.Main) {
-            userRepo.retrieveCurrentUser()?.let { user ->
-                // retrieve current user
-                _userLiveData.postValue(user)
-                Log.d(TAG, "user $user")
+    override fun onAccountSelected() {
+       retrieveUser()
+    }
 
-                user?.let {
-                    userRepo.retrieveAccount(it.name)
-                }
+    private fun retrieveUser() {
+        launch(Dispatchers.Main) {
+            // need to retrieve current user (to get the username) before retrieving the account
+            userRepo.retrieveCurrentUser()?.let { user ->
+                Log.d(TAG, "user $user")
+                _userLiveData.postValue(user)
+
+                userRepo.retrieveAccount(user.name)
             }
         }
     }

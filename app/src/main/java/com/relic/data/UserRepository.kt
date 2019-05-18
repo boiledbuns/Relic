@@ -20,7 +20,7 @@ interface UserRepository {
     @Throws(UserRepoError::class)
     suspend fun retrieveAccount(name : String)
 
-    suspend fun getAccounts() : LiveData<List<AccountModel>>
+    fun getAccounts() : LiveData<List<AccountModel>>
 }
 
 sealed class UserRepoError(message: String?, cause: Throwable?) : Exception(message, cause) {

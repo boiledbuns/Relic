@@ -101,5 +101,6 @@
     </string-array>
 
     <string name="log_in">log in</string>
+    <string name="add_account">add account</string>
 
 </resources>
