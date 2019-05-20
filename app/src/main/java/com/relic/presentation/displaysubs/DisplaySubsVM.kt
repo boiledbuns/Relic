@@ -8,7 +8,6 @@ import android.util.Log
 import com.relic.data.auth.AuthImpl
 import com.relic.data.ListingRepository
 import com.relic.data.SubRepository
-import com.relic.presentation.callbacks.AuthenticationCallback
 import com.relic.data.models.SubredditModel
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import javax.inject.Inject
@@ -17,7 +16,7 @@ class DisplaySubsVM (
         private val subRepository: SubRepository,
         private val listingRepository: ListingRepository,
         private val authenticator: AuthImpl
-) : ViewModel(), DisplaySubsContract.VM, AuthenticationCallback, SubInfoDialogContract.Delegate {
+) : ViewModel(), DisplaySubsContract.VM, SubInfoDialogContract.Delegate {
 
     class Factory @Inject constructor(
             private val subRepository: SubRepository,
@@ -75,8 +74,9 @@ class DisplaySubsVM (
     override fun retrieveMoreSubs(resetPosts: Boolean) {
         if (resetPosts) {
             refreshing = true
-            // refresh token before performing any requests
-            authenticator.refreshToken(this)
+            subRepository.retrieveAllSubscribedSubs {
+                refreshing = false
+            }
         }
     }
 
@@ -88,14 +88,6 @@ class DisplaySubsVM (
         if (!query.isEmpty()) {
             // replaces the current livedata with a new one based on new query string
             subRepository.searchSubreddits(_searchResults, query)
-        }
-    }
-
-    override fun onAuthenticated() {
-        Log.d(TAG, "On authenticated called")
-
-        subRepository.retrieveAllSubscribedSubs {
-            refreshing = false
         }
     }
 

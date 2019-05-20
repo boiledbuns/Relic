@@ -217,10 +217,8 @@ class MainActivity : AppCompatActivity() {
                 navHeaderAccounts.addView(this)
 
                 setOnClickListener {
-                    // selected account should be changed via preferences
-                    // all we need to do is let vm know that it's happened
                     // TODO consider switching to preference listener for a cleaner class
-                    mainVM.onAccountSelected()
+                    mainVM.onAccountSelected(account.name)
                 }
             }
         }

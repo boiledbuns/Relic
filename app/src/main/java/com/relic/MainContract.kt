@@ -7,6 +7,6 @@ interface MainContract {
          * 1. user logs in for the first time
          * 2. user is already logged in, but selects another account
          */
-        fun onAccountSelected()
+        fun onAccountSelected(name : String? = null)
     }
 }

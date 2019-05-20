@@ -79,15 +79,6 @@ class PostRepositoryImpl @Inject constructor(
     override val postGateway: PostGateway
         get() = PostGatewayImpl(appContext, requestManager)
 
-    // get the oauth token from the app's shared preferences
-    private fun checkToken(): String {
-        // retrieve the auth token shared preferences
-        val authKey = appContext.resources.getString(R.string.AUTH_PREF)
-        val tokenKey = appContext.resources.getString(R.string.TOKEN_KEY)
-        return appContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-            .getString(tokenKey, "DEFAULT") ?: ""
-    }
-
     // region interface methods
 
     override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
@@ -126,8 +117,7 @@ class PostRepositoryImpl @Inject constructor(
                 // create the new request and submit it
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
-                    url = "$ENDPOINT$ending?after=$listingAfter",
-                    authToken = checkToken()
+                    url = "$ENDPOINT$ending?after=$listingAfter"
                 )
                 Log.d(TAG, "more posts $response")
 
@@ -185,8 +175,7 @@ class PostRepositoryImpl @Inject constructor(
             try {
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
-                    url = ending,
-                    authToken = checkToken()
+                    url = ending
                 )
                 val clear = launch { clearAllPostsFromSource(postSource) }
                 Log.d(TAG, "retrieve posts response :  $response")
@@ -220,8 +209,7 @@ class PostRepositoryImpl @Inject constructor(
             try {
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
-                    url = ENDPOINT + ending,
-                    authToken = checkToken()
+                    url = ENDPOINT + ending
                 )
 
                 postDeserializer.parsePost(response).apply {

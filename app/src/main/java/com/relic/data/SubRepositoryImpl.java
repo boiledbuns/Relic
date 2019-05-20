@@ -51,6 +51,7 @@ public class SubRepositoryImpl implements SubRepository {
     appDb = ApplicationDB.getDatabase(context);
   }
 
+  // TODO remove this
   private String checkToken() {
     // retrieve the auth token shared preferences
     String authKey = context.getResources().getString(R.string.AUTH_PREF);
