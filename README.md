@@ -1,12 +1,27 @@
 # Relic
 
+## Updates (May 20th, 2019)
+***I'm still in school during summer, so I don't have as much time as I'd like to work on this. I'm going to start a cleanup phase which will freeze feature development for a while***
+
+The focus of this will be on:
+1. Code cleanup -> focus on repository methods and packages to:
+    - solidify the system currently in place
+    - create a more systematic way of handling exceptions
+2. Regression -> just need to make sure that:
+    - we know expected behaviour (in preparation for adding tests)
+    - we can reproduce expected behaviour
+3. Adding tests -> focus will be on:
+    - setting up ci environment
+    - jvm tests for deserializer classes
+    - integration tests w/ network requests
+    
 ## Why Relic? (WIP)
 
 Relic is an open source Reddit client developed from the ground up with offline use in mind. 
 
-## Notes
+## About
 
-This is an Android Reddit client I've been working off/on for a few months now. It's a pet project that started as a way to learn new skills (Android dev, mobile design) and has since become a primary focus for me.
+This is an Android Reddit client I've been working off/on for a few months now. It's a pet project that started as a way to learn new skills (Android dev, mobile design) and has since become a primary focus for me. I try to work on it when I can between school and other stuff I'm learning :)
 
 As of now, the project is in a state of constant flux! I'm still learning new things and trying to balance development between architectural decisions and speed. APIs and features will be changing regularly so I've opted to wait until a more stable base version to add tests.
 
