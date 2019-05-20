@@ -8,6 +8,8 @@ import com.relic.R
 import com.relic.data.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -41,10 +43,11 @@ class NetworkRequestManager (
         authToken: String? = null,
         data: MutableMap<String, String>? = null
     ) : String {
+
         val token = authToken ?: checkToken()
 
         return suspendCoroutine { cont ->
-            val relicRequest = RelicOAuthRequest(
+            val request = RelicOAuthRequest(
                 method, url,
                 Response.Listener { response: String ->
                     cont.resumeWith(Result.success(response))
@@ -56,7 +59,7 @@ class NetworkRequestManager (
                 data
             )
 
-            volleyQueue.add(relicRequest)
+            volleyQueue.add(request)
         }
     }
 

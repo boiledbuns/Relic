@@ -44,7 +44,7 @@ public class DisplaySubInfoVM extends ViewModel implements DisplaySubInfoContrac
 
   @Override
   public void retrieveSubreddit() {
-    subRepo.retrieveSingleSub("getnarwhal");
+//    subRepo.retrieveSingleSub("getnarwhal");
   }
 
   public LiveData<String> getDescription() {

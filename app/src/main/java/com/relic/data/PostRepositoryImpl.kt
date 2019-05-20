@@ -192,7 +192,6 @@ class PostRepositoryImpl @Inject constructor(
                     is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
                     else -> Log.d(TAG, "Error retrieving sorted posts : $e")
                 }
-//                throw (e)
             }
         }
     }

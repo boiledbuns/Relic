@@ -23,9 +23,13 @@ open class DisplaySubVM (
     private val postSource: PostRepository.PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
-    private val networkUtil : NetworkUtil,
-    override val coroutineContext: CoroutineContext = Dispatchers.Default
+    private val networkUtil : NetworkUtil
 ) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, CoroutineScope {
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
+        // TODO handle exception
+        Log.d(TAG, "caught exception $e")
+    }
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
@@ -80,7 +84,7 @@ open class DisplaySubVM (
 
     private fun initializeSubredditInformation(subName : String ) {
         // TODO: STILL TESTING retrieve the banner image from the subreddit css
-        subRepo.subGateway.apply {
+        subRepo.getSubGateway().apply {
             getAdditionalSubInfo(subName)
             getSidebar(subName)
         }
@@ -89,7 +93,7 @@ open class DisplaySubVM (
         _subredditMediator.addSource(subRepo.getSingleSub(subName)) { newModel ->
             if (newModel == null) {
                 Log.d(TAG, "No subreddit saved locally, retrieving from network")
-                subRepo.retrieveSingleSub(subName)
+                launch(Dispatchers.Main) { subRepo.retrieveSingleSub(subName) }
             } else {
                 Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl())
                 _subredditMediator.setValue(newModel)
@@ -176,7 +180,7 @@ open class DisplaySubVM (
             Log.d(TAG, "Changing to subscribed $subscribe")
             if (subscribe) {
                 // subscribe if not currently subscribed
-                val successObservable = subRepo.subGateway.subscribe(subName)
+                val successObservable = subRepo.getSubGateway().subscribe(subName)
                 _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
                     if (success != null && success) {
@@ -187,7 +191,7 @@ open class DisplaySubVM (
                 }
             } else {
                 // unsubscribe if already subscribed
-                val successObservable = subRepo.subGateway.unsubscribe(subName)
+                val successObservable = subRepo.getSubGateway().unsubscribe(subName)
                 _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
                     if (success != null && success) {
