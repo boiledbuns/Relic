@@ -31,11 +31,11 @@ interface PostRepository {
     suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
 
     /**
-     *
-     * @param callback
-     * @param subName
+     * Retrieves the "after" values to be used for the next post listing
+     * @param callback callback to send the name to
+     * @param postSource source of the post
      */
-    fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource)
+    suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource)
 
     /**
      * exposes a single post model as livedata

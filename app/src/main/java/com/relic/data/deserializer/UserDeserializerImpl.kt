@@ -1,21 +1,16 @@
 package com.relic.data.deserializer
 
-import android.content.Context
 import android.util.Log
-import com.google.gson.GsonBuilder
 import com.relic.data.models.UserModel
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 
-class UserDeserializerImpl(
-    appContext : Context
-) : Contract.UserDeserializer {
+class UserDeserializerImpl : Contract.UserDeserializer {
 
     private val TAG = "USER_DESERIALIZER"
 
     private val jsonParser: JSONParser = JSONParser()
-    private val gson = GsonBuilder().create()
 
     override suspend fun parseUser(userResponse: String, trophiesResponse : String): UserModel {
         val userData = (jsonParser.parse(userResponse) as JSONObject)["data"] as JSONObject?
@@ -56,4 +51,8 @@ class UserDeserializerImpl(
         }
     }
 
+    override suspend fun parseUsername(response: String): String {
+        val responseJson = jsonParser.parse(response) as JSONObject
+        return responseJson["name"] as String
+    }
 }

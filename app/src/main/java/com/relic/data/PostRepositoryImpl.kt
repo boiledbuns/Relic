@@ -20,9 +20,12 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.data.models.PostModel
+import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.request.RelicRequestError
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 import org.json.simple.parser.ParseException
 import java.lang.Exception
@@ -52,14 +55,12 @@ import javax.inject.Inject
  *  As a result, the retrieval methods are now suspend functions
  */
 class PostRepositoryImpl @Inject constructor(
-    private val appContext: Context,
+    appContext: Context,
     private val requestManager: NetworkRequestManager
 ) : PostRepository {
+    private val TAG = "POST_REPO"
 
     companion object {
-        private const val ENDPOINT = "https://oauth.reddit.com/"
-        private const val TAG = "POST_REPO"
-
         // keys for the "after" value for listings
         private const val KEY_FRONTPAGE = "frontpage"
         private const val KEY_ALL = "all"
@@ -76,8 +77,7 @@ class PostRepositoryImpl @Inject constructor(
     // TODO convert this to DI
     private val postDeserializer = PostDeserializerImpl(appContext)
 
-    override val postGateway: PostGateway
-        get() = PostGatewayImpl(appContext, requestManager)
+    override val postGateway: PostGateway = PostGatewayImpl(appContext, requestManager)
 
     // region interface methods
 
@@ -131,14 +131,14 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    /**
-     * Retrieves the "after" values to be used for the next post listing
-     * @param callback callback to send the name to
-     * @param postSource source of the post
-     */
-    override fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
+    override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
         val key = getListingKey(postSource)
-        RetrieveListingAfterTask(appDB, callback).execute(key)
+
+        withContext(Dispatchers.IO) {
+            // get the "after" value for the most current sub listing
+            val subAfter = appDB.listingDAO.getNext(key)
+            callback.onNextListing(subAfter)
+        }
     }
 
     override fun getPost(postFullName: String): LiveData<PostModel> {
@@ -233,12 +233,33 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
-        ClearPostsFromSourceTask().execute(appDB, postSource)
+        withContext(Dispatchers.IO) {
+            when (postSource) {
+                is PostRepository.PostSource.Frontpage -> appDB.postSourceDao.removeAllFrontpageAsSource()
+                is PostRepository.PostSource.All -> appDB.postSourceDao.removeAllAllAsSource()
+                is PostRepository.PostSource.Subreddit -> appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
+                is PostRepository.PostSource.User -> {
+                    appDB.postSourceDao.apply {
+                        when (postSource.retrievalOption) {
+                            PostRepository.RetrievalOption.Submitted -> removeAllUserSubmittedAsSource()
+                            PostRepository.RetrievalOption.Comments -> removeAllUserCommentsAsSource()
+                            PostRepository.RetrievalOption.Saved -> removeAllUserSavedAsSource()
+                            PostRepository.RetrievalOption.Upvoted -> removeAllUserUpvotedAsSource()
+                            PostRepository.RetrievalOption.Downvoted -> removeAllUserDownvotedAsSource()
+                            PostRepository.RetrievalOption.Gilded -> removeAllUserGildedAsSource()
+                            PostRepository.RetrievalOption.Hidden -> removeAllUserHiddenAsSource()
+                        }
+                    }
+                }
+            }
+
+            // remove all the source entities that no longer correspond to any remaining posts
+            appDB.postSourceDao.removeAllUnusedSources()
+        }
     }
 
     // endregion interface methods
 
-    // region helper functions
 
     private fun insertParsedPosts(parsedPosts : ParsedPostsData) {
         parsedPosts.apply {
@@ -263,79 +284,4 @@ class PostRepositoryImpl @Inject constructor(
             else -> KEY_OTHER
         }
     }
-
-    // end region helper functions
-
-    // region async tasks
-
-    /**
-     * Async task to insert posts and create/update the listing data for the current subreddit to
-     * point to the next listing
-     */
-    internal class InsertPostsTask(
-        private var appDB: ApplicationDB,
-        private var postList: List<PostEntity>,
-        private var postSourceEntities : ArrayList<PostSourceEntity>
-    ) : AsyncTask<ListingEntity, Int, Int>() {
-
-        override fun doInBackground(vararg listing: ListingEntity): Int? {
-            appDB.postDao.insertPosts(postList)
-            appDB.postSourceDao.insertPostSources(postSourceEntities)
-            appDB.listingDAO.insertListing(listing[0])
-            return null
-        }
-    }
-
-    private class InsertPostTask : AsyncTask<Any, Unit, Unit>() {
-        override fun doInBackground(vararg objects: Any) {
-            val applicationDB = objects[0] as ApplicationDB
-            applicationDB.postDao.insertPost(objects[1] as PostEntity)
-        }
-    }
-
-    private class RetrieveListingAfterTask(
-        var appDB: ApplicationDB,
-        var callback: RetrieveNextListingCallback
-    ) : AsyncTask<String, Unit, Unit>() {
-        override fun doInBackground(vararg strings: String) {
-            // get the "after" value for the most current sub listing
-            val subAfter = appDB.listingDAO.getNext(strings[0])
-            callback.onNextListing(subAfter)
-        }
-    }
-
-    private class ClearPostsFromSourceTask : AsyncTask<Any, Unit, Unit>() {
-        override fun doInBackground(vararg objects: Any) {
-            val appDB = objects[0] as ApplicationDB
-            val postSource = objects[1] as PostRepository.PostSource
-            when (postSource) {
-                is PostRepository.PostSource.Frontpage -> {
-                    appDB.postSourceDao.removeAllFrontpageAsSource()
-                }
-                is PostRepository.PostSource.All -> {
-                    appDB.postSourceDao.removeAllAllAsSource()
-                }
-                is PostRepository.PostSource.Subreddit -> {
-                    appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
-                }
-                is PostRepository.PostSource.User -> {
-                    appDB.postSourceDao.apply {
-                        when (postSource.retrievalOption) {
-                            PostRepository.RetrievalOption.Submitted -> removeAllUserSubmittedAsSource()
-                            PostRepository.RetrievalOption.Comments -> removeAllUserCommentsAsSource()
-                            PostRepository.RetrievalOption.Saved -> removeAllUserSavedAsSource()
-                            PostRepository.RetrievalOption.Upvoted -> removeAllUserUpvotedAsSource()
-                            PostRepository.RetrievalOption.Downvoted -> removeAllUserDownvotedAsSource()
-                            PostRepository.RetrievalOption.Gilded -> removeAllUserGildedAsSource()
-                            PostRepository.RetrievalOption.Hidden -> removeAllUserHiddenAsSource()
-                        }
-                    }
-                }
-            }
-            // remove all the source entities that no longer correspond to any remaining posts
-            appDB.postSourceDao.removeAllUnusedSources()
-        }
-    }
-
-    // endregion async tasks
 }

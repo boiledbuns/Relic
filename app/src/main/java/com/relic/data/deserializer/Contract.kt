@@ -7,6 +7,11 @@ import com.relic.data.models.UserModel
 import com.relic.exception.RelicException
 import org.json.simple.JSONObject
 
+/**
+ * Decoupled from the repository package because deserializers should be responsible
+ * for directly converting server response into entities -> repo shouldn't care how it's done,
+ * just that the correct results are returned
+ */
 interface Contract {
 
     interface PostDeserializer {
@@ -37,8 +42,9 @@ interface Contract {
     }
 
     interface UserDeserializer {
-        suspend fun parseUser(
-            userResponse: String, trophiesResponse : String) : UserModel
+        suspend fun parseUser(userResponse: String, trophiesResponse : String) : UserModel
+
+        suspend fun parseUsername(response: String) : String
     }
 
     interface AccountDeserializer {
@@ -46,8 +52,9 @@ interface Contract {
     }
 
     interface SubDeserializer {
-        suspend fun parseSubreddits(response: String): List<SubredditEntity>
-        suspend fun parseSearchedSubs(response: String): List<String>
+        suspend fun parseSubredditResponse(response: String): SubredditEntity
+        suspend fun parseSubredditsResponse(response: String): ParsedSubsData
+        suspend fun parseSearchSubsResponse(response: String): List<String>
     }
 
 }
@@ -70,4 +77,9 @@ data class ParsedCommentData(
     val replyCount : Int
 )
 
-class DeserializationException(message : String, cause : Throwable) : RelicException(message, cause)
+data class ParsedSubsData(
+    val subsList : List<SubredditEntity>,
+    val after : String?
+)
+
+class RelicParseException(message : String, cause : Throwable) : RelicException(message, cause)

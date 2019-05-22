@@ -4,24 +4,18 @@ import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
 import com.android.volley.VolleyError
-import com.relic.data.deserializer.AccountDeserializerImpl
-import com.relic.data.deserializer.Contract
-import com.relic.data.deserializer.DeserializationException
-import com.relic.data.deserializer.UserDeserializerImpl
+import com.relic.data.deserializer.*
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
+import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
 
 class UserRepositoryImpl (
     private val appContext: Context,
     private val requestManager: NetworkRequestManager
 ): UserRepository {
-
-    private val ENDPOINT = "https://oauth.reddit.com"
     private val TAG = "USER_REPO"
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
@@ -30,12 +24,11 @@ class UserRepositoryImpl (
     private val appDB = ApplicationDB.getDatabase(appContext)
     private val accountDao = appDB.accountDao
 
-    private val userDeserializer = UserDeserializerImpl(appContext)
-    private val accountDeserializer : Contract.AccountDeserializer = AccountDeserializerImpl(appContext)
-    private val jsonParser: JSONParser = JSONParser()
+    private val userDeserializer : Contract.UserDeserializer = UserDeserializerImpl()
+    private val accountDeserializer : Contract.AccountDeserializer = AccountDeserializerImpl()
 
     override suspend fun retrieveUsername(): String? {
-        val selfEndpoint = "$ENDPOINT/api/v1/me"
+        val selfEndpoint = "${ENDPOINT}api/v1/me"
         var username : String? = null
 
         withContext (Dispatchers.IO){
@@ -46,8 +39,7 @@ class UserRepositoryImpl (
                     url = selfEndpoint
                 )
 
-                val responseJson = jsonParser.parse(response) as JSONObject
-                username = responseJson["name"] as String
+                username = userDeserializer.parseUsername(response)
             } catch (e: Exception) {
                 throw transformException("Error retrieving self from $selfEndpoint", e)
             }
@@ -57,8 +49,8 @@ class UserRepositoryImpl (
     }
 
     override suspend fun retrieveUser(username: String): UserModel? {
-        val userEndpoint = "$ENDPOINT/user/$username/about"
-        val trophiesEndpoint = "$ENDPOINT/api/v1/user/$username/trophies"
+        val userEndpoint = "${ENDPOINT}user/$username/about"
+        val trophiesEndpoint = "${ENDPOINT}api/v1/user/$username/trophies"
 
         var userModel : UserModel? = null
 
@@ -142,7 +134,7 @@ class UserRepositoryImpl (
         Log.d(TAG, e.toString())
         return when (e) {
             is VolleyError-> UserRepoError.Retrieval(method, e)
-            is DeserializationException -> UserRepoError.Deserialization(method, e)
+            is RelicParseException -> UserRepoError.Deserialization(method, e)
             else -> UserRepoError.Unknown(e)
         }
     }

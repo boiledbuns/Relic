@@ -1,6 +1,5 @@
 package com.relic.data.deserializer
 
-import android.content.Context
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
@@ -10,9 +9,7 @@ import kotlinx.coroutines.withContext
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 
-class AccountDeserializerImpl(
-    appContext : Context
-) : Contract.AccountDeserializer {
+class AccountDeserializerImpl : Contract.AccountDeserializer {
     private val TAG = "ACCOUNT_DESERIALIZER"
 
     private val gson = GsonBuilder().create()
@@ -30,7 +27,7 @@ class AccountDeserializerImpl(
                 gson.fromJson(accountResponse, AccountEntity::class.java)
             }
             catch (e : JsonSyntaxException){
-                throw DeserializationException("error parsing account", e)
+                throw RelicParseException("error parsing account", e)
             }
         }
     }
