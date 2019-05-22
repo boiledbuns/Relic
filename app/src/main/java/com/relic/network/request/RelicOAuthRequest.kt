@@ -15,7 +15,7 @@ class RelicOAuthRequest @JvmOverloads constructor(
         url: String,
         var listener: Response.Listener<String>,
         errorListener: Response.ErrorListener,
-        private val authToken: String,
+        var authToken: String? = null,
         private val data: MutableMap<String, String>? = null
 ) : StringRequest(method, url, listener, errorListener) {
 

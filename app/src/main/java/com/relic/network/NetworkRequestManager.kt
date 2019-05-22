@@ -1,16 +1,15 @@
 package com.relic.network
 
 import android.content.Context
+import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.relic.R
 import com.relic.data.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import java.lang.Exception
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
@@ -19,7 +18,11 @@ import kotlin.coroutines.suspendCoroutine
  */
 class NetworkRequestManager (
     private val appContext: Context
-) {
+) : CoroutineScope {
+    val TAG = "NETWORK_REQUEST_MANAGER"
+
+    override val coroutineContext = Dispatchers.IO + SupervisorJob()
+
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
 
@@ -28,7 +31,18 @@ class NetworkRequestManager (
     private val tokenStore = ApplicationDB.getDatabase(appContext).tokenStoreDao
 
     fun processRequest(relicRequest : RelicOAuthRequest) {
-        volleyQueue.add(relicRequest)
+        val handler = CoroutineExceptionHandler { _, e ->
+            if (e is VolleyError) {
+                relicRequest.errorListener.onErrorResponse(e)
+            }
+        }
+
+        launch(handler) {
+            volleyQueue.add(relicRequest.apply {
+                authToken = checkToken()
+            })
+            throw VolleyError()
+        }
     }
 
     /**

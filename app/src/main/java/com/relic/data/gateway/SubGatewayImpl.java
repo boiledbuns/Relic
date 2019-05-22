@@ -22,7 +22,6 @@ public class SubGatewayImpl implements SubGateway {
   private final String NON_OAUTH_ENDPOINT = "https://www.reddit.com/";
 
   public static String TAG = "SUB_GATEWAY";
-  private String authToken;
 
   private ApplicationDB appDb;
   public final int GET_SUBINFO = 1;
@@ -33,18 +32,8 @@ public class SubGatewayImpl implements SubGateway {
 
   public SubGatewayImpl(Context context, NetworkRequestManager networkRequestManager) {
     appDb = ApplicationDB.getDatabase(context);
-    // Get the key values needed to get the actual authtoken from shared preferences
-    String authKey = context.getString(R.string.AUTH_PREF);
-    String tokenKey = context.getString(R.string.TOKEN_KEY);
-
     requestManager = networkRequestManager;
-
-    // retrieve the authtoken for use
-    authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-        .getString(tokenKey, "DEFAULT");
-
   }
-
 
   public LiveData<String> getAdditionalSubInfo(String subredditName) {
     MutableLiveData<String> subinfo = new MutableLiveData<>();
@@ -81,8 +70,7 @@ public class SubGatewayImpl implements SubGateway {
                 Log.d(TAG, "Error parsing the response");
               }
             },
-            error -> Log.d(TAG, "Error retrieving the response from the server"),
-            authToken
+            error -> Log.d(TAG, "Error retrieving the response from the server")
     ));
 
     return subinfo;
@@ -122,8 +110,7 @@ public class SubGatewayImpl implements SubGateway {
               Log.d(TAG, "sidebar : " + response);
               sidebar.setValue("test");
             },
-            error -> Log.d(TAG, "Error retrieving the response from the server"),
-            authToken
+            error -> Log.d(TAG, "Error retrieving the response from the server")
     ));
 
     sidebar.setValue("yeet");
@@ -148,7 +135,8 @@ public class SubGatewayImpl implements SubGateway {
 
     // delay response request a bit to ensure it doesn't occur until the livedata has been subscribed to
     new Handler().postDelayed(()-> {
-        requestManager.processRequest(new RelicOAuthRequest(
+        requestManager.processRequest(
+            new RelicOAuthRequest(
                 RelicOAuthRequest.POST, end,
                 response -> {
                   Log.d(TAG, "Subscribed to " + subName);
@@ -159,7 +147,9 @@ public class SubGatewayImpl implements SubGateway {
                 error -> {
                   Log.d(TAG, "Error subscribing to subreddit " + error.networkResponse.headers);
                   success.setValue(false);
-                }, authToken));
+                }
+            )
+        );
       }, 500);
 
     return success;
@@ -185,8 +175,7 @@ public class SubGatewayImpl implements SubGateway {
               error -> {
                 Log.d(TAG, "Error unsubscribing to subreddit " + error.networkResponse.headers);
                 success.setValue(false);
-              },
-              authToken
+              }
       ));
     }, 500);
 
@@ -263,8 +252,7 @@ public class SubGatewayImpl implements SubGateway {
             },
             error -> {
               Log.d(TAG, "Error retrieving response from server " + error.toString());
-            },
-            authToken
+            }
     ));
   }
 
