@@ -1,9 +1,11 @@
 package com.relic.data.repository
 
+import com.relic.exception.RelicException
+
 /**
  * Exceptions common to all repo classes
  */
-class RepoError(
+class RepoException(
     override val message: String?,
     override val cause: Throwable?
-) : Exception(message, cause)
+) : RelicException(message, cause)

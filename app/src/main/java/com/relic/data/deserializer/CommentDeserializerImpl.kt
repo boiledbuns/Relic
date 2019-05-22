@@ -11,7 +11,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
-import org.json.simple.parser.ParseException
+import org.json.simple.parser.JSONParser
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
@@ -20,63 +20,22 @@ import kotlin.math.pow
 object CommentDeserializer : Contract.CommentDeserializer {
     private val TAG = "COMMENT_DESERIALIZER"
 
+    private val jsonParser: JSONParser = JSONParser()
     private val gson = GsonBuilder().create()
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val currentYear = Date().year
 
-    /**
-     * Parse the response from the api and store the comments in the room db
-     * @param response json string response
-     * @param postFullName full name of post used as a key for the "after" value
-     * @param parentDepth depth of the parent. Since posts start with a depth of 0, -1 is the
-     * depth of the parent when calling from outside a recursive call
-     * @param parentPosition positional value of the parent
-     * @return : Parsed comment
-     * @throws ParseException potential issue with parsing of json structure
-     */
-    @Throws(ParseException::class)
-    override suspend fun parseComments(
+    // region interface methods
+
+    override suspend fun parseCommentsResponse(
         postFullName: String,
-        response: JSONObject,
-        parentDepth : Int,
-        parentPosition : Float
+        response: String
     ) : ParsedCommentData {
-        val commentsData = (response["data"] as JSONObject)
-        val listing = ListingEntity(postFullName, commentsData["after"]?.run { this as String })
+        // the comment data is nested as the first element within an array
+        val requestData = jsonParser.parse(response) as JSONArray
+        val parentPostId = CommentDeserializer.removeTypePrefix(postFullName)
 
-        // get the list of children (comments) associated with the post
-        val commentChildren = commentsData["children"] as JSONArray
-        val commentList = ArrayList<CommentEntity>()
-
-        // used for calculating the position of a comment
-        val scale = 10f.pow(-(parentDepth + 1))
-        var childCount = 1
-
-        coroutineScope {
-            commentChildren.forEach { commentChild ->
-                val position = parentPosition + childCount*scale
-                val commentJson = commentChild as JSONObject
-                val childKind = commentJson["kind"] as String?
-
-                if (childKind == "more") {
-                    // means there is a "more object"
-                    val deferredMore = async {
-                        val moreData = (commentJson["data"] as JSONObject)
-                        unmarshallMore(moreData, postFullName, position)
-                    }
-                    commentList.add(deferredMore.await())
-                } else {
-                    val deferredCommentList = async {
-                        unmarshallComment(commentJson, position)
-                    }
-                    commentList.addAll(deferredCommentList.await())
-                }
-
-                childCount ++
-            }
-        }
-
-        return ParsedCommentData(listing, commentList, commentChildren.size)
+        return CommentDeserializer.parseComments(parentPostId, requestData[1] as JSONObject)
     }
 
     /**
@@ -84,12 +43,11 @@ object CommentDeserializer : Contract.CommentDeserializer {
      * format than the traditional method for retrieving comments
      *
      */
-    @Throws(ParseException::class)
-    override suspend fun parseMoreComments(
+    override suspend fun parseMoreCommentsResponse(
         moreChildrenComment: CommentModel,
-        requestJson: JSONObject
+        response: String
     ) : List<CommentEntity> {
-        //
+        val requestJson = (jsonParser.parse(response) as JSONObject)["json"] as JSONObject
 
         val requestData = requestJson["data"] as JSONObject
         val requestComments = requestData["things"] as JSONArray
@@ -127,26 +85,6 @@ object CommentDeserializer : Contract.CommentDeserializer {
             }
 
             accum.apply { addAll(unmarshalledComments) }
-        }
-    }
-
-    private fun unmarshallMore(
-        moreJsonObject : JSONObject,
-        postFullName : String,
-        commentPosition : Float
-    ) : CommentEntity {
-        return CommentEntity().apply {
-            id = moreJsonObject["name"] as String
-            parentPostId = postFullName
-            parent_id = moreJsonObject["parent_id"] as String
-            created = CommentEntity.MORE_CREATED
-            position = commentPosition
-            depth = (moreJsonObject["depth"] as Long).toInt()
-
-            val childrenLinks = moreJsonObject["children"] as JSONArray
-            body_html = childrenLinks.toString()
-            // reply count for "more" item will hold the number of comments to load
-            replyCount = childrenLinks.size
         }
     }
 
@@ -232,6 +170,81 @@ object CommentDeserializer : Contract.CommentDeserializer {
         }
     }
 
+    // endregion interface methods
+
+    /**
+     * Parse the response from the api and store the comments in the room db
+     * @param response json string response
+     * @param postFullName full name of post used as a key for the "after" value
+     * @param parentDepth depth of the parent. Since posts start with a depth of 0, -1 is the
+     * depth of the parent when calling from outside a recursive call
+     * @param parentPosition positional value of the parent
+     * @return : Parsed comment
+     */
+    private suspend fun parseComments(
+        postFullName: String,
+        response: JSONObject,
+        parentDepth : Int = -1,
+        parentPosition : Float = 0f
+    ) : ParsedCommentData {
+        val commentsData = (response["data"] as JSONObject)
+        val listing = ListingEntity(postFullName, commentsData["after"]?.run { this as String })
+
+        // get the list of children (comments) associated with the post
+        val commentChildren = commentsData["children"] as JSONArray
+        val commentList = ArrayList<CommentEntity>()
+
+        // used for calculating the position of a comment
+        val scale = 10f.pow(-(parentDepth + 1))
+        var childCount = 1
+
+        coroutineScope {
+            commentChildren.forEach { commentChild ->
+                val position = parentPosition + childCount*scale
+                val commentJson = commentChild as JSONObject
+                val childKind = commentJson["kind"] as String?
+
+                if (childKind == "more") {
+                    // means there is a "more object"
+                    val deferredMore = async {
+                        val moreData = (commentJson["data"] as JSONObject)
+                        unmarshallMore(moreData, postFullName, position)
+                    }
+                    commentList.add(deferredMore.await())
+                } else {
+                    val deferredCommentList = async {
+                        unmarshallComment(commentJson, position)
+                    }
+                    commentList.addAll(deferredCommentList.await())
+                }
+
+                childCount ++
+            }
+        }
+
+        return ParsedCommentData(listing, commentList, commentChildren.size)
+    }
+
+    private fun unmarshallMore(
+        moreJsonObject : JSONObject,
+        postFullName : String,
+        commentPosition : Float
+    ) : CommentEntity {
+        return CommentEntity().apply {
+            id = moreJsonObject["name"] as String
+            parentPostId = postFullName
+            parent_id = moreJsonObject["parent_id"] as String
+            created = CommentEntity.MORE_CREATED
+            position = commentPosition
+            depth = (moreJsonObject["depth"] as Long).toInt()
+
+            val childrenLinks = moreJsonObject["children"] as JSONArray
+            body_html = childrenLinks.toString()
+            // reply count for "more" item will hold the number of comments to load
+            replyCount = childrenLinks.size
+        }
+    }
+
     // removes the type associated with the comment, leaving only its id
     fun removeTypePrefix(fullName : String) : String {
         return if (fullName.length >= 4) {
@@ -242,9 +255,3 @@ object CommentDeserializer : Contract.CommentDeserializer {
     }
 
 }
-
-data class ParsedCommentData(
-    val listingEntity : ListingEntity,
-    val commentList : List<CommentEntity>,
-    val replyCount : Int
-)

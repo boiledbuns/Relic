@@ -4,31 +4,30 @@ import com.relic.data.PostRepository
 import com.relic.data.entities.*
 import com.relic.data.models.CommentModel
 import com.relic.data.models.UserModel
+import com.relic.exception.RelicException
 import org.json.simple.JSONObject
 
 interface Contract {
 
     interface PostDeserializer {
-        suspend fun parsePost(response: String) : ParsedPostData
-
         suspend fun parsePosts(
             response: String,
             postSource: PostRepository.PostSource,
             listingKey : String
         ) : ParsedPostsData
+
+        suspend fun parsePost(response: String) : ParsedPostData
     }
 
     interface CommentDeserializer {
-        suspend fun parseComments(
+        suspend fun parseCommentsResponse(
             postFullName: String,
-            response: JSONObject,
-            parentDepth : Int = -1,
-            parentPosition : Float = 0f
+            response: String
         ) : ParsedCommentData
 
-        suspend fun parseMoreComments(
+        suspend fun parseMoreCommentsResponse(
             moreChildrenComment: CommentModel,
-            requestJson: JSONObject
+            response : String
         ) : List<CommentEntity>
 
         suspend fun unmarshallComment(
@@ -37,9 +36,9 @@ interface Contract {
         ) : List<CommentEntity>
     }
 
-
     interface UserDeserializer {
-        suspend fun parseUser(userResponse: String, trophiesResponse : String) : UserModel
+        suspend fun parseUser(
+            userResponse: String, trophiesResponse : String) : UserModel
     }
 
     interface AccountDeserializer {
@@ -65,4 +64,10 @@ data class ParsedPostsData(
     val listingEntity: ListingEntity
 )
 
-class DeserializationException(message : String, cause : Throwable) : Exception(message, cause)
+data class ParsedCommentData(
+    val listingEntity : ListingEntity,
+    val commentList : List<CommentEntity>,
+    val replyCount : Int
+)
+
+class DeserializationException(message : String, cause : Throwable) : RelicException(message, cause)

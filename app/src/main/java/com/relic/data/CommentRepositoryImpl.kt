@@ -3,54 +3,27 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
-import android.os.AsyncTask
 import android.util.Log
 import com.android.volley.VolleyError
 
-import com.relic.R
 import com.relic.data.deserializer.CommentDeserializer
-import com.relic.data.deserializer.ParsedCommentData
 import com.relic.network.NetworkRequestManager
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.models.CommentModel
+import com.relic.data.repository.RepoConstants
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
 
-import org.json.simple.JSONArray
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
-
 class CommentRepositoryImpl(
-        private val viewContext: Context,
-        private val requestManager: NetworkRequestManager,
-        private val listingRepo: ListingRepository
+    private val viewContext: Context,
+    private val requestManager: NetworkRequestManager,
+    private val listingRepo: ListingRepository
 ) : CommentRepository {
-
-    companion object {
-        private const val ENDPOINT = "https://oauth.reddit.com/"
-        private const val NON_OAUTH_ENDPOINT = "https://www.reddit.com/"
-
-        private const val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
-        private const val TAG = "COMMENT_REPO"
-
-        const val TYPE_COMMENT = "t1"
-    }
+    private val TAG = "COMMENT_REPO"
 
     private val appDB = ApplicationDB.getDatabase(viewContext)
-
-    private val authToken: String?
-
-    private val jsonParser = JSONParser()
-
-    init {
-        // TODO convert this to a authenticator method
-        // retrieve the auth token shared preferences
-        val authKey = viewContext.resources.getString(R.string.AUTH_PREF)
-        val tokenKey = viewContext.resources.getString(R.string.TOKEN_KEY)
-        authToken = viewContext.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-                .getString(tokenKey, "DEFAULT")
-    }
+    private val commentDao = appDB.commentDAO
 
     // region interface
 
@@ -58,10 +31,10 @@ class CommentRepositoryImpl(
         val postFullname = CommentDeserializer.removeTypePrefix(postFullName)
         return when {
             (displayNRows > 0) -> {
-                appDB.commentDAO.getChildrenByLevel(postFullname, displayNRows)
+                commentDao.getChildrenByLevel(postFullname, displayNRows)
             }
             else -> {
-                appDB.commentDAO.getAllComments(postFullname)
+                commentDao.getAllComments(postFullname)
             }
         }
     }
@@ -78,14 +51,9 @@ class CommentRepositoryImpl(
         }
     }
 
-
-    override suspend fun retrieveComments(
-        subName: String,
-        postFullName: String,
-        refresh : Boolean
-    ) {
+    override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) {
         val postName = CommentDeserializer.removeTypePrefix(postFullName)
-        var url = "${ENDPOINT}r/$subName/comments/$postName?count=20"
+        var url = "${RepoConstants}r/$subName/comments/$postName?count=20"
 
         if (refresh) {
             val after = withContext(Dispatchers.Default) { listingRepo.getAfterString(postFullName) }
@@ -93,15 +61,16 @@ class CommentRepositoryImpl(
         }
 
         try {
-            val response = requestManager.processRequest(RelicOAuthRequest.GET, url, authToken!!)
+            val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
             Log.d(TAG, "${response}")
-            val parsedData = parseCommentRequestResponse(
+
+            val parsedData = CommentDeserializer.parseCommentsResponse(
                 postFullName = postFullName,
                 response = response
             )
 
             coroutineScope {
-                launch (Dispatchers.IO) {
+                withContext (Dispatchers.IO) {
                     insertComments(parsedData.commentList, parsedData.listingEntity)
                 }
             }
@@ -116,6 +85,8 @@ class CommentRepositoryImpl(
     }
 
     override suspend fun retrieveCommentChildren(moreChildrenComment: CommentModel) {
+        val url = "${RepoConstants.ENDPOINT}api/morechildren"
+
         val removedQuotations = moreChildrenComment.body.replace("\"", "")
         val idList = removedQuotations.subSequence(1, removedQuotations.length - 1)
 
@@ -127,17 +98,19 @@ class CommentRepositoryImpl(
             put("sort", "confidence")
         }
 
-        val url = "${ENDPOINT}api/morechildren"
-        val response = requestManager.processRequest(RelicOAuthRequest.POST, url, authToken!!, postData)
+        val response = requestManager.processRequest(
+            method = RelicOAuthRequest.POST,
+            url = url,
+            data = postData
+        )
 
         try {
-            val requestJson = (jsonParser.parse(response) as JSONObject)["json"] as JSONObject
-            val commentEntities = CommentDeserializer.parseMoreComments(moreChildrenComment, requestJson)
+            val commentEntities = CommentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
 
             coroutineScope {
                 launch (Dispatchers.IO) {
-                    appDB.commentDAO.deleteComment(moreChildrenComment.fullName)
-                    appDB.commentDAO.insertComments(commentEntities)
+                    commentDao.deleteComment(moreChildrenComment.fullName)
+                    commentDao.insertComments(commentEntities)
                 }
             }
         } catch (e : Exception) {
@@ -148,45 +121,28 @@ class CommentRepositoryImpl(
         }
     }
 
-    override fun clearAllCommentsFromSource(postFullName: String) {
-        ClearCommentsTask().execute(appDB, CommentDeserializer.removeTypePrefix(postFullName))
+    override suspend fun clearAllCommentsFromSource(postFullName: String) {
+        withContext(Dispatchers.IO){
+            commentDao.deletePostComments(CommentDeserializer.removeTypePrefix(postFullName))
+        }
     }
 
     override fun getReplies(parentId: String): LiveData<List<CommentModel>> {
-        return appDB.commentDAO.getAllComments(parentId)
+        return commentDao.getAllComments(parentId)
     }
 
     // endregion interface
 
-    // region helper
 
-    private suspend fun parseCommentRequestResponse(
-        postFullName: String,
-        response: String
-    ) : ParsedCommentData {
-        // the comment data is nested as the first element within an array
-        val requestData = jsonParser.parse(response) as JSONArray
-        val parentPostId = CommentDeserializer.removeTypePrefix(postFullName)
-
-        return CommentDeserializer.parseComments(parentPostId, requestData[1] as JSONObject)
-    }
-
-    // endregion helper
-
-    // region async tasks
-
-    private fun insertComments(comments : List<CommentEntity>, listing : ListingEntity) {
-        appDB.commentDAO.insertComments(comments)
-        appDB.listingDAO.insertListing(listing)
-    }
-
-    private class ClearCommentsTask : AsyncTask<Any, Int, Unit>() {
-        override fun doInBackground(vararg objects: Any) {
-            val appDB = objects[0] as ApplicationDB
-            val postId = objects[1] as String
-            appDB.commentDAO.deletePostComments(postId)
+    /**
+     * only use this function to insert comments to ensure they're inserted with an associated
+     * listing
+     */
+    private suspend fun insertComments(comments : List<CommentEntity>, listing : ListingEntity) {
+        withContext(Dispatchers.IO) {
+            commentDao.insertComments(comments)
+            appDB.listingDAO.insertListing(listing)
         }
     }
-
-    // endregion async tasks
+    
 }
