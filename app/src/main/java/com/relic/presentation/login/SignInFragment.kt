@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +26,15 @@ import kotlinx.coroutines.*
 
 class SignInFragment: RelicFragment(), CoroutineScope {
 
-    override val coroutineContext = Dispatchers.Main + SupervisorJob()
+    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
+        // TODO handle exception
+        // TODO add option to show more details and retry
+        Snackbar.make(
+            web_auth_rootview,
+            "Authentication unsuccessful",
+            Snackbar.LENGTH_SHORT
+        ).show()
+    }
 
     lateinit var auth : AuthImpl
     lateinit var userRepo : UserRepository
@@ -68,25 +77,17 @@ class SignInFragment: RelicFragment(), CoroutineScope {
             if (request.url.host == redirectHost) {
                 Toast.makeText(context, "You've been authenticated!", Toast.LENGTH_SHORT).show()
                 // retrieves the access token using the redirect url
-                auth.retrieveAccessToken(request.url.toString(), this)
+                launch(Dispatchers.Main) {
+                    auth.retrieveAccessToken(request.url.toString(), this@LoginClient)
+                }
                 override = true
             }
             return override
         }
 
         override fun onAuthenticated() {
-            val handler = CoroutineExceptionHandler { _, e ->
-                // TODO add option to show more details and retry
-                Snackbar.make(
-                    web_auth_rootview,
-                    "Authentication unsuccessful",
-                    Snackbar.LENGTH_INDEFINITE
-                ).show()
-            }
-
-            launch(Dispatchers.Main + handler) {
+            launch(Dispatchers.Main) {
                 userRepo.retrieveUsername()?.let { name ->
-                    userRepo.setCurrentAccount(name)
                     userRepo.retrieveCurrentUser()
                 }
 

@@ -5,12 +5,19 @@ import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.relic.data.SubRepository
 import com.relic.data.models.SubredditModel
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class SubInfoDialogVM (
         private val subRepo: SubRepository,
         private val subredditName: String
-) : ViewModel () {
+) : ViewModel(), CoroutineScope {
+    val TAG = "SUBINFO_DIALOG_VM"
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
+        // TODO handle exception
+        Log.d(TAG, "caught exception $e")
+    }
 
     class Factory @Inject constructor(private val subRepository: SubRepository) {
         fun create(subredditName : String) : SubInfoDialogVM{
@@ -21,11 +28,11 @@ class SubInfoDialogVM (
     private val _subredditLiveData = subRepo.getSingleSub(subredditName)
     val subredditLiveData : LiveData<SubredditModel> = _subredditLiveData
 
-    private val _sideBarLiveData = subRepo.subGateway.getSidebar(subredditName)
+    private val _sideBarLiveData = subRepo.getSubGateway().getSidebar(subredditName)
     val sideBarLiveData : LiveData<String> = _sideBarLiveData
 
     init {
-        subRepo.subGateway.getAdditionalSubInfo(subredditName)
+        subRepo.getSubGateway().getAdditionalSubInfo(subredditName)
     }
 
     fun updateSubscriptionStatus(subscribed: Boolean) {
@@ -33,6 +40,8 @@ class SubInfoDialogVM (
     }
 
     fun pinSubreddit(pinned : Boolean) {
-        subRepo.pinSubreddit(subredditName, true)
+        launch(Dispatchers.Main) {
+            subRepo.pinSubreddit(subredditName, true)
+        }
     }
 }

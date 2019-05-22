@@ -11,9 +11,16 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.relic.R
+import com.relic.data.ApplicationDB
 import com.relic.data.Auth
+import com.relic.data.UserRepository
+import com.relic.data.UserRepositoryImpl
+import com.relic.data.entities.TokenStoreEntity
+import com.relic.network.NetworkRequestManager
 import com.relic.network.VolleyQueue
+import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.AuthenticationCallback
+import kotlinx.coroutines.*
 
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -22,57 +29,45 @@ import org.json.simple.parser.ParseException
 import java.util.Calendar
 import java.util.Date
 import java.util.HashMap
+import javax.inject.Inject
 
 /**
  * Singleton instance of the authenticator because we should be able to
  */
-class AuthImpl (private val appContext: Context) : Auth {
+class AuthImpl (
+    private val appContext: Context
+) : Auth {
     private val TAG = "AUTHENTICATOR"
 
-    private val preference: String
-    private val redirectCode: String
+    // TODO move to interface after refactoring account repo keys for data in response
+    private val preference = appContext.resources.getString(R.string.AUTH_PREF)
+    private val redirectCode= appContext.resources.getString(R.string.REDIRECT_CODE)
+    private val KEY_ACCOUNTS_DATA= "PREF_ACCOUNTS_DATA"
+    private val KEY_CURR_ACCOUNT= "PREF_CURR_ACCOUNT"
 
     // keys for shared preferences
-    private val KEY_USERNAME = "PREF_USERNAME"
-    private val tokenKey: String
-    private val refreshTokenKey: String
+    private val tokenKey= appContext.resources.getString(R.string.TOKEN_KEY)
+    private val refreshTokenKey= appContext.resources.getString(R.string.REFRESH_TOKEN_KEY)
 
-    private val requestQueue: RequestQueue
+    private val requestQueue = VolleyQueue.get(appContext)
     private var lastRefresh: Date? = null
+    private var authDeserializer = AuthDeserializer(appContext)
 
-    val url: String
-        get() = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
+    private val appDB = ApplicationDB.getDatabase(appContext)
+    // TODO convert to inject
+    private val requestManager: NetworkRequestManager = NetworkRequestManager(appContext)
+    private val userRepo : UserRepository = UserRepositoryImpl(appContext, requestManager)
+
+    val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
             + "&response_type=" + AuthConstants.RESPONSE_TYPE
             + "&state=" + AuthConstants.STATE
             + "&redirect_uri=" + AuthConstants.REDIRECT
             + "&duration=" + AuthConstants.DURATION
             + "&scope=" + AuthConstants.SCOPE)
 
-    /**
-     * checks if the user is currently signed in by checking shared preferences
-     * @return whether the user is signed in
-     */
-    private val isAuthenticated: Boolean
-        get() = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE).contains(tokenKey)
-
-    // get the current user from shared preferences
-    val user: String?
-        get() {
-            val prefEditor = appContext.getSharedPreferences(KEY_USERNAME, Context.MODE_PRIVATE)
-            return prefEditor.getString(KEY_USERNAME, null)
-        }
-
-
     init {
-        requestQueue = VolleyQueue.get(appContext)
-
-        // retrieve the strings from res
-        appContext.resources.apply {
-            preference = getString(R.string.AUTH_PREF)
-            tokenKey = getString(R.string.TOKEN_KEY)
-            refreshTokenKey = getString(R.string.REFRESH_TOKEN_KEY)
-            redirectCode = getString(R.string.REDIRECT_CODE)
-        }
+        // checks if the user is currently signed in by checking shared preferences
+        val isAuthenticated = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).contains(KEY_CURR_ACCOUNT)
 
         if (isAuthenticated) {
             // refresh the auth token
@@ -82,13 +77,12 @@ class AuthImpl (private val appContext: Context) : Auth {
         }
     }
 
-
     /**
      * Callback used to parse the url after the user has authenticated through the reddit auth page.
      * Retrieves the code value and uses it to obtain the real auth token
      * @param redirectUrl url with params to parse
      */
-    fun retrieveAccessToken(redirectUrl: String, callback: AuthenticationCallback) {
+    override suspend fun retrieveAccessToken(redirectUrl: String, callback: AuthenticationCallback) {
         val queryStrings = redirectUrl.substring(AuthConstants.REDIRECT.length + 1)
         val queryPairs = queryStrings.split("&".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
@@ -104,73 +98,102 @@ class AuthImpl (private val appContext: Context) : Auth {
             .putString(redirectCode, queryMap[redirectCode]).apply()
 
         // get the access and refresh token
+        // TODO convert to use request manager to remove callbacks
         requestQueue.add(RedditGetTokenRequest(Request.Method.POST, AuthConstants.ACCESS_TOKEN_URI,
             Response.Listener { response ->
-                Log.d(TAG, response)
-                saveReturn(response, callback)
+                Log.d(TAG, "successful response $response")
+                // we should control how we store the token here
+                // TODO refactor the account repo into its own class in this package since the two
+                // are more closely related than user <-> account
+                GlobalScope.launch (Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+                    Log.d(TAG, "failed to retrieve access token $e")
+                }) {
+                    Log.d(TAG, "test")
+                    val responseData = authDeserializer.parseAuthResponse(response)
+                    val username = retrieveUserName(responseData.access)
+
+                    Log.d(TAG, "successful response $response")
+
+                    if (username != null) {
+                        withContext(Dispatchers.IO) {
+                            appDB.tokenStoreDao.insertTokenStore(
+                                TokenStoreEntity().apply {
+                                    accountName = username
+                                    access = responseData.access
+                                    refresh = responseData.refresh
+                                }
+                            )
+
+                            // TODO extract once account repo is refactored
+                            // store the current account name in shared preferences
+                            appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
+                                sp.edit().putString(KEY_CURR_ACCOUNT, username)?.apply()
+                            }
+                        }
+                    }
+
+                    callback.onAuthenticated()
+                }
             },
-            Response.ErrorListener { error -> Log.d(TAG, "Error retrieving access token through reddit $error") })
+            Response.ErrorListener { error ->
+                Log.d(TAG, "Error retrieving access token through reddit $error")
+            })
         )
+
     }
 
 
     /**
      * gets a new current access token using the refresh token
      */
-    override fun refreshToken(callback: AuthenticationCallback) {
-        requestQueue.add(
-            RedditGetRefreshRequest(
-                Request.Method.POST,
-                AuthConstants.ACCESS_TOKEN_URI,
-                Response.Listener { response ->
-                    Log.d(TAG, "Token refreshed$response")
-                    saveReturn(response, callback)
+    override suspend fun refreshToken(callback: AuthenticationCallback) {
+        coroutineScope {
+            // get the name of the current account
+            val name : String = appContext
+                .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
+                .getString(KEY_CURR_ACCOUNT, null) ?: throw Exception()
 
-                    // set time of refresh
-                },
-                Response.ErrorListener { error -> Log.d(TAG, "Token failed to refresh = $error") }
+            val refreshKey = withContext(Dispatchers.IO) {
+                appDB.tokenStoreDao.getTokenStore(name).refresh
+            }
+            Log.d(TAG, "refresh key $refreshKey")
+            requestQueue.add(
+                RedditGetRefreshRequest(
+                    Request.Method.POST,
+                    AuthConstants.ACCESS_TOKEN_URI,
+                    Response.Listener { response ->
+                        GlobalScope.launch {
+                            Log.d(TAG, "Token refreshed$response")
+                            val refreshData = authDeserializer.parseRefreshResponse(response)
+
+                            withContext(Dispatchers.IO) {
+                                appDB.tokenStoreDao.updateAccessToken(name, refreshData.access)
+                                callback.onAuthenticated()
+                            }
+                        }
+                    },
+                    Response.ErrorListener { error -> Log.d(TAG, "Token failed to refresh = $error") },
+                    refreshKey
+                )
             )
-        )
-    }
-
-    fun initializeUser(username: String) {
-        // stores the current user in shared preferences
-        val prefEditor = appContext
-            .getSharedPreferences(KEY_USERNAME, Context.MODE_PRIVATE).edit()
-
-        prefEditor.putString(KEY_USERNAME, username).apply()
+        }
     }
 
     /**
-     * parses the successful auth response to store the oauth and refresh token in the shared
-     * preferences. Then refreshes the token to get the permanent token
-     * @param response
+     * we need to retrieve
      */
-    private fun saveReturn(response: String, callback: AuthenticationCallback) {
-        val parser = JSONParser()
-        try {
-            val data = parser.parse(response) as JSONObject
-            Log.d(TAG, "" + data["scope"]!!.toString())
+    private suspend fun retrieveUserName(accessToken : String) : String? {
+        val selfEndpoint = "https://oauth.reddit.com/api/v1/me"
 
-            // stores the token in shared preferences
-            val prefEditor = appContext
-                .getSharedPreferences("auth", Context.MODE_PRIVATE).edit()
-
-            // checks if there is an refresh token to be stored
-            if (data.containsKey(refreshTokenKey)) {
-                prefEditor.putString(refreshTokenKey, data[refreshTokenKey] as String?).apply()
-            }
-
-            prefEditor.putString(tokenKey, data[tokenKey] as String?).apply()
-            Log.d(TAG, "token saved! " + (data[tokenKey] as String?)!!)
-
-            callback.onAuthenticated()
-
-        } catch (e: ParseException) {
-            // TODO remove toast code. It has no business being here
-            Toast.makeText(appContext, "yikes", Toast.LENGTH_SHORT).show()
+        return withContext (Dispatchers.IO){
+            // create the new request and submit it
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = selfEndpoint,
+                authToken = accessToken
+            )
+            authDeserializer.parseGetUsernameResponse(response)
         }
-
     }
 
     internal inner class RedditGetTokenRequest (
@@ -213,7 +236,8 @@ class AuthImpl (private val appContext: Context) : Auth {
         method: Int,
         url: String,
         listener: Response.Listener<String>,
-        errorListener: Response.ErrorListener
+        errorListener: Response.ErrorListener,
+        private val refreshToken: String
     ) : StringRequest(method, url, listener, errorListener) {
 
         // override headers to add custom credentials in client_secret:redirect_code format
@@ -236,26 +260,10 @@ class AuthImpl (private val appContext: Context) : Auth {
         public override fun getParams(): Map<String, String> {
             val params = HashMap<String, String>()
 
-            val refreshToken = appContext.getSharedPreferences("auth", Context.MODE_PRIVATE)
-                .getString(refreshTokenKey, "DEFAULT")
-
             params["grant_type"] = refreshTokenKey
-            params["refresh_token"] = refreshToken!!
+            params["refresh_token"] = refreshToken
 
             return params
         }
     }
-
-    companion object {
-
-        fun checkToken(appContext: Context): String? {
-            // retrieve the auth token shared preferences
-            val authKey = appContext.resources.getString(R.string.AUTH_PREF)
-            val tokenKey = appContext.resources.getString(R.string.TOKEN_KEY)
-            return appContext
-                .getSharedPreferences(authKey, Context.MODE_PRIVATE)
-                .getString(tokenKey, "")
-        }
-    }
-
 }

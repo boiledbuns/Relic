@@ -14,7 +14,6 @@ import com.relic.network.request.RelicOAuthRequest;
 public class PostGatewayImpl implements  PostGateway {
   private final String ENDPOINT = "https://oauth.reddit.com/";
   public static String TAG = "POST_GATEWAY";
-  private String authToken;
 
   private ApplicationDB appDb;
 
@@ -23,14 +22,6 @@ public class PostGatewayImpl implements  PostGateway {
 
   public PostGatewayImpl(Context context, NetworkRequestManager networkRequestManager) {
     appDb = ApplicationDB.getDatabase(context);
-    // Get the key values needed to get the actual authtoken from shared preferences
-    String authKey = context.getString(R.string.AUTH_PREF);
-    String tokenKey = context.getString(R.string.TOKEN_KEY);
-
-    // retrieve the authtoken for use
-    authToken = context.getSharedPreferences(authKey, Context.MODE_PRIVATE)
-        .getString(tokenKey, "DEFAULT");
-
     requestManager = networkRequestManager;
   }
 
@@ -55,8 +46,7 @@ public class PostGatewayImpl implements  PostGateway {
             error -> {
               Log.d(TAG, "Sorry, there was an error voting on the post " + fullname + " to " + voteStatus);
               success.setValue(false);
-            },
-            authToken
+            }
     ));
 
     return success;
@@ -84,8 +74,7 @@ public class PostGatewayImpl implements  PostGateway {
             error -> {
               Log.d(TAG, "Sorry, there was an error saving the post " + fullname);
               success.setValue(false);
-            },
-            authToken
+            }
     ));
 
     return success;

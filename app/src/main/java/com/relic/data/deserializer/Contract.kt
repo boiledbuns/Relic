@@ -46,6 +46,11 @@ interface Contract {
         suspend fun parseAccount(accountResponse : String) : AccountEntity
     }
 
+    interface SubDeserializer {
+        suspend fun parseSubreddits(response: String): List<SubredditEntity>
+        suspend fun parseSearchedSubs(response: String): List<String>
+    }
+
 }
 
 data class ParsedPostData(

@@ -37,18 +37,28 @@ class MainVM(
     val userLiveData : LiveData<UserModel> = _userLiveData
 
     init {
-        auth.refreshToken(AuthenticationCallback {
-            Log.d(TAG, "Token refreshed")
-            retrieveUser()
-        })
+        launch(Dispatchers.Main) {
+            auth.refreshToken(AuthenticationCallback {
+                Log.d(TAG, "Token refreshed")
+                retrieveUser()
+            })
+        }
 
         _accountsLiveData.addSource(userRepo.getAccounts()) { accounts ->
             _accountsLiveData.postValue(accounts)
         }
     }
 
-    override fun onAccountSelected() {
-       retrieveUser()
+    override fun onAccountSelected(name : String?) {
+        name?.let {
+            launch(Dispatchers.Main) {
+                // update the current account so we can retrieve the user associated with it
+                userRepo.setCurrentAccount(name)
+//                userRepo.retrieveCurrentUser()?.let { user ->
+//                    _userLiveData.postValue(user)
+//                }
+            }
+        } ?: retrieveUser()
     }
 
     private fun retrieveUser() {
