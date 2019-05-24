@@ -226,7 +226,7 @@ class DisplayPostVM (
 
     override fun onPostVoted(voteValue: Int) {
         Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue)
-        postRepo.postGateway.voteOnPost(postFullname, voteValue)
+        launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(postFullname, voteValue) }
     }
 
     override fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int{
@@ -242,7 +242,7 @@ class DisplayPostVM (
 
         // send request only if value changed
         if (newUserUpvoteValue != commentModel.userUpvoted) {
-            postRepo.postGateway.voteOnPost(commentModel.fullName, voteValue)
+            launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(commentModel.fullName, voteValue) }
         }
         return newUserUpvoteValue
     }

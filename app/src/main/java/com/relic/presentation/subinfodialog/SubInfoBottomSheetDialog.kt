@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialogFragment
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -79,7 +80,7 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         subCountView.text = resources.getString(R.string.subscriber_count, subredditModel.subscriberCount)
-        subDescriptionView.text = subredditModel.description
+        subDescriptionView.text = Html.fromHtml(Html.fromHtml(subredditModel.description).toString())
         // TODO create custom movement method class
         subDescriptionView.movementMethod
     }

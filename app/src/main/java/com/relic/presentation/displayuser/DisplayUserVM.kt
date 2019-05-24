@@ -27,7 +27,12 @@ class DisplayUserVM(
     private val listingRepo: ListingRepository,
     private val userRepo: UserRepository,
     private val username : String
-) : ViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
+) : ViewModel(), DisplayUserContract.ListingItemAdapterDelegate, CoroutineScope {
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
+        // TODO handle exception
+        Log.d(TAG, "caught exception $e")
+    }
 
     val TAG = "DISPLAY_USER_VM"
 
@@ -238,7 +243,7 @@ class DisplayUserVM(
     // region post adapter delegate
 
     override fun visitListing(listingItem : ListingItem) {
-        postRepo.postGateway.visitPost(listingItem.fullName)
+        launch(Dispatchers.Main) { postRepo.postGateway.visitPost(listingItem.fullName) }
 
         // retrieval option doesn't matter in this case
         val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
@@ -264,11 +269,11 @@ class DisplayUserVM(
     }
 
     override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
-        postRepo.postGateway.voteOnPost(listingItem.fullName, newVote)
+        launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(listingItem.fullName, newVote) }
     }
 
     override fun saveListing(listingItem : ListingItem) {
-        postRepo.postGateway.savePost(listingItem.fullName, !listingItem.saved)
+        launch(Dispatchers.Main) { postRepo.postGateway.savePost(listingItem.fullName, !listingItem.saved) }
     }
 
     override fun onThumbnailClicked(listingItem : ListingItem) {

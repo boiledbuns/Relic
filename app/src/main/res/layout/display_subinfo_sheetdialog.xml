@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/padding_m"
+    android:paddingTop="@dimen/padding_m"
+    android:paddingLeft="@dimen/padding_m"
+    android:paddingRight="@dimen/padding_m"
     android:background="?attr/relicBackgroundColorB">
 
     <android.support.v4.widget.NestedScrollView
@@ -24,7 +26,9 @@
                 android:layout_marginStart="@dimen/padding_s"
                 android:textSize="@dimen/title_text_l"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/subInfoSubView"/>
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/subInfoSubView"
+                app:layout_constraintStart_toStartOf="parent"/>
 
             <ImageView
                 android:id="@+id/subInfoSubView"
@@ -43,7 +47,8 @@
                 android:layout_marginStart="@dimen/padding_s"
                 android:layout_marginBottom="@dimen/padding_m"
                 android:textSize="@dimen/title_text_m"
-                app:layout_constraintTop_toBottomOf="@id/subNameView"/>
+                app:layout_constraintTop_toBottomOf="@id/subNameView"
+                app:layout_constraintStart_toStartOf="parent"/>
 
             <ImageView
                 android:id="@+id/subInfoPinView"
@@ -71,7 +76,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_m"
                 android:textSize="@dimen/text_m"
-                app:layout_constraintTop_toBottomOf="@id/subCountView"/>
+                app:layout_constraintTop_toBottomOf="@id/subCountView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginBottom="@dimen/padding_m"/>
 
         </android.support.constraint.ConstraintLayout>
 

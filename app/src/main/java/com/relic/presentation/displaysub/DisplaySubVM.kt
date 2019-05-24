@@ -17,7 +17,6 @@ import com.relic.network.NetworkUtil
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.*
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 open class DisplaySubVM (
     private val postSource: PostRepository.PostSource,
@@ -84,9 +83,11 @@ open class DisplaySubVM (
 
     private fun initializeSubredditInformation(subName : String ) {
         // TODO: STILL TESTING retrieve the banner image from the subreddit css
-        subRepo.getSubGateway().apply {
-            getAdditionalSubInfo(subName)
-            getSidebar(subName)
+        launch(Dispatchers.Main) {
+            subRepo.getSubGateway().apply {
+                retrieveAdditionalSubInfo(subName)
+                retrieveSidebar(subName)
+            }
         }
 
         //subRepo.getSubGateway().retrieveSubBanner(subName);
@@ -178,30 +179,9 @@ open class DisplaySubVM (
         if (postSource is PostRepository.PostSource.Subreddit) {
             val subName = postSource.subredditName
             Log.d(TAG, "Changing to subscribed $subscribe")
-            if (subscribe) {
-                // subscribe if not currently subscribed
-                val successObservable = subRepo.getSubGateway().subscribe(subName)
-                _subredditMediator.addSource(successObservable) { success: Boolean? ->
 
-                    if (success != null && success) {
-                        Log.d(TAG, "subscribing")
-                    }
-                    // unsubscribe after consuming event
-                    _subredditMediator.removeSource(successObservable)
-                }
-            } else {
-                // unsubscribe if already subscribed
-                val successObservable = subRepo.getSubGateway().unsubscribe(subName)
-                _subredditMediator.addSource(successObservable) { success: Boolean? ->
-
-                    if (success != null && success) {
-                        Log.d(TAG, "unsubscribing")
-                        //subMediator.setValue(false);
-                    }
-
-                    //subscribed.setValue(success);
-                    _subredditMediator.removeSource(successObservable)
-                }
+            launch(Dispatchers.Main) {
+                subRepo.getSubGateway().subscribe(subscribe, subName)
             }
         }
     }
@@ -209,18 +189,18 @@ open class DisplaySubVM (
     // region view action delegate
 
     override fun visitPost(postFullname : String, subreddit : String) {
-        postRepo.postGateway.visitPost(postFullname)
+        launch(Dispatchers.Main) { postRepo.postGateway.visitPost(postFullname) }
         _navigationLiveData.value = SubNavigationData.ToPost(postFullname, subreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
         Log.d(TAG, "Voting on post " + postFullname + "value = " + voteValue)
-        postRepo.postGateway.voteOnPost(postFullname, voteValue)
+        launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(postFullname, voteValue) }
     }
 
     override fun savePost(postFullname: String, save: Boolean) {
         Log.d(TAG, "Saving on post " + postFullname + "save = " + save)
-        postRepo.postGateway.savePost(postFullname, save)
+        launch(Dispatchers.Main) { postRepo.postGateway.savePost(postFullname, save) }
     }
 
     override fun onLinkPressed(url: String) {

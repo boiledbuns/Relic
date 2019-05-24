@@ -1,6 +1,7 @@
 package com.relic.presentation.subinfodialog
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.relic.data.SubRepository
@@ -28,11 +29,16 @@ class SubInfoDialogVM (
     private val _subredditLiveData = subRepo.getSingleSub(subredditName)
     val subredditLiveData : LiveData<SubredditModel> = _subredditLiveData
 
-    private val _sideBarLiveData = subRepo.getSubGateway().getSidebar(subredditName)
+    private val _sideBarLiveData = MutableLiveData<String>()
     val sideBarLiveData : LiveData<String> = _sideBarLiveData
 
     init {
-        subRepo.getSubGateway().getAdditionalSubInfo(subredditName)
+        launch (Dispatchers.Main) {
+            subRepo.getSubGateway().retrieveAdditionalSubInfo(subredditName)
+
+            val sidebar = subRepo.getSubGateway().retrieveSidebar(subredditName)
+            _sideBarLiveData.postValue(sidebar)
+        }
     }
 
     fun updateSubscriptionStatus(subscribed: Boolean) {

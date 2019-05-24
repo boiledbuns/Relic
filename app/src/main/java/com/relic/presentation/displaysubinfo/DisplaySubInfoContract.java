@@ -12,10 +12,6 @@ public interface DisplaySubInfoContract {
     LiveData<SubredditModel> getSubreddit();
     void retrieveSubreddit();
 
-    LiveData<String> getDescription();
-
-    LiveData<Boolean> getSubscribed();
-
     LiveData<Boolean> subscribe();
     LiveData<Boolean> unsubscribe();
 
