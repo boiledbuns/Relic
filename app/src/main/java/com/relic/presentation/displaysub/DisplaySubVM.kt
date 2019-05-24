@@ -110,7 +110,7 @@ open class DisplaySubVM (
             // only indicate refreshing if connected to network
             _refreshLiveData.postValue(true)
 
-            GlobalScope.launch {
+            launch(Dispatchers.Main){
                 val request = async {
                     if (resetPosts) {
                         postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
@@ -155,7 +155,7 @@ open class DisplaySubVM (
         sortType?.let { currentSortingType = it }
         sortScope?.let { currentSortingScope = it }
 
-        GlobalScope.launch {
+        launch(Dispatchers.Main) {
             // remove all posts from current db for this subreddit (triggers retrieval)
             postRepo.clearAllPostsFromSource(postSource)
         }
@@ -168,7 +168,7 @@ open class DisplaySubVM (
         Log.d(TAG, "Retrieving next posts with $nextVal")
         // retrieve the "after" value for the next posting
         nextVal?.let {
-            GlobalScope.launch {
+            launch(Dispatchers.Main) {
                 postRepo.retrieveMorePosts(postSource, it)
             }
         }

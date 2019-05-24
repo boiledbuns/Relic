@@ -127,10 +127,6 @@ class DisplayPostFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViewModel()
-
-        // TODO: Testing user gateway using user "reddit"
-        val userGateway = UserGatewayImpl(context!!, NetworkRequestManager(activity!!.applicationContext))
-        userGateway.getUser("reddit")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

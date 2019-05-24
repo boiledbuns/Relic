@@ -46,13 +46,14 @@ class SubRepositoryImpl(private val context: Context, private val requestManager
 
     override suspend fun retrieveSingleSub(subName: String) {
         val url = "{ENDPOINT}r/{subName}/about"
-        val response = requestManager.processRequest(
-            method = RelicOAuthRequest.GET,
-            url = url
-        )
-        Log.d(TAG, response)
 
         try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = url
+            )
+            Log.d(TAG, response)
+
             val subreddit = subDeserializer.parseSubredditResponse(response)
 
             // create a new task to insert the subreddits on parse success
@@ -84,7 +85,7 @@ class SubRepositoryImpl(private val context: Context, private val requestManager
     }
 
     override suspend fun pinSubreddit(subredditName: String, newPinnedStatus: Boolean) {
-        subDao.updatePinnedStatus(subredditName, newPinnedStatus)
+        withContext(Dispatchers.IO) { subDao.updatePinnedStatus(subredditName, newPinnedStatus) }
     }
 
     override fun getPinnedsubs(): LiveData<List<SubredditModel>> {

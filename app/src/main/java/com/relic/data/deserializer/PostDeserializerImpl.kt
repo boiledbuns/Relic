@@ -103,7 +103,7 @@ class PostDeserializerImpl(
                     val newPost = extractPost(post)
                     postEntities.add(newPost)
 
-                    val existingPostSource = async {
+                    val existingPostSource = async(Dispatchers.IO) {
                         appDB.postSourceDao.getPostSource(newPost.name)
                     }.await()
 
@@ -127,7 +127,7 @@ class PostDeserializerImpl(
                 postCount++
 
             } catch (e : Exception) {
-                    throw RelicParseException(response, e)
+                throw RelicParseException(response, e)
             }
         }
 
@@ -204,23 +204,25 @@ class PostDeserializerImpl(
         }
     }
 
-    private fun getSourceCount(postSource : PostRepository.PostSource) : Int {
+    private suspend fun getSourceCount(postSource : PostRepository.PostSource) : Int {
         val sourceDao = appDB.postSourceDao
 
-        return when (postSource) {
-            is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
-            is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
-            is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
-            is PostRepository.PostSource.Popular -> 0
-            is PostRepository.PostSource.User -> {
-                when (postSource.retrievalOption) {
-                    PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
-                    PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserComments()
-                    PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
-                    PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
-                    PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
-                    PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
-                    PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
+        return withContext(Dispatchers.IO) {
+            when (postSource) {
+                is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
+                is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
+                is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
+                is PostRepository.PostSource.Popular -> 0
+                is PostRepository.PostSource.User -> {
+                    when (postSource.retrievalOption) {
+                        PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
+                        PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserComments()
+                        PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
+                        PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
+                        PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
+                        PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
+                        PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
+                    }
                 }
             }
         }

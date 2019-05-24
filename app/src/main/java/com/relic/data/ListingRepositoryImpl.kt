@@ -9,9 +9,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.shopify.livedataktx.observe
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 
 import org.json.simple.parser.JSONParser
 
@@ -48,6 +46,6 @@ class ListingRepositoryImpl(context: Context) : ListingRepository {
     }
 
     override suspend fun getAfterString(fullName: String): String? {
-        return appDB.listingDAO.getAfterString(fullName)
+        return withContext(Dispatchers.IO) { appDB.listingDAO.getAfterString(fullName) }
     }
 }

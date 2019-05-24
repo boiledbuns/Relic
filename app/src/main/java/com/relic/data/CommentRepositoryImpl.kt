@@ -52,7 +52,7 @@ class CommentRepositoryImpl(
 
     override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) {
         val postName = CommentDeserializer.removeTypePrefix(postFullName)
-        var url = "${RepoConstants}r/$subName/comments/$postName?count=20"
+        var url = "${RepoConstants.ENDPOINT}r/$subName/comments/$postName?count=20"
 
         if (refresh) {
             val after = listingRepo.getAfterString(postFullName)

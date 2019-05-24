@@ -16,9 +16,7 @@ import com.relic.network.request.RelicRequestError
 import com.relic.util.MediaHelper
 import com.relic.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class DisplayPostVM (
@@ -29,7 +27,12 @@ class DisplayPostVM (
     private val subName: String,
     private val postFullname: String,
     private val postSource : PostRepository.PostSource
-): ViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
+): ViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate, CoroutineScope {
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
+        // TODO handle exception
+        Log.d(TAG, "caught exception $e")
+    }
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -93,7 +96,7 @@ class DisplayPostVM (
         if (networkUtil.checkConnection()) {
             _refreshingLiveData.postValue(true)
 
-            GlobalScope.launch {
+            launch(Dispatchers.Main) {
                 val commentJob = launch { retrieveMoreComments(true) }
                 val postJob = launch {
                     postRepo.retrievePost(subName, postFullname, postSource) { exception: RelicRequestError ->
@@ -121,7 +124,7 @@ class DisplayPostVM (
     override fun retrieveMoreComments(refresh: Boolean) {
         // TODO check if there is connection
         // retrieves post and comments from network
-        GlobalScope.launch {
+        launch(Dispatchers.Main) {
             if (refresh) {
                 _refreshingLiveData.postValue(true)
                 commentRepo.clearAllCommentsFromSource(postFullname)
@@ -209,7 +212,7 @@ class DisplayPostVM (
                     if (it.isNotEmpty()) {
                         insertReplies(commentPosition, it)
                     } else {
-                        GlobalScope.launch {
+                        launch(Dispatchers.Main) {
                             // TODO retrieve comments from server if replies are not loaded
                             commentRepo.retrieveCommentChildren(commentModel)
                         }
