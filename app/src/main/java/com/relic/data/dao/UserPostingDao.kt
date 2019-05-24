@@ -42,32 +42,32 @@ abstract class UserPostingDao {
 
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
         "WHERE userCommentsPosition >= 0 ORDER BY userCommentsPosition ASC")
     abstract fun getUserComments(): LiveData<List<CommentModel>>
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
         "WHERE userSavedPosition >= 0 ORDER BY userSavedPosition ASC")
     abstract fun getUserSavedComments(): LiveData<List<CommentModel>>
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
         "WHERE userUpvotedPosition >= 0 ORDER BY userUpvotedPosition ASC")
     abstract fun getUserUpvotedComments(): LiveData<List<CommentModel>>
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
         "WHERE  userDownvotedPosition >= 0 ORDER BY userDownvotedPosition ASC")
     abstract fun getUserDownvotedComments(): LiveData<List<CommentModel>>
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
         "WHERE userGildedPosition >= 0 ORDER BY userGildedPosition ASC")
     abstract fun getUserGildedComments(): LiveData<List<CommentModel>>
 
     @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.fullName = PostSourceEntity.sourceId " +
+        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
         "WHERE userHiddenPosition >= 0 ORDER BY userHiddenPosition ASC")
     abstract fun getUserHiddenComments(): LiveData<List<CommentModel>>
 }

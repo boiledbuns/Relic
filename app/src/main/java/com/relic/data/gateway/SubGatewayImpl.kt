@@ -57,9 +57,9 @@ class SubGatewayImpl(context: Context, private val requestManager: NetworkReques
                 withContext(Dispatchers.IO) {
                     subDAO.updateSubInfo(
                         subredditName,
-                        subInfoObject["header_title"] as String,
+                        subInfoObject["header_title"] as String?,
                         Html.escapeHtml(subInfoObject["description_html"] as String),
-                        subInfoObject["submit_text"] as String
+                        subInfoObject["submit_text"] as String?
                     )
                 }
             }

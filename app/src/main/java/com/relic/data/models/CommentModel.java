@@ -6,6 +6,7 @@ public class CommentModel extends ListingItem {
     public static int NOVOTE = 0;
     public static String TYPE = "t1_";
 
+    public String id;
     public String author;
     private String body;
     public String created;
@@ -54,4 +55,9 @@ public class CommentModel extends ListingItem {
     public boolean isLoadMore() {
       return author == null;
   }
+
+    @Override
+    public String getFullName() {
+        return "t1_" + id;
+    }
 }

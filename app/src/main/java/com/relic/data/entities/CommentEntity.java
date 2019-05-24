@@ -11,7 +11,6 @@ public class CommentEntity {
 
     @NonNull
     @PrimaryKey
-    @ColumnInfo(name = "fullName")
     private String id;
 
     //public String replies;
