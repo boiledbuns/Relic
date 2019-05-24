@@ -10,9 +10,7 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.data.PostRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -37,24 +35,27 @@ class PostDeserializerImpl(
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val current = Date()
 
-    override suspend fun parsePost(response: String) : ParsedPostData = coroutineScope {
+    override suspend fun parsePost(response: String) : ParsedPostData {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
         val child = (data["children"] as JSONArray)[0] as JSONObject
         val post = child["data"] as JSONObject
 
-        val newPost = extractPost(post)
-
-        val existingPostSource = async {
+        val newPost = try {
+            extractPost(post)
+        } catch (e : ParseException){
+            throw RelicParseException(response, e)
+        }
+        // should probably be supplied instead of retrieved here
+        val existingPostSource = withContext(Dispatchers.IO) {
             appDB.postSourceDao.getPostSource(newPost.name)
-        }.await()
-
+        }
 
         val postSourceEntity = existingPostSource?.apply {
             sourceId = newPost.name
             subreddit = newPost.subreddit
         } ?: PostSourceEntity(newPost.name, newPost.subreddit)
 
-        ParsedPostData(postSourceEntity, newPost)
+        return ParsedPostData(postSourceEntity, newPost)
     }
 
     /**
@@ -64,7 +65,6 @@ class PostDeserializerImpl(
      * @param response the json response from the server with the listing object
      * @throws ParseException
      */
-    @Throws(ParseException::class)
     override suspend fun parsePosts(
         response: String,
         postSource: PostRepository.PostSource,
@@ -87,51 +87,49 @@ class PostDeserializerImpl(
 
         val postIterator = listingPosts?.iterator()
 
-        launch {
-            var postCount: Int = getSourceCount(postSource)
+        var postCount: Int = getSourceCount(postSource)
 
-            // generate the list of posts using the json array
-            while (postIterator != null && postIterator.hasNext()) {
-                val fullEntityJson = (postIterator.next() as JSONObject)
+        // generate the list of posts using the json array
+        while (postIterator != null && postIterator.hasNext()) {
+            val fullEntityJson = (postIterator.next() as JSONObject)
 
-                try {
-                    var postSourceEntity: PostSourceEntity?
-                    val postKind = fullEntityJson["kind"] as String
+            try {
+                var postSourceEntity: PostSourceEntity?
+                val postKind = fullEntityJson["kind"] as String
 
-                    if (postKind.equals(TYPE_POST)) {
+                if (postKind.equals(TYPE_POST)) {
 
-                        val post = fullEntityJson["data"] as JSONObject
-                        val newPost = extractPost(post)
-                        postEntities.add(newPost)
+                    val post = fullEntityJson["data"] as JSONObject
+                    val newPost = extractPost(post)
+                    postEntities.add(newPost)
 
-                        val existingPostSource = async {
-                            appDB.postSourceDao.getPostSource(newPost.name)
-                        }.await()
+                    val existingPostSource = async {
+                        appDB.postSourceDao.getPostSource(newPost.name)
+                    }.await()
 
-                        postSourceEntity = existingPostSource?.apply {
-                            sourceId = newPost.name
-                            subreddit = newPost.subreddit
-                        } ?: PostSourceEntity(newPost.name, newPost.subreddit)
-                    } else {
-                        val newComment = CommentDeserializer.unmarshallComment(
-                            commentChild = fullEntityJson,
-                            commentPosition = 0F
-                        ).first()
-                        commentEntities.add(newComment)
+                    postSourceEntity = existingPostSource?.apply {
+                        sourceId = newPost.name
+                        subreddit = newPost.subreddit
+                    } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+                } else {
+                    val newComment = CommentDeserializer.unmarshallComment(
+                        commentChild = fullEntityJson,
+                        commentPosition = 0F
+                    ).first()
+                    commentEntities.add(newComment)
 
-                        postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
-                    }
-
-                    setSource(postSourceEntity, postSource, postCount)
-                    postSourceEntities.add(postSourceEntity)
-
-                    postCount++
-
-                } catch (e : Exception) {
-                    Log.d(TAG, "Error parsing post ${e.message} \n  message :  ${fullEntityJson["data"] as JSONObject}")
+                    postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
                 }
+
+                setSource(postSourceEntity, postSource, postCount)
+                postSourceEntities.add(postSourceEntity)
+
+                postCount++
+
+            } catch (e : Exception) {
+                    throw RelicParseException(response, e)
             }
-        }.join()
+        }
 
         ParsedPostsData(postSourceEntities, postEntities, commentEntities, listing)
     }
@@ -140,8 +138,7 @@ class PostDeserializerImpl(
      * This is fine for now because I'm still working on finalizing which fields to use/not use
      * There will be a lot more experimentation and changes to come in this method as a result
      */
-    @Throws(ParseException::class)
-    fun extractPost(post: JSONObject) : PostEntity {
+    private fun extractPost(post: JSONObject) : PostEntity {
         // use "api" prefix to indicate fields accessed directly from api
         return gson.fromJson(post.toJSONString(), PostEntity::class.java).apply {
             //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));

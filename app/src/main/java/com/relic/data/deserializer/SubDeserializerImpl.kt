@@ -9,7 +9,7 @@ import org.json.simple.parser.ParseException
 import java.util.ArrayList
 
 class SubDeserializerImpl : Contract.SubDeserializer {
-    private val TAG = "POST_DESERIALIZER"
+    private val TAG = "SUB_DESERIALIZER"
 
     private val parser: JSONParser = JSONParser()
     private val gson = GsonBuilder().create()
@@ -19,6 +19,7 @@ class SubDeserializerImpl : Contract.SubDeserializer {
         val subredditObject = (parser.parse(response) as JSONObject)["data"] as JSONObject?
         return gson.fromJson(subredditObject!!.toJSONString(), SubredditEntity::class.java)
     }
+
     /**
      * Parses a "listing" for subreddits into a list of Subreddit
      * @param response JSON formatted listing for the subreddits to be parsed
@@ -27,21 +28,25 @@ class SubDeserializerImpl : Contract.SubDeserializer {
      */
     // TODO convert error to deserializer error -> classes using it should not be aware of what
     // this class uses to parse response
-    @Throws(ParseException::class)
+    @Throws(RelicParseException::class)
     override suspend fun parseSubredditsResponse(response: String): ParsedSubsData {
         val data = (parser.parse(response) as JSONObject)["data"] as JSONObject
         val newAfter = data["after"] as String?
 
         val subscribed = ArrayList<SubredditEntity>()
 
-        // get all the subs that the user is subscribed to
-        val subs = data["children"] as JSONArray?
-        for (sub in subs!!) {
-            val currentSub = (sub as JSONObject)["data"] as JSONObject
-            // Log.d(TAG, "keys = " + currentSub.keySet());
-            // Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
-            // Log.d(TAG, currentSub.get("display_name") + "banner url  = " + currentSub.get("community_icon") + " " + currentSub.get("icon_img"));
-            subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity::class.java))
+        try {
+            // get all the subs that the user is subscribed to
+            val subs = data["children"] as JSONArray?
+            for (sub in subs!!) {
+                val currentSub = (sub as JSONObject)["data"] as JSONObject
+                // Log.d(TAG, "keys = " + currentSub.keySet());
+                // Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
+                // Log.d(TAG, currentSub.get("display_name") + "banner url  = " + currentSub.get("community_icon") + " " + currentSub.get("icon_img"));
+                subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity::class.java))
+            }
+        } catch (e : ParseException) {
+            throw RelicParseException(response, e)
         }
 
         //Log.d(TAG, subscribed.toString());
@@ -67,7 +72,7 @@ class SubDeserializerImpl : Contract.SubDeserializer {
                 parsedMatches.add((subIterator.next() as JSONObject)["name"] as String)
             }
         } catch (e: ParseException) {
-            e.printStackTrace()
+            throw RelicParseException(response, e)
         }
 
         return parsedMatches

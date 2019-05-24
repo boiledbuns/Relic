@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.util.Log
-import com.android.volley.VolleyError
 
 import com.relic.data.deserializer.CommentDeserializer
 import com.relic.network.NetworkRequestManager
@@ -28,13 +27,13 @@ class CommentRepositoryImpl(
     // region interface
 
     override fun getComments(postFullName : String, displayNRows: Int): LiveData<List<CommentModel>> {
-        val postFullname = CommentDeserializer.removeTypePrefix(postFullName)
+        val postId = CommentDeserializer.removeTypePrefix(postFullName)
         return when {
             (displayNRows > 0) -> {
-                commentDao.getChildrenByLevel(postFullname, displayNRows)
+                commentDao.getChildrenByLevel(postId, displayNRows)
             }
             else -> {
-                commentDao.getAllComments(postFullname)
+                commentDao.getAllComments(postId)
             }
         }
     }
@@ -56,31 +55,23 @@ class CommentRepositoryImpl(
         var url = "${RepoConstants}r/$subName/comments/$postName?count=20"
 
         if (refresh) {
-            val after = withContext(Dispatchers.Default) { listingRepo.getAfterString(postFullName) }
+            val after = listingRepo.getAfterString(postFullName)
             url += "&after=$after"
         }
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
-            Log.d(TAG, "${response}")
+            Log.d(TAG, "$response")
 
             val parsedData = CommentDeserializer.parseCommentsResponse(
                 postFullName = postFullName,
                 response = response
             )
 
-            coroutineScope {
-                withContext (Dispatchers.IO) {
-                    insertComments(parsedData.commentList, parsedData.listingEntity)
-                }
-            }
+            insertComments(parsedData.commentList, parsedData.listingEntity)
         }
-
         catch (e : Exception) {
-            when (e) {
-                is VolleyError -> Log.d(TAG, "Error with request : at $url \n ${e.networkResponse}")
-                else -> Log.d(TAG, "Error parsing JSON return " + e.message)
-            }
+            throw DomainTransfer.handleException("retrieve comments", e) ?: e
         }
     }
 
@@ -107,17 +98,12 @@ class CommentRepositoryImpl(
         try {
             val commentEntities = CommentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
 
-            coroutineScope {
-                launch (Dispatchers.IO) {
-                    commentDao.deleteComment(moreChildrenComment.fullName)
-                    commentDao.insertComments(commentEntities)
-                }
+            withContext (Dispatchers.IO) {
+                commentDao.deleteComment(moreChildrenComment.fullName)
+                commentDao.insertComments(commentEntities)
             }
         } catch (e : Exception) {
-            when (e) {
-                is VolleyError -> Log.d(TAG, "Error with request : at $url \n ${e.networkResponse.statusCode} : ${e.message}")
-                else -> Log.d(TAG, "Error parsing JSON return " + e.message)
-            }
+            throw DomainTransfer.handleException("retrieve comment children", e) ?: e
         }
     }
 

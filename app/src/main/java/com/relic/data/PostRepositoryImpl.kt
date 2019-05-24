@@ -110,25 +110,23 @@ class PostRepositoryImpl @Inject constructor(
             is PostRepository.PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
             else -> ""
         }
-        coroutineScope {
-            Log.d(TAG, "retrieve more posts : api url : $ENDPOINT$ending?after=$listingAfter")
 
-            try {
-                // create the new request and submit it
-                val response = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = "$ENDPOINT$ending?after=$listingAfter"
-                )
-                Log.d(TAG, "more posts $response")
+        Log.d(TAG, "retrieve more posts : api url : $ENDPOINT$ending?after=$listingAfter")
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = "$ENDPOINT$ending?after=$listingAfter"
+            )
+            Log.d(TAG, "more posts $response")
 
-                val listingKey = getListingKey(postSource)
-                val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
-                launch { insertParsedPosts(parsedData) }
+            val listingKey = getListingKey(postSource)
+            val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
 
-            } catch (e: Exception) {
-                Log.d(TAG, "Error: " + e.message)
-            }
+            insertParsedPosts(parsedData)
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }
+
     }
 
     override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
@@ -170,8 +168,8 @@ class PostRepositoryImpl @Inject constructor(
             if (sortTypesWithScope.contains(sortType)) ending += "?t=" + sortScope.name.toLowerCase()
         }
 
+        Log.d(TAG, "retrieve sorted posts api url : $ending")
         coroutineScope {
-            Log.d(TAG, "retrieve sorted posts api url : $ending")
             try {
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
@@ -185,13 +183,9 @@ class PostRepositoryImpl @Inject constructor(
                 Log.d(TAG, "retrieve more posts : after ${parsedData.listingEntity.afterPosting}")
 
                 clear.join()
-                launch { insertParsedPosts(parsedData) }
-
+                insertParsedPosts(parsedData)
             } catch (e: Exception) {
-                when (e) {
-                    is ParseException -> Log.d(TAG, "Error parsing sorted posts $e")
-                    else -> Log.d(TAG, "Error retrieving sorted posts : $e")
-                }
+                throw DomainTransfer.handleException("retrieve account", e) ?: e
             }
         }
     }
@@ -204,31 +198,23 @@ class PostRepositoryImpl @Inject constructor(
     ) {
         val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
 
-        coroutineScope {
-            try {
-                val response = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = ENDPOINT + ending
-                )
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = ENDPOINT + ending
+            )
 
-                postDeserializer.parsePost(response).apply {
-                    postEntity.visited = true
+            postDeserializer.parsePost(response).apply {
+                postEntity.visited = true
 
-                    launch {
-                        appDB.postDao.insertPost(postEntity)
-                        appDB.postSourceDao.insertPostSources(listOf(postSourceEntity))
-                    }
-                }
-
-            } catch (e: Exception) {
-                // TODO decide if it would be better to move this to another method
-                when (e) {
-                    is NoConnectionError -> {
-                        errorHandler.invoke(RelicRequestError.NetworkUnavailableError())
-                    }
-                    else -> Log.d(TAG, "Error retrieving post: $e")
+                withContext(Dispatchers.IO) {
+                    appDB.postDao.insertPost(postEntity)
+                    appDB.postSourceDao.insertPostSources(listOf(postSourceEntity))
                 }
             }
+
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve account", e) ?: e
         }
     }
 
@@ -261,13 +247,15 @@ class PostRepositoryImpl @Inject constructor(
     // endregion interface methods
 
 
-    private fun insertParsedPosts(parsedPosts : ParsedPostsData) {
-        parsedPosts.apply {
-            if (postEntities.isNotEmpty()) appDB.postDao.insertPosts(postEntities)
-            if (commentEntities.isNotEmpty()) appDB.commentDAO.insertComments(commentEntities)
+    private suspend fun insertParsedPosts(parsedPosts : ParsedPostsData) {
+        withContext(Dispatchers.IO) {
+            parsedPosts.apply {
+                if (postEntities.isNotEmpty()) appDB.postDao.insertPosts(postEntities)
+                if (commentEntities.isNotEmpty()) appDB.commentDAO.insertComments(commentEntities)
 
-            appDB.postSourceDao.insertPostSources(postSourceEntities)
-            appDB.listingDAO.insertListing(listingEntity)
+                appDB.postSourceDao.insertPostSources(postSourceEntities)
+                appDB.listingDAO.insertListing(listingEntity)
+            }
         }
     }
 

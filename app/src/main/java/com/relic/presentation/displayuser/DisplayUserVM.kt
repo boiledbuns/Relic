@@ -133,14 +133,12 @@ class DisplayUserVM(
                 // not a fan of this design, because it requires the viewmodel to be aware of the
                 // "key" being used to store the "after" value which is an implementation detail.
                 // TODO consider refactoring later, for now be consistent
-                val key = suspendCoroutine<String> { cont ->
-                    postRepo.getNextPostingVal(
-                        postSource = postSource,
-                        callback = RetrieveNextListingCallback { afterVal ->
-                            cont.resumeWith(Result.success(afterVal))
-                        })
-                }
-                postRepo.retrieveMorePosts(postSource, key)
+                postRepo.getNextPostingVal(
+                    postSource = postSource,
+                    callback = RetrieveNextListingCallback { key ->
+                        launch { postRepo.retrieveMorePosts(postSource, key) }
+                    }
+                )
             }
         }
     }

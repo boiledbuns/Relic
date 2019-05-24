@@ -60,18 +60,23 @@ class SubRepositoryImpl(private val context: Context, private val requestManager
                 subDao.insert(subreddit)
             }
         } catch (e: Exception) {
-            Log.d(TAG, "There was an error retrieving the response from the server " + e.message)
+            throw DomainTransfer.handleException("retrieve single sub", e) ?: e
         }
     }
 
     override suspend fun searchSubreddits(query: String) : List<String>{
         val url = "{ENDPOINT}api/search_subreddits?query={query}"
-        val response = requestManager.processRequest(
-            method = RelicOAuthRequest.POST,
-            url = url
-        )
 
-        return subDeserializer.parseSearchSubsResponse(response)
+        return try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.POST,
+                url = url
+            )
+
+            subDeserializer.parseSearchSubsResponse(response)
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve single sub", e) ?: e
+        }
     }
 
     override fun getSubGateway(): SubGateway {
@@ -97,24 +102,27 @@ class SubRepositoryImpl(private val context: Context, private val requestManager
         var ending = "subreddits/mine/subscriber?limit=30"
         after?.let { ending += "&after=$after" }
 
-        val response = requestManager.processRequest(
-            method = RelicOAuthRequest.GET,
-            url = ENDPOINT + ending
-        )
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = ENDPOINT + ending
+            )
 
-        val subsData = subDeserializer.parseSubredditsResponse(response)
+            val subsData = subDeserializer.parseSubredditsResponse(response)
 
-        withContext(Dispatchers.IO) { subDao.insertAll(subsData.subsList) }
+            withContext(Dispatchers.IO) { subDao.insertAll(subsData.subsList) }
 
-        if (subsData.after != null) {
-            Log.d(TAG, "after = " + subsData.after)
-            // checks the after value of the listing for the current subs
-            // retrieve more subs without refreshing if the string is null
-            retrieveMoreSubscribedSubs(subsData.after, callback)
-        }
-        else {
-            // if no after value, invoke callback method
-            callback?.callback()
+            if (subsData.after != null) {
+                Log.d(TAG, "after = " + subsData.after)
+                // checks the after value of the listing for the current subs
+                // retrieve more subs without refreshing if the string is null
+                retrieveMoreSubscribedSubs(subsData.after, callback)
+            } else {
+                // if no after value, invoke callback method
+                callback?.callback()
+            }
+        } catch (e : Exception){
+            throw DomainTransfer.handleException("retrieve more subsribed subs", e) ?: e
         }
     }
 }

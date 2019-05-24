@@ -3,7 +3,6 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
-import com.android.volley.VolleyError
 import com.relic.data.deserializer.*
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
@@ -31,7 +30,7 @@ class UserRepositoryImpl (
         val selfEndpoint = "${ENDPOINT}api/v1/me"
         var username : String? = null
 
-        withContext (Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             try {
                 // create the new request and submit it
                 val response = requestManager.processRequest(
@@ -41,7 +40,7 @@ class UserRepositoryImpl (
 
                 username = userDeserializer.parseUsername(response)
             } catch (e: Exception) {
-                throw transformException("Error retrieving self from $selfEndpoint", e)
+                throw DomainTransfer.handleException("retrieve username", e) ?: e
             }
         }
 
@@ -54,27 +53,23 @@ class UserRepositoryImpl (
 
         var userModel : UserModel? = null
 
-        coroutineScope {
-            try {
-                // create the new request and submit it
-                val userResponse = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = userEndpoint
-                )
+        try {
+            val userResponse = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = userEndpoint
+            )
 
-                // create the new request and submit it
-                val trophiesResponse = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = trophiesEndpoint
-                )
+            val trophiesResponse = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = trophiesEndpoint
+            )
 
-                Log.d(TAG, "more posts $userResponse")
-                Log.d(TAG, "trophies $trophiesResponse")
+            Log.d(TAG, "more posts $userResponse")
+            Log.d(TAG, "trophies $trophiesResponse")
 
-                userModel = userDeserializer.parseUser(userResponse, trophiesResponse)
-            } catch (e: Exception) {
-                throw transformException("retrieving user from $userEndpoint", e)
-            }
+            userModel = userDeserializer.parseUser(userResponse, trophiesResponse)
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve user", e) ?: e
         }
 
         return userModel
@@ -88,10 +83,8 @@ class UserRepositoryImpl (
     }
 
     override suspend fun setCurrentAccount(username: String) {
-        coroutineScope {
-            appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
-                sp.edit().putString(KEY_CURR_ACCOUNT, username)?.apply()
-            }
+        appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).let { sp ->
+            sp.edit().putString(KEY_CURR_ACCOUNT, username)?.apply()
         }
     }
 
@@ -100,42 +93,23 @@ class UserRepositoryImpl (
     }
 
     override suspend fun retrieveAccount(name : String) {
-        val prefEndpoint = "$ENDPOINT/api/v1/me/prefs"
-        coroutineScope {
-            val retrieveResult = launch {
-                val response = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = prefEndpoint
-                )
-                Log.d(TAG, response)
+        val url = "$ENDPOINT/api/v1/me/prefs"
+        try {
+            val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
+            Log.d(TAG, response)
 
-                val accountEntity = accountDeserializer.parseAccount(response).apply{
-                    // need to manually specify name here
-                    this.name = name
-                }
+            accountDeserializer.parseAccount(response).let { account ->
+                // need to manually specify name here
+                account.name = name
                 withContext(Dispatchers.IO) {
-                    accountDao.insertAccount(accountEntity)
+                    accountDao.insertAccount(account)
                 }
             }
-
-            try {
-                retrieveResult.join()
-            } catch (e : Exception) {
-                throw transformException("retrieving account from endpoint $prefEndpoint", e)
-            }
+        }
+        catch (e : Exception){
+            throw DomainTransfer.handleException("retrieve account", e) ?: e
         }
     }
 
-    /**
-     * Transforms library specific exceptions into more generic exceptions tied to repo interface
-     * A bit overkill, but I'd prefer to have finer control over exception structure
-     */
-    private fun transformException(method : String, e : Throwable) : UserRepoError {
-        Log.d(TAG, e.toString())
-        return when (e) {
-            is VolleyError-> UserRepoError.Retrieval(method, e)
-            is RelicParseException -> UserRepoError.Deserialization(method, e)
-            else -> UserRepoError.Unknown(e)
-        }
-    }
+
 }

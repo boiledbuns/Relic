@@ -48,7 +48,7 @@ interface Contract {
     }
 
     interface AccountDeserializer {
-        suspend fun parseAccount(accountResponse : String) : AccountEntity
+        suspend fun parseAccount(response : String) : AccountEntity
     }
 
     interface SubDeserializer {
@@ -82,4 +82,4 @@ data class ParsedSubsData(
     val after : String?
 )
 
-class RelicParseException(message : String, cause : Throwable) : RelicException(message, cause)
+class RelicParseException(response : String, cause : Throwable) : RelicException("error parsing response : `$response`", cause)

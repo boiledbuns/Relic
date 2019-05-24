@@ -12,6 +12,7 @@ import kotlinx.coroutines.coroutineScope
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
@@ -35,7 +36,11 @@ object CommentDeserializer : Contract.CommentDeserializer {
         val requestData = jsonParser.parse(response) as JSONArray
         val parentPostId = CommentDeserializer.removeTypePrefix(postFullName)
 
-        return CommentDeserializer.parseComments(parentPostId, requestData[1] as JSONObject)
+        return try {
+            parseComments(parentPostId, requestData[1] as JSONObject)
+        } catch (e : ParseException) {
+            throw RelicParseException(response, e)
+        }
     }
 
     /**
@@ -59,32 +64,36 @@ object CommentDeserializer : Contract.CommentDeserializer {
 
         Log.d(TAG, "load more scale ${moreChildrenComment.position}")
 
-        return requestComments.fold(mutableListOf()) { accum, requestComment : Any? ->
-            val commentJson = requestComment as JSONObject
-            val childKind = commentJson["kind"] as String?
+        return try {
+            requestComments.fold(mutableListOf()) { accum, requestComment : Any? ->
+                val commentJson = requestComment as JSONObject
+                val childKind = commentJson["kind"] as String?
 
-            val unmarshalledComments = if (childKind == "more") {
-                // means there is a "more object"
-                val moreData = (commentJson["data"] as JSONObject)
+                val unmarshalledComments = if (childKind == "more") {
+                    // means there is a "more object"
+                    val moreData = (commentJson["data"] as JSONObject)
 
-                val moreComment = unmarshallMore(
-                    moreData,
-                    moreChildrenComment.parentPostId,
-                    moreChildrenComment.position + commentCount*scale
-                )
-                commentCount += 1
-                listOf(moreComment)
-            } else {
-                unmarshallComment(commentJson, moreChildrenComment.depth.toFloat()).apply {
-                    forEach { commentEntity ->
-                        commentEntity.position = moreChildrenComment.position + commentCount*scale
-                        commentCount += 1
-                        Log.d(TAG, "load more scale ${commentEntity.position}")
+                    val moreComment = unmarshallMore(
+                        moreData,
+                        moreChildrenComment.parentPostId,
+                        moreChildrenComment.position + commentCount*scale
+                    )
+                    commentCount += 1
+                    listOf(moreComment)
+                } else {
+                    unmarshallComment(commentJson, moreChildrenComment.depth.toFloat()).apply {
+                        forEach { commentEntity ->
+                            commentEntity.position = moreChildrenComment.position + commentCount*scale
+                            commentCount += 1
+                            Log.d(TAG, "load more scale ${commentEntity.position}")
+                        }
                     }
                 }
-            }
 
-            accum.apply { addAll(unmarshalledComments) }
+                accum.apply { addAll(unmarshalledComments) }
+            }
+        } catch (e : ParseException) {
+            throw RelicParseException(response, e)
         }
     }
 
@@ -143,7 +152,9 @@ object CommentDeserializer : Contract.CommentDeserializer {
                 // have to do this because Reddit has a decided this can be boolean or string
                 try {
                     editedDate = formatDate(commentPOJO["edited"] as Double)
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+
+                }
             }
 
             deferredCommentData?.let {
@@ -198,9 +209,10 @@ object CommentDeserializer : Contract.CommentDeserializer {
         val scale = 10f.pow(-(parentDepth + 1))
         var childCount = 1
 
+
         coroutineScope {
             commentChildren.forEach { commentChild ->
-                val position = parentPosition + childCount*scale
+                val position = parentPosition + childCount * scale
                 val commentJson = commentChild as JSONObject
                 val childKind = commentJson["kind"] as String?
 
@@ -218,7 +230,7 @@ object CommentDeserializer : Contract.CommentDeserializer {
                     commentList.addAll(deferredCommentList.await())
                 }
 
-                childCount ++
+                childCount++
             }
         }
 
@@ -243,6 +255,10 @@ object CommentDeserializer : Contract.CommentDeserializer {
             // reply count for "more" item will hold the number of comments to load
             replyCount = childrenLinks.size
         }
+    }
+
+    private fun failParse(response : String, e : Throwable) : Nothing {
+        throw RelicParseException(response, e)
     }
 
     // removes the type associated with the comment, leaving only its id
