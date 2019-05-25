@@ -89,6 +89,7 @@ class SignInFragment: RelicFragment(), CoroutineScope {
             launch(Dispatchers.Main) {
                 userRepo.retrieveUsername()?.let { name ->
                     userRepo.retrieveCurrentUser()
+                    userRepo.setCurrentAccount(name)
                 }
 
                 activity?.apply {

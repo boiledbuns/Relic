@@ -57,6 +57,8 @@ sealed class PostNavigationData {
     data class ToUserPreview(
         val username: String
     ) : PostNavigationData()
+
+    // TODO add external
 }
 
 sealed class PostExceptionData : Exception() {

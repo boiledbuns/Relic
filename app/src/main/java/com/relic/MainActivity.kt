@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
@@ -38,7 +39,6 @@ import com.relic.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.navigation_header.*
 
 import javax.inject.Inject
 
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var relicGD: GestureDetectorCompat
 
     private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
-
+    private lateinit var navHeader : View
 
     // region lifecycle hooks
 
@@ -74,14 +74,15 @@ class MainActivity : AppCompatActivity() {
 
         setTheme()
         setContentView(R.layout.activity_main)
+        // we can't use ktx on views in the headerview for some reason (ie. it crashes with npe)
+        // since i't not super important, just use this workaround for now
+        navHeader = navigationView.getHeaderView(0)
+        relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
         initializeDefaultView()
-
-        (application as RelicApp).appComponent.inject(this)
-
-        bindViewModel(this)
         initNavDrawer()
 
-        relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
+        (application as RelicApp).appComponent.inject(this)
+        bindViewModel(this@MainActivity)
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -93,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { handleNavMenuOnclick(it) }
 
         // init onclick for user in nav header
-        navigationView.getHeaderView(0).findViewById<TextView>(R.id.navHeaderUsername).apply {
+        navHeader.findViewById<TextView>(R.id.navHeaderUsername).apply {
             setOnClickListener {
                 mainVM.userLiveData.value?.let {
                     val displayUserFrag = DisplayUserFragment.create(text.toString())
@@ -112,15 +113,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         // init onclick for "preferences" selector in nav header
-        navigationView.getHeaderView(0).findViewById<ImageView>(R.id.navUserDropdownIc).setOnClickListener {
-            navHeaderDropdown.visibility = when (navHeaderDropdown.visibility)  {
+        navHeader.findViewById<ImageView>(R.id.navUserDropdownIc).setOnClickListener {
+            val dropdown = findViewById<LinearLayout>(R.id.navHeaderDropdown)
+            dropdown.visibility = when (dropdown.visibility)  {
                 View.VISIBLE -> View.GONE
                 else -> View.VISIBLE
             }
-        }
-        // init onclick for "preferences" selector in nav header
-        navigationView.getHeaderView(0).findViewById<TextView>(R.id.navHeaderAddAccount).setOnClickListener {
-            LoginActivity.startForResult(this@MainActivity)
+            // init onclick for "preferences" selector in nav header
+            navHeader.findViewById<TextView>(R.id.navHeaderAddAccount).setOnClickListener {
+                LoginActivity.startForResult(this@MainActivity)
+            }
         }
     }
 
@@ -186,19 +188,22 @@ class MainActivity : AppCompatActivity() {
     // region livedata handlers
 
     private fun setUser(userModel : UserModel?) {
-        if (userModel != null) {
-            navHeaderUsername.text = userModel.name
-            linkKarma.text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
-            commentKarma.text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
-            navUserDropdownIc.visibility = View.VISIBLE
-        }
-        else {
-            navUserDropdownIc.visibility = View.GONE
+        navHeader.apply {
+            if (userModel != null) {
+                findViewById<TextView>(R.id.navHeaderUsername).text = userModel.name
+                findViewById<TextView>(R.id.linkKarma).text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
+                findViewById<TextView>(R.id.commentKarma).text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
+                findViewById<ImageView>(R.id.navUserDropdownIc).visibility = View.VISIBLE
+            } else {
+                findViewById<ImageView>(R.id.navUserDropdownIc).visibility = View.GONE
+            }
         }
     }
 
     private fun setAccounts(accounts: List<AccountModel>) {
-        navHeaderAccounts.removeAllViews()
+        navHeader.apply {
+            findViewById<LinearLayout>(R.id.navHeaderAccounts).removeAllViews()
+        }
 
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -214,11 +219,20 @@ class MainActivity : AppCompatActivity() {
             TextView(this).apply {
                 text = account.name
                 layoutParams = params
-                navHeaderAccounts.addView(this)
+                navHeader.findViewById<LinearLayout>(R.id.navHeaderAccounts).addView(this)
 
                 setOnClickListener {
                     // TODO consider switching to preference listener for a cleaner class
                     mainVM.onAccountSelected(account.name)
+                    // need to close drawer and dropdown
+                    navigationDrawer.closeDrawers()
+                    navHeader.findViewById<LinearLayout>(R.id.navHeaderDropdown).visibility = View.GONE
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.switched_account, account.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

@@ -50,15 +50,11 @@ class MainVM(
     }
 
     override fun onAccountSelected(name : String?) {
-        name?.let {
-            launch(Dispatchers.Main) {
-                // update the current account so we can retrieve the user associated with it
-                userRepo.setCurrentAccount(name)
-//                userRepo.retrieveCurrentUser()?.let { user ->
-//                    _userLiveData.postValue(user)
-//                }
-            }
-        } ?: retrieveUser()
+        launch(Dispatchers.Main) {
+            // update the current account so we can retrieve the user associated with it
+            name?.let { userRepo.setCurrentAccount(name) }
+            retrieveUser()
+        }
     }
 
     private fun retrieveUser() {

@@ -1,6 +1,9 @@
 package com.relic.data.auth
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -57,6 +60,15 @@ class AuthImpl (
     // TODO convert to inject
     private val requestManager: NetworkRequestManager = NetworkRequestManager(appContext)
     private val userRepo : UserRepository = UserRepositoryImpl(appContext, requestManager)
+
+    private val spAccountLiveData = MutableLiveData<String?>()
+    private val listener : SharedPreferences.OnSharedPreferenceChangeListener by lazy {
+        SharedPreferences.OnSharedPreferenceChangeListener { sp, key ->
+            if (key == KEY_CURR_ACCOUNT) {
+                spAccountLiveData.postValue(sp.getString(KEY_CURR_ACCOUNT, null))
+            }
+        }
+    }
 
     val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
             + "&response_type=" + AuthConstants.RESPONSE_TYPE
@@ -265,5 +277,13 @@ class AuthImpl (
 
             return params
         }
+    }
+
+    /**
+     * need to keep strong reference to prevent gc
+     * Should be subscribed to in main vm
+     */
+    override fun getCurrentAccountName(): LiveData<String?> {
+        return spAccountLiveData
     }
 }

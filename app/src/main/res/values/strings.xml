@@ -102,5 +102,6 @@
 
     <string name="log_in">log in</string>
     <string name="add_account">add account</string>
+    <string name="switched_account">switched account to %s</string>
 
 </resources>

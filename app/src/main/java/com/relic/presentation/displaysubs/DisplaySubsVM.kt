@@ -37,7 +37,6 @@ class DisplaySubsVM (
         }
     }
 
-
     private var refreshing: Boolean = false
 
     private val _subscribedSubsList = MediatorLiveData <List<SubredditModel>> ()

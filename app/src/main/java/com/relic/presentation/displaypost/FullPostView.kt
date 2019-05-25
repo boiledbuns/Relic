@@ -91,9 +91,11 @@ class FullPostView @JvmOverloads constructor(
                 postImageView.visibility = View.VISIBLE
             }
             else -> {
-                Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
-                postLinkUrl.text = postModel.url
-                postLinkCard.visibility = View.VISIBLE
+                postModel.thumbnail?.apply {
+                    Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
+                    postLinkUrl.text = postModel.url
+                    postLinkCard.visibility = View.VISIBLE
+                }
             }
         }
     }
