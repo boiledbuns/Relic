@@ -114,7 +114,7 @@ class DisplaySubFragment : RelicFragment() {
 
         initializeOnClicks()
         attachScrollListeners()
-        subItemTouchHelper = ItemTouchHelper(PostItemsTouchHelper(displaySubVM))
+        subItemTouchHelper = ItemTouchHelper(PostItemsTouchHelper(displaySubVM, context!!))
         subItemTouchHelper.attachToRecyclerView(subPostsRecyclerView)
         displaySubFAB.hide()
 

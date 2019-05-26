@@ -40,4 +40,8 @@
 
     <color name="stickied">#5a7e52</color>
 
+    <!-- consider making this part of the theme -->
+    <color name="upvote">#FF9800</color>
+    <color name="downvote">#3F51B5</color>
+
 </resources>

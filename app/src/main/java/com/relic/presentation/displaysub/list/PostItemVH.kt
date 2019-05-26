@@ -7,7 +7,7 @@ import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.android.synthetic.main.post_item_span.view.*
 
 class PostItemVH (
-    private val postItemView : RelicPostItemView
+    val postItemView : RelicPostItemView
 ) : RecyclerView.ViewHolder(postItemView) {
 
     var itemFullName = ""

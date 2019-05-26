@@ -85,23 +85,27 @@ class RelicPostItemView @JvmOverloads constructor(
                 postBodyView.visibility = View.GONE
             }
 
-            when (postModel.userUpvoted) {
-                1 -> {
-                    postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                    postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
-                }
-                0 -> {
-                    postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
-                }
-                -1 -> {
-                    postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    postItemDownvoteView.setImageResource(R.drawable.ic_downvote_active)
-                }
-            }
+            setVote(postModel.userUpvoted)
 
             postItemScore.text = postModel.score.toString()
             postItemCommentCountView.text = postModel.commentCount.toString()
+        }
+    }
+
+    fun setVote(vote : Int) {
+        when (vote) {
+            1 -> {
+                postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)
+                postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            0 -> {
+                postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
+                postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            -1 -> {
+                postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
+                postItemDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+            }
         }
     }
 
