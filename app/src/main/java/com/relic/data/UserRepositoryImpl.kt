@@ -51,8 +51,6 @@ class UserRepositoryImpl (
         val userEndpoint = "${ENDPOINT}user/$username/about"
         val trophiesEndpoint = "${ENDPOINT}api/v1/user/$username/trophies"
 
-        var userModel : UserModel? = null
-
         try {
             val userResponse = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
@@ -67,12 +65,10 @@ class UserRepositoryImpl (
             Log.d(TAG, "more posts $userResponse")
             Log.d(TAG, "trophies $trophiesResponse")
 
-            userModel = userDeserializer.parseUser(userResponse, trophiesResponse)
+            return userDeserializer.parseUser(userResponse, trophiesResponse)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve user", e) ?: e
         }
-
-        return userModel
     }
 
     override suspend fun retrieveCurrentUser(): UserModel? {

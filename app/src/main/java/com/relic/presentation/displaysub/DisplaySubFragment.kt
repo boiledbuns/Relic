@@ -76,6 +76,7 @@ class DisplaySubFragment : RelicFragment() {
     private lateinit var searchView: SearchView
     private lateinit var postAdapter: PostItemAdapter
     private lateinit var subItemTouchHelper : ItemTouchHelper
+    private lateinit var touchHelperCallback : ItemTouchHelper.Callback
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
@@ -114,7 +115,8 @@ class DisplaySubFragment : RelicFragment() {
 
         initializeOnClicks()
         attachScrollListeners()
-        subItemTouchHelper = ItemTouchHelper(PostItemsTouchHelper(displaySubVM, context!!))
+        touchHelperCallback = PostItemsTouchHelper(this, context!!)
+        subItemTouchHelper = ItemTouchHelper(touchHelperCallback)
         subItemTouchHelper.attachToRecyclerView(subPostsRecyclerView)
         displaySubFAB.hide()
 
@@ -217,6 +219,18 @@ class DisplaySubFragment : RelicFragment() {
 
         displaySubVM.refreshLiveData.nonNull().observe (lifecycleOwner) {
             subSwipeRefreshLayout.isRefreshing = it
+        }
+    }
+
+    fun handleVHSwipeAction(vh : RecyclerView.ViewHolder, direction : Int) {
+        // TODO don't handle manually -> need to check preferences
+        when (direction) {
+            ItemTouchHelper.LEFT -> {
+                postAdapter.onPostDownvotePressed(vh.adapterPosition)
+            }
+            ItemTouchHelper.RIGHT -> {
+                postAdapter.onPostUpvotePressed(vh.adapterPosition)
+            }
         }
     }
 

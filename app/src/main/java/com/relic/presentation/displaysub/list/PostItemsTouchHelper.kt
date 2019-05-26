@@ -2,27 +2,28 @@ package com.relic.presentation.displaysub.list
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Rect
-import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import com.relic.R
-import com.relic.presentation.displaysub.DisplaySubContract
-import kotlinx.coroutines.delay
+import com.relic.presentation.displaysub.DisplaySubFragment
 import kotlin.math.roundToInt
 
 class PostItemsTouchHelper(
-    private val delegate : DisplaySubContract.PostAdapterDelegate,
+    private val fragment: DisplaySubFragment,
     private val context : Context
 ) : ItemTouchHelper.Callback() {
 
+    private val translationScale = 0.5
+    private var previousXTranslation = 0F
+
     // initialize values needed for swipe so we don't have to retrieve them each time
-    val swipeRightColor  = context.resources.getColor(R.color.upvote)
-    val swipeLeftColor  = context.resources.getColor(R.color.downvote)
-    val marginTop = context.resources.getDimension(R.dimen.padding_xs).roundToInt()
-    val upvoteIcon = context.getDrawable(R.drawable.ic_upvote)
-    val downvoteIcon = context.getDrawable(R.drawable.ic_downvote)
+    private val swipeRightColor  = context.resources.getColor(R.color.upvote)
+    private val swipeLeftColor  = context.resources.getColor(R.color.downvote)
+    private val marginTop = context.resources.getDimension(R.dimen.padding_xs).roundToInt()
+    private val upvoteIcon = context.getDrawable(R.drawable.ic_upvote)
+    private val downvoteIcon = context.getDrawable(R.drawable.ic_downvote)
 
     override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int {
         return ItemTouchHelper.Callback.makeFlag(
@@ -41,19 +42,18 @@ class PostItemsTouchHelper(
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        val postItemVh = viewHolder as PostItemVH
+        // full swipe not actually allowed because I currently don't have
+        // any good solutions to return the viewholder to its original position
+        // notifyItemChanged works, but it flashes which makes for terrible ux
+    }
 
-        when (direction) {
-            // might need to go through adapter to indicate change
-            ItemTouchHelper.LEFT -> {
-                delegate.voteOnPost(postItemVh.itemFullName,  -1)
-                postItemVh.postItemView.setVote(-1)
-            }
-            ItemTouchHelper.RIGHT -> {
-                delegate.voteOnPost(postItemVh.itemFullName,  1)
-                postItemVh.postItemView.setVote(1)
-            }
-        }
+    override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
+        return 10F
+    }
+
+    override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
+        // see onSwiped method
+        return Float.MAX_VALUE
     }
 
     override fun onChildDraw(
@@ -65,9 +65,10 @@ class PostItemsTouchHelper(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
+        Log.d("touch helper", dX.toString())
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
-                viewHolder.itemView.translationX = dX.div(1.5).toFloat()
+                viewHolder.itemView.translationX = dX.times(translationScale).toFloat()
 
                 canvas.apply {
                     // clip the canvas to the height of the item in the list
@@ -78,9 +79,19 @@ class PostItemsTouchHelper(
                         viewHolder.itemView.bottom.toFloat()
                     )
 
-                    val vhHeight = viewHolder.itemView.bottom- viewHolder.itemView.top
+                    val vhHeight = viewHolder.itemView.bottom - viewHolder.itemView.top
 
-                    if (dX > 0) {
+                    if (dX == 0F) {
+                        // from right swipe to release
+                        if (previousXTranslation > 0F) {
+                            Log.d("touch helper right", dX.toString())
+                            fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.RIGHT)
+                        } else if (previousXTranslation < 0F){
+                            Log.d("touch helper left", dX.toString())
+                            fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.LEFT)
+                        }
+                    }
+                    else if (dX > 0) {
                         drawColor(swipeRightColor)
                         // left, top, right, bottom
                         upvoteIcon.bounds = Rect(
@@ -93,7 +104,6 @@ class PostItemsTouchHelper(
                     }
                     else if (dX < 0) {
                         drawColor(swipeLeftColor)
-                        // left, top, right, bottom
                         downvoteIcon.bounds = Rect(
                             marginTop,
                             viewHolder.itemView.top + marginTop,
@@ -104,6 +114,8 @@ class PostItemsTouchHelper(
                     }
 
                 }
+
+                previousXTranslation = dX
             }
             else -> super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }

@@ -14,10 +14,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.relic.R
-import com.relic.data.ApplicationDB
-import com.relic.data.Auth
-import com.relic.data.UserRepository
-import com.relic.data.UserRepositoryImpl
+import com.relic.data.*
 import com.relic.data.entities.TokenStoreEntity
 import com.relic.network.NetworkRequestManager
 import com.relic.network.VolleyQueue
@@ -147,8 +144,8 @@ class AuthImpl (
                     callback.onAuthenticated()
                 }
             },
-            Response.ErrorListener { error ->
-                Log.d(TAG, "Error retrieving access token through reddit $error")
+            Response.ErrorListener { e ->
+                throw DomainTransfer.handleException("retrieve access token", e) ?: e
             })
         )
 
@@ -184,7 +181,9 @@ class AuthImpl (
                             }
                         }
                     },
-                    Response.ErrorListener { error -> Log.d(TAG, "Token failed to refresh = $error") },
+                    Response.ErrorListener { e ->
+                        throw DomainTransfer.handleException("refresh token", e) ?: e
+                    },
                     refreshKey
                 )
             )

@@ -20,8 +20,8 @@ interface DisplaySubContract {
     interface PostItemAdapterDelegate {
         fun onPostPressed(itemPosition : Int)
         fun onPostSavePressed(itemPosition : Int)
-        fun onPostUpvotePressed(itemPosition : Int)
-        fun onPostDownvotePressed(itemPosition : Int)
+        fun onPostUpvotePressed(itemPosition : Int, notify : Boolean = true)
+        fun onPostDownvotePressed(itemPosition : Int, notify : Boolean = true)
         fun onPostLinkPressed(itemPosition : Int)
         fun onUserPressed(itemPosition : Int)
     }

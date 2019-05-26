@@ -103,7 +103,7 @@ class ListingItemAdapter(
         notifyItemChanged(itemPosition)
     }
 
-    override fun onPostUpvotePressed(itemPosition : Int) {
+    override fun onPostUpvotePressed(itemPosition : Int, notify : Boolean) {
         listingItems[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newVote = if (it.userUpvoted <= 0) 1 else 0
@@ -114,7 +114,7 @@ class ListingItemAdapter(
         }
     }
 
-    override fun onPostDownvotePressed(itemPosition : Int) {
+    override fun onPostDownvotePressed(itemPosition : Int, notify : Boolean) {
         listingItems[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newVote = if (it.userUpvoted >= 0) -1 else 0

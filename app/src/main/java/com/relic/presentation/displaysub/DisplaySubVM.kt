@@ -27,7 +27,7 @@ open class DisplaySubVM (
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
         // TODO handle exception
-        Log.d(TAG, "caught exception $e")
+        Log.d(TAG, "caught exception $e.message")
     }
 
     class Factory @Inject constructor(

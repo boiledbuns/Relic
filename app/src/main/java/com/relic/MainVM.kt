@@ -52,8 +52,11 @@ class MainVM(
     override fun onAccountSelected(name : String?) {
         launch(Dispatchers.Main) {
             // update the current account so we can retrieve the user associated with it
-            name?.let { userRepo.setCurrentAccount(name) }
-            retrieveUser()
+            userRepo.setCurrentAccount(name!!)
+            // since we're switching the user, need to refresh the auth token
+            auth.refreshToken(AuthenticationCallback {
+                retrieveUser()
+            })
         }
     }
 
