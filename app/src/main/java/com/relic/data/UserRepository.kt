@@ -13,7 +13,7 @@ interface UserRepository {
     suspend fun retrieveUser(username : String) : UserModel?
 
     @Throws(UserRepoError::class)
-    suspend fun retrieveCurrentUser() : UserModel?
+    suspend fun getCurrentUser() : UserModel?
 
     suspend fun setCurrentAccount(username : String)
 

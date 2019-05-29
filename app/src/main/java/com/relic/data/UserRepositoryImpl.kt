@@ -71,7 +71,7 @@ class UserRepositoryImpl (
         }
     }
 
-    override suspend fun retrieveCurrentUser(): UserModel? {
+    override suspend fun getCurrentUser(): UserModel? {
         val name = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
             .getString(KEY_CURR_ACCOUNT, null)
 

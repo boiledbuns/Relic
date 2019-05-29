@@ -25,6 +25,31 @@ class NetworkRequestManager (
     private val volleyQueue: RequestQueue = VolleyAccessor.getInstance(appContext).requestQueue
     private val tokenStore = ApplicationDB.getDatabase(appContext).tokenStoreDao
 
+    @Throws(VolleyError::class)
+    suspend fun processUnauthenticatedRequest (
+        method: Int,
+        url: String,
+        headers: MutableMap<String, String>? = null,
+        data: MutableMap<String, String>? = null
+    ) : String {
+        return suspendCoroutine { cont ->
+            val request = RelicOAuthRequest(
+                method = method,
+                url = url,
+                listener = Response.Listener { response: String ->
+                    cont.resumeWith(Result.success(response))
+                },
+                errorListener = Response.ErrorListener { e: VolleyError ->
+                    cont.resumeWithException(e)
+                },
+                headers = headers,
+                data = data
+            )
+
+            volleyQueue.add(request)
+        }
+    }
+
     /**
      * note that token should 99% be left empty (checked here) when calling process request
      * token field should only be filled in when processing a request for the first time

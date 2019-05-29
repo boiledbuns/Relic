@@ -47,19 +47,25 @@ class MainVM(
 
     override fun onAccountSelected(name : String?) {
         launch(Dispatchers.Main) {
-            // update the current account so we can retrieve the user associated with it
-            userRepo.setCurrentAccount(name!!)
-            // since we're switching the user, need to refresh the auth token
-            auth.refreshToken(AuthenticationCallback {
-                retrieveUser()
-            })
+            if (name != null) {
+                // account switch, we're in charge of refreshing info about the account
+                // update the current account so we can retrieve the user associated with it
+                userRepo.setCurrentAccount(name)
+                // since we're switching the user, need to refresh the auth token
+                auth.refreshToken(AuthenticationCallback {
+                    retrieveUser()
+                })
+            } else {
+                // username should already have been set, we just need to update livedata appropriately
+                _userLiveData.postValue(userRepo.getCurrentUser())
+            }
         }
     }
 
     private fun retrieveUser() {
         launch(Dispatchers.Main) {
             // need to retrieve current user (to get the username) before retrieving the account
-            userRepo.retrieveCurrentUser()?.let { user ->
+            userRepo.getCurrentUser()?.let { user ->
                 Log.d(TAG, "user $user")
                 _userLiveData.postValue(user)
 
