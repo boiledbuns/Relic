@@ -52,8 +52,7 @@ interface PostRepository {
     suspend fun retrievePost(
         subredditName: String,
         postFullName: String,
-        postSource: PostSource,
-        errorHandler : (error : RelicRequestError) -> Unit
+        postSource: PostSource
     )
 
     /**

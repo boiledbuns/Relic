@@ -53,8 +53,11 @@ data class DisplaySubInfoData (
     var sortingScope : PostRepository.SortScope
 )
 
-sealed class SubExceptionData : Exception() {
-    object NoPosts : SubExceptionData()
-    object NetworkUnavailable : SubExceptionData()
-    object UnexpectedException : SubExceptionData()
+/**
+ * note: this isn't an exception; it's represents data to be displayed to user in case of failure
+ */
+sealed class SubError {
+    object NoPosts : SubError()
+    object NetworkUnavailable : SubError()
+    object UnexpectedException : SubError()
 }

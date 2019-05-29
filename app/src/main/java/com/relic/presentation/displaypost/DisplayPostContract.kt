@@ -61,8 +61,7 @@ sealed class PostNavigationData {
     // TODO add external
 }
 
-sealed class PostExceptionData : Exception() {
-    object NoComments : PostExceptionData()
-    object NetworkUnavailable : PostExceptionData()
-    object UnexpectedException : PostExceptionData()
+sealed class PostErrorData {
+    object NetworkUnavailable : PostErrorData()
+    object UnexpectedException : PostErrorData()
 }

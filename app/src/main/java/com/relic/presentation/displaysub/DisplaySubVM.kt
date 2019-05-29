@@ -3,7 +3,6 @@ package com.relic.presentation.displaysub
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.util.Log
 
 import com.relic.data.PostRepository
@@ -11,24 +10,22 @@ import com.relic.data.SubRepository
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.data.models.PostModel
 import com.relic.data.models.SubredditModel
+import com.relic.data.repository.NetworkException
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.helper.ImageHelper
 import com.relic.network.NetworkUtil
+import com.relic.presentation.base.RelicViewModel
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 open class DisplaySubVM (
     private val postSource: PostRepository.PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
     private val networkUtil : NetworkUtil
-) : ViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, CoroutineScope {
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
-        // TODO handle exception
-        Log.d(TAG, "caught exception $e.message")
-    }
+) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
@@ -40,7 +37,6 @@ open class DisplaySubVM (
         }
     }
 
-    private val TAG = "DISPLAY_SUB_VM"
     private var currentSortingType = PostRepository.SortType.DEFAULT
     private var currentSortingScope = PostRepository.SortScope.NONE
     private var retrievalInProgress = true
@@ -50,14 +46,14 @@ open class DisplaySubVM (
     private val _navigationLiveData = SingleLiveData<SubNavigationData>()
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     private val _refreshLiveData = MutableLiveData<Boolean>()
-    private val _errorLiveData = MutableLiveData<SubExceptionData>()
+    private val _errorLiveData = SingleLiveData<SubError>()
 
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
     val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
     val refreshLiveData : LiveData<Boolean> = _refreshLiveData
-    val errorLiveData : LiveData<SubExceptionData> = _errorLiveData
+    val errorLiveData : LiveData<SubError> = _errorLiveData
 
     init {
         retrieveMorePosts(true)
@@ -129,8 +125,8 @@ open class DisplaySubVM (
                     // display the associated error
                     _errorLiveData.postValue(
                         when (e) {
-                            is RelicRequestError -> SubExceptionData.NetworkUnavailable
-                            else -> SubExceptionData.UnexpectedException
+                            is RelicRequestError -> SubError.NetworkUnavailable
+                            else -> SubError.UnexpectedException
                         }
                     )
                 }
@@ -141,7 +137,7 @@ open class DisplaySubVM (
         }
         else {
             retrievalInProgress = false
-            _errorLiveData.postValue(SubExceptionData.NetworkUnavailable)
+            _errorLiveData.postValue(SubError.NetworkUnavailable)
         }
     }
 
@@ -220,4 +216,14 @@ open class DisplaySubVM (
     }
 
     // endregion view action delegate
+
+    override fun handleException(context: CoroutineContext, e : Throwable) {
+        val subE = when (e) {
+            is NetworkException -> SubError.NetworkUnavailable
+            else -> SubError.UnexpectedException
+        }
+        _errorLiveData.postValue(subE)
+
+        Log.e(TAG, "caught exception", e)
+    }
 }

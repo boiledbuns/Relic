@@ -13,9 +13,10 @@ import java.util.HashMap
 class RelicOAuthRequest @JvmOverloads constructor(
         method: Int,
         url: String,
-        var listener: Response.Listener<String>,
+        listener: Response.Listener<String>,
         errorListener: Response.ErrorListener,
         var authToken: String? = null,
+        private val headers: MutableMap<String, String>? = null,
         private val data: MutableMap<String, String>? = null
 ) : StringRequest(method, url, listener, errorListener) {
 
@@ -27,14 +28,12 @@ class RelicOAuthRequest @JvmOverloads constructor(
     private val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"
 
     override fun getHeaders(): Map<String, String> {
-        val headers = HashMap<String, String>()
-
-        // generate the credential string for oauth
-        val credentials = "bearer $authToken"
-        headers["Authorization"] = credentials
-        headers["User-Agent"] = userAgent
-
-        return headers
+        // generate the headers if not supplied string for oauth
+        return headers ?: HashMap<String, String>().apply {
+            val credentials = "bearer $authToken"
+            put("Authorization", credentials)
+            put("User-Agent", userAgent)
+        }
     }
 
     override fun getParams(): MutableMap<String, String> {

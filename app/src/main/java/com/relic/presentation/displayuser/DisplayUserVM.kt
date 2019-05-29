@@ -13,12 +13,14 @@ import com.relic.data.models.CommentModel
 import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.data.models.UserModel
+import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.util.RelicEvent
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.suspendCoroutine
 
 class DisplayUserVM(
@@ -27,14 +29,7 @@ class DisplayUserVM(
     private val listingRepo: ListingRepository,
     private val userRepo: UserRepository,
     private val username : String
-) : ViewModel(), DisplayUserContract.ListingItemAdapterDelegate, CoroutineScope {
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
-        // TODO handle exception
-        Log.d(TAG, "caught exception $e")
-    }
-
-    val TAG = "DISPLAY_USER_VM"
+) : RelicViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -64,13 +59,13 @@ class DisplayUserVM(
     private var commentLists = mutableMapOf<UserTab, List<CommentModel>>()
 
     init {
-        GlobalScope.launch  {
+        launch(Dispatchers.Main) {
             _userLiveData.postValue(userRepo.retrieveUser(username))
         }
     }
 
     fun getTabPostsLiveData(tab : UserTab) : LiveData<List<ListingItem>> {
-        GlobalScope.launch  {
+        launch(Dispatchers.Main) {
             _userLiveData.postValue(userRepo.retrieveUser(username))
         }
         var tabLiveData = postsLiveData[tab]
@@ -130,7 +125,7 @@ class DisplayUserVM(
         val type = currentSortingType[tab] ?: PostRepository.SortType.DEFAULT
         val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
 
-        GlobalScope.launch {
+        launch(Dispatchers.Main) {
             if (refresh) {
                 runBlocking { postRepo.clearAllPostsFromSource(postSource) }
                 postRepo.retrieveSortedPosts(postSource, type, scope)
@@ -294,4 +289,8 @@ class DisplayUserVM(
         // TODO only open another user if it's not the current user being displayed
     }
     // endregion post adapter delegate
+
+    override fun handleException(context: CoroutineContext, e: Throwable) {
+        Log.e(TAG, "handling e", e)
+    }
 }

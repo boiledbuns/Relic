@@ -193,8 +193,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun retrievePost(
         subredditName: String,
         postFullName: String,
-        postSource: PostRepository.PostSource,
-        errorHandler: (error : RelicRequestError) -> Unit
+        postSource: PostRepository.PostSource
     ) {
         val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
 

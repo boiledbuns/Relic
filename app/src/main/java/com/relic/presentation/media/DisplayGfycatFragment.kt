@@ -2,7 +2,6 @@ package com.relic.presentation.media
 
 import android.arch.lifecycle.MutableLiveData
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +9,12 @@ import android.view.ViewGroup
 import com.gfycat.core.GfyCore
 import com.gfycat.core.gfycatapi.pojo.Gfycat
 import com.relic.R
+import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_gif.*
 import kotlinx.coroutines.*
 
-class DisplayGfycatFragment : Fragment() {
-    private val TAG = "DISPLAY_GFYCAT_FRAGMENT"
+class DisplayGfycatFragment : RelicFragment() {
 
     private var gfyUrl: String? = null
     private val gfycatLiveData : MutableLiveData<Gfycat> = MutableLiveData()
@@ -74,7 +73,7 @@ class DisplayGfycatFragment : Fragment() {
 
         }
 
-        // remember to release the resources for player when done
+        // TODO release the resources for player when done
     }
 
     companion object {

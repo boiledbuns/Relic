@@ -6,20 +6,16 @@ import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.data.models.AccountModel
 import com.relic.data.models.UserModel
+import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class MainVM(
     private val auth : AuthImpl,
     private val userRepo : UserRepository
-) : MainContract.VM, CoroutineScope, ViewModel() {
-    val TAG = "MAIN_VM"
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
-        // TODO handle exception
-        Log.d(TAG, "caught exception $e")
-    }
+) : RelicViewModel(), MainContract.VM, CoroutineScope {
 
     class Factory @Inject constructor(
         private val auth : AuthImpl,
@@ -71,4 +67,6 @@ class MainVM(
             }
         }
     }
+
+    override fun handleException(context: CoroutineContext, e: Throwable) {}
 }

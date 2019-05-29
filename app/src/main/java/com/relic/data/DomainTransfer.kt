@@ -24,7 +24,7 @@ class DomainTransfer {
          * if not handled, return null to indicate explicitly
          */
         fun handleException(message : String, e : Throwable) : RepoException? {
-            Log.d(TAG, e.toString())
+            Log.e(TAG, "transforming e", e)
             return when (e) {
                 is RelicParseException -> RepoException.ClientException(message, e)
                 // exceptions from volley

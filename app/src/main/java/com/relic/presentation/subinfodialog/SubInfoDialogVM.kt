@@ -6,19 +6,15 @@ import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.relic.data.SubRepository
 import com.relic.data.models.SubredditModel
+import com.relic.presentation.base.RelicViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class SubInfoDialogVM (
         private val subRepo: SubRepository,
         private val subredditName: String
-) : ViewModel(), CoroutineScope {
-    val TAG = "SUBINFO_DIALOG_VM"
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
-        // TODO handle exception
-        Log.d(TAG, "caught exception $e")
-    }
+) : RelicViewModel() {
 
     class Factory @Inject constructor(private val subRepository: SubRepository) {
         fun create(subredditName : String) : SubInfoDialogVM{
@@ -49,5 +45,9 @@ class SubInfoDialogVM (
         launch(Dispatchers.Main) {
             subRepo.pinSubreddit(subredditName, true)
         }
+    }
+
+    override fun handleException(context: CoroutineContext, e: Throwable) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

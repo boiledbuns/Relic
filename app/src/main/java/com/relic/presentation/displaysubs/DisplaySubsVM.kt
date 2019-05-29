@@ -2,7 +2,6 @@ package com.relic.presentation.displaysubs
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.ViewModel
 import android.util.Log
 
 import com.relic.data.auth.AuthImpl
@@ -10,22 +9,17 @@ import com.relic.data.ListingRepository
 import com.relic.data.SubRepository
 import com.relic.data.SubsLoadedCallback
 import com.relic.data.models.SubredditModel
+import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DisplaySubsVM (
         private val subRepository: SubRepository,
         private val listingRepository: ListingRepository,
         private val authenticator: AuthImpl
-) : ViewModel(), DisplaySubsContract.VM, SubInfoDialogContract.Delegate, CoroutineScope {
-
-    private val TAG = "DISPLAY_SUBS_VM"
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
-        // TODO handle exception
-        Log.d(TAG, "caught exception $e")
-    }
+) : RelicViewModel(), DisplaySubsContract.VM, SubInfoDialogContract.Delegate {
 
     class Factory @Inject constructor(
             private val subRepository: SubRepository,
@@ -109,4 +103,7 @@ class DisplaySubsVM (
     }
     // End of SubInfoDialogContract delegate methods
 
+    override fun handleException(context: CoroutineContext, e: Throwable) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

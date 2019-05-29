@@ -22,14 +22,9 @@ import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.*
 
-import org.json.simple.JSONObject
-import org.json.simple.parser.JSONParser
-import org.json.simple.parser.ParseException
-
 import java.util.Calendar
 import java.util.Date
 import java.util.HashMap
-import javax.inject.Inject
 
 /**
  * Singleton instance of the authenticator because we should be able to
@@ -156,43 +151,52 @@ class AuthImpl (
      * gets a new current access token using the refresh token
      */
     override suspend fun refreshToken(callback: AuthenticationCallback) {
-        coroutineScope {
-            // get the name of the current account
-            val name : String = appContext
-                .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
-                .getString(KEY_CURR_ACCOUNT, null) ?: throw Exception()
+        // get the name of the current account
+        val name : String = appContext
+            .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
+            .getString(KEY_CURR_ACCOUNT, null) ?: throw Exception()
 
-            val refreshKey = withContext(Dispatchers.IO) {
-                appDB.tokenStoreDao.getTokenStore(name).refresh
-            }
-            Log.d(TAG, "refresh key $refreshKey")
-            requestQueue.add(
-                RedditGetRefreshRequest(
-                    Request.Method.POST,
-                    AuthConstants.ACCESS_TOKEN_URI,
-                    Response.Listener { response ->
-                        GlobalScope.launch {
-                            Log.d(TAG, "Token refreshed$response")
-                            val refreshData = authDeserializer.parseRefreshResponse(response)
+        val refreshToken = withContext(Dispatchers.IO) {
+            appDB.tokenStoreDao.getTokenStore(name).refresh
+        }
 
-                            withContext(Dispatchers.IO) {
-                                appDB.tokenStoreDao.updateAccessToken(name, refreshData.access)
-                                callback.onAuthenticated()
-                            }
-                        }
-                    },
-                    Response.ErrorListener { e ->
-                        throw DomainTransfer.handleException("refresh token", e) ?: e
-                    },
-                    refreshKey
-                )
+        val code: String? = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
+            .getString(redirectCode, "DEFAULT")
+
+        // create a new header map and add the right headers to it
+        val headers = HashMap<String, String>().apply {
+            // generate encoded credential string with client id and code from redirect
+            val credentials = appContext.getString(R.string.client_id) + ":" + code
+            val auth = "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
+            put("Authorization", auth)
+        }
+
+        val params = HashMap<String, String>().apply {
+            put("grant_type", refreshTokenKey)
+            put("refresh_token", refreshToken)
+        }
+
+        Log.d(TAG, "refresh token $refreshToken")
+        try {
+            val response = requestManager.processRequest(
+                method = Request.Method.POST,
+                url = AuthConstants.ACCESS_TOKEN_URI,
+                data = params,
+                headers = headers
             )
+
+            val refreshData = authDeserializer.parseRefreshResponse(response)
+
+            withContext(Dispatchers.IO) {
+                appDB.tokenStoreDao.updateAccessToken(name, refreshData.access)
+                callback.onAuthenticated()
+            }
+
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("refresh token", e) ?: e
         }
     }
 
-    /**
-     * we need to retrieve
-     */
     private suspend fun retrieveUserName(accessToken : String) : String? {
         val selfEndpoint = "https://oauth.reddit.com/api/v1/me"
 
@@ -238,42 +242,6 @@ class AuthImpl (
             params["grant_type"] = "authorization_code"
             params["code"] = code!!
             params["redirect_uri"] = AuthConstants.REDIRECT
-            return params
-        }
-    }
-
-
-    internal inner class RedditGetRefreshRequest (
-        method: Int,
-        url: String,
-        listener: Response.Listener<String>,
-        errorListener: Response.ErrorListener,
-        private val refreshToken: String
-    ) : StringRequest(method, url, listener, errorListener) {
-
-        // override headers to add custom credentials in client_secret:redirect_code format
-        @Throws(AuthFailureError::class)
-        override fun getHeaders(): Map<String, String> {
-            // create a new header map and add the right headers to it
-            val headers = HashMap<String, String>()
-
-            val code = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
-                .getString(redirectCode, "DEFAULT")
-            // generate encoded credential string with client id and code from redirect
-            val credentials = appContext.getString(R.string.client_id) + ":" + code
-            val auth = "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
-            headers["Authorization"] = auth
-
-            return headers
-        }
-
-        @Throws(AuthFailureError::class)
-        public override fun getParams(): Map<String, String> {
-            val params = HashMap<String, String>()
-
-            params["grant_type"] = refreshTokenKey
-            params["refresh_token"] = refreshToken
-
             return params
         }
     }

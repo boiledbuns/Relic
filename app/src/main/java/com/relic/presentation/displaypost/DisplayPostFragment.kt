@@ -19,10 +19,8 @@ import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
-import com.relic.data.gateway.UserGatewayImpl
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
-import com.relic.network.NetworkRequestManager
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
@@ -36,34 +34,13 @@ import com.relic.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
-class DisplayPostFragment : RelicFragment() {
-    companion object {
-        private const val TAG = "DISPLAYPOST_VIEW"
-        private const val ARG_POST_FULLNAME = "full_name"
-        private const val ARG_SUB_NAME = "subreddit"
-        private const val ARG_POST_SOURCE = "post_source"
-        private const val ARG_ENABLE_VISIT_SUB = "enable_visit_sub"
-
-        /**
-         * @param enableVisitSub used to allow onClicks to subreddit. Should only be enabled when
-         * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
-         * continuously chaining open subreddit actions
-         */
-        fun create(postId : String, subreddit : String, postSource: PostRepository.PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
-            // create a new bundle for the post id
-            val bundle = Bundle().apply {
-                putString(ARG_POST_FULLNAME, postId)
-                putString(ARG_SUB_NAME, subreddit)
-                putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
-                putParcelable(ARG_POST_SOURCE, postSource)
-            }
-
-            return DisplayPostFragment().apply {
-                arguments = bundle
-            }
-        }
-    }
+class DisplayPostFragment : RelicFragment(), CoroutineScope {
+    override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
@@ -87,7 +64,7 @@ class DisplayPostFragment : RelicFragment() {
     private lateinit var rootView : View
     private lateinit var myToolbar: Toolbar
     private lateinit var commentAdapter: CommentItemAdapter
-    private var previousError : PostExceptionData? = null
+    private var previousError : PostErrorData? = null
 
     // region lifecycle hooks
 
@@ -120,6 +97,7 @@ class DisplayPostFragment : RelicFragment() {
             adapter = commentAdapter
         }
 
+        rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).isRefreshing = true
         attachViewListeners()
         return rootView
     }
@@ -154,9 +132,6 @@ class DisplayPostFragment : RelicFragment() {
         displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
         displayPostVM.postNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
         displayPostVM.errorLiveData.observe(this) { handleError(it) }
-        displayPostVM.refreshingLiveData.nonNull().observe(this) {
-            displayPostSwipeRefresh.isRefreshing = it
-        }
     }
 
     // region live data handlers
@@ -166,8 +141,13 @@ class DisplayPostFragment : RelicFragment() {
     }
 
     private fun displayComments(commentList : List<CommentModel>) {
-        // notify the adapter and set the new list
-        commentAdapter.setComments(commentList)
+        launch(Dispatchers.Main) {
+            // notify the adapter and set the new list
+            commentAdapter.setComments(commentList) {
+//                displayPostSwipeRefresh.isRefreshing = false
+            }
+            displayPostSwipeRefresh.isRefreshing = false
+        }
     }
 
     private fun handleNavigation(navigationData : PostNavigationData) {
@@ -187,30 +167,18 @@ class DisplayPostFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : PostExceptionData?) {
-        if (error == null) {
-            snackbar?.dismiss()
-            snackbar = null
-            previousError = null
-        }
-        else if (previousError != error) {
-            // only need to update error if the error has changed
+    private fun handleError(error : PostErrorData?) {
+        if (previousError != error) {
+            displayPostSwipeRefresh.isRefreshing = false
+
+            // default details for unhandled exceptions to be displayed
             var snackbarMessage = resources.getString(R.string.unknown_error)
             var displayLength = Snackbar.LENGTH_SHORT
-
             var actionMessage: String? = null
             var action: () -> Unit = {}
 
             when (error) {
-                is PostExceptionData.NoComments -> {
-                    // TODO show the no comment image if this sub has no comments
-                    // hide the loading icon if some comments have been loaded
-                    snackbarMessage = resources.getString(R.string.no_comments)
-                    displayLength = Snackbar.LENGTH_INDEFINITE
-                    actionMessage = resources.getString(R.string.refresh)
-                    action = { displayPostVM.refreshData() }
-                }
-                is PostExceptionData.NetworkUnavailable -> {
+                is PostErrorData.NetworkUnavailable -> {
                     snackbarMessage = resources.getString(R.string.network_unavailable)
                     displayLength = Snackbar.LENGTH_INDEFINITE
                     actionMessage = resources.getString(R.string.refresh)
@@ -292,5 +260,32 @@ class DisplayPostFragment : RelicFragment() {
         // replace the current screen with the newly created fragment
         activity!!.supportFragmentManager.beginTransaction()
                 .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
+    }
+
+    companion object {
+        private const val TAG = "DISPLAYPOST_VIEW"
+        private const val ARG_POST_FULLNAME = "full_name"
+        private const val ARG_SUB_NAME = "subreddit"
+        private const val ARG_POST_SOURCE = "post_source"
+        private const val ARG_ENABLE_VISIT_SUB = "enable_visit_sub"
+
+        /**
+         * @param enableVisitSub used to allow onClicks to subreddit. Should only be enabled when
+         * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
+         * continuously chaining open subreddit actions
+         */
+        fun create(postId : String, subreddit : String, postSource: PostRepository.PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
+            // create a new bundle for the post id
+            val bundle = Bundle().apply {
+                putString(ARG_POST_FULLNAME, postId)
+                putString(ARG_SUB_NAME, subreddit)
+                putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
+                putParcelable(ARG_POST_SOURCE, postSource)
+            }
+
+            return DisplayPostFragment().apply {
+                arguments = bundle
+            }
+        }
     }
 }

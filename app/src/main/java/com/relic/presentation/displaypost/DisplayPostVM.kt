@@ -3,7 +3,6 @@ package com.relic.presentation.displaypost
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.util.Log
 
 import com.relic.data.CommentRepository
@@ -11,13 +10,16 @@ import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
 import com.relic.data.models.PostModel
+import com.relic.data.repository.NetworkException
 import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
+import com.relic.presentation.base.RelicViewModel
 import com.relic.util.MediaHelper
 import com.relic.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DisplayPostVM (
     private val postRepo : PostRepository,
@@ -27,12 +29,7 @@ class DisplayPostVM (
     private val subName: String,
     private val postFullname: String,
     private val postSource : PostRepository.PostSource
-): ViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate, CoroutineScope {
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { _, e ->
-        // TODO handle exception
-        Log.d(TAG, "caught exception $e")
-    }
+): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -45,19 +42,15 @@ class DisplayPostVM (
         }
     }
 
-    private val TAG = "DISPLAYPOST_VM"
-
     private val _postLiveData = MediatorLiveData<PostModel> ()
     private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()
     private val _navigationLiveData = SingleLiveData<PostNavigationData> ()
-    private val _refreshingLiveData = MutableLiveData<Boolean> ()
-    private val _errorLiveData = MutableLiveData<PostExceptionData> ()
+    private val _errorLiveData = MutableLiveData<PostErrorData> ()
 
     val postLiveData : LiveData<PostModel> =_postLiveData
     val commentListLiveData : LiveData<List<CommentModel>> = _commentListLiveData
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
-    val refreshingLiveData : LiveData<Boolean> = _refreshingLiveData
-    val errorLiveData : LiveData<PostExceptionData> = _errorLiveData
+    val errorLiveData : LiveData<PostErrorData> = _errorLiveData
 
     private var retrievalInProgress = true
 
@@ -73,12 +66,6 @@ class DisplayPostVM (
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
             post?.let {
                 _postLiveData.postValue(it)
-
-                if (post.commentCount == 0) {
-                    _errorLiveData.postValue(PostExceptionData.NoComments)
-                } else {
-                    _errorLiveData.postValue(null)
-                }
             }
         }
 
@@ -86,7 +73,6 @@ class DisplayPostVM (
             nullableComments?.let { comments ->
                 if (!retrievalInProgress) {
                     _commentListLiveData.postValue(comments)
-                    _refreshingLiveData.postValue(false)
                 }
             }
         }
@@ -94,29 +80,17 @@ class DisplayPostVM (
 
     override fun refreshData() {
         if (networkUtil.checkConnection()) {
-            _refreshingLiveData.postValue(true)
 
             launch(Dispatchers.Main) {
                 val commentJob = launch { retrieveMoreComments(true) }
-                val postJob = launch {
-                    postRepo.retrievePost(subName, postFullname, postSource) { exception: RelicRequestError ->
-                        publishException(exception)
-                    }
-                }
+                val postJob = launch { postRepo.retrievePost(subName, postFullname, postSource) }
 
-                try {
-                    joinAll(commentJob, postJob)
-                    retrievalInProgress = false
-                }
-                catch (e : Exception) {
-                    publishException(e)
-                    retrievalInProgress = false
-                }
+                joinAll(commentJob, postJob)
+                retrievalInProgress = false
             }
         }
         else {
-            _refreshingLiveData.postValue(false)
-            publishException(PostExceptionData.NetworkUnavailable)
+            publishException(PostErrorData.NetworkUnavailable)
             retrievalInProgress = false
         }
     }
@@ -126,7 +100,6 @@ class DisplayPostVM (
         // retrieves post and comments from network
         launch(Dispatchers.Main) {
             if (refresh) {
-                _refreshingLiveData.postValue(true)
                 commentRepo.clearAllCommentsFromSource(postFullname)
             }
             commentRepo.retrieveComments(subName, postFullname, refresh)
@@ -164,42 +137,21 @@ class DisplayPostVM (
      * it to the livedata to let the view display it
      */
     private fun publishException(exception : Exception) {
-        val viewException : PostExceptionData = when (exception) {
-            is RelicRequestError -> PostExceptionData.NetworkUnavailable
-            else -> PostExceptionData.UnexpectedException
+        val viewException : PostErrorData = when (exception) {
+            is RelicRequestError -> PostErrorData.NetworkUnavailable
+            else -> PostErrorData.UnexpectedException
         }
 
         publishException(viewException)
     }
 
-    private fun publishException(viewException : PostExceptionData) {
-        _refreshingLiveData.postValue(false)
+    private fun publishException(viewException : PostErrorData) {
         _errorLiveData.postValue(viewException)
     }
 
     //  region view action delegate
 
     override fun onExpandReplies(commentId: String, expanded : Boolean) {
-//        val commentModel = _commentListLiveData.value!![position]
-//
-//        if (expanded) {
-//            removeReplies(position)
-//        } else {
-//            val commentSource = commentRepo.getReplies(commentModel.id)
-//            _commentListLiveData.addSource(commentSource) { replies ->
-//                replies?.let {
-//                    if (it.isNotEmpty()) {
-//                        insertReplies(position, it)
-//                    } else {
-//                        // TODO retrieve comments from server if replies are not loaded
-//                        commentRepo.retrieveCommentChildren(commentModel)
-//                    }
-//                    // remove this as a source since this is a one off to retrieve replies
-//                    _commentListLiveData.removeSource(commentSource)
-//                }
-//            }
-//        }
-
         val commentPosition = _commentListLiveData.value!!.indexOfFirst { it.fullName == commentId }
         val commentModel = _commentListLiveData.value!![commentPosition]
 
@@ -266,8 +218,20 @@ class DisplayPostVM (
     }
 
     override fun onUserPressed(commentModel: CommentModel) {
-        _navigationLiveData.value = PostNavigationData.ToUserPreview(commentModel.author)
+        if (networkUtil.checkConnection()) {
+            _navigationLiveData.value = PostNavigationData.ToUserPreview(commentModel.author)
+        } else {
+            _errorLiveData.postValue(PostErrorData.NetworkUnavailable)
+        }
     }
 
     // endregion view action delegate
+
+    override fun handleException(context: CoroutineContext, e: Throwable) {
+        val postE = when (e) {
+            is NetworkException -> PostErrorData.NetworkUnavailable
+            else -> PostErrorData.UnexpectedException
+        }
+        _errorLiveData.postValue(postE)
+    }
 }

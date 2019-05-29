@@ -12,8 +12,6 @@ class FrontpageVM (
     networkUtil : NetworkUtil
 ): DisplaySubVM(PostRepository.PostSource.Frontpage , subRepo, postRepo, networkUtil) {
 
-    private val TAG = "DISPLAY_SUB_VM"
-
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,

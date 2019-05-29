@@ -1,15 +1,12 @@
 package com.relic.network
 
 import android.content.Context
-import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
-import com.relic.R
 import com.relic.data.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
-import java.lang.Exception
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
@@ -18,10 +15,8 @@ import kotlin.coroutines.suspendCoroutine
  */
 class NetworkRequestManager (
     private val appContext: Context
-) : CoroutineScope {
+) {
     val TAG = "NETWORK_REQUEST_MANAGER"
-
-    override val coroutineContext = Dispatchers.IO + SupervisorJob()
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
@@ -29,21 +24,6 @@ class NetworkRequestManager (
     // TODO move this to be injected
     private val volleyQueue: RequestQueue = VolleyAccessor.getInstance(appContext).requestQueue
     private val tokenStore = ApplicationDB.getDatabase(appContext).tokenStoreDao
-
-    fun processRequest(relicRequest : RelicOAuthRequest) {
-        val handler = CoroutineExceptionHandler { _, e ->
-            if (e is VolleyError) {
-                relicRequest.errorListener.onErrorResponse(e)
-            }
-        }
-
-        launch(handler) {
-            volleyQueue.add(relicRequest.apply {
-                authToken = checkToken()
-            })
-            throw VolleyError()
-        }
-    }
 
     /**
      * note that token should 99% be left empty (checked here) when calling process request
@@ -55,6 +35,7 @@ class NetworkRequestManager (
         method: Int,
         url: String,
         authToken: String? = null,
+        headers: MutableMap<String, String>? = null,
         data: MutableMap<String, String>? = null
     ) : String {
 
@@ -70,6 +51,7 @@ class NetworkRequestManager (
                     cont.resumeWithException(e)
                 },
                 token,
+                headers,
                 data
             )
 

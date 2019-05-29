@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.relic.data.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
@@ -16,10 +18,6 @@ class CommentItemAdapter (
     private val TAG = "COMMENT_ADAPTER"
     private val VIEW_TYPE_COMMENT = 0
     private val VIEW_TYPE_LOAD_MORE = 1
-
-    init {
-        
-    }
 
     override fun getItemCount(): Int = commentList.size
 
@@ -49,12 +47,42 @@ class CommentItemAdapter (
         return if (commentList[position].isLoadMore) VIEW_TYPE_LOAD_MORE else VIEW_TYPE_COMMENT
     }
 
-    fun setComments(newComments: List<CommentModel>) {
+    suspend fun setComments(newComments: List<CommentModel>, onPostsCalculated : () -> Unit) {
         if (commentList.isEmpty()) {
             commentList = newComments
             notifyDataSetChanged()
+        } else {
+            withContext(Dispatchers.Default) {
+                calculateDiffs(newComments)
+            }.dispatchUpdatesTo(this)
+            commentList = newComments
         }
-        CalculateDiffTask(this, commentList, newComments).execute()
+    }
+
+    private fun calculateDiffs(newComments: List<CommentModel>) : DiffUtil.DiffResult{
+        return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int {
+                return commentList.size
+            }
+
+            override fun getNewListSize(): Int {
+                return newComments.size
+            }
+
+            override fun areItemsTheSame(i: Int, i1: Int): Boolean {
+                return commentList[i].fullName == newComments[i1].fullName
+            }
+
+            override fun areContentsTheSame(i: Int, i1: Int): Boolean {
+                val oldComment = commentList[i]
+                val newComment = newComments[i1]
+                return (
+                    oldComment.userUpvoted == newComment.userUpvoted &&
+                        oldComment.body == newComment.body &&
+                        oldComment.replyCount == newComment.replyCount
+                    )
+            }
+        })
     }
 
     // region OnClick handlers
@@ -89,44 +117,4 @@ class CommentItemAdapter (
     }
 
     // endregion OnClick handlers
-
-    class CalculateDiffTask(
-        val adapter : CommentItemAdapter,
-        val commentList : List <CommentModel>,
-        val newComments : List <CommentModel>
-    ) : AsyncTask<Any, Int, Unit> () {
-        private lateinit var diff : DiffUtil.DiffResult
-
-        override fun doInBackground(vararg params: Any) {
-            diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-                override fun getOldListSize(): Int {
-                    return commentList.size
-                }
-
-                override fun getNewListSize(): Int {
-                    return newComments.size
-                }
-
-                override fun areItemsTheSame(i: Int, i1: Int): Boolean {
-                    return commentList[i].fullName == newComments[i1].fullName
-                }
-
-                override fun areContentsTheSame(i: Int, i1: Int): Boolean {
-                    val oldComment = commentList[i]
-                    val newComment = newComments[i1]
-                    return (
-                        oldComment.userUpvoted == newComment.userUpvoted &&
-                            oldComment.body == newComment.body &&
-                            oldComment.replyCount == newComment.replyCount
-                        )
-                }
-            })
-        }
-
-        override fun onPostExecute(result: Unit?) {
-            diff.dispatchUpdatesTo(adapter)
-            adapter.commentList = newComments
-        }
-    }
-
 }

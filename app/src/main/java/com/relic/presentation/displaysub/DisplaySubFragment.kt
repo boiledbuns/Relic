@@ -44,18 +44,6 @@ import kotlinx.android.synthetic.main.display_sub.*
 
 class DisplaySubFragment : RelicFragment() {
 
-    companion object {
-        private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
-
-        fun create(subredditName : String) : DisplaySubFragment {
-            return DisplaySubFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_SUBREDDIT_NAME, subredditName)
-                }
-            }
-        }
-    }
-
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -291,16 +279,21 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : SubExceptionData?) {
+    private fun handleError(error : SubError?) {
         error?.let {
+            // cancellation should also stop all progress indicators
+            subSwipeRefreshLayout.isRefreshing = false
+            displaySubProgress.visibility = View.GONE
+            scrollLocked = false
+
+            // default snackbar details for unhandled errors
             var message = resources.getString(R.string.unknown_error)
             var displayLength = Snackbar.LENGTH_SHORT
-
             var actionMessage: String? = null
             var action: () -> Unit = {}
 
             when (it) {
-                is SubExceptionData.NetworkUnavailable -> {
+                is SubError.NetworkUnavailable -> {
                     message = resources.getString(R.string.network_unavailable)
                     displayLength = Snackbar.LENGTH_INDEFINITE
                     actionMessage = resources.getString(R.string.refresh)
@@ -329,6 +322,7 @@ class DisplaySubFragment : RelicFragment() {
 
         subSortByInfo.text = sortInfoText
     }
+
     // endregion LiveData handlers
 
     // region view functions
@@ -419,4 +413,16 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     // endregion view functions
+
+    companion object {
+        private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
+
+        fun create(subredditName : String) : DisplaySubFragment {
+            return DisplaySubFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_SUBREDDIT_NAME, subredditName)
+                }
+            }
+        }
+    }
 }
