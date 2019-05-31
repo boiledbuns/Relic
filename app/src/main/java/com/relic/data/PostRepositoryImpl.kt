@@ -243,6 +243,22 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchSubPosts(subredditName: String, query : String) : PostRepository.SubSearchResult {
+        val ending = "r/$subredditName/search?q=$query"
+
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = ENDPOINT + ending
+            )
+
+            return postDeserializer.parseSearchSubPostsResponse(response)
+
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve account", e) ?: e
+        }
+    }
+
     // endregion interface methods
 
 

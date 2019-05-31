@@ -135,6 +135,9 @@ class MainActivity : AppCompatActivity() {
             }
             RequestCodes.CHANGED_ACCOUNT -> {
                 mainVM.onAccountSelected()
+                supportFragmentManager.fragments.forEach {
+
+                }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }

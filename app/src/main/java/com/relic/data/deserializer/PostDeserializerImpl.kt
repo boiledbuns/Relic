@@ -10,6 +10,8 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.data.PostRepository
+import com.relic.data.models.PostModel
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
@@ -30,6 +32,7 @@ class PostDeserializerImpl(
 
     private val jsonParser: JSONParser = JSONParser()
     private val gson = GsonBuilder().create()
+    private val moshi = Moshi.Builder().build()
 
     // initialize the date formatter and date for "now"
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
@@ -132,6 +135,23 @@ class PostDeserializerImpl(
         }
 
         ParsedPostsData(postSourceEntities, postEntities, commentEntities, listing)
+    }
+
+    override suspend fun parseSearchSubPostsResponse(response: String): PostRepository.SubSearchResult {
+        // TODO realized that we can do this with gson so look to replace simplejson with it
+        val listing = jsonParser.parse(response) as JSONObject
+        val data = listing["data"] as JSONObject
+        val children = data["children"] as JSONArray
+
+        val after = data["after"] as String?
+        val postModels = children.mapNotNull { mapToPostModel(it as JSONObject) }
+
+        return PostRepository.SubSearchResult(postModels, after)
+    }
+
+    private fun mapToPostModel(child : JSONObject) : PostModel? {
+        return moshi.adapter(JPostModel::class.java)
+            .fromJson((child["data"] as JSONObject).toString())
     }
 
     /**

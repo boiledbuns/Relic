@@ -68,6 +68,13 @@ interface PostRepository {
         sortScope: SortScope
     )
 
+    suspend fun searchSubPosts(subredditName: String, query : String) : SubSearchResult
+
+    data class SubSearchResult(
+        val posts : List<PostModel>,
+        val after : String?
+    )
+
     /**
      * //TODO tentative -> should expose or not
      * need to decide whether the viewModel should handle this or not

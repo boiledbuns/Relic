@@ -35,7 +35,7 @@ class FullPostView @JvmOverloads constructor(
             postTitleView.text = title
             postAuthorView.text = resources.getString(R.string.user_and_time, author, created)
 
-            if (isNsfw) postNSFWView.visibility = View.VISIBLE
+            if (nsfw) postNSFWView.visibility = View.VISIBLE
 
             postTagView.text = linkFlair
             if (!linkFlair.isNullOrEmpty()) postTagView.visibility = View.VISIBLE
@@ -44,7 +44,8 @@ class FullPostView @JvmOverloads constructor(
             if (!authorFlair.isNullOrEmpty()) postAuthorFlairView.visibility = View.VISIBLE
 
             if (!selftext.isNullOrEmpty()) {
-                markwon.setMarkdown(postSelfText, selftext)
+                val selfText = selftext!!
+                markwon.setMarkdown(postSelfText, selfText)
                 postSelfText.visibility = View.VISIBLE
             }
 

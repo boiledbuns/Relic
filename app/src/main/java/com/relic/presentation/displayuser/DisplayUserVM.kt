@@ -246,12 +246,12 @@ class DisplayUserVM(
         val navData = when (listingItem) {
             is PostModel -> SubNavigationData.ToPost(
                     listingItem.fullName,
-                    listingItem.subreddit,
+                    listingItem.subreddit!!,
                     postSource
             )
             is CommentModel -> SubNavigationData.ToPost(
                     PostModel.TYPE + "_" + listingItem.parentPostId,
-                    listingItem.subreddit,
+                    listingItem.subreddit!!,
                     postSource,
                     listingItem.fullName
             )
@@ -273,12 +273,12 @@ class DisplayUserVM(
 
     override fun onThumbnailClicked(listingItem : ListingItem) {
         if (listingItem is PostModel){
-            val isImage = ImageHelper.isValidImage(listingItem.url)
+            val isImage = ImageHelper.isValidImage(listingItem.url!!)
 
             val subNavigation : SubNavigationData = if (isImage) {
-                SubNavigationData.ToImage(listingItem.url)
+                SubNavigationData.ToImage(listingItem.url!!)
             } else {
-                SubNavigationData.ToExternal(listingItem.url)
+                SubNavigationData.ToExternal(listingItem.url!!)
             }
 
             _navigationLiveData.postValue(RelicEvent(subNavigation))

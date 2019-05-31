@@ -49,21 +49,22 @@ class RelicPostItemView @JvmOverloads constructor(
 
     fun setPost(postModel : PostModel) {
         postItemRootView?.apply {
-            if (postModel.isVisited) {
+            if (postModel.visited) {
                 setBackgroundColor(backgroundVisitedColor)
             } else {
                 setBackgroundColor(backgroundColor)
             }
 
-            if (postModel.isStickied) {
+            if (postModel.stickied) {
                 titleView.setTextColor(stickiedColor)
             } else {
                 titleView.setTextColor(textColor)
             }
 
             if (!postModel.thumbnail.isNullOrBlank()) {
+                val thumbnail = postModel.thumbnail!!
                 postItemThumbnailView.visibility = View.VISIBLE
-                setThumbnail(postModel.thumbnail)
+                setThumbnail(thumbnail)
                 postItemLinkDomain.visibility = View.VISIBLE
                 postItemLinkDomain.text = postModel.domain
             } else {
@@ -121,7 +122,7 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setPostTags(postModel: PostModel) {
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        postItemNSFWView.visibility = if (postModel.isNsfw) View.VISIBLE else View.GONE
+        postItemNSFWView.visibility = if (postModel.nsfw) View.VISIBLE else View.GONE
 
         postItemTagView.apply {
             if (postModel.linkFlair != null) {

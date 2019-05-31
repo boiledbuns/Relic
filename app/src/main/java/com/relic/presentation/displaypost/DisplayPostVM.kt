@@ -203,8 +203,8 @@ class DisplayPostVM (
         postLiveData.value?.let {
             val mediaType = MediaHelper.determineType(it)
             _navigationLiveData.value = when (mediaType) {
-                is MediaType.Image, MediaType.Gfycat -> PostNavigationData.ToMedia(mediaType, _postLiveData.value!!.url)
-                is MediaType.Link -> PostNavigationData.ToURL(_postLiveData.value!!.url)
+                is MediaType.Image, MediaType.Gfycat -> PostNavigationData.ToMedia(mediaType, _postLiveData.value!!.url!!)
+                is MediaType.Link -> PostNavigationData.ToURL(_postLiveData.value!!.url!!)
                 else -> null
             }
             _navigationLiveData.value = null

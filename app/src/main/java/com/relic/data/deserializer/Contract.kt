@@ -3,6 +3,7 @@ package com.relic.data.deserializer
 import com.relic.data.PostRepository
 import com.relic.data.entities.*
 import com.relic.data.models.CommentModel
+import com.relic.data.models.SubredditModel
 import com.relic.data.models.UserModel
 import com.relic.exception.RelicException
 import org.json.simple.JSONObject
@@ -22,6 +23,8 @@ interface Contract {
         ) : ParsedPostsData
 
         suspend fun parsePost(response: String) : ParsedPostData
+
+        suspend fun parseSearchSubPostsResponse(response: String): PostRepository.SubSearchResult
     }
 
     interface CommentDeserializer {

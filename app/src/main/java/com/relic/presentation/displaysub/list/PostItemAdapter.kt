@@ -53,9 +53,9 @@ class PostItemAdapter (
     override fun onPostPressed (itemPosition : Int) {
         postList[itemPosition].also {
             // update post to show that it has been visited
-            postAdapterDelegate.visitPost(it.fullName, it.subreddit)
+            postAdapterDelegate.visitPost(it.fullName, it.subreddit!!)
             // update the view and local model to reflect onclick
-            it.isVisited = true
+            it.visited = true
         }
         notifyItemChanged(itemPosition)
     }
@@ -99,7 +99,7 @@ class PostItemAdapter (
     }
 
     override fun onPostLinkPressed (itemPosition : Int) {
-        postAdapterDelegate.onLinkPressed(postList[itemPosition].url)
+        postAdapterDelegate.onLinkPressed(postList[itemPosition].url!!)
     }
 
     override fun onUserPressed(itemPosition: Int) {
@@ -129,7 +129,7 @@ class PostItemAdapter (
                 val oldPost = postList[oldItemPosition]
                 val newPost = newPostList[newItemPosition]
 
-                return oldPost.fullName == newPost.fullName && oldPost.isVisited == newPost.isVisited
+                return oldPost.fullName == newPost.fullName && oldPost.visited == newPost.visited
             }
         })
     }

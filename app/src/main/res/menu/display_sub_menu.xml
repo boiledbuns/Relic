@@ -5,8 +5,7 @@
     <item android:id="@+id/display_sub_searchitem"
           android:title="@string/searchmenu_title"
           android:icon="@drawable/ic_search"
-          app:showAsAction="ifRoom|collapseActionView"
-          app:actionViewClass="android.support.v7.widget.SearchView"
+          app:showAsAction="ifRoom"
           app:queryBackground="@android:color/transparent"/>
 
     <item android:id="@+id/display_sub_sort"

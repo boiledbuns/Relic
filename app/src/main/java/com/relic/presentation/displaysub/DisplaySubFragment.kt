@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
 import android.support.v7.widget.Toolbar
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
@@ -61,7 +60,6 @@ class DisplaySubFragment : RelicFragment() {
 
     private lateinit var subName: String
 
-    private lateinit var searchView: SearchView
     private lateinit var postAdapter: PostItemAdapter
     private lateinit var subItemTouchHelper : ItemTouchHelper
     private lateinit var touchHelperCallback : ItemTouchHelper.Callback
@@ -94,7 +92,7 @@ class DisplaySubFragment : RelicFragment() {
                 layoutManager = LinearLayoutManager(context)
             }
 
-            initializeToolbar(findViewById<Toolbar>(R.id.subToolbar))
+            initializeToolbar(findViewById(R.id.subToolbar))
         }
     }
 
@@ -141,25 +139,6 @@ class DisplaySubFragment : RelicFragment() {
             val sortingMethodSubMenu = sortMenu?.findItem(subMenuId)?.subMenu
             inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
         }
-
-        menu?.findItem(R.id.display_sub_searchitem)?.let {
-            searchView = (it.actionView as SearchView).apply {
-                val padding = resources.getDimension(R.dimen.search_padding).toInt()
-                setPadding(0, 0, padding, padding)
-
-                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(s: String): Boolean {
-                        Toast.makeText(context, "Display sub view $s", Toast.LENGTH_SHORT).show()
-                        return false
-                    }
-
-                    override fun onQueryTextChange(s: String): Boolean {
-                        Toast.makeText(context, "Display sub view $s", Toast.LENGTH_SHORT).show()
-                        return false
-                    }
-                })
-            }
-        }
     }
 
     // endregion fragment lifecycle hooks
@@ -169,7 +148,13 @@ class DisplaySubFragment : RelicFragment() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
         when (item?.itemId) {
-            R.id.display_sub_searchitem -> { }
+            R.id.display_sub_searchitem -> {
+                val searchFrag = DisplaySubSearch.create(PostRepository.PostSource.Subreddit(subName))
+                // intentionally because replacing then popping off back stack loses scroll position
+                activity!!.supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()
+                fragmentOpened = true
+            }
             // when the sorting type is changed
             R.id.post_sort_hot, R.id.post_sort_rising, R.id.post_sort_top -> {
                 // update the temporary local sorting method since we don't sort yet

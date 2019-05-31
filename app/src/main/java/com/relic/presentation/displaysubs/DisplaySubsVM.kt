@@ -42,9 +42,6 @@ class DisplaySubsVM (
     val pinnedSubs : LiveData<List<SubredditModel>> = subRepository.getPinnedsubs()
 
     init {
-        _searchResults.value = null
-        _subscribedSubsList.value = null
-
         initializeObservers()
     }
 

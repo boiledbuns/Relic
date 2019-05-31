@@ -104,4 +104,6 @@
     <string name="add_account">add account</string>
     <string name="switched_account">switched account to %s</string>
 
+    <string name="search_sub">enter search</string>
+    <string name="search_sub_result_count">%d results loaded</string>
 </resources>

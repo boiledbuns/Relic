@@ -25,7 +25,7 @@ open class DisplaySubVM (
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback {
+) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, DisplaySubContract.SearchVM {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
@@ -40,6 +40,7 @@ open class DisplaySubVM (
     private var currentSortingType = PostRepository.SortType.DEFAULT
     private var currentSortingScope = PostRepository.SortScope.NONE
     private var retrievalInProgress = true
+    private var after : String? = null
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
@@ -47,6 +48,7 @@ open class DisplaySubVM (
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     private val _refreshLiveData = MutableLiveData<Boolean>()
     private val _errorLiveData = SingleLiveData<SubError>()
+    private val _searchResults = MutableLiveData<List<PostModel>>()
 
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
@@ -54,6 +56,7 @@ open class DisplaySubVM (
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
     val refreshLiveData : LiveData<Boolean> = _refreshLiveData
     val errorLiveData : LiveData<SubError> = _errorLiveData
+    override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
         retrieveMorePosts(true)
@@ -214,6 +217,26 @@ open class DisplaySubVM (
     override fun previewUser(username: String) {
         _navigationLiveData.value = SubNavigationData.ToUserPreview(username)
     }
+
+
+    // region search vm
+    override fun search(query : String) {
+        launch(Dispatchers.Main) {
+            val results = when (postSource) {
+                is PostRepository.PostSource.Subreddit -> postRepo.searchSubPosts(postSource.subredditName, query)
+                else -> {
+                    null
+                }
+            }
+
+            results?.let {
+                after = it.after
+                _searchResults.postValue(it.posts)
+            }
+        }
+    }
+
+    // endregion search vm
 
     // endregion view action delegate
 

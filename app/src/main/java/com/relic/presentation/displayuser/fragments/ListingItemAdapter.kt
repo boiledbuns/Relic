@@ -77,7 +77,7 @@ class ListingItemAdapter(
                 val oldItem = listingItems[oldPosition]
                 val newItem = newListingItems[newPosition]
 
-                return oldItem.fullName == newItem.fullName && oldItem.isVisited == newItem.isVisited
+                return oldItem.fullName == newItem.fullName && oldItem.visited == newItem.visited
             }
         }).dispatchUpdatesTo(this)
 
@@ -98,7 +98,7 @@ class ListingItemAdapter(
             actionDelegate.visitListing(it)
 
             // update the view and local model to reflect onclick
-            it.isVisited = true
+            it.visited = true
         }
         notifyItemChanged(itemPosition)
     }

@@ -89,7 +89,7 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
           PostModel oldPost = postList.get(oldItemPosition);
           PostModel newPost = newPostList.get(newItemPosition);
           boolean check = oldPost.getFullName().equals(newPost.getFullName())
-            && oldPost.isVisited() == newPost.isVisited();
+            && oldPost.getVisited() == newPost.getVisited();
 
           return check;
         }
@@ -189,11 +189,11 @@ public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostIt
         PostModel postModel = postList.get(itemPosition);
 
         // calculate new save value based on the previous one and tell vm to update appropriately
-        boolean newStatus = !postModel.saved;
+        boolean newStatus = !postModel.getSaved();
         postAdapterDelegate.savePost(postModel.getFullName(), newStatus);
 
         // update the view and local model to reflect onclick
-        postModel.saved = newStatus;
+        postModel.setSaved(newStatus);
         notifyItemChanged(itemPosition);
       });
     }

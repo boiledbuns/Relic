@@ -31,7 +31,8 @@ object MediaHelper {
                 type = MediaType.VReddit
             }
             else {
-                val lastThree = postModel.url.substring(postModel.url.length - 3)
+                val url = postModel.url!!
+                val lastThree = url.substring(url.length - 3)
                 if (validImageEndings.contains(lastThree)) {
                     type = MediaType.Image
                 } else if (!postModel.self) {

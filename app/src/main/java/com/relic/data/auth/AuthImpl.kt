@@ -158,7 +158,7 @@ class AuthImpl (
         // get the name of the current account
         val name : String = appContext
             .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
-            .getString(KEY_CURR_ACCOUNT, null) ?: throw Exception()
+            .getString(KEY_CURR_ACCOUNT, null) ?: throw Exception() // TODO replace with custom e
 
         val refreshToken = withContext(Dispatchers.IO) {
             appDB.tokenStoreDao.getTokenStore(name).refresh

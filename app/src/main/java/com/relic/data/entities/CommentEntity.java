@@ -12,6 +12,7 @@ public class CommentEntity {
     @NonNull
     @PrimaryKey
     private String id;
+    private String fullName;
 
     //public String replies;
     public String created;
@@ -73,4 +74,12 @@ public class CommentEntity {
 
     // for "more" values
     public String moreChildren;
+
+    public String getFullName() {
+        return "t1_" + id;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 }
