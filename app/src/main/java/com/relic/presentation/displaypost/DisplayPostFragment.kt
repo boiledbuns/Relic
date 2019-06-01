@@ -88,9 +88,11 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     ): View? {
         rootView = inflater.inflate(R.layout.display_post, container, false)
 
-        myToolbar = rootView.findViewById<Toolbar>(R.id.displayPostToolbar).apply {
-            (activity as AppCompatActivity).setSupportActionBar(this)
+        myToolbar = rootView.findViewById(R.id.displayPostToolbar)
+        (activity as AppCompatActivity).apply {
+            setSupportActionBar(myToolbar)
         }
+
         initializeToolbar()
 
         rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {

@@ -30,6 +30,8 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
     // region android lifecycle hooks
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        previewPost = initializePreviewPost()
+
         activity?.let {
             preferencesManager = PreferencesManagerImpl.create(it.getPreferences(Context.MODE_PRIVATE))
             currentTheme = preferencesManager.getApplicationTheme()
@@ -40,12 +42,12 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
         return localInflater.inflate(R.layout.preferences_theme, container, false).apply {
             this@ThemeFragment.rootView = this
-            initializePreviewPost()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         preferencesThemeToolbarView.setNavigationOnClickListener {
             activity?.onBackPressed()
@@ -76,11 +78,13 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
     // region view helper functions
 
-    private fun initializePreviewPost() {
-        previewPost = PostModel().apply {
+    private fun initializePreviewPost() : PostModel {
+        return PostModel().apply {
             title = resources.getString(R.string.preference_theme_instruction)
+            author ="boiledbuns"
             selftext = resources.getString(R.string.long_placeholder_text)
             subreddit = "theme_editor"
+            created ="300 years ago"
         }
     }
 

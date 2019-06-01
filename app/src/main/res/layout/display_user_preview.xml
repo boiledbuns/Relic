@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/padding_m"
     android:paddingBottom="@dimen/padding_l"
-    android:background="@color/backgroundSecondary">
+    android:background="?attr/relicBackgroundColorB">
 
     <TextView
         android:id="@+id/userPreviewUser"
@@ -23,7 +23,7 @@
         android:id="@+id/userPreviewRule"
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="@color/primaryText"
+        android:background="?android:textColor"
         app:layout_constraintTop_toBottomOf="@id/userPreviewUser"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="@dimen/text_spacing_m"

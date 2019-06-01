@@ -54,7 +54,10 @@
                     android:layout_margin="@dimen/postitem_margin"
                     android:textAllCaps="false"
                     android:textSize="15sp"
-                    android:minWidth="82dp"/>
+                    android:minWidth="82dp"
+                    android:background="?attr/relicBackgroundColor"
+                    android:textColor="?attr/relicTitleColor"
+                    tools:text="subscribe"/>
 
             </RelativeLayout>
 

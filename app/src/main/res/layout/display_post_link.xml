@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/card_thumbnail_size"
-    android:layout_marginBottom="@dimen/padding_m">
+    android:layout_marginBottom="@dimen/padding_m"
+    app:cardBackgroundColor="?attr/relicBackgroundColor">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,13 +20,15 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/card_thumbnail_size"
             android:padding="@dimen/card_padding_small"
-            android:textSize="@dimen/title_size_s"/>
+            android:textSize="@dimen/title_size_s"
+            tools:text="@tools:sample/lorem/random"/>
 
         <ImageView
             android:id="@+id/postLinkThumbnail"
             android:layout_width="@dimen/card_thumbnail_size"
             android:layout_height="@dimen/card_thumbnail_size"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            tools:src="@tools:sample/avatars"/>
 
     </RelativeLayout>
 

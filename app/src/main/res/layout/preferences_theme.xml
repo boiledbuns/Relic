@@ -13,6 +13,7 @@
         android:background="?attr/colorPrimary"
         app:title="@string/preference_theme"
         app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="?attr/relicTitleColor"
         app:navigationIcon="?attr/homeAsUpIndicator">
 
         <Spinner

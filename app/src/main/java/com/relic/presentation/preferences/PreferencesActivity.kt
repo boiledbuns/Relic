@@ -1,13 +1,13 @@
 package com.relic.presentation.preferences
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.MenuItem
 import com.relic.R
+import com.relic.util.PreferencesManagerImpl
 import com.relic.util.RequestCodes
-import kotlinx.android.synthetic.main.activity_preferences.*
 
 class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
 
@@ -16,6 +16,11 @@ class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val themeId = PreferencesManagerImpl
+            .create(getPreferences(Context.MODE_PRIVATE))
+            .getApplicationTheme()
+
+        setTheme(themeId)
         setContentView(R.layout.activity_preferences)
 
         // retrieve the link to be used
@@ -48,7 +53,9 @@ class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
 
     override fun onPreferenceChanged(preferenceLink : PreferenceLink) {
         when (preferenceLink) {
-            PreferenceLink.Theme -> { changedPreferences.add(PreferenceLink.Theme)}
+            PreferenceLink.Theme -> {
+                changedPreferences.add(PreferenceLink.Theme)
+            }
         }
     }
 

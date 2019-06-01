@@ -20,12 +20,13 @@
 
     <style name="RelicThemeLight" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/white</item>
+        <item name="colorAccent">@color/paleGray</item>
         <item name="relicBackgroundColor">@color/paleGray</item>
         <item name="relicBackgroundColorB">@color/almostWhite</item>
 
-        <item name="android:textColor">@color/paleGray</item>
+        <item name="android:textColor">@color/paleBlueGray</item>
         <item name="relicStickiedColor">@color/stickied</item>
-        <item name="relicTitleColor">@color/paleGray</item>
+        <item name="relicTitleColor">@color/darkGray</item>
     </style>
 
     <style name="ThemeDark" parent="Theme.AppCompat.NoActionBar">
@@ -78,6 +79,7 @@
 
     <style name="collapsingTitleAppearance" parent="TextAppearance.AppCompat.Title">
         <item name="android:textSize">24sp</item>
+        <item name="android:textColor">?attr/relicTitleColor</item>
     </style>
 
 </resources>

@@ -12,6 +12,7 @@
         android:background="?attr/colorPrimary"
         app:title="@string/preference_theme"
         app:navigationIcon="?attr/homeAsUpIndicator"
+        app:titleTextColor="?attr/relicTitleColor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/themeOptionView"/>
 
@@ -21,6 +22,7 @@
         android:layout_height="wrap_content"
         android:text="@string/preference_theme"
         android:padding="@dimen/padding_l"
-        app:layout_constraintTop_toBottomOf="@id/preferencesToolbarView"/>
+        app:layout_constraintTop_toBottomOf="@id/preferencesToolbarView"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>
