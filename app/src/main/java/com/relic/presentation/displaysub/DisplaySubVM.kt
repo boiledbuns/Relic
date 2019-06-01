@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.relic.RelicError
 
 import com.relic.data.PostRepository
 import com.relic.data.SubRepository
@@ -48,7 +49,7 @@ open class DisplaySubVM (
     private val _navigationLiveData = SingleLiveData<SubNavigationData>()
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     private val _refreshLiveData = MutableLiveData<Boolean>()
-    private val _errorLiveData = SingleLiveData<SubError>()
+    private val _errorLiveData = SingleLiveData<RelicError>()
     private val _searchResults = MutableLiveData<List<PostModel>>()
 
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
@@ -56,7 +57,7 @@ open class DisplaySubVM (
     val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
     val refreshLiveData : LiveData<Boolean> = _refreshLiveData
-    val errorLiveData : LiveData<SubError> = _errorLiveData
+    val errorLiveData : LiveData<RelicError> = _errorLiveData
     override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
@@ -129,8 +130,8 @@ open class DisplaySubVM (
                     // display the associated error
                     _errorLiveData.postValue(
                         when (e) {
-                            is RelicRequestError -> SubError.NetworkUnavailable
-                            else -> SubError.UnexpectedException
+                            is RelicRequestError -> RelicError.NetworkUnavailable
+                            else -> RelicError.Unexpected
                         }
                     )
                 }
@@ -141,7 +142,7 @@ open class DisplaySubVM (
         }
         else {
             retrievalInProgress = false
-            _errorLiveData.postValue(SubError.NetworkUnavailable)
+            _errorLiveData.postValue(RelicError.NetworkUnavailable)
         }
     }
 
@@ -159,10 +160,11 @@ open class DisplaySubVM (
         launch(Dispatchers.Main) {
             // remove all posts from current db for this subreddit (triggers retrieval)
             postRepo.clearAllPostsFromSource(postSource)
+            retrieveMorePosts(true)
+            _subInfoLiveData.postValue(
+                DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
+            )
         }
-        _subInfoLiveData.postValue(
-            DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
-        )
     }
 
     override fun onNextListing(nextVal: String?) {
@@ -257,7 +259,7 @@ open class DisplaySubVM (
                     after = moreResult.after
                     // show appropriate message to user to indicate no more posts could be found
                     if (moreResult.posts.isEmpty()) {
-                        // TODO
+                        _errorLiveData.postValue(NoResults)
                     } else {
                         val newPosts = ArrayList<PostModel>()
                         _searchResults.value?.let { newPosts.addAll(it) }
@@ -279,8 +281,8 @@ open class DisplaySubVM (
 
     override fun handleException(context: CoroutineContext, e : Throwable) {
         val subE = when (e) {
-            is NetworkException -> SubError.NetworkUnavailable
-            else -> SubError.UnexpectedException
+            is NetworkException -> RelicError.NetworkUnavailable
+            else -> RelicError.Unexpected
         }
         _errorLiveData.postValue(subE)
 

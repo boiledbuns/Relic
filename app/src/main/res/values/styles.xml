@@ -7,9 +7,9 @@
     <!-- REGION THEMES -->
     <style name="RelicThemePrimary" parent="RelicBaseTheme">
         <item name="colorPrimary">@color/backgroundSecondary</item>
+        <item name="colorAccent">@color/paleDarkGray</item>
         <item name="relicBackgroundColor">@color/paleDarkGray</item>
         <item name="relicBackgroundColorB">@color/backgroundSecondaryB</item>
-
 
         <item name="android:textColor">@color/paleGray</item>
         <item name="android:navigationBarColor">@color/paleDarkGray</item>

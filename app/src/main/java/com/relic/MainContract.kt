@@ -12,3 +12,13 @@ interface MainContract {
         fun onAccountSelected(name : String? = null)
     }
 }
+
+/**
+ * note: these aren't exceptions; they represents data to be displayed to user in case of failure
+ * base class for failures to be propagated to the view
+ * should include failures that could occur on any view -> ex. network unavailable
+ */
+open class RelicError {
+    object NetworkUnavailable : RelicError()
+    object Unexpected : RelicError()
+}

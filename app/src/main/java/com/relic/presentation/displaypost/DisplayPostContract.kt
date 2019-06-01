@@ -1,6 +1,7 @@
 package com.relic.presentation.displaypost
 
 import com.relic.data.models.CommentModel
+import com.relic.data.models.ListingItem
 import com.relic.util.MediaType
 
 const val UPVOTE_PRESSED = 1
@@ -27,7 +28,7 @@ interface DisplayPostContract {
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onLinkPressed()
         fun onReplyPressed()
-        fun onUserPressed(commentModel: CommentModel)
+        fun onUserPressed(listing: ListingItem)
     }
 
     interface CommentAdapterDelegate {

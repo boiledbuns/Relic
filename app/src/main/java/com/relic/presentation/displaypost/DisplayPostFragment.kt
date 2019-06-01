@@ -34,6 +34,7 @@ import com.relic.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
+import kotlinx.android.synthetic.main.full_post.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -138,6 +139,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     private fun displayPost (postModel : PostModel) {
         fullPostView.setPost(postModel, determineType(postModel), displayPostVM)
+        postAuthorView.setOnClickListener { displayPostVM.onUserPressed(postModel) }
     }
 
     private fun displayComments(commentList : List<CommentModel>) {

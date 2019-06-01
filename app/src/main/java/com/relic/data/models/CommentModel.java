@@ -7,7 +7,6 @@ public class CommentModel extends ListingItem {
     public static String TYPE = "t1_";
 
     public String id;
-    public String author;
     private String body;
     public String created;
     private int score;

@@ -128,7 +128,7 @@ class PostDeserializerImpl(
                 postSourceEntities.add(postSourceEntity)
 
                 postCount++
-
+                Log.d(TAG, "post count : $postCount")
             } catch (e : Exception) {
                 throw RelicParseException(response, e)
             }

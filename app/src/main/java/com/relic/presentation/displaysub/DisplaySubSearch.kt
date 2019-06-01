@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat.getSystemService
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -15,7 +16,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import com.relic.R
+import com.relic.RelicError
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
@@ -78,7 +81,7 @@ class DisplaySubSearch : RelicFragment() {
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        subSearchVM.errorLiveData.observe(lifecycleOwner){ }
+        subSearchVM.errorLiveData.nonNull().observe(lifecycleOwner){ handleError(it) }
         subSearchVM.searchResults.nonNull().observe(lifecycleOwner){ handleSearchResults(it) }
         subSearchVM.subNavigationLiveData.observe(lifecycleOwner){  }
     }
@@ -122,6 +125,27 @@ class DisplaySubSearch : RelicFragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+    }
+
+    private fun handleError(error : RelicError) {
+        displaySearchProgress.visibility = View.GONE
+        when(error) {
+            is NoResults -> {
+                Toast.makeText(context, "No more results for query", Toast.LENGTH_SHORT).show()
+            }
+            is RelicError.NetworkUnavailable -> {
+                Snackbar.make(
+                    subSearchRoot,
+                    resources.getString(R.string.network_unavailable),
+                    Snackbar.LENGTH_INDEFINITE
+                ).apply {
+                    setAction(resources.getString(R.string.refresh)) {
+                        subSearchVM.search(subSearch.text.toString())
+                    }
+                    show()
+                }
+            }
+        }
     }
 
     // endregion lifecycle hooks

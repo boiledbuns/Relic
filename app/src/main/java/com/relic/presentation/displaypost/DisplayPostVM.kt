@@ -9,6 +9,7 @@ import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.models.CommentModel
+import com.relic.data.models.ListingItem
 import com.relic.data.models.PostModel
 import com.relic.data.repository.NetworkException
 import com.relic.network.NetworkUtil
@@ -217,9 +218,9 @@ class DisplayPostVM (
         _navigationLiveData.value = null
     }
 
-    override fun onUserPressed(commentModel: CommentModel) {
+    override fun onUserPressed(listing: ListingItem) {
         if (networkUtil.checkConnection()) {
-            _navigationLiveData.value = PostNavigationData.ToUserPreview(commentModel.author)
+            _navigationLiveData.value = PostNavigationData.ToUserPreview(listing.author)
         } else {
             _errorLiveData.postValue(PostErrorData.NetworkUnavailable)
         }

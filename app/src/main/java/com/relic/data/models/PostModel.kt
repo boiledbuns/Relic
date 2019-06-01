@@ -6,7 +6,6 @@ import com.relic.domain.Post
 
 open class PostModel : ListingItem(), Post {
 
-    lateinit var author: String
     lateinit var title: String
     lateinit var created: String
 

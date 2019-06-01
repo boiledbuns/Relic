@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 
 import com.relic.R
+import com.relic.RelicError
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
@@ -165,6 +166,7 @@ class DisplaySubFragment : RelicFragment() {
                 resetRecyclerView()
                 val sortType = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)
                 displaySubVM.changeSortingMethod(sortType)
+                subSwipeRefreshLayout.isRefreshing = true
             }
             // when the sorting scope is changed
             R.id.order_scope_hour, R.id.order_scope_day, R.id.order_scope_week,
@@ -173,6 +175,7 @@ class DisplaySubFragment : RelicFragment() {
 
                 val sortScope = DisplaySubMenuHelper.convertMenuItemToSortScope(item.itemId)
                 displaySubVM.changeSortingMethod(sortType = tempSortMethod, sortScope = sortScope)
+                subSwipeRefreshLayout.isRefreshing = true
                 Toast.makeText(context, "Sorting option selected $sortScope", Toast.LENGTH_SHORT).show()
             }
             else -> override = super.onOptionsItemSelected(item)
@@ -264,7 +267,7 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : SubError?) {
+    private fun handleError(error : RelicError?) {
         error?.let {
             // cancellation should also stop all progress indicators
             subSwipeRefreshLayout.isRefreshing = false
@@ -278,7 +281,7 @@ class DisplaySubFragment : RelicFragment() {
             var action: () -> Unit = {}
 
             when (it) {
-                is SubError.NetworkUnavailable -> {
+                is RelicError.NetworkUnavailable -> {
                     message = resources.getString(R.string.network_unavailable)
                     displayLength = Snackbar.LENGTH_INDEFINITE
                     actionMessage = resources.getString(R.string.refresh)

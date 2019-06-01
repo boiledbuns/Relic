@@ -1,6 +1,7 @@
 package com.relic.presentation.displaysub
 
 import android.arch.lifecycle.LiveData
+import com.relic.RelicError
 import com.relic.data.PostRepository
 import com.relic.data.models.PostModel
 
@@ -61,11 +62,5 @@ data class DisplaySubInfoData (
     var sortingScope : PostRepository.SortScope
 )
 
-/**
- * note: this isn't an exception; it's represents data to be displayed to user in case of failure
- */
-sealed class SubError {
-    object NoPosts : SubError()
-    object NetworkUnavailable : SubError()
-    object UnexpectedException : SubError()
-}
+
+object NoResults: RelicError()

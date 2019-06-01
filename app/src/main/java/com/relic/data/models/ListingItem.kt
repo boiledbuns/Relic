@@ -4,6 +4,8 @@ open class ListingItem {
 
     // the id is the "full name" of an item
     open var fullName = ""
+    lateinit var author: String
+
     var visited: Boolean = false
     var userUpvoted: Int = 0
     var saved: Boolean = false

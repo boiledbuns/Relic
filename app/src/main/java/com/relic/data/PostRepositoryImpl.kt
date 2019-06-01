@@ -126,7 +126,6 @@ class PostRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }
-
     }
 
     override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
