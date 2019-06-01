@@ -14,6 +14,7 @@ interface DisplaySubContract {
     interface SearchVM {
         val searchResults : LiveData<List<PostModel>>
         fun search(query : String)
+        fun retrieveMoreSearchResults()
     }
 
     interface PostAdapterDelegate {

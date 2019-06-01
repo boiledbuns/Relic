@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v4.content.ContextCompat.getSystemService
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -31,9 +30,10 @@ import kotlinx.android.synthetic.main.display_sub_search.*
 
 class DisplaySubSearch : RelicFragment() {
 
-    private lateinit var displaySubSearchVM : DisplaySubVM
+    private lateinit var subSearchVM : DisplaySubVM
     private lateinit var postAdapter: PostItemAdapter
 
+    private var scrollLocked = true
     // region lifecycle hooks
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,7 @@ class DisplaySubSearch : RelicFragment() {
 
         val source = arguments?.getParcelable(ARG_SOURCE) as PostRepository.PostSource
 
-        displaySubSearchVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+        subSearchVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return DaggerVMComponent.builder()
                     .repoModule(RepoModule(context!!))
@@ -52,7 +52,7 @@ class DisplaySubSearch : RelicFragment() {
             }
         }).get(DisplaySubVM::class.java)
 
-        postAdapter = PostItemAdapter(displaySubSearchVM)
+        postAdapter = PostItemAdapter(subSearchVM)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -72,25 +72,50 @@ class DisplaySubSearch : RelicFragment() {
 
         getSystemService(requireContext(), InputMethodManager::class.java)
             ?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.RESULT_SHOWN)
+
         bindViewModel(this)
+        attachScrollListeners()
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        displaySubSearchVM.errorLiveData.observe(lifecycleOwner){ }
-        displaySubSearchVM.searchResults.nonNull().observe(lifecycleOwner){ handleSearchResults(it) }
-        displaySubSearchVM.subNavigationLiveData.observe(lifecycleOwner){  }
+        subSearchVM.errorLiveData.observe(lifecycleOwner){ }
+        subSearchVM.searchResults.nonNull().observe(lifecycleOwner){ handleSearchResults(it) }
+        subSearchVM.subNavigationLiveData.observe(lifecycleOwner){  }
+    }
+
+    private fun attachScrollListeners() {
+        subSearchRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                // checks if the recycler view can no longer scroll downwards
+                if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
+                    // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
+                    scrollLocked = true
+                    displaySearchProgress.visibility = View.VISIBLE
+
+                    // fetch the next post listing
+                    subSearchVM.retrieveMoreSearchResults()
+                }
+            }
+        })
     }
 
     private fun handleSearchResults(results : List<PostModel>) {
         subSearchResultCount.text = getString(R.string.search_sub_result_count, results.size)
         postAdapter.setPostList(results)
+
+        // hide loading and allow load more again
+        scrollLocked = false
+        displaySearchProgress.visibility = View.GONE
     }
 
     private fun initSearchEditText(editText: EditText) {
         editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 // TODO refine search experience -> basic idea is to start only search after user stops typing
-                displaySubSearchVM.search(s.toString())
+                subSearchVM.search(s.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

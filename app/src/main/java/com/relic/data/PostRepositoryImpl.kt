@@ -243,19 +243,27 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchSubPosts(subredditName: String, query : String) : PostRepository.SubSearchResult {
-        val ending = "r/$subredditName/search?q=$query"
+    override suspend fun searchSubPosts(
+        subredditName: String,
+        query : String,
+        restrictToSub : Boolean,
+        after : String?
+    ) : PostRepository.SubSearchResult {
+        var ending = "r/$subredditName/search?q=$query"
+        if (restrictToSub) ending += "&restrict_sr=true"
+        if (after != null) ending += "&after=$after"
 
         try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending
             )
-
+            Log.d(TAG, "ending $ending")
+            Log.d(TAG, "response $response")
             return postDeserializer.parseSearchSubPostsResponse(response)
 
         } catch (e: Exception) {
-            throw DomainTransfer.handleException("retrieve account", e) ?: e
+            throw DomainTransfer.handleException("retrieve search results", e) ?: e
         }
     }
 

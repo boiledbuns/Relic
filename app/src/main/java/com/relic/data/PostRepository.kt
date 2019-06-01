@@ -68,7 +68,12 @@ interface PostRepository {
         sortScope: SortScope
     )
 
-    suspend fun searchSubPosts(subredditName: String, query : String) : SubSearchResult
+    suspend fun searchSubPosts(
+        subredditName: String,
+        query : String,
+        restrictToSub : Boolean = false,
+        after : String? = null
+    ) : SubSearchResult
 
     data class SubSearchResult(
         val posts : List<PostModel>,

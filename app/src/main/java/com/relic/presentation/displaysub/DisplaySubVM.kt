@@ -41,6 +41,7 @@ open class DisplaySubVM (
     private var currentSortingScope = PostRepository.SortScope.NONE
     private var retrievalInProgress = true
     private var after : String? = null
+    private var query : String? = null
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
@@ -221,9 +222,12 @@ open class DisplaySubVM (
 
     // region search vm
     override fun search(query : String) {
+        this.query = query
         launch(Dispatchers.Main) {
             val results = when (postSource) {
-                is PostRepository.PostSource.Subreddit -> postRepo.searchSubPosts(postSource.subredditName, query)
+                is PostRepository.PostSource.Subreddit -> {
+                    postRepo.searchSubPosts(postSource.subredditName, query, true)
+                }
                 else -> {
                     null
                 }
@@ -232,6 +236,39 @@ open class DisplaySubVM (
             results?.let {
                 after = it.after
                 _searchResults.postValue(it.posts)
+            }
+        }
+    }
+
+    override fun retrieveMoreSearchResults() {
+        val currQuery = query
+        launch(Dispatchers.Main) {
+            if (after != null && currQuery != null){
+                val results = when (postSource) {
+                    is PostRepository.PostSource.Subreddit -> {
+                        postRepo.searchSubPosts(postSource.subredditName, currQuery, true, after)
+                    }
+                    else -> {
+                        null
+                    }
+                }
+
+                results?.let { moreResult ->
+                    after = moreResult.after
+                    // show appropriate message to user to indicate no more posts could be found
+                    if (moreResult.posts.isEmpty()) {
+                        // TODO
+                    } else {
+                        val newPosts = ArrayList<PostModel>()
+                        _searchResults.value?.let { newPosts.addAll(it) }
+                        newPosts.addAll(moreResult.posts)
+
+                        _searchResults.postValue(newPosts)
+                    }
+                }
+
+            } else {
+                Log.d(TAG, "No more posts available for this query")
             }
         }
     }
