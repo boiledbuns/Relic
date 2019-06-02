@@ -1,4 +1,4 @@
-package com.relic.util
+package com.relic.presentation.util
 
 class RelicEvent <out T> (
     private val data : T

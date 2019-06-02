@@ -1,11 +1,9 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.database.Cursor
 
 import com.relic.data.gateway.SubGateway
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 
 interface SubRepository {
 

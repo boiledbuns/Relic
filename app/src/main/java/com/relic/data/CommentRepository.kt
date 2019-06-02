@@ -2,7 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 
-import com.relic.data.models.CommentModel
+import com.relic.domain.models.CommentModel
 
 interface CommentRepository {
 

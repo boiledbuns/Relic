@@ -10,7 +10,7 @@ import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.data.PostRepository
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
 import org.json.simple.JSONArray

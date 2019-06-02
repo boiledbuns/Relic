@@ -1,4 +1,4 @@
-package com.relic
+package com.relic.presentation.main
 
 interface MainContract {
     interface VM {

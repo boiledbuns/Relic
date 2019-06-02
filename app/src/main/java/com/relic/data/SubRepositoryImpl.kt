@@ -9,7 +9,7 @@ import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.SubDeserializerImpl
 import com.relic.data.gateway.SubGateway
 import com.relic.data.gateway.SubGatewayImpl
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest

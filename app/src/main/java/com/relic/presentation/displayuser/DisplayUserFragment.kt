@@ -24,7 +24,7 @@ import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
-import com.relic.util.RelicEvent
+import com.relic.presentation.util.RelicEvent
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*

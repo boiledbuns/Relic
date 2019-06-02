@@ -3,25 +3,23 @@ package com.relic.presentation.displayuser
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.UserRepository
-import com.relic.data.models.CommentModel
-import com.relic.data.models.ListingItem
-import com.relic.data.models.PostModel
-import com.relic.data.models.UserModel
+import com.relic.domain.models.CommentModel
+import com.relic.domain.models.ListingItem
+import com.relic.domain.models.PostModel
+import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
-import com.relic.util.RelicEvent
+import com.relic.presentation.util.RelicEvent
 import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.suspendCoroutine
 
 class DisplayUserVM(
     private val postRepo: PostRepository,

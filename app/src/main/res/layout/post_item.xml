@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="postModel"
-            type="com.relic.data.models.PostModel"/>
+            type="com.relic.domain.models.PostModel"/>
         <variable
             name="postOnClick"
             type="com.relic.presentation.adapter.PostItemOnclick"/>

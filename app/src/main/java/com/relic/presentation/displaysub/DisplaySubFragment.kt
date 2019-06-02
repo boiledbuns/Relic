@@ -22,14 +22,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 
 import com.relic.R
-import com.relic.RelicError
+import com.relic.presentation.main.RelicError
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
-import com.relic.data.models.PostModel
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.PostModel
+import com.relic.domain.models.SubredditModel
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment

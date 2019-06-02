@@ -1,10 +1,6 @@
-package com.relic.data.models
+package com.relic.domain.models
 
-import android.text.Html
-
-import com.relic.domain.Post
-
-open class PostModel : ListingItem(), Post {
+open class PostModel : ListingItem() {
 
     lateinit var title: String
     lateinit var created: String
@@ -40,9 +36,6 @@ open class PostModel : ListingItem(), Post {
     var gold: Int = 0
     var silver: Int = 0
     var self: Boolean = false
-
-    val htmlSelfText: String?
-        get() = if (selftext == null) selftext else Html.fromHtml(Html.fromHtml(selftext).toString()).toString()
 
     companion object {
         var TYPE = "t3"

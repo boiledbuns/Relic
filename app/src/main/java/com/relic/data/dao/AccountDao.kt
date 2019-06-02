@@ -6,8 +6,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.relic.data.entities.AccountEntity
-import com.relic.data.models.AccountModel
-import com.relic.data.models.UserModel
+import com.relic.domain.models.AccountModel
 
 @Dao
 abstract class AccountDao {

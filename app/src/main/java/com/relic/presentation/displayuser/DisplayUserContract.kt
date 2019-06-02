@@ -1,7 +1,7 @@
 package com.relic.presentation.displayuser
 
 import android.os.Parcelable
-import com.relic.data.models.ListingItem
+import com.relic.domain.models.ListingItem
 import kotlinx.android.parcel.Parcelize
 
 interface DisplayUserContract {

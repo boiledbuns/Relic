@@ -4,13 +4,13 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.relic.RelicError
+import com.relic.presentation.main.RelicError
 
 import com.relic.data.PostRepository
 import com.relic.data.SubRepository
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.relic.data.models.PostModel
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.PostModel
+import com.relic.domain.models.SubredditModel
 import com.relic.data.repository.NetworkException
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.helper.ImageHelper

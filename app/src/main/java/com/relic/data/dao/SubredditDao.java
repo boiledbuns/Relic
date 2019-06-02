@@ -5,10 +5,9 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.database.Cursor;
 
 import com.relic.data.entities.SubredditEntity;
-import com.relic.data.models.SubredditModel;
+import com.relic.domain.models.SubredditModel;
 
 import java.util.List;
 

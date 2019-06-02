@@ -1,6 +1,6 @@
 package com.relic.dagger
 
-import com.relic.MainActivity
+import com.relic.presentation.main.MainActivity
 import com.relic.dagger.modules.AppModule
 import com.relic.dagger.modules.AuthModule
 import dagger.Component

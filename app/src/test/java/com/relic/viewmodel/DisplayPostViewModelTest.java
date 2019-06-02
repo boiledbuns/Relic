@@ -10,8 +10,7 @@ import android.support.v4.app.Fragment;
 import com.relic.data.CommentRepository;
 import com.relic.data.ListingRepository;
 import com.relic.data.PostRepository;
-import com.relic.data.models.CommentModel;
-import com.relic.presentation.callbacks.RetrieveNextListingCallback;
+import com.relic.domain.models.CommentModel;
 import com.relic.presentation.displaypost.DisplayPostContract;
 import com.relic.presentation.displaypost.DisplayPostVM;
 
@@ -23,10 +22,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class DisplayPostViewModelTest {

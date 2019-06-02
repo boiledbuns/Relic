@@ -1,4 +1,4 @@
-package com.relic.util
+package com.relic.preference
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -2,10 +2,9 @@ package com.relic.data.deserializer
 
 import com.relic.data.PostRepository
 import com.relic.data.entities.*
-import com.relic.data.models.CommentModel
-import com.relic.data.models.SubredditModel
-import com.relic.data.models.UserModel
-import com.relic.exception.RelicException
+import com.relic.domain.models.CommentModel
+import com.relic.domain.models.UserModel
+import com.relic.domain.exception.RelicException
 import org.json.simple.JSONObject
 
 /**

@@ -1,6 +1,6 @@
 package com.relic.data.deserializer
 
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

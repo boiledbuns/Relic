@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 import kotlinx.android.synthetic.main.pinned_sub_item.view.*
 
 class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSubVH> () {

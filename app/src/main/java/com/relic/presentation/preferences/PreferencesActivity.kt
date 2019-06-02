@@ -6,8 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.relic.R
-import com.relic.util.PreferencesManagerImpl
-import com.relic.util.RequestCodes
+import com.relic.preference.PreferencesManagerImpl
+import com.relic.presentation.util.RequestCodes
 
 class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
 

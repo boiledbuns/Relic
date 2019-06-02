@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
-import com.relic.data.models.UserModel
+import com.relic.domain.models.UserModel
 import com.relic.presentation.helper.DateHelper
 import kotlinx.android.synthetic.main.user_preview_view.view.*
 import java.text.SimpleDateFormat

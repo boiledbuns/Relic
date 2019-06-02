@@ -1,7 +1,7 @@
 package com.relic.presentation.displaypost.commentlist
 
 import android.support.v7.widget.RecyclerView
-import com.relic.data.models.CommentModel
+import com.relic.domain.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
 
 class CommentMoreItemsVH (

@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 import com.relic.presentation.adapter.PinnedSubItemAdapter
 import kotlinx.android.synthetic.main.display_pinned_subs.view.*
 

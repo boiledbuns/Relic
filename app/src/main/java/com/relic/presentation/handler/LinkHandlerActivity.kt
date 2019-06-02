@@ -1,10 +1,11 @@
-package com.relic
+package com.relic.presentation.handler
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.relic.R
 import com.relic.data.PostRepository
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment

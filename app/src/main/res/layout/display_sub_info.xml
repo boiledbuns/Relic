@@ -12,7 +12,7 @@
 
         <variable
             name="subModel"
-            type="com.relic.data.models.SubredditModel"/>
+            type="com.relic.domain.models.SubredditModel"/>
     </data>
 
     

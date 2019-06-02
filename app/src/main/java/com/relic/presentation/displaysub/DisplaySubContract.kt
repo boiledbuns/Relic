@@ -1,9 +1,9 @@
 package com.relic.presentation.displaysub
 
 import android.arch.lifecycle.LiveData
-import com.relic.RelicError
+import com.relic.presentation.main.RelicError
 import com.relic.data.PostRepository
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 
 interface DisplaySubContract {
     interface ViewModel {

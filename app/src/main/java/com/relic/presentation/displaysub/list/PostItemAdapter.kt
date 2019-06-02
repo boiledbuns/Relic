@@ -2,12 +2,10 @@ package com.relic.presentation.displaysub.list
 
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.ViewGroup
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
-import kotlinx.coroutines.*
 import ru.noties.markwon.Markwon
 
 class PostItemAdapter (

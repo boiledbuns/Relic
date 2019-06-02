@@ -1,4 +1,4 @@
-package com.relic
+package com.relic.presentation.main
 
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
@@ -20,22 +20,24 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.relic.R
+import com.relic.RelicApp
 import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 
 import com.relic.data.auth.AuthImpl
-import com.relic.data.models.AccountModel
-import com.relic.data.models.UserModel
+import com.relic.domain.models.AccountModel
+import com.relic.domain.models.UserModel
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.util.PreferencesManagerImpl
-import com.relic.util.RequestCodes
+import com.relic.preference.PreferencesManagerImpl
+import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*

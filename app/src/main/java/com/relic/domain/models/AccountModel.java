@@ -1,11 +1,9 @@
-package com.relic.data.models;
-
-import com.relic.domain.Account;
+package com.relic.domain.models;
 
 /**
  * This model contains the preferences for an **AUTHENTICATED** account
  */
-public class AccountModel implements Account {
+public class AccountModel {
     public String name;
     public boolean autoplayVideo;
     public boolean overAge;

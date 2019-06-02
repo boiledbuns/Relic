@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.relic.R;
-import com.relic.data.models.PostModel;
+import com.relic.domain.models.PostModel;
 import com.relic.databinding.PostItemBinding;
 import com.relic.presentation.displaysub.DisplaySubContract;
 import com.squareup.picasso.Picasso;

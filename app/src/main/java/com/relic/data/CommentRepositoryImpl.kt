@@ -9,7 +9,7 @@ import com.relic.data.deserializer.CommentDeserializer
 import com.relic.network.NetworkRequestManager
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
-import com.relic.data.models.CommentModel
+import com.relic.domain.models.CommentModel
 import com.relic.data.repository.RepoConstants
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*

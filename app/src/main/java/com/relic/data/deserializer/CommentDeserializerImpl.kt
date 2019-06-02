@@ -5,7 +5,7 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
-import com.relic.data.models.CommentModel
+import com.relic.domain.models.CommentModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

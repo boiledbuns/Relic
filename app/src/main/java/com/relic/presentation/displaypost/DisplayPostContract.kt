@@ -1,8 +1,8 @@
 package com.relic.presentation.displaypost
 
-import com.relic.data.models.CommentModel
-import com.relic.data.models.ListingItem
-import com.relic.util.MediaType
+import com.relic.domain.models.CommentModel
+import com.relic.domain.models.ListingItem
+import com.relic.presentation.util.MediaType
 
 const val UPVOTE_PRESSED = 1
 const val DOWNVOTE_PRESSED = -1

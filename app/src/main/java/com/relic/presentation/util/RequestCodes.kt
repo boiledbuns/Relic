@@ -1,4 +1,4 @@
-package com.relic.util
+package com.relic.presentation.util
 
 object RequestCodes {
     private const val BASE = 100

@@ -1,9 +1,7 @@
 package com.relic.presentation.displaypost.commentlist
 
 import android.support.v7.widget.RecyclerView
-import android.text.Html
-import com.relic.R
-import com.relic.data.models.CommentModel
+import com.relic.domain.models.CommentModel
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.UPVOTE_PRESSED

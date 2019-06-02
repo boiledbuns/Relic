@@ -7,7 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.relic.data.entities.CommentEntity;
-import com.relic.data.models.CommentModel;
+import com.relic.domain.models.CommentModel;
 
 import java.util.List;
 

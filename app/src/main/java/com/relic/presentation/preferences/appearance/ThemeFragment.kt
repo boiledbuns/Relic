@@ -7,15 +7,14 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.relic.R
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.preferences.PreferenceChangedListener
 import com.relic.presentation.preferences.PreferenceLink
-import com.relic.util.PreferencesManager
-import com.relic.util.PreferencesManagerImpl
+import com.relic.preference.PreferencesManager
+import com.relic.preference.PreferencesManagerImpl
 import kotlinx.android.synthetic.main.preferences_theme.*
-import ru.noties.markwon.Markwon
 
 class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 

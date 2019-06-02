@@ -8,7 +8,7 @@ import com.relic.data.auth.AuthImpl
 import com.relic.data.ListingRepository
 import com.relic.data.SubRepository
 import com.relic.data.SubsLoadedCallback
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import kotlinx.coroutines.*

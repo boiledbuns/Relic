@@ -19,8 +19,8 @@ import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
-import com.relic.data.models.CommentModel
-import com.relic.data.models.PostModel
+import com.relic.domain.models.CommentModel
+import com.relic.domain.models.PostModel
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
@@ -29,8 +29,8 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.editor.EditorView
 import com.relic.presentation.media.DisplayGfycatFragment
-import com.relic.util.MediaHelper.determineType
-import com.relic.util.MediaType
+import com.relic.presentation.util.MediaHelper.determineType
+import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*

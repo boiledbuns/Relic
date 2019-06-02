@@ -1,6 +1,6 @@
-package com.relic.util
+package com.relic.presentation.util
 
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 
 /**
  * currently supported media types:

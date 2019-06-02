@@ -4,8 +4,8 @@ import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.util.Log
 import com.relic.data.deserializer.*
-import com.relic.data.models.AccountModel
-import com.relic.data.models.UserModel
+import com.relic.domain.models.AccountModel
+import com.relic.domain.models.UserModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest

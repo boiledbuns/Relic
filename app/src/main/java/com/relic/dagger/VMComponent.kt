@@ -1,7 +1,7 @@
 package com.relic.dagger
 
 import android.arch.lifecycle.ViewModelProvider
-import com.relic.MainVM
+import com.relic.presentation.main.MainVM
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule

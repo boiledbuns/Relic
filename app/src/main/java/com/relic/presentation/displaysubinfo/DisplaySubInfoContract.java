@@ -3,7 +3,7 @@ package com.relic.presentation.displaysubinfo;
 import android.arch.lifecycle.LiveData;
 
 import com.relic.data.SubRepository;
-import com.relic.data.models.SubredditModel;
+import com.relic.domain.models.SubredditModel;
 
 public interface DisplaySubInfoContract {
   interface ViewModel {

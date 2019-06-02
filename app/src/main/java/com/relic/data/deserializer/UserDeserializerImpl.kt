@@ -1,7 +1,7 @@
 package com.relic.data.deserializer
 
 import android.util.Log
-import com.relic.data.models.UserModel
+import com.relic.domain.models.UserModel
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser

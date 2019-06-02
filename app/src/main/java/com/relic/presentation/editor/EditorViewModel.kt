@@ -37,7 +37,7 @@ class EditorViewModel constructor(
                 // retrieve the post from the post repo
                 _replyParentLiveData.addSource(postRepo.getPost(fullName)) {
                     Log.d("editorvm", "fullname = " + fullName + ": " + it?.selftext)
-                    _replyParentLiveData.postValue(ReplyParent(it?.title, it?.htmlSelfText))
+                    _replyParentLiveData.postValue(ReplyParent(it?.title, it?.selftext))
                 }
             }
             ParentType.COMMENT -> {

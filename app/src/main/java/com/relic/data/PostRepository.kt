@@ -5,7 +5,7 @@ import android.os.Parcelable
 
 import com.relic.data.gateway.PostGateway
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.relic.network.request.RelicRequestError
 import kotlinx.android.parcel.Parcelize
 

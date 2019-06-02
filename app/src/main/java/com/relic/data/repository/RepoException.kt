@@ -1,6 +1,6 @@
 package com.relic.data.repository
 
-import com.relic.exception.RelicException
+import com.relic.domain.exception.RelicException
 
 /**
  * Exceptions common to all repo classes

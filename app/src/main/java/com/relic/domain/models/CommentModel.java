@@ -1,4 +1,4 @@
-package com.relic.data.models;
+package com.relic.domain.models;
 
 public class CommentModel extends ListingItem {
     public static int UPVOTE = 1;

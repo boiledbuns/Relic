@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
-import com.relic.data.models.CommentModel
+import com.relic.domain.models.CommentModel
 import kotlinx.android.synthetic.main.comment_item.view.*
 
 class RelicCommentView (

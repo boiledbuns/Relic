@@ -7,11 +7,9 @@ import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -24,7 +22,7 @@ import com.relic.dagger.DaggerVMComponent
 import com.relic.dagger.modules.AuthModule
 import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.presentation.adapter.SearchItemAdapter
 import com.relic.presentation.adapter.SearchSubItemOnClick

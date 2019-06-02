@@ -20,7 +20,6 @@ import com.relic.data.entities.PostEntity;
 import com.relic.data.entities.PostSourceEntity;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.entities.TokenStoreEntity;
-import com.relic.data.models.AccountModel;
 
 @Database(
     entities = {

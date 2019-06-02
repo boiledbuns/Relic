@@ -3,7 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="subredditItem"
-                  type="com.relic.data.models.SubredditModel"/>
+                  type="com.relic.domain.models.SubredditModel"/>
         <variable name="subOnClick"
                   type="com.relic.presentation.adapter.SubItemOnClick"/>
     </data>

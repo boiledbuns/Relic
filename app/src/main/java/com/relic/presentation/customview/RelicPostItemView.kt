@@ -1,6 +1,7 @@
 package com.relic.presentation.customview
 
 import android.content.Context
+import android.text.Html
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -8,10 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_span.view.*
-import ru.noties.markwon.Markwon
 
 class RelicPostItemView @JvmOverloads constructor(
         context: Context,
@@ -78,8 +78,8 @@ class RelicPostItemView @JvmOverloads constructor(
             postItemAuthorView.text = resources.getString(R.string.user_prefix_label, postModel.author)
             setPostTags(postModel)
 
-            if (!postModel.htmlSelfText.isNullOrEmpty()) {
-                postBodyView.text = postModel.htmlSelfText
+            if (!postModel.selftext.isNullOrEmpty()) {
+                postBodyView.text = Html.fromHtml(postModel.selftext).toString()
                 postBodyView.visibility = View.VISIBLE
             }
             else {

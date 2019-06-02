@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
-import com.relic.data.models.PostModel
-import com.relic.util.MediaType
+import com.relic.domain.models.PostModel
+import com.relic.presentation.util.MediaType
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
 import ru.noties.markwon.Markwon

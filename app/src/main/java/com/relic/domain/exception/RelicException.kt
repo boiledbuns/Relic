@@ -1,4 +1,4 @@
-package com.relic.exception
+package com.relic.domain.exception
 
 /**
  * Base exception for the application

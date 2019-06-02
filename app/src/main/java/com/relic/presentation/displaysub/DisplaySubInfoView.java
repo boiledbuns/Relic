@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.relic.R;
-import com.relic.data.models.SubredditModel;
+import com.relic.domain.models.SubredditModel;
 import com.relic.databinding.DisplaySubInfoBinding;
 import com.relic.presentation.displaysubinfo.DisplaySubInfoContract;
 import com.squareup.picasso.Picasso;

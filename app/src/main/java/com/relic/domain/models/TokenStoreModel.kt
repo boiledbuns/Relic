@@ -1,4 +1,4 @@
-package com.relic.data.models
+package com.relic.domain.models
 
 class TokenStoreModel {
     var accountName : String = ""

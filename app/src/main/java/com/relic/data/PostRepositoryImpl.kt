@@ -1,14 +1,10 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
-import android.os.AsyncTask
 import android.util.Log
-import com.android.volley.NoConnectionError
 
-import com.relic.R
 import com.relic.data.deserializer.ParsedPostsData
 import com.relic.data.deserializer.PostDeserializerImpl
 import com.relic.network.NetworkRequestManager
@@ -16,10 +12,7 @@ import com.relic.data.gateway.PostGateway
 import com.relic.data.gateway.PostGatewayImpl
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.relic.data.entities.ListingEntity
-import com.relic.data.entities.PostEntity
-import com.relic.data.entities.PostSourceEntity
-import com.relic.data.models.PostModel
+import com.relic.domain.models.PostModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.request.RelicRequestError
 import kotlinx.coroutines.Dispatchers
@@ -27,10 +20,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-import org.json.simple.parser.ParseException
 import java.lang.Exception
-
-import java.util.ArrayList
 
 import javax.inject.Inject
 

@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.data.models.ListingItem
+import com.relic.domain.models.ListingItem
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM

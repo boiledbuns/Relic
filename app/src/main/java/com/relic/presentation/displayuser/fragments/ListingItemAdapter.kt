@@ -3,9 +3,9 @@ package com.relic.presentation.displayuser.fragments
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import com.relic.data.models.CommentModel
-import com.relic.data.models.ListingItem
-import com.relic.data.models.PostModel
+import com.relic.domain.models.CommentModel
+import com.relic.domain.models.ListingItem
+import com.relic.domain.models.PostModel
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.commentlist.CommentItemVH

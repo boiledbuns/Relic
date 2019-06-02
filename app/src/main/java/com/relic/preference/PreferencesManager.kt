@@ -1,4 +1,4 @@
-package com.relic.util
+package com.relic.preference
 
 interface PreferencesManager {
     fun getApplicationTheme() : Int

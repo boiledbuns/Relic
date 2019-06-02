@@ -2,17 +2,13 @@ package com.relic.presentation.base
 
 import android.arch.lifecycle.LifecycleOwner
 import android.content.Context
-import android.content.res.TypedArray
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.support.v7.app.ActionBar
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import com.relic.MainActivity
 import com.relic.R
 
 open class RelicFragment: Fragment() {

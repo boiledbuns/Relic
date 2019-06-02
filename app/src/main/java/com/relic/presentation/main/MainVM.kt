@@ -1,11 +1,11 @@
-package com.relic
+package com.relic.presentation.main
 
 import android.arch.lifecycle.*
 import android.util.Log
 import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
-import com.relic.data.models.AccountModel
-import com.relic.data.models.UserModel
+import com.relic.domain.models.AccountModel
+import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.*

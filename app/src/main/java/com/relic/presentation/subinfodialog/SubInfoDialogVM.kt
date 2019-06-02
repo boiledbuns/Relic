@@ -2,10 +2,8 @@ package com.relic.presentation.subinfodialog
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
-import android.util.Log
 import com.relic.data.SubRepository
-import com.relic.data.models.SubredditModel
+import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject

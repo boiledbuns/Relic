@@ -1,16 +1,13 @@
-package com.relic.data.models;
+package com.relic.domain.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.relic.domain.Subreddit;
-
 
 /**
  * Mapper class with public var to reduce boilerplate and and allow the SubredditImpl class to be
  * used with room without violating clean architecture (ie. keeping it framework independent)
  */
-public class SubredditModel implements Subreddit, Parcelable {
+public class SubredditModel implements  Parcelable {
   public String id;
   public String name;
   public String bannerUrl;
@@ -37,22 +34,18 @@ public class SubredditModel implements Subreddit, Parcelable {
     return name + " " + id + " " + bannerUrl + " " + nsfw;
   }
 
-  @Override
   public String getId() {
     return id;
   }
 
-  @Override
   public String getSubName() {
     return name;
   }
 
-  @Override
   public String getBannerUrl() {
     return bannerImgUrl;
   }
 
-  @Override
   public int describeContents() {
     return 0;
   }
