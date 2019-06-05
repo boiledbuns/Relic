@@ -26,4 +26,9 @@
 
     </item>
 
+    <item android:id="@+id/display_sub_create_post"
+          android:title="@string/create_post"
+          app:showAsAction="never"
+          app:queryBackground="@android:color/transparent"/>
+
 </menu>

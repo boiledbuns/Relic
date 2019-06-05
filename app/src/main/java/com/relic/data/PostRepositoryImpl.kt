@@ -7,6 +7,7 @@ import android.util.Log
 
 import com.relic.data.deserializer.ParsedPostsData
 import com.relic.data.deserializer.PostDeserializerImpl
+import com.relic.data.entities.PostEntity
 import com.relic.network.NetworkRequestManager
 import com.relic.data.gateway.PostGateway
 import com.relic.data.gateway.PostGatewayImpl
@@ -256,8 +257,73 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun postPost() {
+    override suspend fun postPost(postDraft: PostRepository.PostDraft, type : PostRepository.PostType) {
+        // based on the post type,
+        val url = "${ENDPOINT}api/submit"
 
+        val data = HashMap<String, String>().apply {
+            put("title", postDraft.title)
+            put("sr", postDraft.subreddit)
+            put("nsfw", postDraft.nsfw.toString())
+            put("spoiler", postDraft.spoiler.toString())
+            put("resubmit", postDraft.resubmit.toString())
+            put("send_replies", postDraft.sendReplies.toString())
+
+            when (type) {
+                is PostRepository.PostType.Self -> {
+                    put("kind","self")
+                    put("text", postDraft.body!!)
+                }
+                is PostRepository.PostType.Link -> {
+                    put("kind","link")
+                }
+            }
+        }
+
+        Log.d(TAG, "post post draft ${postDraft.sendReplies.toString()}  ${type}")
+
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.POST,
+                url = url,
+                data = data
+            )
+
+            Log.d(TAG, "post post $response")
+            // delete the post draft when we've successfully submitted it
+            appDB.postDao.deletePostDraft(postDraft.subreddit)
+
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("post post", e) ?: e
+        }
+    }
+
+    override suspend fun saveDraft(postDraft: PostRepository.PostDraft) {
+        withContext(Dispatchers.IO) {
+            val newPostDraft = PostEntity().apply {
+                name = ""
+                author = ""
+                title = postDraft.title
+                selftext = postDraft.body
+                subreddit = postDraft.subreddit
+            }
+
+            appDB.postDao.insertPost(newPostDraft)
+        }
+    }
+
+    override suspend fun loadDraft(subreddit : String) : PostRepository.PostDraft? {
+        return withContext(Dispatchers.IO) {
+            val draftModel = appDB.postDao.getPostDraft(subreddit)
+
+            if (draftModel != null) {
+                PostRepository.PostDraft(
+                    title = draftModel.title,
+                    body = draftModel.selftext,
+                    subreddit = draftModel.subreddit!!
+                )
+            } else null
+        }
     }
 
     // endregion interface methods

@@ -106,4 +106,8 @@
 
     <string name="search_sub">enter search</string>
     <string name="search_sub_result_count">%d results loaded</string>
+    <string name="create_post">create post</string>
+    <string name="submit_post">submit post</string>
+    <string name="save_draft">save draft</string>
+
 </resources>

@@ -31,7 +31,7 @@ class DisplayPostVM (
     private val subName: String,
     private val postFullname: String,
     private val postSource : PostRepository.PostSource
-): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate, EditorContract.EditorDelegate {
+): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -151,14 +151,6 @@ class DisplayPostVM (
         _errorLiveData.postValue(viewException)
     }
 
-
-    override fun submit(text: String) {
-
-    }
-
-    override fun saveChanges(text: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
     //  region view action delegate
 
     override fun onExpandReplies(commentId: String, expanded : Boolean) {

@@ -36,6 +36,7 @@ import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.relic.presentation.displayuser.DisplayUserPreview
+import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
@@ -154,6 +155,13 @@ class DisplaySubFragment : RelicFragment() {
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()
+                fragmentOpened = true
+            }
+            R.id.display_sub_create_post -> {
+                val createPostFrag = NewPostEditorFragment.create(subName)
+                // intentionally because replacing then popping off back stack loses scroll position
+                activity!!.supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, createPostFrag).addToBackStack(TAG).commit()
                 fragmentOpened = true
             }
             // when the sorting type is changed

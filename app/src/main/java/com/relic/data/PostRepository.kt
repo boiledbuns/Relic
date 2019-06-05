@@ -75,7 +75,11 @@ interface PostRepository {
         after : String? = null
     ) : SubSearchResult
 
-    suspend fun postPost()
+    suspend fun postPost(postDraft: PostDraft, type : PostType)
+
+    suspend fun saveDraft(postDraft: PostDraft)
+
+    suspend fun loadDraft(subreddit : String) : PostDraft?
 
     data class SubSearchResult(
         val posts : List<PostModel>,
@@ -127,5 +131,20 @@ interface PostRepository {
         Submitted, Comments,
         // these should only be available for the current user
         Saved, Upvoted, Downvoted, Gilded, Hidden
+    }
+
+    data class PostDraft(
+        val title : String,
+        val body : String?,
+        val subreddit : String,
+        val nsfw : Boolean = false,
+        val spoiler : Boolean = false,
+        val resubmit : Boolean = false,
+        val sendReplies : Boolean = true
+    )
+
+    sealed class PostType {
+        class Self : PostType()
+        class Link : PostType()
     }
 }

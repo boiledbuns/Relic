@@ -49,6 +49,14 @@ public abstract class PostDao {
     @Query("SELECT * FROM PostEntity INNER JOIN PostSourceEntity ON fullName = sourceId WHERE fullName = :fullName")
     public abstract LiveData<PostModel> getSinglePost(String fullName);
 
+    @Query("SELECT * FROM PostEntity " +
+        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
+        "WHERE PostSourceEntity.subreddit = :subreddit AND fullName = '' AND author = ''")
+    public abstract PostModel getPostDraft(String subreddit);
+
+    @Query("DELETE FROM PostEntity WHERE subreddit = :subreddit AND fullName = '' AND author = ''")
+    public abstract void deletePostDraft(String subreddit);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPost(PostEntity post);
 

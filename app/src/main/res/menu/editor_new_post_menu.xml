@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/editor_new_post_submit"
+          android:title="@string/submit_post"
+          android:icon="@drawable/ic_search"
+          app:showAsAction="never"
+          app:queryBackground="@android:color/transparent"/>
+
+    <item android:id="@+id/editor_new_post_save"
+          android:title="@string/save_draft"
+          android:icon="@drawable/ic_search"
+          app:showAsAction="never"
+          app:queryBackground="@android:color/transparent"/>
+</menu>

@@ -26,8 +26,7 @@ import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
-import com.relic.presentation.editor.EditorContract
-import com.relic.presentation.editor.EditorView
+import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.util.MediaHelper.determineType
 import com.relic.presentation.util.MediaType
@@ -259,7 +258,9 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     }
 
     private fun openPostReplyEditor(parentFullname: String) {
-        val editorFragment = EditorView.create(subredditName, parentFullname, EditorContract.ParentType.COMMENT)
+        // this option is for replying to parent
+        // Should also allow user to do it inline, but that can be saved for a later task
+        val editorFragment = ReplyEditorFragment.create(parentFullname, true)
 
         // replace the current screen with the newly created fragment
         activity!!.supportFragmentManager.beginTransaction()

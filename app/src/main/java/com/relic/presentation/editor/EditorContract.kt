@@ -1,13 +1,20 @@
 package com.relic.presentation.editor
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 interface  EditorContract {
-    interface EditorDelegate {
-        fun submit(text : String)
-        fun saveChanges(text : String)
+    interface Editor {
+        fun submit()
+        fun saveChanges()
+        fun onBodyChanged(newBody : String)
     }
 
-    interface ViewModel {
 
+    interface ReplyEditor : Editor
+
+    interface NewPostEditor : Editor {
+        fun onTitleChanged(newTitle : String)
     }
 
     data class ReplyParent(
@@ -15,5 +22,11 @@ interface  EditorContract {
         val body : String? = null
     )
 
-    enum class ParentType { POST, COMMENT }
+    sealed class EditorOption : Parcelable{
+        @Parcelize
+        data class NewPost (val subreddit : String) : EditorOption()
+
+        @Parcelize
+        data class CommentReply(val parent : String, val parentIsPost : Boolean = false) : EditorOption()
+    }
 }
