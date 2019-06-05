@@ -75,6 +75,8 @@ interface PostRepository {
         after : String? = null
     ) : SubSearchResult
 
+    suspend fun postPost()
+
     data class SubSearchResult(
         val posts : List<PostModel>,
         val after : String?

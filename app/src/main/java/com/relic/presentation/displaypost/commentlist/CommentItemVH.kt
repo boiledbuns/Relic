@@ -17,6 +17,7 @@ class CommentItemVH (
             commentUpvoteView.setOnClickListener { adapter.voteOnComment(adapterPosition, UPVOTE_PRESSED) }
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(adapterPosition, DOWNVOTE_PRESSED) }
             commentAuthorView.setOnClickListener { adapter.previewUser(adapterPosition) }
+            setOnReplyAction { text -> adapter.replyToComment(adapterPosition, text) }
             setOnClickListener { adapter.visitComment(adapterPosition) }
         }
     }

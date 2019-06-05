@@ -15,6 +15,7 @@ import com.relic.data.repository.NetworkException
 import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.base.RelicViewModel
+import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
@@ -30,7 +31,7 @@ class DisplayPostVM (
     private val subName: String,
     private val postFullname: String,
     private val postSource : PostRepository.PostSource
-): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
+): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate, EditorContract.EditorDelegate {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -150,6 +151,14 @@ class DisplayPostVM (
         _errorLiveData.postValue(viewException)
     }
 
+
+    override fun submit(text: String) {
+
+    }
+
+    override fun saveChanges(text: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
     //  region view action delegate
 
     override fun onExpandReplies(commentId: String, expanded : Boolean) {
@@ -213,7 +222,13 @@ class DisplayPostVM (
 
     }
 
-    override fun onReplyPressed() {
+    override fun onReplyPressed(parent: String, text: String) {
+        launch(Dispatchers.Main) {
+            commentRepo.postComment(parent, text)
+        }
+    }
+
+    override fun onNewReplyPressed() {
         _navigationLiveData.value = PostNavigationData.ToReply(postFullname)
         _navigationLiveData.value = null
     }

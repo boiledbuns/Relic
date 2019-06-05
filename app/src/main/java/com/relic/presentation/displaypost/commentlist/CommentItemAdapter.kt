@@ -2,6 +2,7 @@ package com.relic.presentation.displaypost.commentlist
 
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.ViewGroup
 import com.relic.domain.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
@@ -77,9 +78,9 @@ class CommentItemAdapter (
                 val newComment = newComments[i1]
                 return (
                     oldComment.userUpvoted == newComment.userUpvoted &&
-                        oldComment.body == newComment.body &&
-                        oldComment.replyCount == newComment.replyCount
-                    )
+                    oldComment.body == newComment.body &&
+                    oldComment.replyCount == newComment.replyCount
+                )
             }
         })
     }
@@ -101,8 +102,8 @@ class CommentItemAdapter (
         }
     }
 
-    override fun replyToComment(itemPosition : Int) {
-        //TODO implement
+    override fun replyToComment(itemPosition : Int, text: String) {
+        actionDelegate.onReplyPressed(commentList[itemPosition].fullName, text)
     }
 
     override fun visitComment(itemPosition: Int) {}

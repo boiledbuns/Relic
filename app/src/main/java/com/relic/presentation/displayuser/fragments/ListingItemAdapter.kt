@@ -162,7 +162,7 @@ class ListingItemAdapter(
         }
     }
 
-    override fun replyToComment(itemPosition: Int) {}
+    override fun replyToComment(itemPosition : Int, text: String) { }
 
     override fun visitComment(itemPosition: Int) {
          actionDelegate.visitListing(listingItems[itemPosition])

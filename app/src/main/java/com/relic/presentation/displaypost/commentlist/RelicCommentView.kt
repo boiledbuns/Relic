@@ -5,10 +5,12 @@ import android.text.Html
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
 import kotlinx.android.synthetic.main.comment_item.view.*
+import kotlinx.android.synthetic.main.inline_reply.view.*
 
 class RelicCommentView (
     context: Context,
@@ -17,9 +19,12 @@ class RelicCommentView (
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private var displayParent : Boolean = false
+    private lateinit var replyAnchor : LinearLayout
+    private var replyAction : (text : String) -> Unit = { }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.comment_item, this)
+        commentReplyView.setOnClickListener { openReplyEditor() }
     }
 
     fun displayParent(display : Boolean) {
@@ -78,6 +83,28 @@ class RelicCommentView (
         }
         else if (commentModel.depth >= 0){
             displayReplyDepth(commentModel.depth)
+        }
+    }
+
+    fun setOnReplyAction(action : (text : String) -> Unit) {
+        replyAction = action
+    }
+
+    private fun openReplyEditor() {
+        val inlineReply = RelicInlineReplyView(context).apply {
+            // TODO set onclick for cancel and send + prompt user to save or not
+            replyCancel.setOnClickListener {
+                replyAnchor.removeAllViews()
+            }
+
+            replySend.setOnClickListener {
+                replyAnchor.removeAllViews()
+                replyAction(replyEditorView.text.toString())
+            }
+        }
+
+        replyAnchor = commentReplyInlineAnchor.apply {
+            addView(inlineReply)
         }
     }
 

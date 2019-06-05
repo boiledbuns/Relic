@@ -146,27 +146,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible"
-        tools:text="@tools:sample/lorem/random" />
+        tools:text="@tools:sample/lorem/random"/>
 
     <ImageView
         android:id="@+id/commentUpvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
-        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"/>
+        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        tools:src="@drawable/ic_upvote"/>
 
     <ImageView
         android:id="@+id/commentDownvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
-        app:layout_constraintStart_toEndOf="@id/commentUpvoteView"/>
+        app:layout_constraintStart_toEndOf="@id/commentUpvoteView"
+        tools:src="@drawable/ic_downvote"/>
 
     <TextView
         android:id="@+id/commentReplyCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
-        app:layout_constraintStart_toEndOf="@id/commentDownvoteView"/>
+        app:layout_constraintStart_toEndOf="@id/commentDownvoteView"
+        tools:text="100"/>
+
+    <ImageView
+        android:id="@+id/commentReplyView"
+        android:src="@drawable/ic_reply"
+        android:tint="@color/primaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/commentReplyInlineAnchor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/commentReplyView"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"/>
 
 </android.support.constraint.ConstraintLayout>

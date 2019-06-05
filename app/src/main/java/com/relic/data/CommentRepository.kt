@@ -32,4 +32,9 @@ interface CommentRepository {
     suspend fun clearAllCommentsFromSource(postFullName: String)
 
     fun getReplies(parentId : String) : LiveData<List<CommentModel>>
+
+    /**
+     * @param parent full name of the parent
+     */
+    suspend fun postComment(parent: String, text : String)
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/inlineReplyRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/padding_s">
+
+    <ImageView
+        android:id="@+id/replyCancel"
+        android:src="@drawable/ic_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tint="@color/primaryText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/replySend"
+        android:src="@drawable/ic_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tint="@color/primaryText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/replyEditorView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_s"
+        app:layout_constraintTop_toBottomOf="@id/replyCancel"
+        android:gravity="top|start"
+        android:minHeight="100dp"
+        android:background="@null"
+        tools:text="@tools:sample/lorem/random"/>
+
+</android.support.constraint.ConstraintLayout>

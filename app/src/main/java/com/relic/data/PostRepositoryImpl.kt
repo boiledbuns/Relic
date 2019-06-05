@@ -256,6 +256,10 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun postPost() {
+
+    }
+
     // endregion interface methods
 
 

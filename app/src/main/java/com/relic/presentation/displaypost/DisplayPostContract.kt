@@ -27,14 +27,15 @@ interface DisplayPostContract {
         fun onPostVoted(voteValue: Int)
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onLinkPressed()
-        fun onReplyPressed()
+        fun onNewReplyPressed()
+        fun onReplyPressed(parent : String, text : String)
         fun onUserPressed(listing: ListingItem)
     }
 
     interface CommentAdapterDelegate {
         fun displayCommentReplies(itemId : String, commentExpanded : Boolean)
         fun voteOnComment(itemPosition : Int, voteValue : Int)
-        fun replyToComment(itemPosition : Int)
+        fun replyToComment(itemPosition : Int, text: String)
         fun visitComment(itemPosition : Int)
         fun previewUser(itemPosition : Int)
         fun loadMoreComments(itemPosition: Int, displayReplies : Boolean)

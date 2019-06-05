@@ -1,6 +1,10 @@
 package com.relic.presentation.editor
 
 interface  EditorContract {
+    interface EditorDelegate {
+        fun submit(text : String)
+        fun saveChanges(text : String)
+    }
 
     interface ViewModel {
 

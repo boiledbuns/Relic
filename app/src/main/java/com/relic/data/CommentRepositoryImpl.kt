@@ -89,13 +89,13 @@ class CommentRepositoryImpl(
             put("sort", "confidence")
         }
 
-        val response = requestManager.processRequest(
-            method = RelicOAuthRequest.POST,
-            url = url,
-            data = postData
-        )
-
         try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.POST,
+                url = url,
+                data = postData
+            )
+
             val commentEntities = CommentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
 
             withContext (Dispatchers.IO) {
@@ -115,6 +115,30 @@ class CommentRepositoryImpl(
 
     override fun getReplies(parentId: String): LiveData<List<CommentModel>> {
         return commentDao.getAllComments(parentId)
+    }
+
+    /**
+     *
+     */
+    override suspend fun postComment(parent: String, text: String) {
+        var url = "${RepoConstants.ENDPOINT}api/comment"
+
+        val data = HashMap<String, String>().apply {
+            put("thing_id", parent)
+            put("text", text)
+        }
+
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.POST,
+                url = url,
+                data = data
+            )
+
+            Log.d(TAG, response)
+        } catch (e : Exception) {
+            throw DomainTransfer.handleException("post comment", e) ?: e
+        }
     }
 
     // endregion interface
