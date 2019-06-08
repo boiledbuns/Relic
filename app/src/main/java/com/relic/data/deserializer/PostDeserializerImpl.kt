@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class PostDeserializerImpl @Inject constructor(
     private val appDB : ApplicationDB,
-    private val commentDeserializer: CommentDeserializer
+    private val commentDeserializer: Contract.CommentDeserializer
 ) : Contract.PostDeserializer {
 
     private val TYPE_POST = "t3"

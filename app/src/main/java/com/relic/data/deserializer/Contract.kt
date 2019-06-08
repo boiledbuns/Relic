@@ -41,6 +41,8 @@ interface Contract {
             commentChild : JSONObject,
             commentPosition : Float
         ) : List<CommentEntity>
+
+        fun removeTypePrefix(fullName : String) : String
     }
 
     interface UserDeserializer {

@@ -1,51 +1,53 @@
 package com.relic.dagger.modules
 
-import android.app.Application
 import com.relic.data.*
-import com.relic.data.deserializer.AccountDeserializerImpl
-import com.relic.data.deserializer.CommentDeserializer
-import com.relic.data.deserializer.Contract
-import com.relic.data.deserializer.UserDeserializerImpl
-import com.relic.network.NetworkRequestManager
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Module
-class RepoModule {
-    @Inject lateinit var app: Application
-    @Inject lateinit var networkRequestManager: NetworkRequestManager
-    @Inject lateinit var appDB: ApplicationDB
+abstract class RepoModule {
+    @Binds
+    abstract fun bindSubRepository(subRepo : SubRepositoryImpl) : SubRepository
 
-    @Provides
-    @Singleton
-    fun provideSubRepository() : SubRepository {
-        return SubRepositoryImpl(app, networkRequestManager)
-    }
+    @Binds
+    abstract fun bindPostRepository(postRepo : PostRepositoryImpl) : PostRepository
 
-    @Provides
-    @Singleton
-    fun providePostRepository(postDeserializer: Contract.PostDeserializer) : PostRepository {
-        return PostRepositoryImpl(app, networkRequestManager, appDB, postDeserializer)
-    }
+    @Binds
+    abstract fun bindCommentRepository(commentRepo : CommentRepositoryImpl) : CommentRepository
 
-    @Provides
-    @Singleton
-    fun provideCommentRepository(listingRepo: ListingRepository, commentDeserializer: CommentDeserializer) : CommentRepository {
-        return CommentRepositoryImpl(networkRequestManager, appDB, listingRepo, commentDeserializer)
-    }
+    @Binds
+    abstract fun bindListingRepository(listingRepo : ListingRepositoryImpl) : ListingRepository
 
-    @Provides
-    @Singleton
-    fun provideListingRepository() : ListingRepository {
-        return ListingRepositoryImpl(app)
-    }
+    @Binds
+    abstract fun bindUserRepository(userRepo : UserRepositoryImpl) : UserRepository
 
-    @Provides
-    @Singleton
-    fun provideUserRepository() : UserRepository {
-        return UserRepositoryImpl(app, networkRequestManager, UserDeserializerImpl(), AccountDeserializerImpl())
-    }
+//    @Provides
+//    @Singleton
+//    fun provideSubRepository() : SubRepository {
+//        return SubRepositoryImpl(app, networkRequestManager)
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun providePostRepository(postDeserializer: Contract.PostDeserializer) : PostRepository {
+//        return PostRepositoryImpl(app, networkRequestManager, appDB, postDeserializer)
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun provideCommentRepository(listingRepo: ListingRepository, commentDeserializer: CommentDeserializer) : CommentRepository {
+//        return CommentRepositoryImpl(networkRequestManager, appDB, listingRepo, commentDeserializer)
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun provideListingRepository() : ListingRepository {
+//        return ListingRepositoryImpl(app)
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun provideUserRepository() : UserRepository {
+//        return UserRepositoryImpl(app, networkRequestManager, UserDeserializerImpl(), AccountDeserializerImpl())
+//    }
 }

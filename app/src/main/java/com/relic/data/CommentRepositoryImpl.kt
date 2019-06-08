@@ -2,10 +2,9 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.content.Context
 import android.util.Log
 
-import com.relic.data.deserializer.CommentDeserializer
+import com.relic.data.deserializer.Contract
 import com.relic.network.NetworkRequestManager
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
@@ -19,7 +18,7 @@ class CommentRepositoryImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
     private val appDB : ApplicationDB,
     private val listingRepo: ListingRepository,
-    private val commentDeserializer: CommentDeserializer
+    private val commentDeserializer: Contract.CommentDeserializer
 ) : CommentRepository {
     private val TAG = "COMMENT_REPO"
 

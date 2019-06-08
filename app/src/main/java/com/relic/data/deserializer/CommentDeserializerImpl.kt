@@ -21,7 +21,7 @@ import kotlin.math.pow
 
 // TODO convert to object and add interface so this can be injected
 @Singleton
-class CommentDeserializer @Inject constructor(): Contract.CommentDeserializer {
+class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserializer {
     private val TAG = "COMMENT_DESERIALIZER"
 
     private val jsonParser: JSONParser = JSONParser()
@@ -265,7 +265,7 @@ class CommentDeserializer @Inject constructor(): Contract.CommentDeserializer {
     }
 
     // removes the type associated with the comment, leaving only its id
-    fun removeTypePrefix(fullName : String) : String {
+    override fun removeTypePrefix(fullName : String) : String {
         return if (fullName.length >= 4) {
             fullName.removeRange(0, 3)
         } else {

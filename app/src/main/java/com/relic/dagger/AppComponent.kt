@@ -3,11 +3,8 @@ package com.relic.dagger
 import android.app.Application
 import android.content.Context
 import com.relic.RelicApp
-import com.relic.dagger.modules.ActivityModule
+import com.relic.dagger.modules.*
 import com.relic.presentation.main.MainActivity
-import com.relic.dagger.modules.AppModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.VMModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
@@ -21,6 +18,7 @@ import javax.inject.Singleton
         AppModule::class,
         ActivityModule::class,
         RepoModule::class,
+        DeserializerModule::class,
         VMModule::class
     ]
 )
