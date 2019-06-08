@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.util.Log
+import com.relic.data.deserializer.Contract
 
 import com.relic.data.deserializer.ParsedPostsData
 import com.relic.data.deserializer.PostDeserializerImpl
@@ -47,7 +48,9 @@ import javax.inject.Inject
  */
 class PostRepositoryImpl @Inject constructor(
     appContext: Context,
-    private val requestManager: NetworkRequestManager
+    private val requestManager: NetworkRequestManager,
+    private val appDB: ApplicationDB,
+    private val postDeserializer : Contract.PostDeserializer
 ) : PostRepository {
     private val TAG = "POST_REPO"
 
@@ -63,10 +66,6 @@ class PostRepositoryImpl @Inject constructor(
         PostRepository.SortType.RISING,
         PostRepository.SortType.TOP
     )
-
-    private val appDB: ApplicationDB = ApplicationDB.getDatabase(appContext)
-    // TODO convert this to DI
-    private val postDeserializer = PostDeserializerImpl(appContext)
 
     override val postGateway: PostGateway = PostGatewayImpl(appContext, requestManager)
 

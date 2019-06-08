@@ -20,20 +20,19 @@ import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
+import javax.inject.Inject
 
 class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
     private val TAG = "SUB_INFO_DIALOG"
+
+    @Inject
+    lateinit var factory : SubInfoDialogVM.Factory
 
     private val viewModel : SubInfoDialogVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 // inject dependencies into factory and construct viewmodel
-                return DaggerVMComponent.builder()
-                        .repoModule(RepoModule(context!!))
-                        .authModule(AuthModule(context!!))
-                        .utilModule(UtilModule(activity!!.application))
-                        .build()
-                        .getDisplaySubInfoVM().create(subName) as T
+                return factory.create(subName) as T
             }
         }).get(SubInfoDialogVM::class.java)
     }

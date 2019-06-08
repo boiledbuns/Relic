@@ -20,23 +20,23 @@ import javax.inject.Singleton
 @Component( modules = [RepoModule::class, AuthModule::class, UtilModule::class])
 interface VMComponent {
 
-    fun getMainVM() : MainVM.Factory
-
-    fun getDisplayPostVM() : DisplayPostVM.Factory
-
-    fun getNewPostEditorVM() : NewPostEditorVM.Factory
-
-    fun getReplyEditorVM() : ReplyEditorVM.Factory
-
-    fun getDisplaySubInfoVM() : SubInfoDialogVM.Factory
-
-    fun injectEditor(factory: ViewModelProvider.Factory)
-
-    fun getDisplaySubsVM() : DisplaySubsVM.Factory
-
-    fun getDisplaySubVM() : DisplaySubVM.Factory
-
-    fun getDisplayFrontpageVM() : FrontpageVM.Factory
-
-    fun getDisplayUserVM() : DisplayUserVM.Factory
+//    fun getMainVM() : MainVM.Factory
+//
+//    fun getDisplayPostVM() : DisplayPostVM.Factory
+//
+//    fun getNewPostEditorVM() : NewPostEditorVM.Factory
+//
+//    fun getReplyUserVM() : ReplyEditorVM.Factory
+//
+//    fun getDisplaySubInfoVM() : SubInfoDialogVM.Factory
+//
+//    fun injectEditor(factory: ViewModelProvider.Factory)
+//
+//    fun getDisplaySubsVM() : DisplaySubsVM.Factory
+//
+//    fun getDisplaySubVM() : DisplaySubVM.Factory
+//
+//    fun getDisplayFrontpageVM() : FrontpageVM.Factory
+//
+//    fun getDisplayUserVM() : DisplayUserVM.Factory
 }

@@ -27,21 +27,18 @@ import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
+import javax.inject.Inject
 
 class FrontpageFragment : Fragment() {
     private val TAG = "FRONTPAGE_VIEW"
 
+    @Inject
+    lateinit var factory : FrontpageVM.Factory
+
     private val frontpageVM: FrontpageVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent
-                    .builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getDisplayFrontpageVM()
-                    .create() as T
+                return factory.create() as T
             }
         }).get(FrontpageVM::class.java)
     }

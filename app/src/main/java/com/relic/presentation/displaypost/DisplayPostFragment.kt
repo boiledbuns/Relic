@@ -14,10 +14,6 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
@@ -38,20 +34,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
+    @Inject lateinit var factory : DisplayPostVM.Factory
+
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                // construct & inject editor ViewModel
-                return DaggerVMComponent.builder()
-                        .repoModule(RepoModule(context!!))
-                        .authModule(AuthModule(context!!))
-                        .utilModule(UtilModule(activity!!.application))
-                        .build()
-                        .getDisplayPostVM().create(subredditName, postFullName, postSource) as T
+                return factory.create(subredditName, postFullName, postSource) as T
             }
         }).get(DisplayPostVM::class.java)
     }

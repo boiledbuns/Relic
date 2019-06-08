@@ -7,14 +7,15 @@ import com.android.volley.VolleyError
 import com.relic.data.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
+import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
  * Abstraction for all network requests
  */
-class NetworkRequestManager (
-    private val appContext: Context
+class NetworkRequestManager @Inject constructor(
+    private val appContext : Context
 ) {
     val TAG = "NETWORK_REQUEST_MANAGER"
 

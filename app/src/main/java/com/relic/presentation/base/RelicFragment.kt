@@ -10,8 +10,9 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.relic.R
+import com.relic.dagger.Injectable
 
-open class RelicFragment: Fragment() {
+open class RelicFragment: Fragment(), Injectable {
     protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
     protected var snackbar : Snackbar? = null
 

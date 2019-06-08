@@ -18,12 +18,21 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_preview.*
 import kotlinx.android.synthetic.main.display_user_preview.view.*
+import javax.inject.Inject
 
 class DisplayUserPreview : BottomSheetDialogFragment() {
 
     private val TAG = "DISPLAY_USER_PREVIEW"
 
-    private lateinit var displayUserVM : DisplayUserVM
+    @Inject lateinit var factory : DisplayUserVM.Factory
+
+    private val displayUserVM : DisplayUserVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(username) as T
+            }
+        }).get(DisplayUserVM::class.java)
+    }
     private lateinit var username : String
 
     // region lifecycle hooks
@@ -32,17 +41,6 @@ class DisplayUserPreview : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
-
-        displayUserVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getDisplayUserVM().create(username) as T
-            }
-        }).get(DisplayUserVM::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

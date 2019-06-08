@@ -6,13 +6,14 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 
 import com.relic.R
+import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
 
-class LoginActivity : AppCompatActivity(), CoroutineScope {
+class LoginActivity : RelicActivity(), CoroutineScope {
     internal val TAG = "LOGIN_ACTIVITY"
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob()

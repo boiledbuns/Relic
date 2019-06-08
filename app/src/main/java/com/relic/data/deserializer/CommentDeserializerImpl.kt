@@ -15,10 +15,13 @@ import org.json.simple.parser.JSONParser
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.pow
 
 // TODO convert to object and add interface so this can be injected
-object CommentDeserializer : Contract.CommentDeserializer {
+@Singleton
+class CommentDeserializer @Inject constructor(): Contract.CommentDeserializer {
     private val TAG = "COMMENT_DESERIALIZER"
 
     private val jsonParser: JSONParser = JSONParser()
@@ -34,7 +37,7 @@ object CommentDeserializer : Contract.CommentDeserializer {
     ) : ParsedCommentData {
         // the comment data is nested as the first element within an array
         val requestData = jsonParser.parse(response) as JSONArray
-        val parentPostId = CommentDeserializer.removeTypePrefix(postFullName)
+        val parentPostId = removeTypePrefix(postFullName)
 
         return try {
             parseComments(parentPostId, requestData[1] as JSONObject)

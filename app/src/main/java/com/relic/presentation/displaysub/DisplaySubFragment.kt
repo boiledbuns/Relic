@@ -42,20 +42,16 @@ import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
+import javax.inject.Inject
 
 class DisplaySubFragment : RelicFragment() {
+    @Inject
+    lateinit var factory : DisplaySubVM.Factory
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent
-                        .builder()
-                        .repoModule(RepoModule(context!!))
-                        .authModule(AuthModule(context!!))
-                        .utilModule(UtilModule(activity!!.application))
-                        .build()
-                        .getDisplaySubVM()
-                        .create(PostRepository.PostSource.Subreddit(subName)) as T
+                return factory.create(PostRepository.PostSource.Subreddit(subName)) as T
             }
         }).get(DisplaySubVM::class.java)
     }

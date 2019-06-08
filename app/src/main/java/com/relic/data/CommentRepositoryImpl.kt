@@ -13,21 +13,23 @@ import com.relic.domain.models.CommentModel
 import com.relic.data.repository.RepoConstants
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class CommentRepositoryImpl(
-    private val viewContext: Context,
+class CommentRepositoryImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
-    private val listingRepo: ListingRepository
+    private val appDB : ApplicationDB,
+    private val listingRepo: ListingRepository,
+    private val commentDeserializer: CommentDeserializer
 ) : CommentRepository {
     private val TAG = "COMMENT_REPO"
 
-    private val appDB = ApplicationDB.getDatabase(viewContext)
+
     private val commentDao = appDB.commentDAO
 
     // region interface
 
     override fun getComments(postFullName : String, displayNRows: Int): LiveData<List<CommentModel>> {
-        val postId = CommentDeserializer.removeTypePrefix(postFullName)
+        val postId = commentDeserializer.removeTypePrefix(postFullName)
         return when {
             (displayNRows > 0) -> {
                 commentDao.getChildrenByLevel(postId, displayNRows)
@@ -51,7 +53,7 @@ class CommentRepositoryImpl(
     }
 
     override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) {
-        val postName = CommentDeserializer.removeTypePrefix(postFullName)
+        val postName = commentDeserializer.removeTypePrefix(postFullName)
         var url = "${RepoConstants.ENDPOINT}r/$subName/comments/$postName?count=20"
 
         if (refresh) {
@@ -63,7 +65,7 @@ class CommentRepositoryImpl(
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
             Log.d(TAG, "$response")
 
-            val parsedData = CommentDeserializer.parseCommentsResponse(
+            val parsedData = commentDeserializer.parseCommentsResponse(
                 postFullName = postFullName,
                 response = response
             )
@@ -96,7 +98,7 @@ class CommentRepositoryImpl(
                 data = postData
             )
 
-            val commentEntities = CommentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
+            val commentEntities = commentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
 
             withContext (Dispatchers.IO) {
                 commentDao.deleteComment(moreChildrenComment.fullName)
@@ -109,7 +111,7 @@ class CommentRepositoryImpl(
 
     override suspend fun clearAllCommentsFromSource(postFullName: String) {
         withContext(Dispatchers.IO){
-            commentDao.deletePostComments(CommentDeserializer.removeTypePrefix(postFullName))
+            commentDao.deletePostComments(commentDeserializer.removeTypePrefix(postFullName))
         }
     }
 

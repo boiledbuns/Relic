@@ -16,8 +16,9 @@ import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import javax.inject.Inject
 
-class SubRepositoryImpl(private val context: Context, private val requestManager: NetworkRequestManager) : SubRepository {
+class SubRepositoryImpl @Inject constructor(private val context: Context, private val requestManager: NetworkRequestManager) : SubRepository {
     private val TAG = "SUB_REPO"
 
     private val subDao: SubredditDao = ApplicationDB.getDatabase(context).subredditDao

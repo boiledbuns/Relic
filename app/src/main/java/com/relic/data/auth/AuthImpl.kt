@@ -1,5 +1,6 @@
 package com.relic.data.auth
 
+import android.app.Application
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
@@ -7,10 +8,7 @@ import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
 
-import com.android.volley.AuthFailureError
 import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.relic.R
 import com.relic.data.*
 import com.relic.data.entities.TokenStoreEntity
@@ -22,12 +20,16 @@ import kotlinx.coroutines.*
 import java.util.Calendar
 import java.util.Date
 import java.util.HashMap
+import javax.inject.Inject
 
 /**
  * Singleton instance of the authenticator because we should be able to
  */
-class AuthImpl (
-    private val appContext: Context
+class AuthImpl @Inject constructor(
+    private val appContext: Application,
+    private val requestManager: NetworkRequestManager,
+    private val userRepo : UserRepository,
+    private val appDB : ApplicationDB
 ) : Auth {
     private val TAG = "AUTHENTICATOR"
 
@@ -42,11 +44,6 @@ class AuthImpl (
 
     private var lastRefresh: Date? = null
     private var authDeserializer = AuthDeserializer(appContext)
-
-    private val appDB = ApplicationDB.getDatabase(appContext)
-    // TODO convert to inject
-    private val requestManager: NetworkRequestManager = NetworkRequestManager(appContext)
-    private val userRepo : UserRepository = UserRepositoryImpl(appContext, requestManager)
 
     private val spAccountLiveData = MutableLiveData<String?>()
     private val listener : SharedPreferences.OnSharedPreferenceChangeListener by lazy {

@@ -11,12 +11,12 @@ import javax.inject.Singleton
 
 @Module
 class UtilModule @Inject constructor(
-    private val appContext : Application
+    private val app : Application
 ) {
 
     @Provides
     @Singleton
     fun provideNetworkUtil() : NetworkUtil {
-        return NetworkUtilImpl(appContext)
+        return NetworkUtilImpl(app)
     }
 }

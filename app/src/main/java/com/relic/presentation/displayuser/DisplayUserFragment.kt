@@ -30,10 +30,21 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
 import kotlinx.android.synthetic.main.display_user.view.*
 import java.util.*
+import javax.inject.Inject
 
 class DisplayUserFragment : RelicFragment() {
 
-    private lateinit var displayUserVM : DisplayUserVM
+    @Inject
+    lateinit var factory : DisplayUserVM.Factory
+
+    private val displayUserVM : DisplayUserVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(username) as T
+            }
+        }).get(DisplayUserVM::class.java)
+    }
+
     private lateinit var username : String
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
@@ -42,17 +53,6 @@ class DisplayUserFragment : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
-
-        displayUserVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getDisplayUserVM().create(username) as T
-            }
-        }).get(DisplayUserVM::class.java)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
             contentFragments.add(PostsTabFragment.create(UserTab.Submitted))

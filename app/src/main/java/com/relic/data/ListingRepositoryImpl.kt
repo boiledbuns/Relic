@@ -12,8 +12,9 @@ import com.shopify.livedataktx.observe
 import kotlinx.coroutines.*
 
 import org.json.simple.parser.JSONParser
+import javax.inject.Inject
 
-class ListingRepositoryImpl(context: Context) : ListingRepository {
+class ListingRepositoryImpl @Inject constructor(context: Context) : ListingRepository {
     private val TAG = "LISTING_REPO"
 
     // TODO get instance from DI

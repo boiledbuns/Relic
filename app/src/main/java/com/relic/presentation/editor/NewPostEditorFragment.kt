@@ -16,19 +16,18 @@ import com.relic.dagger.modules.RepoModule
 import com.relic.dagger.modules.UtilModule
 import com.relic.presentation.base.RelicFragment
 import kotlinx.android.synthetic.main.editor_new_post.view.*
+import javax.inject.Inject
 
 class NewPostEditorFragment : RelicFragment() {
+
+    @Inject
+    lateinit var factory : NewPostEditorVM.Factory
 
     private val newPostEditorVM : NewPostEditorVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 // construct & inject editor ViewModel
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getNewPostEditorVM().create(subName) as T
+                return factory.create(subName) as T
             }
         }).get(NewPostEditorVM::class.java)
     }

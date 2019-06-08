@@ -9,14 +9,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
-class AuthModule @Inject constructor(
-    private val applicationContext : Context
-) {
-
-    @Provides
-    @Singleton
-    fun provideAuthModule() : AuthImpl {
-        return AuthImpl(applicationContext)
-    }
+class AuthModule {
 }
 
