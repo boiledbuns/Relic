@@ -13,10 +13,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
@@ -28,7 +24,6 @@ import com.relic.presentation.util.RelicEvent
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
-import kotlinx.android.synthetic.main.display_user.view.*
 import java.util.*
 import javax.inject.Inject
 
@@ -53,6 +48,16 @@ class DisplayUserFragment : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.display_user, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindViewModel(viewLifecycleOwner)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
             contentFragments.add(PostsTabFragment.create(UserTab.Submitted))
@@ -64,23 +69,11 @@ class DisplayUserFragment : RelicFragment() {
             contentFragments.add(PostsTabFragment.create(UserTab.Hidden))
         }
 
-        setHasOptionsMenu(true)
-    }
+        initializeToolbar(userToolbar as Toolbar)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_user, container, false).apply {
-            initializeToolbar(userToolbar as Toolbar)
-
-            userViewPager.adapter = pagerAdapter
-            userViewPager.offscreenPageLimit = 1
-            userTabLayout.setupWithViewPager(userViewPager)
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        bindViewModel(viewLifecycleOwner)
+        userViewPager.adapter = pagerAdapter
+        userViewPager.offscreenPageLimit = 1
+        userTabLayout.setupWithViewPager(userViewPager)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

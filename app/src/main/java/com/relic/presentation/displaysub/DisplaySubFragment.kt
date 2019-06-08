@@ -23,10 +23,6 @@ import android.widget.Toast
 
 import com.relic.R
 import com.relic.presentation.main.RelicError
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
@@ -75,28 +71,26 @@ class DisplaySubFragment : RelicFragment() {
         arguments?.apply {
             subName = getString(ARG_SUBREDDIT_NAME, "")
         }
-
-        postAdapter = PostItemAdapter(displaySubVM)
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.display_sub, container, false).apply {
-            (findViewById<RecyclerView>(R.id.subPostsRecyclerView)).apply {
-                adapter = postAdapter
-                layoutManager = LinearLayoutManager(context)
-            }
-
-            initializeToolbar(findViewById(R.id.subToolbar))
-        }
+        return inflater.inflate(R.layout.display_sub, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        postAdapter = PostItemAdapter(displaySubVM)
 
+        subPostsRecyclerView.apply {
+            adapter = postAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        initializeToolbar()
         initializeOnClicks()
         attachScrollListeners()
         touchHelperCallback = PostItemsTouchHelper(this, context!!)
@@ -140,8 +134,6 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     // endregion fragment lifecycle hooks
-
-    // region fragment event hooks
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
@@ -187,8 +179,6 @@ class DisplaySubFragment : RelicFragment() {
 
         return override
     }
-
-    // endregion fragment event hooks
 
     override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
         displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
@@ -331,10 +321,10 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun initializeToolbar(toolbar: Toolbar) {
+    private fun initializeToolbar() {
         val pActivity = (activity as AppCompatActivity)
 
-        toolbar.apply {
+        (subToolbar as Toolbar).apply {
             pActivity.setSupportActionBar(this)
 
             title = subName

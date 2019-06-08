@@ -18,10 +18,6 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.presentation.adapter.SearchItemAdapter

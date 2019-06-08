@@ -4,8 +4,9 @@ import android.app.Application
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.relic.network.NetworkUtil
+import javax.inject.Inject
 
-class NetworkUtilImpl (
+class NetworkUtilImpl @Inject constructor(
     // using application context won't create a memory leak
     private val appContext : Application
 ) : NetworkUtil {

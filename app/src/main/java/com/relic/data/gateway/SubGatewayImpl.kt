@@ -1,6 +1,5 @@
 package com.relic.data.gateway
 
-import android.content.Context
 import android.text.Html
 import android.util.Log
 
@@ -15,8 +14,12 @@ import org.json.simple.parser.ParseException
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class SubGatewayImpl(context: Context, private val requestManager: NetworkRequestManager) : SubGateway {
+class SubGatewayImpl @Inject constructor(
+    private val appDB : ApplicationDB,
+    private val requestManager: NetworkRequestManager
+) : SubGateway {
     var TAG = "SUB_GATEWAY"
     private val ENDPOINT = "https://oauth.reddit.com/"
     private val NON_OAUTH_ENDPOINT = "https://www.reddit.com/"
@@ -25,9 +28,7 @@ class SubGatewayImpl(context: Context, private val requestManager: NetworkReques
     val SUBSCRIBE = 2
     val UNSUBSCRIBE = 3
 
-    private val appDB = ApplicationDB.getDatabase(context)
     private val subDAO = appDB.subredditDao
-
 
     // TODO change to "retrieve"
     override suspend fun retrieveAdditionalSubInfo(subredditName: String): String {

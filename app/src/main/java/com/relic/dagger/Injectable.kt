@@ -1,5 +1,3 @@
 package com.relic.dagger
 
-interface Injectable {
-
-}
+interface Injectable

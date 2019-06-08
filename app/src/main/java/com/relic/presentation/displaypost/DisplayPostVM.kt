@@ -8,6 +8,7 @@ import android.util.Log
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
+import com.relic.data.gateway.PostGateway
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
@@ -27,6 +28,7 @@ class DisplayPostVM (
     private val postRepo : PostRepository,
     private val commentRepo: CommentRepository,
     private val listingRepo: ListingRepository,
+    private val postGateway: PostGateway,
     private val networkUtil : NetworkUtil,
     private val subName: String,
     private val postFullname: String,
@@ -37,10 +39,11 @@ class DisplayPostVM (
         private val postRepo: PostRepository,
         private val commentRepo: CommentRepository,
         private val listingRepo: ListingRepository,
-        private val networkUtil : NetworkUtil
+        private val networkUtil : NetworkUtil,
+        private val postGateway: PostGateway
     ) {
         fun create(subredditName : String, postFullname : String, postSource: PostRepository.PostSource) : DisplayPostVM {
-            return DisplayPostVM(postRepo, commentRepo, listingRepo, networkUtil, subredditName, postFullname, postSource)
+            return DisplayPostVM(postRepo, commentRepo, listingRepo, postGateway, networkUtil, subredditName, postFullname, postSource)
         }
     }
 
@@ -180,7 +183,7 @@ class DisplayPostVM (
 
     override fun onPostVoted(voteValue: Int) {
         Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue)
-        launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(postFullname, voteValue) }
+        launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
     }
 
     override fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int{
@@ -196,7 +199,7 @@ class DisplayPostVM (
 
         // send request only if value changed
         if (newUserUpvoteValue != commentModel.userUpvoted) {
-            launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(commentModel.fullName, voteValue) }
+            launch(Dispatchers.Main) { postGateway.voteOnPost(commentModel.fullName, voteValue) }
         }
         return newUserUpvoteValue
     }

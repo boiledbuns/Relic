@@ -10,10 +10,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.presentation.base.RelicFragment
 import kotlinx.android.synthetic.main.editor_new_post.view.*
 import javax.inject.Inject

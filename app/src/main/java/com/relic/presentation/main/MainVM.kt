@@ -2,6 +2,7 @@ package com.relic.presentation.main
 
 import android.arch.lifecycle.*
 import android.util.Log
+import com.relic.data.Auth
 import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.domain.models.AccountModel
@@ -13,12 +14,12 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class MainVM(
-    private val auth : AuthImpl,
+    private val auth : Auth,
     private val userRepo : UserRepository
 ) : RelicViewModel(), MainContract.VM, CoroutineScope {
 
     class Factory @Inject constructor(
-        private val auth : AuthImpl,
+        private val auth : Auth,
         private val userRepo : UserRepository
     ) {
         fun create () : MainVM {

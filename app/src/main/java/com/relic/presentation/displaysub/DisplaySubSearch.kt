@@ -19,10 +19,6 @@ import android.widget.EditText
 import android.widget.Toast
 import com.relic.R
 import com.relic.presentation.main.RelicError
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment

@@ -1,13 +1,12 @@
 package com.relic.presentation.home.frontpage
 
+import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -15,11 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.domain.models.PostModel
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.SubNavigationData
@@ -29,9 +25,7 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
 import javax.inject.Inject
 
-class FrontpageFragment : Fragment() {
-    private val TAG = "FRONTPAGE_VIEW"
-
+class FrontpageFragment : RelicFragment() {
     @Inject
     lateinit var factory : FrontpageVM.Factory
 
@@ -48,31 +42,29 @@ class FrontpageFragment : Fragment() {
 
     private var scrollLocked: Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        bindViewModel()
-        postAdapter = PostItemAdapter(frontpageVM)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.frontpage, container, false).apply {
-            frontpageRecyclerView = findViewById<RecyclerView>(R.id.frontpagePostsRecyclerView).apply {
-                itemAnimator = null
-                layoutManager = LinearLayoutManager(context)
-                adapter = postAdapter
-            }
-
-            attachViewListeners(this)
-        }
+        return inflater.inflate(R.layout.frontpage, container, false)
     }
 
-    private fun attachViewListeners(root : View) {
-        val swipeRefreshLayout = root.findViewById<SwipeRefreshLayout>(R.id.frontpageSwipeRefreshLayout)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postAdapter = PostItemAdapter(frontpageVM)
+
+        frontpageRecyclerView = frontpagePostsRecyclerView.apply {
+            itemAnimator = null
+            layoutManager = LinearLayoutManager(context)
+            adapter = postAdapter
+        }
+
+        attachViewListeners()
+    }
+
+    private fun attachViewListeners() {
+        val swipeRefreshLayout = frontpageSwipeRefreshLayout
 
         swipeRefreshLayout.apply {
             setOnRefreshListener {
@@ -99,10 +91,10 @@ class FrontpageFragment : Fragment() {
         })
     }
 
-    private fun bindViewModel() {
+    override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // observe the live data list of posts for this subreddit
-        frontpageVM.postListLiveData.nonNull().observe(this) { handlePostsLoaded(it) }
-        frontpageVM.subNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
+        frontpageVM.postListLiveData.nonNull().observe(lifecycleOwner) { handlePostsLoaded(it) }
+        frontpageVM.subNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
     }
 
     // region live data handlers
@@ -146,6 +138,4 @@ class FrontpageFragment : Fragment() {
     }
 
     // endregion live data handlers
-
-
 }

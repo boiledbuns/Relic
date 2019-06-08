@@ -1,10 +1,7 @@
 package com.relic.data.gateway
 
-import android.content.Context
-import android.os.AsyncTask
 import android.util.Log
 
-import com.relic.R
 import com.relic.data.DomainTransfer
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
@@ -12,8 +9,11 @@ import com.relic.network.request.RelicOAuthRequest
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
+import javax.inject.Inject
 
-class UserGatewayImpl(context: Context, private val requestManager: NetworkRequestManager) : UserGateway {
+class UserGatewayImpl @Inject constructor(
+    private val requestManager: NetworkRequestManager
+) : UserGateway {
     private val ENDPOINT = "https://oauth.reddit.com/"
 
     override suspend fun getUser(username: String) {

@@ -4,6 +4,7 @@ import com.relic.data.deserializer.*
 import dagger.Binds
 import dagger.Module
 
+@Suppress("unused")
 @Module
 abstract class DeserializerModule {
     @Binds

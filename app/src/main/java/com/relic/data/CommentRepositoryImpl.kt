@@ -22,7 +22,6 @@ class CommentRepositoryImpl @Inject constructor(
 ) : CommentRepository {
     private val TAG = "COMMENT_REPO"
 
-
     private val commentDao = appDB.commentDAO
 
     // region interface

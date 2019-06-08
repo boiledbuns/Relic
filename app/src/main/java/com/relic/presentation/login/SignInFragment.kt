@@ -14,6 +14,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.relic.R
+import com.relic.data.Auth
 import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.data.UserRepositoryImpl
@@ -37,7 +38,7 @@ class SignInFragment: RelicFragment(), CoroutineScope {
     }
 
     @Inject
-    lateinit var auth : AuthImpl
+    lateinit var auth : Auth
     @Inject
     lateinit var userRepo : UserRepository
 

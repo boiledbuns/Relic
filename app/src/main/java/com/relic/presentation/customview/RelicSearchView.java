@@ -53,7 +53,7 @@ public class RelicSearchView extends RelativeLayout {
       @Override
       public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
 //        /Toast.makeText(getContext().getApplicationContext(), "Button pressed " + keyCode + " " + keyEvent.getAction(), Toast.LENGTH_SHORT).show();
-        if (keyEvent.getAction() == keyEvent.ACTION_UP && (keyCode == KeyEvent.ACTION_DOWN || keyCode == keyEvent.KEYCODE_BACK)) {
+        if (keyEvent.getAction() == KeyEvent.ACTION_UP && (keyCode == KeyEvent.ACTION_DOWN || keyCode == KeyEvent.KEYCODE_BACK)) {
           expandSearch(!searchExpanded);
           searchExpanded = !searchExpanded;
         }

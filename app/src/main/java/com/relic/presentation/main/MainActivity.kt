@@ -21,13 +21,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.relic.R
-import com.relic.RelicApp
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 
-import com.relic.data.auth.AuthImpl
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.displayuser.DisplayUserFragment

@@ -16,14 +16,14 @@ class UserRepositoryImpl @Inject constructor(
     private val appContext: Context,
     private val requestManager: NetworkRequestManager,
     private val userDeserializer : Contract.UserDeserializer,
-    private val accountDeserializer : Contract.AccountDeserializer
+    private val accountDeserializer : Contract.AccountDeserializer,
+    private val appDB : ApplicationDB
 ): UserRepository {
     private val TAG = "USER_REPO"
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
 
-    private val appDB = ApplicationDB.getDatabase(appContext)
     private val accountDao = appDB.accountDao
 
     override suspend fun retrieveUsername(): String? {

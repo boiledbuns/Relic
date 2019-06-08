@@ -13,6 +13,7 @@ import javax.inject.Singleton
 
 @Module
 class AppModule {
+
     @Singleton
     @Provides
     fun provideDB(app: Application) : ApplicationDB {

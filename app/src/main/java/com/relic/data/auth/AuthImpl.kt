@@ -29,7 +29,8 @@ class AuthImpl @Inject constructor(
     private val appContext: Application,
     private val requestManager: NetworkRequestManager,
     private val userRepo : UserRepository,
-    private val appDB : ApplicationDB
+    private val appDB : ApplicationDB,
+    private val authDeserializer : Auth.Deserializer
 ) : Auth {
     private val TAG = "AUTHENTICATOR"
 
@@ -43,7 +44,6 @@ class AuthImpl @Inject constructor(
     private val refreshTokenKey= appContext.resources.getString(R.string.REFRESH_TOKEN_KEY)
 
     private var lastRefresh: Date? = null
-    private var authDeserializer = AuthDeserializer(appContext)
 
     private val spAccountLiveData = MutableLiveData<String?>()
     private val listener : SharedPreferences.OnSharedPreferenceChangeListener by lazy {
@@ -54,7 +54,7 @@ class AuthImpl @Inject constructor(
         }
     }
 
-    val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
+    override val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
             + "&response_type=" + AuthConstants.RESPONSE_TYPE
             + "&state=" + AuthConstants.STATE
             + "&redirect_uri=" + AuthConstants.REDIRECT
@@ -94,8 +94,7 @@ class AuthImpl @Inject constructor(
         appContext.getSharedPreferences(preference, Context.MODE_PRIVATE).edit()
             .putString(redirectCode, queryMap[redirectCode]).apply()
 
-        val redirectCode = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
-            .getString(redirectCode, "DEFAULT")
+        val redirectCode = queryMap[redirectCode]!!
 
         // override headers to add custom credentials in client_secret:redirect_code format
         val headers = HashMap<String, String>().apply {
@@ -123,7 +122,6 @@ class AuthImpl @Inject constructor(
             // we should control how we store the token here
             // TODO refactor the account repo into its own class in this package since the two
             // are more closely related than user <-> account
-            Log.d(TAG, "test")
             val responseData = authDeserializer.parseAuthResponse(response)
             val username = retrieveUserName(responseData.access)
 
@@ -202,13 +200,17 @@ class AuthImpl @Inject constructor(
         val selfEndpoint = "https://oauth.reddit.com/api/v1/me"
 
         return withContext (Dispatchers.IO){
-            // create the new request and submit it
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = selfEndpoint,
-                authToken = accessToken
-            )
-            authDeserializer.parseGetUsernameResponse(response)
+            try { // create the new request and submit it
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = selfEndpoint,
+                    authToken = accessToken
+                )
+
+                authDeserializer.parseGetUsernameResponse(response)
+            } catch (e: Exception) {
+                throw DomainTransfer.handleException("retrieve username", e) ?: e
+            }
         }
     }
 

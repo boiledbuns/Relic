@@ -11,12 +11,6 @@ import kotlinx.android.parcel.Parcelize
 
 interface PostRepository {
     /**
-     * Exposes gateway for vm to interact with objects stored on the server
-     * @return gateway object for exposing post actions
-     */
-    val postGateway: PostGateway
-
-    /**
      * Exposes the livedata list of posts
      * @param postSource subreddit to get the list for
      * @return live data list of posts

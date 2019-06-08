@@ -5,24 +5,18 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
+import com.relic.presentation.base.RelicBottomSheetDialog
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_preview.*
 import kotlinx.android.synthetic.main.display_user_preview.view.*
 import javax.inject.Inject
 
-class DisplayUserPreview : BottomSheetDialogFragment() {
-
-    private val TAG = "DISPLAY_USER_PREVIEW"
+class DisplayUserPreview : RelicBottomSheetDialog() {
 
     @Inject lateinit var factory : DisplayUserVM.Factory
 

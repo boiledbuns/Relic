@@ -15,7 +15,8 @@ import kotlin.coroutines.suspendCoroutine
  * Abstraction for all network requests
  */
 class NetworkRequestManager @Inject constructor(
-    private val appContext : Context
+    private val appContext : Context,
+    appDB: ApplicationDB
 ) {
     val TAG = "NETWORK_REQUEST_MANAGER"
 
@@ -24,7 +25,7 @@ class NetworkRequestManager @Inject constructor(
 
     // TODO move this to be injected
     private val volleyQueue: RequestQueue = VolleyAccessor.getInstance(appContext).requestQueue
-    private val tokenStore = ApplicationDB.getDatabase(appContext).tokenStoreDao
+    private val tokenStore = appDB.tokenStoreDao
 
     @Throws(VolleyError::class)
     suspend fun processUnauthenticatedRequest (

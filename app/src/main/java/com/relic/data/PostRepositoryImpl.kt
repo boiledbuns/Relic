@@ -47,7 +47,6 @@ import javax.inject.Inject
  *  As a result, the retrieval methods are now suspend functions
  */
 class PostRepositoryImpl @Inject constructor(
-    appContext: Context,
     private val requestManager: NetworkRequestManager,
     private val appDB: ApplicationDB,
     private val postDeserializer : Contract.PostDeserializer
@@ -67,14 +66,12 @@ class PostRepositoryImpl @Inject constructor(
         PostRepository.SortType.TOP
     )
 
-    override val postGateway: PostGateway = PostGatewayImpl(appContext, requestManager)
-
     // region interface methods
 
     override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
         return when (postSource) {
             is PostRepository.PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
-            is PostRepository.PostSource.Frontpage -> appDB.postDao.getPostsFromFrontpage()
+            is PostRepository.PostSource.Frontpage -> appDB.postDao.postsFromFrontpage
             is PostRepository.PostSource.User -> {
                 when (postSource.retrievalOption) {
                     PostRepository.RetrievalOption.Submitted -> appDB.userPostingDao.getUserPosts()
@@ -86,7 +83,7 @@ class PostRepositoryImpl @Inject constructor(
                     PostRepository.RetrievalOption.Hidden -> appDB.userPostingDao.getUserHidden()
                 }
             }
-            else -> appDB.postDao.getPostsFromAll()
+            else -> appDB.postDao.postsFromAll
         }
     }
 
@@ -279,7 +276,7 @@ class PostRepositoryImpl @Inject constructor(
             }
         }
 
-        Log.d(TAG, "post post draft ${postDraft.sendReplies.toString()}  ${type}")
+        Log.d(TAG, "post post draft ${postDraft.sendReplies}  ${type}")
 
         try {
             val response = requestManager.processRequest(

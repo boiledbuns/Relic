@@ -19,7 +19,9 @@ import javax.inject.Singleton
         ActivityModule::class,
         RepoModule::class,
         DeserializerModule::class,
-        VMModule::class
+        UtilModule::class,
+        AuthModule::class,
+        ApiModule::class
     ]
 )
 interface AppComponent {
@@ -34,17 +36,9 @@ interface AppComponent {
         @BindsInstance
         fun context(appContext : Context) : Builder
 
-//        @BindsInstance
-//        fun repoModule(app : RepoModule) : Builder
-//
-//        @BindsInstance
-//        fun appModule(app : AppModule) : Builder
-
-
         fun build() : AppComponent
     }
 
     fun inject(app : RelicApp)
 
-//    fun inject(mainActivity: MainActivity)
 }

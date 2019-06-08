@@ -1,14 +1,19 @@
 package com.relic.dagger.modules
 
-import android.content.Context
-import com.relic.data.UserRepository
+import com.relic.data.Auth
+import com.relic.data.auth.AuthDeserializerImpl
 import com.relic.data.auth.AuthImpl
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Inject
-import javax.inject.Singleton
 
+@Suppress("unused")
 @Module
-class AuthModule {
+abstract class AuthModule {
+
+    @Binds
+    abstract fun bindAuth(auth : AuthImpl) : Auth
+
+    @Binds
+    abstract fun bindAuthDeserializer(authDeserializer: AuthDeserializerImpl) : Auth.Deserializer
 }
 

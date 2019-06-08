@@ -5,8 +5,8 @@ import com.relic.domain.models.ListingItem
 import kotlinx.android.parcel.Parcelize
 
 interface DisplayUserContract {
-    interface View {}
-    interface ViewModel {}
+    interface View
+    interface ViewModel
 
     interface ListingItemAdapterDelegate {
         fun visitListing(listingItem : ListingItem)

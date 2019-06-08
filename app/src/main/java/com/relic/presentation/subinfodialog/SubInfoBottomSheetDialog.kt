@@ -4,27 +4,21 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
 import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.domain.models.SubredditModel
+import com.relic.presentation.base.RelicBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
 import javax.inject.Inject
 
-class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
-    private val TAG = "SUB_INFO_DIALOG"
-
+class SubInfoBottomSheetDialog : RelicBottomSheetDialog() {
     @Inject
     lateinit var factory : SubInfoDialogVM.Factory
 
@@ -44,7 +38,6 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
 
         arguments?.getString(ARG_SUB_NAME)?.apply {
             subName = this
-            bindVm()
         }
     }
 
@@ -54,7 +47,7 @@ class SubInfoBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        bindVm()
         subNameView.text = resources.getString(R.string.sub_prefix_name, subName)
 
         // initialize onclicks
