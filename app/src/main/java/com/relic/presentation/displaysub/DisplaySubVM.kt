@@ -8,6 +8,7 @@ import com.relic.presentation.main.RelicError
 
 import com.relic.data.PostRepository
 import com.relic.data.SubRepository
+import com.relic.data.gateway.PostGateway
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
@@ -25,16 +26,18 @@ open class DisplaySubVM (
     private val postSource: PostRepository.PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
+    private val postGateway: PostGateway,
     private val networkUtil : NetworkUtil
 ) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, DisplaySubContract.SearchVM {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,
+        private val postGateway: PostGateway,
         private val networkUtil : NetworkUtil
     ) {
         fun create (postSource : PostRepository.PostSource) : DisplaySubVM {
-            return DisplaySubVM(postSource, subRepo, postRepo, networkUtil)
+            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, networkUtil)
         }
     }
 
@@ -191,18 +194,18 @@ open class DisplaySubVM (
     // region view action delegate
 
     override fun visitPost(postFullname : String, subreddit : String) {
-        launch(Dispatchers.Main) { postRepo.postGateway.visitPost(postFullname) }
+        launch(Dispatchers.Main) { postGateway.visitPost(postFullname) }
         _navigationLiveData.value = SubNavigationData.ToPost(postFullname, subreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
         Log.d(TAG, "Voting on post " + postFullname + "value = " + voteValue)
-        launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(postFullname, voteValue) }
+        launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
     }
 
     override fun savePost(postFullname: String, save: Boolean) {
         Log.d(TAG, "Saving on post " + postFullname + "save = " + save)
-        launch(Dispatchers.Main) { postRepo.postGateway.savePost(postFullname, save) }
+        launch(Dispatchers.Main) { postGateway.savePost(postFullname, save) }
     }
 
     override fun onLinkPressed(url: String) {

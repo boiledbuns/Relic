@@ -8,6 +8,7 @@ import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.UserRepository
+import com.relic.data.gateway.PostGateway
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
@@ -17,7 +18,9 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.presentation.util.RelicEvent
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -26,6 +29,7 @@ class DisplayUserVM(
     private val commentRepo: CommentRepository,
     private val listingRepo: ListingRepository,
     private val userRepo: UserRepository,
+    private val postGateway: PostGateway,
     private val username : String
 ) : RelicViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
 
@@ -33,10 +37,11 @@ class DisplayUserVM(
         private val postRepo: PostRepository,
         private val commentRepo: CommentRepository,
         private val listingRepo: ListingRepository,
-        private val userRepo: UserRepository
+        private val userRepo: UserRepository,
+        private val postGateway: PostGateway
     ) {
         fun create(username : String) : DisplayUserVM {
-            return DisplayUserVM(postRepo, commentRepo, listingRepo, userRepo, username)
+            return DisplayUserVM(postRepo, commentRepo, listingRepo, userRepo, postGateway, username)
         }
     }
 
@@ -236,7 +241,7 @@ class DisplayUserVM(
     // region post adapter delegate
 
     override fun visitListing(listingItem : ListingItem) {
-        launch(Dispatchers.Main) { postRepo.postGateway.visitPost(listingItem.fullName) }
+        launch(Dispatchers.Main) { postGateway.visitPost(listingItem.fullName) }
 
         // retrieval option doesn't matter in this case
         val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
@@ -262,11 +267,11 @@ class DisplayUserVM(
     }
 
     override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
-        launch(Dispatchers.Main) { postRepo.postGateway.voteOnPost(listingItem.fullName, newVote) }
+        launch(Dispatchers.Main) { postGateway.voteOnPost(listingItem.fullName, newVote) }
     }
 
     override fun saveListing(listingItem : ListingItem) {
-        launch(Dispatchers.Main) { postRepo.postGateway.savePost(listingItem.fullName, !listingItem.saved) }
+        launch(Dispatchers.Main) { postGateway.savePost(listingItem.fullName, !listingItem.saved) }
     }
 
     override fun onThumbnailClicked(listingItem : ListingItem) {

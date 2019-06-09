@@ -14,6 +14,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.relic.R
+import com.relic.data.Auth
 import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.data.UserRepositoryImpl
@@ -22,6 +23,7 @@ import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.android.synthetic.main.web_auth.*
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 class SignInFragment: RelicFragment(), CoroutineScope {
 
@@ -35,17 +37,10 @@ class SignInFragment: RelicFragment(), CoroutineScope {
         ).show()
     }
 
-    lateinit var auth : AuthImpl
+    @Inject
+    lateinit var auth : Auth
+    @Inject
     lateinit var userRepo : UserRepository
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        (activity as FragmentActivity).let {
-            auth = AuthImpl(it)
-            userRepo = UserRepositoryImpl(it, NetworkRequestManager(it))
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // TODO add exit option to allow user to go back

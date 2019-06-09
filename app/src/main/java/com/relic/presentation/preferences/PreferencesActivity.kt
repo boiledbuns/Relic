@@ -7,9 +7,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.relic.R
 import com.relic.preference.PreferencesManagerImpl
+import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes
 
-class PreferencesActivity : AppCompatActivity(), PreferenceChangedListener  {
+class PreferencesActivity : RelicActivity(), PreferenceChangedListener  {
 
     private var changedPreferences = ArrayList<PreferenceLink>()
 

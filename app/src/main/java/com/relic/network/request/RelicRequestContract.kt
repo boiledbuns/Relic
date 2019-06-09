@@ -1,6 +1,6 @@
 package com.relic.network.request
 
-interface RelicRequestContract {}
+interface RelicRequestContract
 
 sealed class RelicRequestError : Exception() {
     class NetworkUnavailableError: RelicRequestError()

@@ -19,10 +19,6 @@ import android.widget.EditText
 import android.widget.Toast
 import com.relic.R
 import com.relic.presentation.main.RelicError
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
@@ -30,9 +26,11 @@ import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub_search.*
+import javax.inject.Inject
 
 class DisplaySubSearch : RelicFragment() {
-
+    @Inject
+    lateinit var factory : DisplaySubVM.Factory
     private lateinit var subSearchVM : DisplaySubVM
     private lateinit var postAdapter: PostItemAdapter
 
@@ -46,12 +44,7 @@ class DisplaySubSearch : RelicFragment() {
 
         subSearchVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getDisplaySubVM().create(source) as T
+                return factory.create(source) as T
             }
         }).get(DisplaySubVM::class.java)
 

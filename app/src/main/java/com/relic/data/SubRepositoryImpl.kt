@@ -6,7 +6,6 @@ import android.util.Log
 
 import com.relic.data.dao.SubredditDao
 import com.relic.data.deserializer.Contract
-import com.relic.data.deserializer.SubDeserializerImpl
 import com.relic.data.gateway.SubGateway
 import com.relic.data.gateway.SubGatewayImpl
 import com.relic.domain.models.SubredditModel
@@ -16,14 +15,17 @@ import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import javax.inject.Inject
 
-class SubRepositoryImpl(private val context: Context, private val requestManager: NetworkRequestManager) : SubRepository {
+class SubRepositoryImpl @Inject constructor(
+    private val context: Context,
+    private val requestManager: NetworkRequestManager,
+    private val appDb : ApplicationDB,
+    private val subDeserializer: Contract.SubDeserializer
+) : SubRepository {
     private val TAG = "SUB_REPO"
 
-    private val subDao: SubredditDao = ApplicationDB.getDatabase(context).subredditDao
-
-    // TODO convert to injection
-    private val subDeserializer: Contract.SubDeserializer = SubDeserializerImpl()
+    private val subDao: SubredditDao = appDb.subredditDao
 
     // region interface methods
 
@@ -81,7 +83,7 @@ class SubRepositoryImpl(private val context: Context, private val requestManager
     }
 
     override fun getSubGateway(): SubGateway {
-        return SubGatewayImpl(context, requestManager)
+        return SubGatewayImpl(appDb, requestManager)
     }
 
     override suspend fun pinSubreddit(subredditName: String, newPinnedStatus: Boolean) {

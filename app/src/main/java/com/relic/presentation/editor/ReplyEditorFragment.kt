@@ -5,26 +5,21 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
+import javax.inject.Inject
 
 class ReplyEditorFragment : RelicFragment() {
+
+    @Inject
+    lateinit var factory : ReplyEditorVM.Factory
 
     private val replyEditorVM : ReplyEditorVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 // construct & inject editor ViewModel
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getReplyEditorVM().create(parent, parentIsPost) as T
+                return factory.create(parent, parentIsPost) as T
             }
         }).get(ReplyEditorVM::class.java)
     }
@@ -56,8 +51,8 @@ class ReplyEditorFragment : RelicFragment() {
         private const val PARENT_ARG = "arg_parent_name"
         private const val IS_POST_ARG = "arg_post_name"
 
-        fun create(parent: String, isPost : Boolean) : NewPostEditorFragment {
-            return NewPostEditorFragment().apply {
+        fun create(parent: String, isPost : Boolean) : ReplyEditorFragment {
+            return ReplyEditorFragment().apply {
                 arguments = Bundle().apply {
                     putString(PARENT_ARG, parent)
                     putBoolean(IS_POST_ARG, isPost)

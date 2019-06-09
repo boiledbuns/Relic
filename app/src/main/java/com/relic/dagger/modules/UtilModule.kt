@@ -1,22 +1,16 @@
 package com.relic.dagger.modules
 
-import android.app.Application
-import com.gfycat.core.GfyCore
 import com.relic.network.NetworkUtil
 import com.relic.network.NetworkUtilImpl
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Inject
 import javax.inject.Singleton
 
+@Suppress("unused")
 @Module
-class UtilModule @Inject constructor(
-    private val appContext : Application
-) {
+abstract class UtilModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideNetworkUtil() : NetworkUtil {
-        return NetworkUtilImpl(appContext)
-    }
+    abstract fun bindNetworkUtil(networkUtilImpl: NetworkUtilImpl) : NetworkUtil
 }

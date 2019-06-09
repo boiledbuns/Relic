@@ -1,6 +1,5 @@
 package com.relic.data.deserializer
 
-import android.content.Context
 import android.text.Html
 import android.util.Log
 import com.google.gson.GsonBuilder
@@ -20,12 +19,12 @@ import org.json.simple.parser.ParseException
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class PostDeserializerImpl(
-    appContext: Context
+class PostDeserializerImpl @Inject constructor(
+    private val appDB : ApplicationDB,
+    private val commentDeserializer: Contract.CommentDeserializer
 ) : Contract.PostDeserializer {
-
-    private val appDB: ApplicationDB = ApplicationDB.getDatabase(appContext)
 
     private val TYPE_POST = "t3"
     private val TAG = "POST_DESERIALIZER"
@@ -115,7 +114,7 @@ class PostDeserializerImpl(
                         subreddit = newPost.subreddit
                     } ?: PostSourceEntity(newPost.name, newPost.subreddit)
                 } else {
-                    val newComment = CommentDeserializer.unmarshallComment(
+                    val newComment = commentDeserializer.unmarshallComment(
                         commentChild = fullEntityJson,
                         commentPosition = 0F
                     ).first()

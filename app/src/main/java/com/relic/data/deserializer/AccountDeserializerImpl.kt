@@ -8,8 +8,11 @@ import kotlinx.coroutines.withContext
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AccountDeserializerImpl : Contract.AccountDeserializer {
+@Singleton
+class AccountDeserializerImpl @Inject constructor() : Contract.AccountDeserializer {
     private val TAG = "ACCOUNT_DESERIALIZER"
 
     private val gson = GsonBuilder().create()

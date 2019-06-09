@@ -6,9 +6,9 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
+import javax.inject.Inject
 
-class UserDeserializerImpl : Contract.UserDeserializer {
-
+class UserDeserializerImpl @Inject constructor(): Contract.UserDeserializer {
     private val TAG = "USER_DESERIALIZER"
 
     private val jsonParser: JSONParser = JSONParser()

@@ -3,8 +3,8 @@ package com.relic.presentation.displaysubs
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.util.Log
+import com.relic.data.Auth
 
-import com.relic.data.auth.AuthImpl
 import com.relic.data.ListingRepository
 import com.relic.data.SubRepository
 import com.relic.data.SubsLoadedCallback
@@ -18,13 +18,13 @@ import kotlin.coroutines.CoroutineContext
 class DisplaySubsVM (
         private val subRepository: SubRepository,
         private val listingRepository: ListingRepository,
-        private val authenticator: AuthImpl
+        private val authenticator: Auth
 ) : RelicViewModel(), DisplaySubsContract.VM, SubInfoDialogContract.Delegate {
 
     class Factory @Inject constructor(
             private val subRepository: SubRepository,
             private val listingRepository: ListingRepository,
-            private val authenticator: AuthImpl
+            private val authenticator: Auth
     ) {
         fun create() : DisplaySubsVM{
             return DisplaySubsVM(subRepository, listingRepository, authenticator)
@@ -101,6 +101,6 @@ class DisplaySubsVM (
     // End of SubInfoDialogContract delegate methods
 
     override fun handleException(context: CoroutineContext, e: Throwable) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // TODO decide whether to display or not
     }
 }

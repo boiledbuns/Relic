@@ -7,8 +7,9 @@ import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
 import java.util.ArrayList
+import javax.inject.Inject
 
-class SubDeserializerImpl : Contract.SubDeserializer {
+class SubDeserializerImpl @Inject constructor(): Contract.SubDeserializer {
     private val TAG = "SUB_DESERIALIZER"
 
     private val parser: JSONParser = JSONParser()

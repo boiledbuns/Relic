@@ -5,25 +5,28 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
+import com.relic.presentation.base.RelicBottomSheetDialog
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_preview.*
 import kotlinx.android.synthetic.main.display_user_preview.view.*
+import javax.inject.Inject
 
-class DisplayUserPreview : BottomSheetDialogFragment() {
+class DisplayUserPreview : RelicBottomSheetDialog() {
 
-    private val TAG = "DISPLAY_USER_PREVIEW"
+    @Inject lateinit var factory : DisplayUserVM.Factory
 
-    private lateinit var displayUserVM : DisplayUserVM
+    private val displayUserVM : DisplayUserVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(username) as T
+            }
+        }).get(DisplayUserVM::class.java)
+    }
     private lateinit var username : String
 
     // region lifecycle hooks
@@ -32,17 +35,6 @@ class DisplayUserPreview : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.getString(ARG_USERNAME)?.let { username = it }
-
-        displayUserVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(context!!))
-                    .authModule(AuthModule(context!!))
-                    .utilModule(UtilModule(activity!!.application))
-                    .build()
-                    .getDisplayUserVM().create(username) as T
-            }
-        }).get(DisplayUserVM::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

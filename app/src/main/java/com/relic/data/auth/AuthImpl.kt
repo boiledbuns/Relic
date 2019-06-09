@@ -1,5 +1,6 @@
 package com.relic.data.auth
 
+import android.app.Application
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
@@ -7,10 +8,7 @@ import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
 
-import com.android.volley.AuthFailureError
 import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.relic.R
 import com.relic.data.*
 import com.relic.data.entities.TokenStoreEntity
@@ -22,12 +20,17 @@ import kotlinx.coroutines.*
 import java.util.Calendar
 import java.util.Date
 import java.util.HashMap
+import javax.inject.Inject
 
 /**
  * Singleton instance of the authenticator because we should be able to
  */
-class AuthImpl (
-    private val appContext: Context
+class AuthImpl @Inject constructor(
+    private val appContext: Application,
+    private val requestManager: NetworkRequestManager,
+    private val userRepo : UserRepository,
+    private val appDB : ApplicationDB,
+    private val authDeserializer : Auth.Deserializer
 ) : Auth {
     private val TAG = "AUTHENTICATOR"
 
@@ -41,12 +44,6 @@ class AuthImpl (
     private val refreshTokenKey= appContext.resources.getString(R.string.REFRESH_TOKEN_KEY)
 
     private var lastRefresh: Date? = null
-    private var authDeserializer = AuthDeserializer(appContext)
-
-    private val appDB = ApplicationDB.getDatabase(appContext)
-    // TODO convert to inject
-    private val requestManager: NetworkRequestManager = NetworkRequestManager(appContext)
-    private val userRepo : UserRepository = UserRepositoryImpl(appContext, requestManager)
 
     private val spAccountLiveData = MutableLiveData<String?>()
     private val listener : SharedPreferences.OnSharedPreferenceChangeListener by lazy {
@@ -57,7 +54,7 @@ class AuthImpl (
         }
     }
 
-    val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
+    override val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
             + "&response_type=" + AuthConstants.RESPONSE_TYPE
             + "&state=" + AuthConstants.STATE
             + "&redirect_uri=" + AuthConstants.REDIRECT
@@ -97,8 +94,7 @@ class AuthImpl (
         appContext.getSharedPreferences(preference, Context.MODE_PRIVATE).edit()
             .putString(redirectCode, queryMap[redirectCode]).apply()
 
-        val redirectCode = appContext.getSharedPreferences(preference, Context.MODE_PRIVATE)
-            .getString(redirectCode, "DEFAULT")
+        val redirectCode = queryMap[redirectCode]!!
 
         // override headers to add custom credentials in client_secret:redirect_code format
         val headers = HashMap<String, String>().apply {
@@ -126,7 +122,6 @@ class AuthImpl (
             // we should control how we store the token here
             // TODO refactor the account repo into its own class in this package since the two
             // are more closely related than user <-> account
-            Log.d(TAG, "test")
             val responseData = authDeserializer.parseAuthResponse(response)
             val username = retrieveUserName(responseData.access)
 
@@ -205,13 +200,17 @@ class AuthImpl (
         val selfEndpoint = "https://oauth.reddit.com/api/v1/me"
 
         return withContext (Dispatchers.IO){
-            // create the new request and submit it
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = selfEndpoint,
-                authToken = accessToken
-            )
-            authDeserializer.parseGetUsernameResponse(response)
+            try { // create the new request and submit it
+                val response = requestManager.processRequest(
+                    method = RelicOAuthRequest.GET,
+                    url = selfEndpoint,
+                    authToken = accessToken
+                )
+
+                authDeserializer.parseGetUsernameResponse(response)
+            } catch (e: Exception) {
+                throw DomainTransfer.handleException("retrieve username", e) ?: e
+            }
         }
     }
 

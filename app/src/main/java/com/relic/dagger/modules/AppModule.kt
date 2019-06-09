@@ -1,17 +1,22 @@
 package com.relic.dagger.modules
 
+import android.app.Application
+import android.arch.persistence.room.Room
 import android.content.Context
+import com.relic.data.ApplicationDB
+import com.relic.data.UserRepository
+import com.relic.data.UserRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AppModule (private val applicationContext : Context){
+class AppModule {
 
-    @Provides
     @Singleton
-    fun provideAppContext() : Context{
-        return applicationContext
+    @Provides
+    fun provideDB(app: Application) : ApplicationDB {
+        return Room.databaseBuilder(app, ApplicationDB::class.java, "relic.db").build()
     }
-
 }

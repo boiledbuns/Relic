@@ -21,13 +21,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.relic.R
-import com.relic.RelicApp
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 
-import com.relic.data.auth.AuthImpl
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.displayuser.DisplayUserFragment
@@ -37,6 +31,7 @@ import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.preference.PreferencesManagerImpl
+import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -44,25 +39,20 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : RelicActivity() {
     internal val TAG = "MAIN_ACTIVITY"
+
+    @Inject
+    lateinit var factory : MainVM.Factory
 
     private val mainVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                    .repoModule(RepoModule(this@MainActivity))
-                    .authModule(AuthModule(this@MainActivity))
-                    .utilModule(UtilModule(this@MainActivity.application))
-                    .build()
-                    .getMainVM()
-                    .create() as T
+                return factory.create() as T
             }
         }).get(MainVM::class.java)
     }
-
-    @Inject
-    internal lateinit var auth: AuthImpl
 
     private lateinit var relicGD: GestureDetectorCompat
 
@@ -83,7 +73,6 @@ class MainActivity : AppCompatActivity() {
         initializeDefaultView()
         initNavDrawer()
 
-        (application as RelicApp).appComponent.inject(this)
         bindViewModel(this@MainActivity)
     }
 

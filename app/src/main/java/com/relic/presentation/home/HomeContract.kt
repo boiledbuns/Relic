@@ -1,5 +1,3 @@
 package com.relic.presentation.home
 
-class HomeContract {
-
-}
+class HomeContract

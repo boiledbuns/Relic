@@ -23,10 +23,6 @@ import android.widget.Toast
 
 import com.relic.R
 import com.relic.presentation.main.RelicError
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.data.PostRepository
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
@@ -42,20 +38,16 @@ import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
+import javax.inject.Inject
 
 class DisplaySubFragment : RelicFragment() {
+    @Inject
+    lateinit var factory : DisplaySubVM.Factory
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent
-                        .builder()
-                        .repoModule(RepoModule(context!!))
-                        .authModule(AuthModule(context!!))
-                        .utilModule(UtilModule(activity!!.application))
-                        .build()
-                        .getDisplaySubVM()
-                        .create(PostRepository.PostSource.Subreddit(subName)) as T
+                return factory.create(PostRepository.PostSource.Subreddit(subName)) as T
             }
         }).get(DisplaySubVM::class.java)
     }
@@ -79,28 +71,26 @@ class DisplaySubFragment : RelicFragment() {
         arguments?.apply {
             subName = getString(ARG_SUBREDDIT_NAME, "")
         }
-
-        postAdapter = PostItemAdapter(displaySubVM)
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.display_sub, container, false).apply {
-            (findViewById<RecyclerView>(R.id.subPostsRecyclerView)).apply {
-                adapter = postAdapter
-                layoutManager = LinearLayoutManager(context)
-            }
-
-            initializeToolbar(findViewById(R.id.subToolbar))
-        }
+        return inflater.inflate(R.layout.display_sub, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        postAdapter = PostItemAdapter(displaySubVM)
 
+        subPostsRecyclerView.apply {
+            adapter = postAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        initializeToolbar()
         initializeOnClicks()
         attachScrollListeners()
         touchHelperCallback = PostItemsTouchHelper(this, context!!)
@@ -144,8 +134,6 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     // endregion fragment lifecycle hooks
-
-    // region fragment event hooks
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
@@ -191,8 +179,6 @@ class DisplaySubFragment : RelicFragment() {
 
         return override
     }
-
-    // endregion fragment event hooks
 
     override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
         displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
@@ -335,10 +321,10 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun initializeToolbar(toolbar: Toolbar) {
+    private fun initializeToolbar() {
         val pActivity = (activity as AppCompatActivity)
 
-        toolbar.apply {
+        (subToolbar as Toolbar).apply {
             pActivity.setSupportActionBar(this)
 
             title = subName

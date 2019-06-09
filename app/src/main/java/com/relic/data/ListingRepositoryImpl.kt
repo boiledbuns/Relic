@@ -2,22 +2,16 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.content.Context
 import android.os.AsyncTask
 
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.Volley
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.shopify.livedataktx.observe
 import kotlinx.coroutines.*
 
-import org.json.simple.parser.JSONParser
+import javax.inject.Inject
 
-class ListingRepositoryImpl(context: Context) : ListingRepository {
+class ListingRepositoryImpl @Inject constructor(
+    private val appDB: ApplicationDB
+) : ListingRepository {
     private val TAG = "LISTING_REPO"
-
-    // TODO get instance from DI
-    private val appDB = ApplicationDB.getDatabase(context)
 
     // TODO fix this. Not going to do it in this commit, but this is a terrible way to do it
     // initialize the listing key

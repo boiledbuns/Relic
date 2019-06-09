@@ -1,47 +1,24 @@
 package com.relic.dagger.modules
 
-import android.content.Context
 import com.relic.data.*
-import com.relic.network.NetworkRequestManager
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Inject
-import javax.inject.Singleton
 
+@Suppress("unused")
 @Module
-class RepoModule @Inject constructor(
-    private val applicationContext : Context
-) {
+abstract class RepoModule {
+    @Binds
+    abstract fun bindSubRepository(subRepo : SubRepositoryImpl) : SubRepository
 
-    private val networkRequestManager: NetworkRequestManager = NetworkRequestManager(applicationContext)
+    @Binds
+    abstract fun bindPostRepository(postRepo : PostRepositoryImpl) : PostRepository
 
-    @Provides
-    @Singleton
-    fun provideSubRepository() : SubRepository {
-        return SubRepositoryImpl(applicationContext, networkRequestManager)
-    }
+    @Binds
+    abstract fun bindCommentRepository(commentRepo : CommentRepositoryImpl) : CommentRepository
 
-    @Provides
-    @Singleton
-    fun providePostRepository() : PostRepository {
-        return PostRepositoryImpl(applicationContext, networkRequestManager)
-    }
+    @Binds
+    abstract fun bindListingRepository(listingRepo : ListingRepositoryImpl) : ListingRepository
 
-    @Provides
-    @Singleton
-    fun provideCommentRepository() : CommentRepository {
-        return CommentRepositoryImpl(applicationContext, networkRequestManager, provideListingRepository())
-    }
-
-    @Provides
-    @Singleton
-    fun provideListingRepository() : ListingRepository {
-        return ListingRepositoryImpl(applicationContext)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserRepository() : UserRepository {
-        return UserRepositoryImpl(applicationContext, networkRequestManager)
-    }
+    @Binds
+    abstract fun bindUserRepository(userRepo : UserRepositoryImpl) : UserRepository
 }

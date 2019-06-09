@@ -13,10 +13,12 @@ import android.widget.ImageView;
 import com.relic.R;
 import com.relic.domain.models.SubredditModel;
 import com.relic.databinding.DisplaySubInfoBinding;
+import com.relic.presentation.base.RelicBottomSheetDialog;
 import com.relic.presentation.displaysubinfo.DisplaySubInfoContract;
 import com.squareup.picasso.Picasso;
 
-public class DisplaySubInfoView extends BottomSheetDialogFragment{
+@Deprecated
+public class DisplaySubInfoView extends RelicBottomSheetDialog {
   private String TAG = "DISPLAYSUBINFO_VIEW";
 
   private DisplaySubInfoContract.ViewModel displaySubInfoVM;

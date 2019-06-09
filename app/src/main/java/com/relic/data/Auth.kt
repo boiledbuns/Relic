@@ -8,6 +8,13 @@ interface Auth {
     suspend fun refreshToken(callback: AuthenticationCallback)
 
     fun getCurrentAccountName() : LiveData<String?>
+    val url : String
+
+    interface Deserializer {
+        fun parseAuthResponse(response: String) : AuthResponseData
+        fun parseRefreshResponse(response: String) : RefreshResponseData
+        fun parseGetUsernameResponse(response: String) : String?
+    }
 }
 
 data class AuthResponseData(

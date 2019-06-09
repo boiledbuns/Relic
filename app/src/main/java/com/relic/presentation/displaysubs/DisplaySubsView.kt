@@ -18,10 +18,6 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.relic.R
-import com.relic.dagger.DaggerVMComponent
-import com.relic.dagger.modules.AuthModule
-import com.relic.dagger.modules.RepoModule
-import com.relic.dagger.modules.UtilModule
 import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.presentation.adapter.SearchItemAdapter
@@ -37,18 +33,16 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 
 import java.util.ArrayList
+import javax.inject.Inject
 
 class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
+    @Inject
+    lateinit var factory : DisplaySubsVM.Factory
+
     private val viewModel : DisplaySubsVM by lazy {
         ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return DaggerVMComponent.builder()
-                        .authModule(AuthModule(activity!!.applicationContext))
-                        .repoModule(RepoModule(activity!!.applicationContext))
-                        .utilModule(UtilModule(activity!!.application))
-                        .build()
-                        .getDisplaySubsVM()
-                        .create() as T
+                return factory.create() as T
             }
         }).get(DisplaySubsVM::class.java)
     }

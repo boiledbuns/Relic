@@ -1,6 +1,5 @@
 package com.relic.data.gateway
 
-import android.content.Context
 import android.util.Log
 
 import com.relic.data.ApplicationDB
@@ -10,11 +9,13 @@ import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class PostGatewayImpl(context: Context, private val requestManager: NetworkRequestManager) : PostGateway {
+class PostGatewayImpl @Inject constructor(
+    private val appDB : ApplicationDB,
+    private val requestManager: NetworkRequestManager
+) : PostGateway {
     var TAG = "POST_GATEWAY"
-
-    private val appDb: ApplicationDB = ApplicationDB.getDatabase(context)
 
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint
@@ -25,7 +26,7 @@ class PostGatewayImpl(context: Context, private val requestManager: NetworkReque
 
             // update the local model appropriately
             withContext(Dispatchers.IO) {
-                appDb.postDao.updateVote(fullname, voteStatus)
+                appDB.postDao.updateVote(fullname, voteStatus)
             }
         } catch (e : Exception) {
             throw DomainTransfer.handleException("vote on post", e) ?: e
@@ -42,7 +43,7 @@ class PostGatewayImpl(context: Context, private val requestManager: NetworkReque
 
             // update the local model appropriately
             withContext(Dispatchers.IO) {
-                appDb.postDao.updateSave(fullname, save)
+                appDB.postDao.updateSave(fullname, save)
             }
         } catch (e : Exception) {
             throw DomainTransfer.handleException("save post", e) ?: e
@@ -65,7 +66,7 @@ class PostGatewayImpl(context: Context, private val requestManager: NetworkReque
     override suspend fun visitPost(postFullname: String){
         Log.d(TAG, "Setting " + postFullname + "to visited")
         withContext(Dispatchers.IO) {
-            appDb.postDao.updateVisited(postFullname)
+            appDB.postDao.updateVisited(postFullname)
         }
     }
 }
