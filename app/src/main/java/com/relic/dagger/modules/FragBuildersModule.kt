@@ -2,10 +2,11 @@ package com.relic.dagger.modules
 
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.presentation.displaysub.DisplaySubInfoView
 import com.relic.presentation.displaysubs.DisplaySubsView
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
+import com.relic.presentation.editor.NewPostEditorFragment
+import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.relic.presentation.login.SignInFragment
@@ -40,6 +41,15 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributePost() : DisplayPostFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeUser() : DisplayUserFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeNewPostEditor() : NewPostEditorFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeReplyEditor() : ReplyEditorFragment
 
     @ContributesAndroidInjector
     abstract fun contributeUserPreview() : DisplayUserPreview

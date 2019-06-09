@@ -4,10 +4,8 @@ import android.app.Application
 import android.content.Context
 import com.relic.RelicApp
 import com.relic.dagger.modules.*
-import com.relic.presentation.main.MainActivity
 import dagger.BindsInstance
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 

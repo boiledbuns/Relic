@@ -11,7 +11,7 @@ import android.text.TextWatcher
 import android.view.*
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
-import kotlinx.android.synthetic.main.editor_new_post.view.*
+import kotlinx.android.synthetic.main.editor_new_post.*
 import javax.inject.Inject
 
 class NewPostEditorFragment : RelicFragment() {
@@ -43,36 +43,35 @@ class NewPostEditorFragment : RelicFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.editor_new_post, container, false).apply {
-            val pActivity = (activity as AppCompatActivity)
-
-            toolbar = reply_post_toolbar as Toolbar
-            toolbar.title = subName
-
-            pActivity.setSupportActionBar(toolbar)
-
-            editorNewPostTitle.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(editable: Editable?) {
-                    newPostEditorVM.onTitleChanged(editable.toString())
-                }
-
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
-
-            editorNewPostBody.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(editable: Editable?) {
-                    newPostEditorVM.onBodyChanged(editable.toString())
-                }
-
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
-        }
+        return inflater.inflate(R.layout.editor_new_post, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val pActivity = (activity as AppCompatActivity)
+
+        toolbar = reply_post_toolbar as Toolbar
+        toolbar.title = subName
+        pActivity.setSupportActionBar(toolbar)
+
+        editorNewPostTitle.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(editable: Editable?) {
+                newPostEditorVM.onTitleChanged(editable.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        editorNewPostBody.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(editable: Editable?) {
+                newPostEditorVM.onBodyChanged(editable.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         toolbar.apply {
             setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel)

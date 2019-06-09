@@ -51,8 +51,8 @@ class ReplyEditorFragment : RelicFragment() {
         private const val PARENT_ARG = "arg_parent_name"
         private const val IS_POST_ARG = "arg_post_name"
 
-        fun create(parent: String, isPost : Boolean) : NewPostEditorFragment {
-            return NewPostEditorFragment().apply {
+        fun create(parent: String, isPost : Boolean) : ReplyEditorFragment {
+            return ReplyEditorFragment().apply {
                 arguments = Bundle().apply {
                     putString(PARENT_ARG, parent)
                     putBoolean(IS_POST_ARG, isPost)

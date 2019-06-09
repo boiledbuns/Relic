@@ -7,12 +7,14 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
 import com.relic.RelicApp
-import com.relic.dagger.modules.AppModule
-import com.relic.dagger.modules.RepoModule
 import dagger.android.AndroidInjection
 import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.HasSupportFragmentInjector
 
+/**
+ * This object basically controls how injections are handled for all activities & fragments
+ * in the app. It hooks onto lifecycle callbacks to perform injections.
+ */
 object AppInjector {
     lateinit var appComponent : AppComponent
 
@@ -28,7 +30,7 @@ object AppInjector {
     }
 
     /**
-     * register lifecycle callbaks for an app
+     * register lifecycle callbacks for an activity
      * whenever there occur, our callbacks are triggered
      */
     private fun registerActivityLifeCycleCallbacks(relic : RelicApp) {
@@ -54,11 +56,11 @@ object AppInjector {
             AndroidInjection.inject(activity)
         }
 
-        // need to also register callbacks for fragments
+        // need to also register callbacks for an injectable fragment
         if (activity is FragmentActivity) {
             activity.supportFragmentManager.registerFragmentLifecycleCallbacks(object :FragmentManager.FragmentLifecycleCallbacks() {
                 override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-                    if (f is Injectable) {
+                    if (f is RelicInjectable) {
                         AndroidSupportInjection.inject(f)
                     }
                 }
