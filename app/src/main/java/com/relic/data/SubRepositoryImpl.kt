@@ -1,7 +1,6 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
-import android.content.Context
 import android.util.Log
 
 import com.relic.data.dao.SubredditDao
@@ -12,13 +11,14 @@ import com.relic.domain.models.SubredditModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
 
+@Reusable
 class SubRepositoryImpl @Inject constructor(
-    private val context: Context,
     private val requestManager: NetworkRequestManager,
     private val appDb : ApplicationDB,
     private val subDeserializer: Contract.SubDeserializer

@@ -3,10 +3,12 @@ package com.relic.data.auth
 import com.relic.data.Auth
 import com.relic.data.AuthResponseData
 import com.relic.data.RefreshResponseData
+import dagger.Reusable
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import javax.inject.Inject
 
+@Reusable
 class AuthDeserializerImpl @Inject constructor() : Auth.Deserializer {
     private val TAG = "AUTH_DESERIALIZER"
 

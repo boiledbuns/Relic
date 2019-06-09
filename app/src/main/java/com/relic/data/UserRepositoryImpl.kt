@@ -9,9 +9,11 @@ import com.relic.domain.models.UserModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import dagger.Reusable
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+@Reusable
 class UserRepositoryImpl @Inject constructor(
     private val appContext: Context,
     private val requestManager: NetworkRequestManager,

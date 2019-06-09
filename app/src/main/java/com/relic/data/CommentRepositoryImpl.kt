@@ -11,9 +11,11 @@ import com.relic.data.entities.ListingEntity
 import com.relic.domain.models.CommentModel
 import com.relic.data.repository.RepoConstants
 import com.relic.network.request.RelicOAuthRequest
+import dagger.Reusable
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+@Reusable
 class CommentRepositoryImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
     private val appDB : ApplicationDB,

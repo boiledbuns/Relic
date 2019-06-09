@@ -28,10 +28,18 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub_search.*
 import javax.inject.Inject
 
-class DisplaySubSearch : RelicFragment() {
+class SubSearchFragment : RelicFragment() {
     @Inject
     lateinit var factory : DisplaySubVM.Factory
-    private lateinit var subSearchVM : DisplaySubVM
+    private val subSearchVM : DisplaySubVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(source) as T
+            }
+        }).get(DisplaySubVM::class.java)
+    }
+
+    private lateinit var source : PostRepository.PostSource
     private lateinit var postAdapter: PostItemAdapter
 
     private var scrollLocked = true
@@ -39,31 +47,23 @@ class DisplaySubSearch : RelicFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val source = arguments?.getParcelable(ARG_SOURCE) as PostRepository.PostSource
-
-        subSearchVM = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(source) as T
-            }
-        }).get(DisplaySubVM::class.java)
-
-        postAdapter = PostItemAdapter(subSearchVM)
+        source = arguments?.getParcelable(ARG_SOURCE) as PostRepository.PostSource
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_sub_search, container, false).apply {
-            (findViewById<RecyclerView>(R.id.subSearchRV)).apply {
-                adapter = postAdapter
-                layoutManager = LinearLayoutManager(context)
-            }
-
-            initSearchEditText((findViewById(R.id.subSearch)))
-        }
+        return inflater.inflate(R.layout.display_sub_search, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        postAdapter = PostItemAdapter(subSearchVM)
+        subSearchRV.apply {
+            adapter = postAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        initSearchEditText(subSearch)
         subSearch.requestFocus()
 
         getSystemService(requireContext(), InputMethodManager::class.java)
@@ -146,11 +146,11 @@ class DisplaySubSearch : RelicFragment() {
     companion object {
         val ARG_SOURCE = "post_source"
 
-        fun create(source  : PostRepository.PostSource) : DisplaySubSearch {
+        fun create(source  : PostRepository.PostSource) : SubSearchFragment {
             val bundle = Bundle()
             bundle.putParcelable(ARG_SOURCE, source)
 
-            return DisplaySubSearch().apply {
+            return SubSearchFragment().apply {
                 arguments = bundle
             }
         }

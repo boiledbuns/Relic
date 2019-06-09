@@ -15,6 +15,7 @@ import com.relic.data.entities.TokenStoreEntity
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.AuthenticationCallback
+import dagger.Reusable
 import kotlinx.coroutines.*
 
 import java.util.Calendar
@@ -22,9 +23,7 @@ import java.util.Date
 import java.util.HashMap
 import javax.inject.Inject
 
-/**
- * Singleton instance of the authenticator because we should be able to
- */
+@Reusable
 class AuthImpl @Inject constructor(
     private val appContext: Application,
     private val requestManager: NetworkRequestManager,

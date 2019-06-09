@@ -139,7 +139,7 @@ class DisplaySubFragment : RelicFragment() {
         var override = true
         when (item?.itemId) {
             R.id.display_sub_searchitem -> {
-                val searchFrag = DisplaySubSearch.create(PostRepository.PostSource.Subreddit(subName))
+                val searchFrag = SubSearchFragment.create(PostRepository.PostSource.Subreddit(subName))
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()

@@ -2,9 +2,11 @@ package com.relic.dagger.modules
 
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
+import com.relic.presentation.displaysub.SubSearchFragment
 import com.relic.presentation.displaysubs.DisplaySubsView
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
+import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
@@ -46,6 +48,9 @@ abstract class FragBuildersModule {
     abstract fun contributeUser() : DisplayUserFragment
 
     @ContributesAndroidInjector
+    abstract fun contributeUserTabFragment() : PostsTabFragment
+
+    @ContributesAndroidInjector
     abstract fun contributeNewPostEditor() : NewPostEditorFragment
 
     @ContributesAndroidInjector
@@ -56,6 +61,9 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeSubInfo() : SubInfoBottomSheetDialog
+
+    @ContributesAndroidInjector
+    abstract fun contributeSubSearch() : SubSearchFragment
 
     // endregion main ui
 

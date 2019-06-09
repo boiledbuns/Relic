@@ -17,6 +17,7 @@ import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.request.RelicRequestError
+import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ import javax.inject.Inject
  *
  *  As a result, the retrieval methods are now suspend functions
  */
+@Reusable
 class PostRepositoryImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
     private val appDB: ApplicationDB,

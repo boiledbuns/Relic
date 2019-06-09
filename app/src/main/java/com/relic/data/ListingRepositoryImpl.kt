@@ -3,11 +3,13 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.os.AsyncTask
+import dagger.Reusable
 
 import kotlinx.coroutines.*
 
 import javax.inject.Inject
 
+@Reusable
 class ListingRepositoryImpl @Inject constructor(
     private val appDB: ApplicationDB
 ) : ListingRepository {
