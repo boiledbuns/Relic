@@ -100,6 +100,7 @@ interface PostRepository {
      * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
      */
     sealed class PostSource : Parcelable {
+
         @Parcelize
         object Frontpage : PostSource()
 

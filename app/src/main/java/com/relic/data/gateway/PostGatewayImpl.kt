@@ -1,25 +1,36 @@
 package com.relic.data.gateway
 
 import android.util.Log
+import com.relic.api.response.Listing
 
 import com.relic.data.ApplicationDB
 import com.relic.data.DomainTransfer
+import com.relic.data.PostRepository
+import com.relic.data.deserializer.JPostModel
 import com.relic.data.repository.RepoConstants
+import com.relic.data.repository.RepoConstants.ENDPOINT
+import com.relic.domain.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostGatewayImpl @Inject constructor(
     private val appDB : ApplicationDB,
-    private val requestManager: NetworkRequestManager
+    private val requestManager: NetworkRequestManager,
+    private val moshi : Moshi
 ) : PostGateway {
     var TAG = "POST_GATEWAY"
 
+    private val type = Types.newParameterizedType(Listing::class.java, JPostModel::class.java)
+    private val listingAdapter = moshi.adapter<Listing<JPostModel>>(type)
+
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint
-        var ending = RepoConstants.ENDPOINT + "api/vote?id=" + fullname + "&dir=$voteStatus"
+        val ending = RepoConstants.ENDPOINT + "api/vote?id=" + fullname + "&dir=$voteStatus"
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, ending)
             Log.d(TAG, "Success voting on post : $fullname to $voteStatus")
@@ -67,6 +78,31 @@ class PostGatewayImpl @Inject constructor(
         Log.d(TAG, "Setting " + postFullname + "to visited")
         withContext(Dispatchers.IO) {
             appDB.postDao.updateVisited(postFullname)
+        }
+    }
+
+    override suspend fun retrievePosts(
+        source: PostRepository.PostSource,
+        listingAfter: String?
+    ) : List<PostModel> {
+        // change the api endpoint to access the next post listing
+        val ending = when (source) {
+            is PostRepository.PostSource.Subreddit -> "r/${source.subredditName}"
+            is PostRepository.PostSource.User -> "user/${source.username}/${source.retrievalOption.name.toLowerCase()}"
+            else -> ""
+        }
+
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = "$ENDPOINT$ending?after=$listingAfter"
+            )
+
+            val listing = listingAdapter.fromJson(response)
+            return listing!!.data.children!!.mapNotNull { it.data }
+
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }
     }
 }

@@ -23,7 +23,8 @@ import javax.inject.Inject
 
 class PostDeserializerImpl @Inject constructor(
     private val appDB : ApplicationDB,
-    private val commentDeserializer: Contract.CommentDeserializer
+    private val commentDeserializer: Contract.CommentDeserializer,
+    private val moshi : Moshi
 ) : Contract.PostDeserializer {
 
     private val TYPE_POST = "t3"
@@ -31,7 +32,6 @@ class PostDeserializerImpl @Inject constructor(
 
     private val jsonParser: JSONParser = JSONParser()
     private val gson = GsonBuilder().create()
-    private val moshi = Moshi.Builder().build()
 
     // initialize the date formatter and date for "now"
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)

@@ -1,5 +1,8 @@
 package com.relic.data.gateway
 
+import com.relic.data.PostRepository
+import com.relic.domain.models.PostModel
+
 interface PostGateway {
     suspend fun voteOnPost(fullname: String, voteStatus: Int)
 
@@ -12,4 +15,9 @@ interface PostGateway {
     suspend fun reportPosts(fullname: String, report: Boolean)
 
     suspend fun visitPost(postFullname: String)
+
+    suspend fun retrievePosts(
+        source: PostRepository.PostSource,
+        listingAfter: String? = null
+    ) : List<PostModel>
 }

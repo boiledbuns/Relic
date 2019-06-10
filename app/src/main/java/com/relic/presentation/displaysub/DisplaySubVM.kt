@@ -64,6 +64,11 @@ open class DisplaySubVM (
     override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
+        // TESTING
+        launch (Dispatchers.Main) {
+            postGateway.retrievePosts(source = postSource)
+        }
+        // TESTING
         retrieveMorePosts(true)
 
         // observe the list of posts stored locally
