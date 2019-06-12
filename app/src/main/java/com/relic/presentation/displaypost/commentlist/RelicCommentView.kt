@@ -48,7 +48,7 @@ class RelicCommentView (
         commentAuthorView.text = commentModel.author
         commentCreatedView.text = commentModel.created
 
-        commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
+//        commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
         commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
 
         if (commentModel.isSubmitter) {

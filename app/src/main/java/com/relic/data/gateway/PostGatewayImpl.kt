@@ -26,8 +26,8 @@ class PostGatewayImpl @Inject constructor(
 ) : PostGateway {
     var TAG = "POST_GATEWAY"
 
-    private val type = Types.newParameterizedType(Listing::class.java, PostModel::class.java)
-    private val listingAdapter = moshi.adapter<Listing<PostModel>>(type)
+    private val type = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
+    private val listingAdapter = moshi.adapter<Listing<ListingItem>>(type)
 
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint

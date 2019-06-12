@@ -1,13 +1,14 @@
 package com.relic.domain.models
 
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-//@JsonClass(generateAdapter = true)
+@JsonClass(generateAdapter = true)
 open class ListingItem {
 
     // the id is the "full name" of an item
-    open var fullName = ""
-    lateinit var author: String
+    @Json(name = "name") open var fullName = ""
+    var author: String = ""
 
     var visited: Boolean = false
     var userUpvoted: Int = 0
