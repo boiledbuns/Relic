@@ -30,8 +30,11 @@ class CommentModel : ListingItem() {
     var replyCount: Int = 0
     var replyLink: String? = null
 
-    @Json(name = "link_title") var linkTitle: String? = null
-    @Json(name = "link_author") var linkAuthor: String? = null
+    @Json(name = "link_title")
+    var linkTitle: String? = null
+
+    @Json(name = "link_author")
+    var linkAuthor: String? = null
 
     var position: Float = 0.toFloat()
 
@@ -39,7 +42,7 @@ class CommentModel : ListingItem() {
         get() = author == ""
 
     override var fullName: String
-        get() = "t1_$id"
+        get() = if (id == null) "" else "t1_$id"
         set(value: String) {
             super.fullName = value
         }
