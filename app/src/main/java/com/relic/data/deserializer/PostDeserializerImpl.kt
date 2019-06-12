@@ -149,7 +149,7 @@ class PostDeserializerImpl @Inject constructor(
     }
 
     private fun mapToPostModel(child : JSONObject) : PostModel? {
-        return moshi.adapter(JPostModel::class.java)
+        return moshi.adapter(PostModel::class.java)
             .fromJson((child["data"] as JSONObject).toString())
     }
 

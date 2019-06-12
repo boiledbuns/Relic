@@ -66,7 +66,7 @@ open class DisplaySubVM (
     init {
         // TESTING
         launch (Dispatchers.Main) {
-            postGateway.retrievePosts(source = postSource)
+            postGateway.retrieveListingItems(source = postSource)
         }
         // TESTING
         retrieveMorePosts(true)

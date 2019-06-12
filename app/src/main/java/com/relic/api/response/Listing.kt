@@ -8,8 +8,3 @@ data class Listing <T> (
     val data : Data<T>
 )
 
-//@JsonClass(generateAdapter = true)
-//data class Listing (
-//    @Json(name = "kind") val kind : String
-////    @Json(name = "data") val data : Data
-//)

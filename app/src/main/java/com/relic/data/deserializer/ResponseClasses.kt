@@ -12,8 +12,3 @@ data class Data (
     @field:Json(name = "children") val data : List<PostModel>,
     @field:Json(name = "after") val after : String
 )
-
-@JsonClass(generateAdapter = true)
-data class JPostModel(
-    val test : String = ""
-) : PostModel()

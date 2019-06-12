@@ -51,15 +51,13 @@ class DisplayUserVM(
     private var _navigationLiveData = MutableLiveData<RelicEvent<SubNavigationData>>()
     var navigationLiveData : LiveData<RelicEvent<SubNavigationData>> = _navigationLiveData
 
+    // dictionary mapping a tab to its associated livedata
+    // items should only be added if the tab is being accessed for the first time
     private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
     private var currentSortingType = mutableMapOf<UserTab, PostRepository.SortType>()
     private var currentSortingScope = mutableMapOf<UserTab, PostRepository.SortScope>()
     private lateinit var currentTab : UserTab
-
-    // used to store the posts and comments since they are retrieved separately before converging
-    private var postLists = mutableMapOf<UserTab, List<PostModel>>()
-    private var commentLists = mutableMapOf<UserTab, List<CommentModel>>()
 
     init {
         launch(Dispatchers.Main) {
@@ -68,58 +66,18 @@ class DisplayUserVM(
     }
 
     fun getTabPostsLiveData(tab : UserTab) : LiveData<List<ListingItem>> {
-        launch(Dispatchers.Main) {
-            _userLiveData.postValue(userRepo.retrieveUser(username))
-        }
-        var tabLiveData = postsLiveData[tab]
-        val userRetrievalOption = toRetrievalOption(tab)
+        if (postsLiveData[tab] == null) {
+            // create a new livedata if it doesn't already exist
+            postsLiveData[tab] = MediatorLiveData()
 
-        if (tabLiveData == null) {
             // request new posts if this is the first time the tab is being created
             // TODO need to separate the process of deleting old posts from retrieving new posts
             // TODO to prevent the old posts being deleted --> internet connection unavailable --> so new posts
             requestPosts(tab = tab, refresh = true)
-
-            val postSource = postRepo.getPosts(PostRepository.PostSource.User(username, userRetrievalOption))
-            val commentSource = commentRepo.getComments(userRetrievalOption)
-
-            // create a new livedata if it doesn't already exist
-            tabLiveData = MediatorLiveData<List<ListingItem>>().apply {
-                // TODO add a diff util
-                addSource(postSource) { newList ->
-                    if (newList!= null && newList.isNotEmpty()) {
-                        postLists[tab] = newList
-                        // TODO move this logic to repository. We shouldn't care about this
-                        // TODO tbh consider moving the entire convergence method outside of vm
-                        // only post source if all posts and comments are in loaded in order
-                        convergeSources(postLists[tab], commentLists[tab], tab).let { converged ->
-                            if (extractTabPosition(converged.last(), tab) == converged.size - 1) {
-                                this.postValue(converged)
-                            }
-                        }
-                    }
-                }
-                addSource(commentSource) { newList ->
-                    if (newList!= null && newList.isNotEmpty()) {
-                        commentLists[tab] = newList
-                        // only post source if all posts and comments are in loaded in order
-                        convergeSources(postLists[tab], commentLists[tab], tab).let { converged ->
-                            if (extractTabPosition(converged.last(), tab) == converged.size - 1) {
-                                this.postValue(converged)
-                            }
-                        }
-                    }
-                }
-            }
-            postsLiveData[tab] = tabLiveData
         }
-
-        return tabLiveData
+        return postsLiveData[tab]!!
     }
 
-    /**
-     *
-     */
     fun requestPosts(tab : UserTab, refresh : Boolean) {
         // subscribe to the appropriate livedata based on tab selected
         val userRetrievalOption = toRetrievalOption(tab)
@@ -129,6 +87,12 @@ class DisplayUserVM(
         val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
 
         launch(Dispatchers.Main) {
+
+            val listing = postGateway.retrieveListingItems(postSource)
+            listing.data.children?.let { items ->
+                postsLiveData[tab]!!.postValue(items)
+            }
+
             if (refresh) {
                 runBlocking { postRepo.clearAllPostsFromSource(postSource) }
                 postRepo.retrieveSortedPosts(postSource, type, scope)

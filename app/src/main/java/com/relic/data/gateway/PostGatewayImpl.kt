@@ -6,9 +6,10 @@ import com.relic.api.response.Listing
 import com.relic.data.ApplicationDB
 import com.relic.data.DomainTransfer
 import com.relic.data.PostRepository
-import com.relic.data.deserializer.JPostModel
 import com.relic.data.repository.RepoConstants
 import com.relic.data.repository.RepoConstants.ENDPOINT
+import com.relic.data.repository.RepoException
+import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
@@ -25,8 +26,8 @@ class PostGatewayImpl @Inject constructor(
 ) : PostGateway {
     var TAG = "POST_GATEWAY"
 
-    private val type = Types.newParameterizedType(Listing::class.java, JPostModel::class.java)
-    private val listingAdapter = moshi.adapter<Listing<JPostModel>>(type)
+    private val type = Types.newParameterizedType(Listing::class.java, PostModel::class.java)
+    private val listingAdapter = moshi.adapter<Listing<PostModel>>(type)
 
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint
@@ -81,10 +82,10 @@ class PostGatewayImpl @Inject constructor(
         }
     }
 
-    override suspend fun retrievePosts(
+    override suspend fun retrieveListingItems(
         source: PostRepository.PostSource,
         listingAfter: String?
-    ) : List<PostModel> {
+    ) : Listing<out ListingItem> {
         // change the api endpoint to access the next post listing
         val ending = when (source) {
             is PostRepository.PostSource.Subreddit -> "r/${source.subredditName}"
@@ -97,10 +98,9 @@ class PostGatewayImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = "$ENDPOINT$ending?after=$listingAfter"
             )
+            Log.d(TAG, "listing items $response")
 
-            val listing = listingAdapter.fromJson(response)
-            return listing!!.data.children!!.mapNotNull { it.data }
-
+            return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve more posts", null)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }

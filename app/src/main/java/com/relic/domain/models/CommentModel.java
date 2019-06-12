@@ -1,5 +1,8 @@
 package com.relic.domain.models;
 
+import com.squareup.moshi.JsonClass;
+
+//@JsonClass(generateAdapter = true)
 public class CommentModel extends ListingItem {
     public static int UPVOTE = 1;
     public static int DOWNVOTE = -1;

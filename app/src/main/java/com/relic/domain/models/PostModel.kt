@@ -1,9 +1,12 @@
 package com.relic.domain.models
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 open class PostModel : ListingItem() {
 
-    lateinit var title: String
-    lateinit var created: String
+    var title: String = ""
+    var created: String = ""
 
     var selftext: String? = null
     var linkFlair: String? = null

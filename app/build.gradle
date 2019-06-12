@@ -128,6 +128,8 @@ dependencies {
 
     kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshi_ver")
     implementation("com.squareup.moshi:moshi:$moshi_ver")
+    implementation("com.squareup.moshi:moshi-adapters:$moshi_ver")
+
 
     implementation "com.shopify:livedata-ktx:$shopify_livedata_ver"
 

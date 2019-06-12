@@ -1,5 +1,8 @@
 package com.relic.domain.models
 
+import com.squareup.moshi.JsonClass
+
+//@JsonClass(generateAdapter = true)
 open class ListingItem {
 
     // the id is the "full name" of an item

@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 class Data <T> {
     var modhash : String? = null
     var dist : String? = null
-    var children : List<ChildrenData<T>>? = null
+    var children : List<T>? = null
 }

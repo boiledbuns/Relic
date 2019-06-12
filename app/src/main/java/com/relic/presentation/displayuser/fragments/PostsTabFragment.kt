@@ -20,18 +20,19 @@ import kotlinx.android.synthetic.main.display_user_submissions.*
 import kotlinx.android.synthetic.main.display_user_submissions.view.*
 
 class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate {
-    private lateinit var postsTabVM : DisplayUserVM
+
+    private val postsTabVM by lazy {
+        ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
+    }
+
     private lateinit var selectedUserTab : UserTab
 
     private lateinit var userPostsAdapter : ListingItemAdapter
     private var scrollLocked: Boolean = false
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        postsTabVM = ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
-
-        userPostsAdapter = ListingItemAdapter(postsTabVM)
 
         arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
@@ -39,19 +40,19 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_user_submissions, container, false).apply {
-            userTabRecyclerView.apply {
-                adapter = userPostsAdapter
-                layoutManager = LinearLayoutManager(context)
-            }
-            userTabSwipeRefreshLayout.isRefreshing = true
-        }
+        return inflater.inflate(R.layout.display_user_submissions, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bindViewModel(viewLifecycleOwner)
+        userPostsAdapter = ListingItemAdapter(postsTabVM)
+        userTabRecyclerView.apply {
+            adapter = userPostsAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+        userTabSwipeRefreshLayout.isRefreshing = true
+
         attachScrollListeners()
     }
 
