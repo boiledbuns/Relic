@@ -105,4 +105,6 @@ class PostGatewayImpl @Inject constructor(
             throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }
     }
+
+    
 }

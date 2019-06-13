@@ -14,13 +14,11 @@ import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.presentation.util.RelicEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -57,6 +55,8 @@ class DisplayUserVM(
 
     private var currentSortingType = mutableMapOf<UserTab, PostRepository.SortType>()
     private var currentSortingScope = mutableMapOf<UserTab, PostRepository.SortScope>()
+    private var currentAfterValues = mutableMapOf<UserTab, String?>()
+
     private lateinit var currentTab : UserTab
 
     init {
@@ -87,26 +87,26 @@ class DisplayUserVM(
         val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
 
         launch(Dispatchers.Main) {
-
-            val listing = postGateway.retrieveListingItems(postSource)
-            listing.data.children?.let { items ->
-                postsLiveData[tab]!!.postValue(items)
-            }
-
-            if (refresh) {
-                runBlocking { postRepo.clearAllPostsFromSource(postSource) }
-                postRepo.retrieveSortedPosts(postSource, type, scope)
+            val listing = if (refresh) {
+                postsLiveData[tab]!!.postValue(emptyList())
+                postGateway.retrieveListingItems(postSource)
+//                runBlocking { postRepo.clearAllPostsFromSource(postSource) }
+//                postRepo.retrieveSortedPosts(postSource, type, scope)
             } else {
-                // not a fan of this design, because it requires the viewmodel to be aware of the
-                // "key" being used to store the "after" value which is an implementation detail.
-                // TODO consider refactoring later, for now be consistent
-                postRepo.getNextPostingVal(
-                    postSource = postSource,
-                    callback = RetrieveNextListingCallback { key ->
-                        launch { postRepo.retrieveMorePosts(postSource, key) }
-                    }
-                )
+                postGateway.retrieveListingItems(postSource, listingAfter = currentAfterValues[tab])
             }
+
+            Log.d(TAG, "listing after ${listing.data.after}")
+            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
+            listing.data.children?.let { items ->
+                val currentList = postsLiveData[tab]!!.value ?: emptyList()
+                postsLiveData[tab]!!.postValue(currentList.plus(items))
+
+                // only update the "after" val for this tab if successful
+                currentAfterValues[tab] = listing.data.after
+            }
+
+            // TODO based on user preferences -> save data offline
         }
     }
 
