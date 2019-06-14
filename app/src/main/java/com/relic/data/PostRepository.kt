@@ -2,8 +2,10 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.os.Parcelable
+import com.relic.api.response.Listing
 
 import com.relic.data.gateway.PostGateway
+import com.relic.domain.models.ListingItem
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.network.request.RelicRequestError
@@ -18,11 +20,35 @@ interface PostRepository {
     fun getPosts(postSource: PostSource): LiveData<List<PostModel>>
 
     /**
+     * clears all current posts for this subreddit and retrieves new ones based on the sorting
+     * method specified
+     * @param sortType
+     * @param sortScope
+     */
+    @Throws(RelicRequestError::class)
+    suspend fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
+
+    /**
      * Retrieves posts for a subreddit
      * @param postSource origin of the post
      * @param listingAfter after value associated with the listing of the current set of posts
      */
     suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
+
+    /**
+     * this method is used specifically to retrieve listings that can have both post and comments.
+     * currently, this is only used when displaying users.
+     */
+    suspend fun retrieveUserListing(
+        source: PostRepository.PostSource.User,
+        sortType: SortType,
+        sortScope: SortScope
+    ) : Listing<out ListingItem>
+
+    suspend fun retrieveNextListing(
+        source: PostRepository.PostSource,
+        after : String
+    ) : Listing<out ListingItem>
 
     /**
      * Retrieves the "after" values to be used for the next post listing
@@ -47,19 +73,6 @@ interface PostRepository {
         subredditName: String,
         postFullName: String,
         postSource: PostSource
-    )
-
-    /**
-     * clears all current posts for this subreddit and retrieves new ones based on the sorting
-     * method specified
-     * @param sortType
-     * @param sortScope
-     */
-    @Throws(RelicRequestError::class)
-    suspend fun retrieveSortedPosts(
-        postSource: PostSource,
-        sortType: SortType,
-        sortScope: SortScope
     )
 
     suspend fun searchSubPosts(

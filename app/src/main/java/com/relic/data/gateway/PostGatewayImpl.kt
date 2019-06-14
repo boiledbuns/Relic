@@ -1,20 +1,13 @@
 package com.relic.data.gateway
 
 import android.util.Log
-import com.relic.api.response.Listing
 
 import com.relic.data.ApplicationDB
 import com.relic.data.DomainTransfer
-import com.relic.data.PostRepository
 import com.relic.data.repository.RepoConstants
-import com.relic.data.repository.RepoConstants.ENDPOINT
-import com.relic.data.repository.RepoException
-import com.relic.domain.models.ListingItem
-import com.relic.domain.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -25,9 +18,6 @@ class PostGatewayImpl @Inject constructor(
     private val moshi : Moshi
 ) : PostGateway {
     var TAG = "POST_GATEWAY"
-
-    private val type = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
-    private val listingAdapter = moshi.adapter<Listing<ListingItem>>(type)
 
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint
@@ -81,30 +71,4 @@ class PostGatewayImpl @Inject constructor(
             appDB.postDao.updateVisited(postFullname)
         }
     }
-
-    override suspend fun retrieveListingItems(
-        source: PostRepository.PostSource,
-        listingAfter: String?
-    ) : Listing<out ListingItem> {
-        // change the api endpoint to access the next post listing
-        val ending = when (source) {
-            is PostRepository.PostSource.Subreddit -> "r/${source.subredditName}"
-            is PostRepository.PostSource.User -> "user/${source.username}/${source.retrievalOption.name.toLowerCase()}"
-            else -> ""
-        }
-
-        try {
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = "$ENDPOINT$ending?after=$listingAfter"
-            )
-            Log.d(TAG, "listing items $response")
-
-            return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve more posts", null)
-        } catch (e: Exception) {
-            throw DomainTransfer.handleException("retrieve more posts", e) ?: e
-        }
-    }
-
-    
 }

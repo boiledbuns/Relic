@@ -2,21 +2,22 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.content.Context
 import android.util.Log
+import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
 
 import com.relic.data.deserializer.ParsedPostsData
-import com.relic.data.deserializer.PostDeserializerImpl
 import com.relic.data.entities.PostEntity
 import com.relic.network.NetworkRequestManager
-import com.relic.data.gateway.PostGateway
-import com.relic.data.gateway.PostGatewayImpl
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
+import com.relic.data.repository.RepoException
+import com.relic.domain.models.ListingItem
 import com.relic.network.request.RelicRequestError
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -51,7 +52,8 @@ import javax.inject.Inject
 class PostRepositoryImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
     private val appDB: ApplicationDB,
-    private val postDeserializer : Contract.PostDeserializer
+    private val postDeserializer : Contract.PostDeserializer,
+    moshi: Moshi
 ) : PostRepository {
     private val TAG = "POST_REPO"
 
@@ -67,6 +69,9 @@ class PostRepositoryImpl @Inject constructor(
         PostRepository.SortType.RISING,
         PostRepository.SortType.TOP
     )
+
+    private val type = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
+    private val listingAdapter = moshi.adapter<Listing<ListingItem>>(type)
 
     // region interface methods
 
@@ -89,34 +94,6 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun retrieveMorePosts(
-        postSource: PostRepository.PostSource,
-        listingAfter: String
-    ) {
-        // change the api endpoint to access the next post listing
-        val ending = when (postSource) {
-            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
-            is PostRepository.PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
-            else -> ""
-        }
-
-        Log.d(TAG, "retrieve more posts : api url : $ENDPOINT$ending?after=$listingAfter")
-        try {
-            val response = requestManager.processRequest(
-                method = RelicOAuthRequest.GET,
-                url = "$ENDPOINT$ending?after=$listingAfter"
-            )
-            Log.d(TAG, "more posts $response")
-
-            val listingKey = getListingKey(postSource)
-            val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
-
-            insertParsedPosts(parsedData)
-        } catch (e: Exception) {
-            throw DomainTransfer.handleException("retrieve more posts", e) ?: e
-        }
-    }
-
     override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
         val key = getListingKey(postSource)
 
@@ -129,6 +106,53 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun getPost(postFullName: String): LiveData<PostModel> {
         return appDB.postDao.getSinglePost(postFullName)
+    }
+
+    override suspend fun retrieveUserListing(
+        source: PostRepository.PostSource.User,
+        sortType: PostRepository.SortType,
+        sortScope: PostRepository.SortScope
+    ): Listing<out ListingItem> {
+        val ending = "user/${source.username}/${source.retrievalOption.name.toLowerCase()}" + when (sortType) {
+            PostRepository.SortType.HOT -> "?sort=${sortType.name.toLowerCase()}"
+            PostRepository.SortType.TOP, PostRepository.SortType.CONTROVERSIAL -> {
+                "?sort=${sortType.name.toLowerCase()}&t=${sortScope.name.toLowerCase()}"
+            }
+            // default (is "new", no need to manually specify it)
+            else -> ""
+        }
+        Log.d(TAG, "listing items sort $ENDPOINT$ending")
+
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = "$ENDPOINT$ending"
+            )
+            Log.d(TAG, "listing items $response")
+
+            return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve user listing", null)
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve user listing", e) ?: e
+        }
+    }
+
+    override suspend fun retrieveNextListing(source: PostRepository.PostSource, after: String): Listing<out ListingItem> {
+        val ending = when (source) {
+            is PostRepository.PostSource.Subreddit -> "r/${source.subredditName}"
+            is PostRepository.PostSource.User -> "user/${source.username}/${source.retrievalOption.name.toLowerCase()}"
+            else -> ""
+        }
+
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = "$ENDPOINT$ending?after=$after"
+            )
+            Log.d(TAG, "listing items $response")
+            return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve next listing", null)
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve next listing", e) ?: e
+        }
     }
 
     @Throws(RelicRequestError::class)
@@ -173,8 +197,36 @@ class PostRepositoryImpl @Inject constructor(
                 clear.join()
                 insertParsedPosts(parsedData)
             } catch (e: Exception) {
-                throw DomainTransfer.handleException("retrieve account", e) ?: e
+                throw DomainTransfer.handleException("retrieve sorted posts", e) ?: e
             }
+        }
+    }
+
+    override suspend fun retrieveMorePosts(
+        postSource: PostRepository.PostSource,
+        listingAfter: String
+    ) {
+        // change the api endpoint to access the next post listing
+        val ending = when (postSource) {
+            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
+            is PostRepository.PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
+            else -> ""
+        }
+
+        Log.d(TAG, "retrieve more posts : api url : $ENDPOINT$ending?after=$listingAfter")
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = "$ENDPOINT$ending?after=$listingAfter"
+            )
+            Log.d(TAG, "more posts $response")
+
+            val listingKey = getListingKey(postSource)
+            val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
+
+            insertParsedPosts(parsedData)
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }
     }
 

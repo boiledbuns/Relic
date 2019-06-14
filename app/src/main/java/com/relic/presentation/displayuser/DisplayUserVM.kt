@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.relic.api.response.Listing
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
@@ -83,30 +84,43 @@ class DisplayUserVM(
         val userRetrievalOption = toRetrievalOption(tab)
         val postSource = PostRepository.PostSource.User(username, userRetrievalOption)
 
-        val type = currentSortingType[tab] ?: PostRepository.SortType.DEFAULT
-        val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
-
         launch(Dispatchers.Main) {
             val listing = if (refresh) {
+                val type = currentSortingType[tab] ?: PostRepository.SortType.DEFAULT
+                val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
+
                 postsLiveData[tab]!!.postValue(emptyList())
-                postGateway.retrieveListingItems(postSource)
-//                runBlocking { postRepo.clearAllPostsFromSource(postSource) }
-//                postRepo.retrieveSortedPosts(postSource, type, scope)
+                postRepo.retrieveUserListing(postSource, type, scope)
             } else {
-                postGateway.retrieveListingItems(postSource, listingAfter = currentAfterValues[tab])
+                val listingAfter = currentAfterValues[tab]
+                // only retrieve more posts if after is not null
+                if (listingAfter != null) {
+                    postRepo.retrieveNextListing(source = postSource, after = listingAfter)
+                } else null
             }
 
-            Log.d(TAG, "listing after ${listing.data.after}")
-            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
-            listing.data.children?.let { items ->
-                val currentList = postsLiveData[tab]!!.value ?: emptyList()
-                postsLiveData[tab]!!.postValue(currentList.plus(items))
-
-                // only update the "after" val for this tab if successful
-                currentAfterValues[tab] = listing.data.after
+            if (listing != null) {
+                handleListingRetrieval(tab, listing)
             }
 
             // TODO based on user preferences -> save data offline
+        }
+    }
+
+    private fun handleListingRetrieval(tab: UserTab, listing : Listing<out ListingItem>) {
+        listing.data.children?.let { items ->
+            Log.d(TAG, "listing after ${listing.data.after}")
+            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
+
+            val currentList = postsLiveData[tab]!!.value ?: emptyList()
+
+            if (items.isEmpty()) {
+                // TODO tell user no more posts can be loaded
+            } else {
+                postsLiveData[tab]!!.postValue(currentList.plus(items))
+            }
+            // only update the "after" val for this tab if successful
+            currentAfterValues[tab] = listing.data.after
         }
     }
 
@@ -146,46 +160,6 @@ class DisplayUserVM(
             is UserTab.Gilded -> PostRepository.RetrievalOption.Gilded
             is UserTab.Hidden -> PostRepository.RetrievalOption.Hidden
         }
-    }
-
-    private fun convergeSources(
-        posts : List<PostModel>?,
-        comments : List<CommentModel>?,
-        tab : UserTab
-    ) : List<ListingItem> {
-        var listingItems = listOf<ListingItem>()
-
-        if (posts == null && comments != null) {
-            listingItems = comments
-        }
-        else if (comments == null && posts != null) {
-            listingItems = posts
-        }
-        else if (comments != null && posts != null)  {
-            listingItems = mutableListOf()
-            listingItems.addAll(posts)
-            listingItems.addAll(comments)
-
-            listingItems.sortWith(Comparator { o1, o2 ->
-                // TODO switch to use a single field for position and return the appropriate position based on the dao query
-                val firstP = extractTabPosition(o1, tab)
-                val secondP = extractTabPosition(o2, tab)
-
-                firstP - secondP
-            })
-        }
-
-        Log.d(TAG, "saved positions " + listingItems.map {
-            var postTitle = ""
-            if (it is PostModel) {
-                postTitle = it.title
-            } else if (it is CommentModel) {
-                postTitle = it.body.substring(0, 10)
-            }
-            "${it.userSavedPosition} $postTitle"}
-        )
-
-        return listingItems
     }
 
     private fun extractTabPosition(listingItem: ListingItem, tab: UserTab) : Int {
@@ -258,6 +232,6 @@ class DisplayUserVM(
     // endregion post adapter delegate
 
     override fun handleException(context: CoroutineContext, e: Throwable) {
-        Log.e(TAG, "handling e", e)
+        Log.e(TAG, "caught exception", e)
     }
 }

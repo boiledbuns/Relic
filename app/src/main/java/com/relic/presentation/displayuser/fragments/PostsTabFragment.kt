@@ -3,6 +3,7 @@ package com.relic.presentation.displayuser.fragments
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -29,7 +30,6 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
 
     private lateinit var userPostsAdapter : ListingItemAdapter
     private var scrollLocked: Boolean = false
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +72,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
                     // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
                     scrollLocked = true
+                    tabProgress.visibility = View.VISIBLE
                     // fetch the next post listing
                     postsTabVM.requestPosts(selectedUserTab, false)
                 }
@@ -85,10 +86,13 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     }
 
     private fun setListingItems(listingItems : List<ListingItem>) {
+        tabProgress.visibility = View.GONE
         if (listingItems.isNotEmpty()) {
             userPostsAdapter.setItems(listingItems)
             userTabSwipeRefreshLayout.isRefreshing = false
             scrollLocked = false
+        } else {
+            Snackbar.make(userTabRoot, getString(R.string.no_posts), Snackbar.LENGTH_SHORT).show()
         }
     }
 

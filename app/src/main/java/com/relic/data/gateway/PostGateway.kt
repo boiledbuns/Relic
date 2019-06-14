@@ -16,13 +16,4 @@ interface PostGateway {
     suspend fun reportPosts(fullname: String, report: Boolean)
 
     suspend fun visitPost(postFullname: String)
-
-    /**
-     * this method is used specifically to retrieve listings that can have both post and comments.
-     * currently, this is only used when displaying users
-     */
-    suspend fun retrieveListingItems(
-        source: PostRepository.PostSource,
-        listingAfter: String? = null
-    ) : Listing<out ListingItem>
 }
