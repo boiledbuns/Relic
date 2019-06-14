@@ -25,8 +25,6 @@ import kotlin.coroutines.CoroutineContext
 
 class DisplayUserVM(
     private val postRepo: PostRepository,
-    private val commentRepo: CommentRepository,
-    private val listingRepo: ListingRepository,
     private val userRepo: UserRepository,
     private val postGateway: PostGateway,
     private val username : String
@@ -34,13 +32,11 @@ class DisplayUserVM(
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
-        private val commentRepo: CommentRepository,
-        private val listingRepo: ListingRepository,
         private val userRepo: UserRepository,
         private val postGateway: PostGateway
     ) {
         fun create(username : String) : DisplayUserVM {
-            return DisplayUserVM(postRepo, commentRepo, listingRepo, userRepo, postGateway, username)
+            return DisplayUserVM(postRepo, userRepo, postGateway, username)
         }
     }
 
