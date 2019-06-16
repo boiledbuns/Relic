@@ -13,11 +13,12 @@ import com.relic.domain.models.UserModel
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.ErrorData
 import com.relic.presentation.displayuser.UserTab
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,40 +28,48 @@ class UserVMTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    private val mainThreadSurrogate = TestCoroutineDispatcher()
+
     private lateinit var postRepo : PostRepository
     private lateinit var userRepo : UserRepository
     private lateinit var postGateway : PostGateway
 
     private val username = "testUsername"
 
-    init {
-        val mainThreadSurrogate = newSingleThreadContext("Test thread")
-        Dispatchers.setMain(mainThreadSurrogate)
-    }
-
     @Before
     fun setup() {
+        Dispatchers.setMain(mainThreadSurrogate)
+
         postRepo = mock()
         userRepo = mock()
         postGateway = mock()
     }
 
-    @Test
-    fun `user retrieved on init`() = runBlocking {
-        val mockUser = mock<UserModel>()
-        whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
-
-        val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
-
-        val observer : Observer<UserModel> = mock()
-        vm.userLiveData.observeForever(observer)
-
-        verify(userRepo, times(1)).retrieveUser(username)
-        verify(observer).onChanged(mockUser)
+    @After
+    fun teardown() {
+        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
+        mainThreadSurrogate.cleanupTestCoroutines()
     }
 
     @Test
-    fun `livedata updated when posts retrieved` () = runBlocking {
+    fun `user retrieved on init`() = runBlockingTest {
+        launch(Dispatchers.Main) {
+            val mockUser = mock<UserModel>()
+            whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
+
+            val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
+
+            val observer : Observer<UserModel> = mock()
+            vm.userLiveData.observeForever(observer)
+
+            verify(userRepo, times(1)).retrieveUser(username)
+            verify(observer).onChanged(mockUser)
+        }
+        Unit
+    }
+
+    @Test
+    fun `livedata updated when posts retrieved` () = runBlockingTest {
         val mockListingItems = listOf<ListingItem>(mock())
         val listing = mockListing(mockListingItems)
         whenever(postRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
@@ -70,14 +79,13 @@ class UserVMTest {
 
         val observer : Observer<List<ListingItem>> = mock()
         vm.getTabPostsLiveData(tab).observeForever(observer)
-        vm.requestPosts(tab, true)
 
         verify(postRepo, times(1)).retrieveUserListing(any(), any(), any())
         verify(observer, times(1)).onChanged(mockListingItems)
     }
 
     @Test
-    fun `error livedata updated when no posts retrieved` () = runBlocking {
+    fun `error livedata updated when no posts retrieved` () = runBlockingTest {
         val listing = mockListing()
         val localPostRepo = postRepo
         whenever(localPostRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
@@ -90,8 +98,6 @@ class UserVMTest {
 
         val errorObserver : Observer<ErrorData> = mock()
         vm.errorLiveData.observeForever(errorObserver)
-
-        vm.requestPosts(tab, true)
 
         verify(postRepo, times(1)).retrieveUserListing(any(), any(), any())
         // listing livedata shouldn't be updated, but an "error" should be posted
