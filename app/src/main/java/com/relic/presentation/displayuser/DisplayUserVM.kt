@@ -3,12 +3,8 @@ package com.relic.presentation.displayuser
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.relic.api.response.Listing
-import com.relic.data.CommentRepository
-import com.relic.data.ListingRepository
-import com.relic.data.PostRepository
-import com.relic.data.UserRepository
+import com.relic.data.*
 import com.relic.data.gateway.PostGateway
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
@@ -46,12 +42,15 @@ class DisplayUserVM(
     private var _navigationLiveData = MutableLiveData<RelicEvent<SubNavigationData>>()
     var navigationLiveData : LiveData<RelicEvent<SubNavigationData>> = _navigationLiveData
 
+    private var _errorLiveData = MutableLiveData<ErrorData>()
+    val errorLiveData : LiveData<ErrorData> = _errorLiveData
+
     // dictionary mapping a tab to its associated livedata
     // items should only be added if the tab is being accessed for the first time
     private var postsLiveData = mutableMapOf<UserTab, MediatorLiveData<List<ListingItem>>>()
 
-    private var currentSortingType = mutableMapOf<UserTab, PostRepository.SortType>()
-    private var currentSortingScope = mutableMapOf<UserTab, PostRepository.SortScope>()
+    private var currentSortingType = mutableMapOf<UserTab, SortType>()
+    private var currentSortingScope = mutableMapOf<UserTab, SortScope>()
     private var currentAfterValues = mutableMapOf<UserTab, String?>()
 
     private lateinit var currentTab : UserTab
@@ -66,10 +65,6 @@ class DisplayUserVM(
         if (postsLiveData[tab] == null) {
             // create a new livedata if it doesn't already exist
             postsLiveData[tab] = MediatorLiveData()
-
-            // request new posts if this is the first time the tab is being created
-            // TODO need to separate the process of deleting old posts from retrieving new posts
-            // TODO to prevent the old posts being deleted --> internet connection unavailable --> so new posts
             requestPosts(tab = tab, refresh = true)
         }
         return postsLiveData[tab]!!
@@ -78,14 +73,13 @@ class DisplayUserVM(
     fun requestPosts(tab : UserTab, refresh : Boolean) {
         // subscribe to the appropriate livedata based on tab selected
         val userRetrievalOption = toRetrievalOption(tab)
-        val postSource = PostRepository.PostSource.User(username, userRetrievalOption)
+        val postSource = PostSource.User(username, userRetrievalOption)
 
         launch(Dispatchers.Main) {
             val listing = if (refresh) {
-                val type = currentSortingType[tab] ?: PostRepository.SortType.DEFAULT
-                val scope = currentSortingScope[tab] ?: PostRepository.SortScope.NONE
+                val type = currentSortingType[tab] ?: SortType.DEFAULT
+                val scope = currentSortingScope[tab] ?: SortScope.NONE
 
-                postsLiveData[tab]!!.postValue(emptyList())
                 postRepo.retrieveUserListing(postSource, type, scope)
             } else {
                 val listingAfter = currentAfterValues[tab]
@@ -105,13 +99,12 @@ class DisplayUserVM(
 
     private fun handleListingRetrieval(tab: UserTab, listing : Listing<out ListingItem>) {
         listing.data.children?.let { items ->
-            Log.d(TAG, "listing after ${listing.data.after}")
-            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
-
+//            Log.d(TAG, "listing after ${listing.data.after}")
+//            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
             val currentList = postsLiveData[tab]!!.value ?: emptyList()
 
             if (items.isEmpty()) {
-                // TODO tell user no more posts can be loaded
+                _errorLiveData.postValue(ErrorData.NoMorePosts(tab))
             } else {
                 postsLiveData[tab]!!.postValue(currentList.plus(items))
             }
@@ -124,21 +117,21 @@ class DisplayUserVM(
         currentTab = tab
     }
 
-    fun changeSortingMethod(sortType: PostRepository.SortType? = null, sortScope: PostRepository.SortScope? = null) {
+    fun changeSortingMethod(sortType: SortType? = null, sortScope: SortScope? = null) {
         sortType?.let { currentSortingType[currentTab] = it }
         sortScope?.let { currentSortingScope[currentTab] = it }
 
         when (currentSortingType[currentTab]) {
             // these sorting types don't have a scope, so retrieve sorted scopes asap
-            PostRepository.SortType.NEW, PostRepository.SortType.BEST, PostRepository.SortType.CONTROVERSIAL -> {
+            SortType.NEW, SortType.BEST, SortType.CONTROVERSIAL -> {
                 requestPosts(currentTab, refresh = true)
             }
         }
 
         when (currentSortingScope[currentTab]) {
             // when the sorting scope is changed
-            PostRepository.SortScope.HOUR, PostRepository.SortScope.DAY, PostRepository.SortScope.WEEK,
-            PostRepository.SortScope.MONTH, PostRepository.SortScope.YEAR, PostRepository.SortScope.ALL -> {
+            SortScope.HOUR, SortScope.DAY, SortScope.WEEK,
+            SortScope.MONTH, SortScope.YEAR, SortScope.ALL -> {
                 requestPosts(currentTab, refresh = true)
             }
         }
@@ -146,15 +139,15 @@ class DisplayUserVM(
 
     // region helper functions
 
-    private fun toRetrievalOption(tab : UserTab): PostRepository.RetrievalOption {
+    private fun toRetrievalOption(tab : UserTab): RetrievalOption {
         return when (tab) {
-            is UserTab.Submitted -> PostRepository.RetrievalOption.Submitted
-            is UserTab.Comments -> PostRepository.RetrievalOption.Comments
-            is UserTab.Saved -> PostRepository.RetrievalOption.Saved
-            is UserTab.Upvoted -> PostRepository.RetrievalOption.Upvoted
-            is UserTab.Downvoted -> PostRepository.RetrievalOption.Downvoted
-            is UserTab.Gilded -> PostRepository.RetrievalOption.Gilded
-            is UserTab.Hidden -> PostRepository.RetrievalOption.Hidden
+            is UserTab.Submitted -> RetrievalOption.Submitted
+            is UserTab.Comments -> RetrievalOption.Comments
+            is UserTab.Saved -> RetrievalOption.Saved
+            is UserTab.Upvoted -> RetrievalOption.Upvoted
+            is UserTab.Downvoted -> RetrievalOption.Downvoted
+            is UserTab.Gilded -> RetrievalOption.Gilded
+            is UserTab.Hidden -> RetrievalOption.Hidden
         }
     }
 
@@ -178,7 +171,7 @@ class DisplayUserVM(
         launch(Dispatchers.Main) { postGateway.visitPost(listingItem.fullName) }
 
         // retrieval option doesn't matter in this case
-        val postSource = PostRepository.PostSource.User(username, PostRepository.RetrievalOption.Submitted)
+        val postSource = PostSource.User(username, RetrievalOption.Submitted)
 
         val navData = when (listingItem) {
             is PostModel -> SubNavigationData.ToPost(
@@ -228,6 +221,6 @@ class DisplayUserVM(
     // endregion post adapter delegate
 
     override fun handleException(context: CoroutineContext, e: Throwable) {
-        Log.e(TAG, "caught exception", e)
+//        Log.e(TAG, "caught exception", e)
     }
 }

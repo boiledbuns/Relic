@@ -3,11 +3,14 @@ package com.relic.presentation.displaysub
 import android.arch.lifecycle.LiveData
 import com.relic.presentation.main.RelicError
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
+import com.relic.data.SortScope
+import com.relic.data.SortType
 import com.relic.domain.models.PostModel
 
 interface DisplaySubContract {
     interface ViewModel {
-        fun changeSortingMethod(sortType: PostRepository.SortType? = null, sortScope: PostRepository.SortScope? = null)
+        fun changeSortingMethod(sortType: SortType? = null, sortScope: SortScope? = null)
         fun retrieveMorePosts(resetPosts: Boolean)
         fun updateSubStatus(subscribe: Boolean)
     }
@@ -40,7 +43,7 @@ sealed class SubNavigationData {
     data class ToPost (
         val postId : String,
         val subredditName : String,
-        val postSource: PostRepository.PostSource,
+        val postSource: PostSource,
         val commentId : String? = null
     ) : SubNavigationData ()
 
@@ -58,8 +61,8 @@ sealed class SubNavigationData {
 }
 
 data class DisplaySubInfoData (
-    var sortingMethod : PostRepository.SortType,
-    var sortingScope : PostRepository.SortScope
+    var sortingMethod : SortType,
+    var sortingScope : SortScope
 )
 
 

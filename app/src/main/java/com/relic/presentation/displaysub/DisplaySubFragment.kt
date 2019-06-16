@@ -24,6 +24,8 @@ import android.widget.Toast
 import com.relic.R
 import com.relic.presentation.main.RelicError
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
+import com.relic.data.SortType
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.media.DisplayImageFragment
@@ -47,7 +49,7 @@ class DisplaySubFragment : RelicFragment() {
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(PostRepository.PostSource.Subreddit(subName)) as T
+                return factory.create(PostSource.Subreddit(subName)) as T
             }
         }).get(DisplaySubVM::class.java)
     }
@@ -60,7 +62,7 @@ class DisplaySubFragment : RelicFragment() {
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
-    private var tempSortMethod = PostRepository.SortType.DEFAULT
+    private var tempSortMethod = SortType.DEFAULT
 
     // region fragment lifecycle hooks
 
@@ -139,7 +141,7 @@ class DisplaySubFragment : RelicFragment() {
         var override = true
         when (item?.itemId) {
             R.id.display_sub_searchitem -> {
-                val searchFrag = SubSearchFragment.create(PostRepository.PostSource.Subreddit(subName))
+                val searchFrag = SubSearchFragment.create(PostSource.Subreddit(subName))
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()

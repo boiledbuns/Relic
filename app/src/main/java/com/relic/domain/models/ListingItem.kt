@@ -1,5 +1,6 @@
 package com.relic.domain.models
 
+import com.relic.api.qualifier.Likes
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -12,7 +13,10 @@ open class ListingItem {
     var author: String = ""
 
     var visited: Boolean = false
-    var userUpvoted: Int = 0
+
+    @Json(name = "likes")
+    @Likes var userUpvoted: Int = 0
+
     var saved: Boolean = false
     var subreddit : String? = null
 

@@ -13,7 +13,7 @@ interface CommentRepository {
      */
     fun getComments(postFullName: String, displayNRows: Int = 0): LiveData<List<CommentModel>>
 
-    fun getComments(retrievalOption: PostRepository.RetrievalOption): LiveData<List<CommentModel>>
+    fun getComments(retrievalOption: RetrievalOption): LiveData<List<CommentModel>>
 
     /**
      * retrieves comments for a post from the network and stores them locally

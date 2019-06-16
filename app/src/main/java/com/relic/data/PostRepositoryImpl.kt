@@ -65,9 +65,9 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     private val sortTypesWithScope = arrayOf(
-        PostRepository.SortType.HOT,
-        PostRepository.SortType.RISING,
-        PostRepository.SortType.TOP
+        SortType.HOT,
+        SortType.RISING,
+        SortType.TOP
     )
 
     private val type = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
@@ -75,26 +75,26 @@ class PostRepositoryImpl @Inject constructor(
 
     // region interface methods
 
-    override fun getPosts(postSource: PostRepository.PostSource) : LiveData<List<PostModel>> {
+    override fun getPosts(postSource: PostSource) : LiveData<List<PostModel>> {
         return when (postSource) {
-            is PostRepository.PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
-            is PostRepository.PostSource.Frontpage -> appDB.postDao.postsFromFrontpage
-            is PostRepository.PostSource.User -> {
+            is PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
+            is PostSource.Frontpage -> appDB.postDao.postsFromFrontpage
+            is PostSource.User -> {
                 when (postSource.retrievalOption) {
-                    PostRepository.RetrievalOption.Submitted -> appDB.userPostingDao.getUserPosts()
-                    PostRepository.RetrievalOption.Comments -> MutableLiveData()
-                    PostRepository.RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedPosts()
-                    PostRepository.RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedPosts()
-                    PostRepository.RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedPosts()
-                    PostRepository.RetrievalOption.Gilded -> appDB.userPostingDao.getUserGilded()
-                    PostRepository.RetrievalOption.Hidden -> appDB.userPostingDao.getUserHidden()
+                    RetrievalOption.Submitted -> appDB.userPostingDao.getUserPosts()
+                    RetrievalOption.Comments -> MutableLiveData()
+                    RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedPosts()
+                    RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedPosts()
+                    RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedPosts()
+                    RetrievalOption.Gilded -> appDB.userPostingDao.getUserGilded()
+                    RetrievalOption.Hidden -> appDB.userPostingDao.getUserHidden()
                 }
             }
             else -> appDB.postDao.postsFromAll
         }
     }
 
-    override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostRepository.PostSource) {
+    override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource) {
         val key = getListingKey(postSource)
 
         withContext(Dispatchers.IO) {
@@ -109,13 +109,13 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun retrieveUserListing(
-        source: PostRepository.PostSource.User,
-        sortType: PostRepository.SortType,
-        sortScope: PostRepository.SortScope
+        source: PostSource.User,
+        sortType: SortType,
+        sortScope: SortScope
     ): Listing<out ListingItem> {
         val ending = "user/${source.username}/${source.retrievalOption.name.toLowerCase()}" + when (sortType) {
-            PostRepository.SortType.HOT -> "?sort=${sortType.name.toLowerCase()}"
-            PostRepository.SortType.TOP, PostRepository.SortType.CONTROVERSIAL -> {
+            SortType.HOT -> "?sort=${sortType.name.toLowerCase()}"
+            SortType.TOP, SortType.CONTROVERSIAL -> {
                 "?sort=${sortType.name.toLowerCase()}&t=${sortScope.name.toLowerCase()}"
             }
             // default (is "new", no need to manually specify it)
@@ -136,10 +136,10 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun retrieveNextListing(source: PostRepository.PostSource, after: String): Listing<out ListingItem> {
+    override suspend fun retrieveNextListing(source: PostSource, after: String): Listing<out ListingItem> {
         val ending = when (source) {
-            is PostRepository.PostSource.Subreddit -> "r/${source.subredditName}"
-            is PostRepository.PostSource.User -> "user/${source.username}/${source.retrievalOption.name.toLowerCase()}"
+            is PostSource.Subreddit -> "r/${source.subredditName}"
+            is PostSource.User -> "user/${source.username}/${source.retrievalOption.name.toLowerCase()}"
             else -> ""
         }
 
@@ -157,22 +157,22 @@ class PostRepositoryImpl @Inject constructor(
 
     @Throws(RelicRequestError::class)
     override suspend fun retrieveSortedPosts(
-        postSource: PostRepository.PostSource,
-        sortType: PostRepository.SortType,
-        sortScope: PostRepository.SortScope
+        postSource: PostSource,
+        sortType: SortType,
+        sortScope: SortScope
     ) {
         // convert into a builder to make it easier to build api url
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
-            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
-            is PostRepository.PostSource.User -> {
+            is PostSource.Subreddit -> "r/${postSource.subredditName}"
+            is PostSource.User -> {
                 "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}?sort=${sortType.name.toLowerCase()}&t=${sortScope.name.toLowerCase()}"
             }
             else -> ""
         }
 
         // modify the endpoint based on the sorting options selected by the user
-        if (sortType != PostRepository.SortType.DEFAULT && postSource !is PostRepository.PostSource.User) {
+        if (sortType != SortType.DEFAULT && postSource !is PostSource.User) {
             // build the appropriate endpoint based on the "sort by" code and time scope
             ending += "/${sortType.name.toLowerCase()}/"
 
@@ -203,13 +203,13 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun retrieveMorePosts(
-        postSource: PostRepository.PostSource,
+        postSource: PostSource,
         listingAfter: String
     ) {
         // change the api endpoint to access the next post listing
         val ending = when (postSource) {
-            is PostRepository.PostSource.Subreddit -> "r/${postSource.subredditName}"
-            is PostRepository.PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
+            is PostSource.Subreddit -> "r/${postSource.subredditName}"
+            is PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
             else -> ""
         }
 
@@ -233,7 +233,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun retrievePost(
         subredditName: String,
         postFullName: String,
-        postSource: PostRepository.PostSource
+        postSource: PostSource
     ) {
         val ending = "r/$subredditName/comments/${postFullName.substring(3)}"
 
@@ -257,22 +257,22 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun clearAllPostsFromSource(postSource: PostRepository.PostSource) {
+    override suspend fun clearAllPostsFromSource(postSource: PostSource) {
         withContext(Dispatchers.IO) {
             when (postSource) {
-                is PostRepository.PostSource.Frontpage -> appDB.postSourceDao.removeAllFrontpageAsSource()
-                is PostRepository.PostSource.All -> appDB.postSourceDao.removeAllAllAsSource()
-                is PostRepository.PostSource.Subreddit -> appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
-                is PostRepository.PostSource.User -> {
+                is PostSource.Frontpage -> appDB.postSourceDao.removeAllFrontpageAsSource()
+                is PostSource.All -> appDB.postSourceDao.removeAllAllAsSource()
+                is PostSource.Subreddit -> appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
+                is PostSource.User -> {
                     appDB.postSourceDao.apply {
                         when (postSource.retrievalOption) {
-                            PostRepository.RetrievalOption.Submitted -> removeAllUserSubmittedAsSource()
-                            PostRepository.RetrievalOption.Comments -> removeAllUserCommentsAsSource()
-                            PostRepository.RetrievalOption.Saved -> removeAllUserSavedAsSource()
-                            PostRepository.RetrievalOption.Upvoted -> removeAllUserUpvotedAsSource()
-                            PostRepository.RetrievalOption.Downvoted -> removeAllUserDownvotedAsSource()
-                            PostRepository.RetrievalOption.Gilded -> removeAllUserGildedAsSource()
-                            PostRepository.RetrievalOption.Hidden -> removeAllUserHiddenAsSource()
+                            RetrievalOption.Submitted -> removeAllUserSubmittedAsSource()
+                            RetrievalOption.Comments -> removeAllUserCommentsAsSource()
+                            RetrievalOption.Saved -> removeAllUserSavedAsSource()
+                            RetrievalOption.Upvoted -> removeAllUserUpvotedAsSource()
+                            RetrievalOption.Downvoted -> removeAllUserDownvotedAsSource()
+                            RetrievalOption.Gilded -> removeAllUserGildedAsSource()
+                            RetrievalOption.Hidden -> removeAllUserHiddenAsSource()
                         }
                     }
                 }
@@ -288,7 +288,7 @@ class PostRepositoryImpl @Inject constructor(
         query : String,
         restrictToSub : Boolean,
         after : String?
-    ) : PostRepository.SubSearchResult {
+    ) : SubSearchResult {
         var ending = "r/$subredditName/search?q=$query"
         if (restrictToSub) ending += "&restrict_sr=true"
         if (after != null) ending += "&after=$after"
@@ -307,7 +307,7 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun postPost(postDraft: PostRepository.PostDraft, type : PostRepository.PostType) {
+    override suspend fun postPost(postDraft: PostDraft, type : PostType) {
         // based on the post type,
         val url = "${ENDPOINT}api/submit"
 
@@ -320,11 +320,11 @@ class PostRepositoryImpl @Inject constructor(
             put("send_replies", postDraft.sendReplies.toString())
 
             when (type) {
-                is PostRepository.PostType.Self -> {
+                is PostType.Self -> {
                     put("kind","self")
                     put("text", postDraft.body!!)
                 }
-                is PostRepository.PostType.Link -> {
+                is PostType.Link -> {
                     put("kind","link")
                 }
             }
@@ -348,7 +348,7 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveDraft(postDraft: PostRepository.PostDraft) {
+    override suspend fun saveDraft(postDraft: PostDraft) {
         withContext(Dispatchers.IO) {
             val newPostDraft = PostEntity().apply {
                 name = ""
@@ -362,12 +362,12 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadDraft(subreddit : String) : PostRepository.PostDraft? {
+    override suspend fun loadDraft(subreddit : String) : PostDraft? {
         return withContext(Dispatchers.IO) {
             val draftModel = appDB.postDao.getPostDraft(subreddit)
 
             if (draftModel != null) {
-                PostRepository.PostDraft(
+                PostDraft(
                     title = draftModel.title,
                     body = draftModel.selftext,
                     subreddit = draftModel.subreddit!!
@@ -395,12 +395,12 @@ class PostRepositoryImpl @Inject constructor(
      * builds the key used for retrieving the "after" value for a listing using its associated
      * post source
      */
-    private fun getListingKey(postSource : PostRepository.PostSource) : String {
+    private fun getListingKey(postSource : PostSource) : String {
         return when (postSource) {
-            is PostRepository.PostSource.Subreddit -> postSource.subredditName
-            is PostRepository.PostSource.Frontpage -> KEY_FRONTPAGE
-            is PostRepository.PostSource.All -> KEY_ALL
-            is PostRepository.PostSource.User -> postSource.username + postSource.retrievalOption.name
+            is PostSource.Subreddit -> postSource.subredditName
+            is PostSource.Frontpage -> KEY_FRONTPAGE
+            is PostSource.All -> KEY_ALL
+            is PostSource.User -> postSource.username + postSource.retrievalOption.name
             else -> KEY_OTHER
         }
     }

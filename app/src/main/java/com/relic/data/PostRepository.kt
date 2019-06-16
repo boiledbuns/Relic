@@ -40,13 +40,13 @@ interface PostRepository {
      * currently, this is only used when displaying users.
      */
     suspend fun retrieveUserListing(
-        source: PostRepository.PostSource.User,
+        source: PostSource.User,
         sortType: SortType,
         sortScope: SortScope
     ) : Listing<out ListingItem>
 
     suspend fun retrieveNextListing(
-        source: PostRepository.PostSource,
+        source: PostSource,
         after : String
     ) : Listing<out ListingItem>
 
@@ -88,71 +88,71 @@ interface PostRepository {
 
     suspend fun loadDraft(subreddit : String) : PostDraft?
 
-    data class SubSearchResult(
-        val posts : List<PostModel>,
-        val after : String?
-    )
-
     /**
      * //TODO tentative -> should expose or not
      * need to decide whether the viewModel should handle this or not
      * @param postSource
      */
     suspend fun clearAllPostsFromSource(postSource: PostSource)
+}
 
-    enum class SortType {
-        DEFAULT, BEST, CONTROVERSIAL, HOT, NEW, RISING, TOP
-    }
+data class SubSearchResult(
+    val posts : List<PostModel>,
+    val after : String?
+)
 
-    enum class SortScope {
-        NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
-    }
+enum class SortType {
+    DEFAULT, BEST, CONTROVERSIAL, HOT, NEW, RISING, TOP
+}
 
-    /**
-     * Used to represent how a post is being accessed
-     * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
-     */
-    sealed class PostSource : Parcelable {
+enum class SortScope {
+    NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
+}
 
-        @Parcelize
-        object Frontpage : PostSource()
+/**
+ * Used to represent how a post is being accessed
+ * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
+ */
+sealed class PostSource : Parcelable {
 
-        @Parcelize
-        object All : PostSource()
+    @Parcelize
+    object Frontpage : PostSource()
 
-        @Parcelize
-        object Popular : PostSource()
+    @Parcelize
+    object All : PostSource()
 
-        @Parcelize
-        data class Subreddit(
-            val subredditName : String
-        ) : PostSource()
+    @Parcelize
+    object Popular : PostSource()
 
-        @Parcelize
-        data class User(
-            val username : String,
-            val retrievalOption: RetrievalOption
-        ) : PostSource()
-    }
+    @Parcelize
+    data class Subreddit(
+        val subredditName : String
+    ) : PostSource()
 
-    enum class RetrievalOption {
-        Submitted, Comments,
-        // these should only be available for the current user
-        Saved, Upvoted, Downvoted, Gilded, Hidden
-    }
+    @Parcelize
+    data class User(
+        val username : String,
+        val retrievalOption: RetrievalOption
+    ) : PostSource()
+}
 
-    data class PostDraft(
-        val title : String,
-        val body : String?,
-        val subreddit : String,
-        val nsfw : Boolean = false,
-        val spoiler : Boolean = false,
-        val resubmit : Boolean = false,
-        val sendReplies : Boolean = true
-    )
+enum class RetrievalOption {
+    Submitted, Comments,
+    // these should only be available for the current user
+    Saved, Upvoted, Downvoted, Gilded, Hidden
+}
 
-    sealed class PostType {
-        class Self : PostType()
-        class Link : PostType()
-    }
+data class PostDraft(
+    val title : String,
+    val body : String?,
+    val subreddit : String,
+    val nsfw : Boolean = false,
+    val spoiler : Boolean = false,
+    val resubmit : Boolean = false,
+    val sendReplies : Boolean = true
+)
+
+sealed class PostType {
+    class Self : PostType()
+    class Link : PostType()
 }

@@ -1,6 +1,7 @@
 package com.relic.presentation.home.frontpage
 
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
 import com.relic.data.SubRepository
 import com.relic.data.gateway.PostGateway
 import com.relic.network.NetworkUtil
@@ -12,7 +13,7 @@ class FrontpageVM (
     postRepo : PostRepository,
     private val postGateway : PostGateway,
     networkUtil : NetworkUtil
-): DisplaySubVM(PostRepository.PostSource.Frontpage , subRepo, postRepo, postGateway, networkUtil) {
+): DisplaySubVM(PostSource.Frontpage , subRepo, postRepo, postGateway, networkUtil) {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,

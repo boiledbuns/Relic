@@ -14,6 +14,7 @@ import com.relic.domain.models.ListingItem
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
+import com.relic.presentation.displayuser.ErrorData
 import com.relic.presentation.displayuser.UserTab
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -61,6 +62,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         postsTabVM.getTabPostsLiveData(selectedUserTab).nonNull().observe (lifecycleOwner) {
             setListingItems(it)
         }
+        postsTabVM.errorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
     }
 
     private fun attachScrollListeners() {
@@ -102,6 +104,19 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         userPostsAdapter.clear()
 
         userTabSwipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun handleError(errorData: ErrorData) {
+        when(errorData) {
+            is ErrorData.NoMorePosts -> {
+                if (selectedUserTab == errorData.tab) {
+                    Snackbar.make(view!!, "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
+                    tabProgress.visibility = View.GONE
+                    userTabSwipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }
+
     }
 
     // region delegate functions

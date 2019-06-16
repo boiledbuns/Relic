@@ -2,51 +2,55 @@ package com.relic.viewmodel
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
+import com.relic.api.response.Data
+import com.relic.api.response.Listing
 import com.relic.data.PostRepository
 import com.relic.data.UserRepository
 import com.relic.data.gateway.PostGateway
+import com.relic.domain.models.ListingItem
 import com.relic.domain.models.UserModel
 import com.relic.presentation.displayuser.DisplayUserVM
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
-import kotlinx.coroutines.*
+import com.relic.presentation.displayuser.ErrorData
+import com.relic.presentation.displayuser.UserTab
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.mockito.Mockito.*
 
+@ExperimentalCoroutinesApi
 class UserVMTest {
-    private val mainThreadSurrogate = newSingleThreadContext("Test thread")
-
-    lateinit var postRepo : PostRepository
-    lateinit var userRepo : UserRepository
-    lateinit var postGateway : PostGateway
-    val username = "boiledbuns"
-
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @Before
-    fun initTests(){
-        Dispatchers.setMain(mainThreadSurrogate)
+    private lateinit var postRepo : PostRepository
+    private lateinit var userRepo : UserRepository
+    private lateinit var postGateway : PostGateway
 
+    private val username = "testUsername"
+
+    init {
+        val mainThreadSurrogate = newSingleThreadContext("Test thread")
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @Before
+    fun setup() {
         postRepo = mock()
         userRepo = mock()
         postGateway = mock()
     }
 
-    @Test fun `user retrieved on init`() = runBlocking {
-        val mockUser = mock(UserModel::class.java)
+    @Test
+    fun `user retrieved on init`() = runBlocking {
+        val mockUser = mock<UserModel>()
         whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
 
-        val vm = mockVM()
+        val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
 
         val observer : Observer<UserModel> = mock()
         vm.userLiveData.observeForever(observer)
@@ -55,8 +59,54 @@ class UserVMTest {
         verify(observer).onChanged(mockUser)
     }
 
+    @Test
+    fun `livedata updated when posts retrieved` () = runBlocking {
+        val mockListingItems = listOf<ListingItem>(mock())
+        val listing = mockListing(mockListingItems)
+        whenever(postRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
 
-    private fun mockVM() : DisplayUserVM {
-        return DisplayUserVM(postRepo, userRepo, postGateway, username)
+        val tab = UserTab.Saved
+        val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
+
+        val observer : Observer<List<ListingItem>> = mock()
+        vm.getTabPostsLiveData(tab).observeForever(observer)
+        vm.requestPosts(tab, true)
+
+        verify(postRepo, times(1)).retrieveUserListing(any(), any(), any())
+        verify(observer, times(1)).onChanged(mockListingItems)
+    }
+
+    @Test
+    fun `error livedata updated when no posts retrieved` () = runBlocking {
+        val listing = mockListing()
+        val localPostRepo = postRepo
+        whenever(localPostRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
+
+        val tab = UserTab.Saved
+        val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
+
+        val listingObserver : Observer<List<ListingItem>> = mock()
+        vm.getTabPostsLiveData(tab).observeForever(listingObserver)
+
+        val errorObserver : Observer<ErrorData> = mock()
+        vm.errorLiveData.observeForever(errorObserver)
+
+        vm.requestPosts(tab, true)
+
+        verify(postRepo, times(1)).retrieveUserListing(any(), any(), any())
+        // listing livedata shouldn't be updated, but an "error" should be posted
+        verify(listingObserver, never()).onChanged(any())
+        verify(errorObserver, times(1)).onChanged(ErrorData.NoMorePosts(tab))
+    }
+
+    private fun mockListing(
+        listingItems : List<ListingItem> = emptyList()
+    ) : Listing<ListingItem> {
+
+        val data = Data<ListingItem>().apply {
+            children = listingItems
+        }
+
+        return Listing(kind = "", data = data)
     }
 }

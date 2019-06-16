@@ -1,9 +1,5 @@
 package com.relic.data.gateway
 
-import com.relic.api.response.Listing
-import com.relic.data.PostRepository
-import com.relic.domain.models.ListingItem
-
 interface PostGateway {
     suspend fun voteOnPost(fullname: String, voteStatus: Int)
 

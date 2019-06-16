@@ -2,6 +2,8 @@ package com.relic.presentation.displaysub
 
 import com.relic.R
 import com.relic.data.PostRepository
+import com.relic.data.SortScope
+import com.relic.data.SortType
 
 object DisplaySubMenuHelper {
     const val sortMenuId = R.id.display_sub_sort
@@ -12,27 +14,27 @@ object DisplaySubMenuHelper {
 
     // region menu item id helpers
 
-    fun convertMenuItemToSortType(optionId : Int) : PostRepository.SortType {
+    fun convertMenuItemToSortType(optionId : Int) : SortType {
         return when(optionId) {
-            R.id.post_sort_best -> PostRepository.SortType.BEST
-            R.id.post_sort_hot, R.id.user_sort_hot -> PostRepository.SortType.HOT
-            R.id.post_sort_new, R.id.user_sort_new -> PostRepository.SortType.NEW
-            R.id.post_sort_rising -> PostRepository.SortType.RISING
-            R.id.post_sort_top, R.id.user_sort_top -> PostRepository.SortType.TOP
-            R.id.post_sort_controversial, R.id.user_sort_controversial -> PostRepository.SortType.CONTROVERSIAL
-            else -> PostRepository.SortType.DEFAULT
+            R.id.post_sort_best -> SortType.BEST
+            R.id.post_sort_hot, R.id.user_sort_hot -> SortType.HOT
+            R.id.post_sort_new, R.id.user_sort_new -> SortType.NEW
+            R.id.post_sort_rising -> SortType.RISING
+            R.id.post_sort_top, R.id.user_sort_top -> SortType.TOP
+            R.id.post_sort_controversial, R.id.user_sort_controversial -> SortType.CONTROVERSIAL
+            else -> SortType.DEFAULT
         }
     }
 
-    fun convertMenuItemToSortScope(optionId : Int) : PostRepository.SortScope{
+    fun convertMenuItemToSortScope(optionId : Int) : SortScope {
         return when(optionId) {
-            R.id.order_scope_hour -> PostRepository.SortScope.HOUR
-            R.id.order_scope_day -> PostRepository.SortScope.DAY
-            R.id.order_scope_week -> PostRepository.SortScope.WEEK
-            R.id.order_scope_month -> PostRepository.SortScope.MONTH
-            R.id.order_scope_year -> PostRepository.SortScope.YEAR
-            R.id.order_scope_all -> PostRepository.SortScope.ALL
-            else -> PostRepository.SortScope.NONE
+            R.id.order_scope_hour -> SortScope.HOUR
+            R.id.order_scope_day -> SortScope.DAY
+            R.id.order_scope_week -> SortScope.WEEK
+            R.id.order_scope_month -> SortScope.MONTH
+            R.id.order_scope_year -> SortScope.YEAR
+            R.id.order_scope_all -> SortScope.ALL
+            else -> SortScope.NONE
         }
     }
 
@@ -40,26 +42,26 @@ object DisplaySubMenuHelper {
 
     // region text helpers
 
-    fun convertSortingTypeToText(sortByCode : PostRepository.SortType) : String  {
+    fun convertSortingTypeToText(sortByCode : SortType) : String  {
         return when(sortByCode) {
-            PostRepository.SortType.DEFAULT-> "best"
-            PostRepository.SortType.HOT -> "hot"
-            PostRepository.SortType.NEW -> "new"
-            PostRepository.SortType.RISING-> "rising"
-            PostRepository.SortType.TOP -> "top"
-            PostRepository.SortType.CONTROVERSIAL -> "controversial"
+            SortType.DEFAULT-> "best"
+            SortType.HOT -> "hot"
+            SortType.NEW -> "new"
+            SortType.RISING-> "rising"
+            SortType.TOP -> "top"
+            SortType.CONTROVERSIAL -> "controversial"
             else -> "default"
         }
     }
 
-    fun convertSortingScopeToText(sortByScope : PostRepository.SortScope) : String? {
+    fun convertSortingScopeToText(sortByScope : SortScope) : String? {
         return when(sortByScope) {
-            PostRepository.SortScope.HOUR-> "hour"
-            PostRepository.SortScope.DAY -> "day"
-            PostRepository.SortScope.WEEK -> "week"
-            PostRepository.SortScope.MONTH-> "month"
-            PostRepository.SortScope.YEAR -> "year"
-            PostRepository.SortScope.ALL -> "all"
+            SortScope.HOUR-> "hour"
+            SortScope.DAY -> "day"
+            SortScope.WEEK -> "week"
+            SortScope.MONTH-> "month"
+            SortScope.YEAR -> "year"
+            SortScope.ALL -> "all"
             else -> null
         }
     }

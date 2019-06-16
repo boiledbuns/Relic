@@ -3,12 +3,11 @@ package com.relic.data.deserializer
 import android.text.Html
 import android.util.Log
 import com.google.gson.GsonBuilder
-import com.relic.data.ApplicationDB
+import com.relic.data.*
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
-import com.relic.data.PostRepository
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
@@ -69,7 +68,7 @@ class PostDeserializerImpl @Inject constructor(
      */
     override suspend fun parsePosts(
         response: String,
-        postSource: PostRepository.PostSource,
+        postSource: PostSource,
         listingKey : String
     ) : ParsedPostsData = coroutineScope {
         val postEntities = ArrayList<PostEntity>()
@@ -136,7 +135,7 @@ class PostDeserializerImpl @Inject constructor(
         ParsedPostsData(postSourceEntities, postEntities, commentEntities, listing)
     }
 
-    override suspend fun parseSearchSubPostsResponse(response: String): PostRepository.SubSearchResult {
+    override suspend fun parseSearchSubPostsResponse(response: String): SubSearchResult {
         // TODO realized that we can do this with gson so look to replace simplejson with it
         val listing = jsonParser.parse(response) as JSONObject
         val data = listing["data"] as JSONObject
@@ -145,7 +144,7 @@ class PostDeserializerImpl @Inject constructor(
         val after = data["after"] as String?
         val postModels = children.mapNotNull { mapToPostModel(it as JSONObject) }
 
-        return PostRepository.SubSearchResult(postModels, after)
+        return SubSearchResult(postModels, after)
     }
 
     private fun mapToPostModel(child : JSONObject) : PostModel? {
@@ -196,51 +195,51 @@ class PostDeserializerImpl @Inject constructor(
         }
     }
 
-    private fun setSource(entity : PostSourceEntity, src: PostRepository.PostSource, position : Int) {
+    private fun setSource(entity : PostSourceEntity, src: PostSource, position : Int) {
         entity.apply {
             when (src) {
-                is PostRepository.PostSource.Subreddit -> {
+                is PostSource.Subreddit -> {
                     subredditPosition = position
                 }
-                is PostRepository.PostSource.Frontpage -> {
+                is PostSource.Frontpage -> {
                     frontpagePosition = position
                 }
-                is PostRepository.PostSource.All -> {
+                is PostSource.All -> {
                     allPosition = position
                 }
-                is PostRepository.PostSource.User -> {
+                is PostSource.User -> {
                     when (src.retrievalOption) {
-                        PostRepository.RetrievalOption.Submitted -> userSubmittedPosition = position
-                        PostRepository.RetrievalOption.Comments -> userCommentsPosition = position
-                        PostRepository.RetrievalOption.Saved -> userSavedPosition = position
-                        PostRepository.RetrievalOption.Upvoted -> userUpvotedPosition = position
-                        PostRepository.RetrievalOption.Downvoted -> userDownvotedPosition = position
-                        PostRepository.RetrievalOption.Gilded -> userGildedPosition = position
-                        PostRepository.RetrievalOption.Hidden -> userHiddenPosition = position
+                        RetrievalOption.Submitted -> userSubmittedPosition = position
+                        RetrievalOption.Comments -> userCommentsPosition = position
+                        RetrievalOption.Saved -> userSavedPosition = position
+                        RetrievalOption.Upvoted -> userUpvotedPosition = position
+                        RetrievalOption.Downvoted -> userDownvotedPosition = position
+                        RetrievalOption.Gilded -> userGildedPosition = position
+                        RetrievalOption.Hidden -> userHiddenPosition = position
                     }
                 }
             }
         }
     }
 
-    private suspend fun getSourceCount(postSource : PostRepository.PostSource) : Int {
+    private suspend fun getSourceCount(postSource : PostSource) : Int {
         val sourceDao = appDB.postSourceDao
 
         return withContext(Dispatchers.IO) {
             when (postSource) {
-                is PostRepository.PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
-                is PostRepository.PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
-                is PostRepository.PostSource.All -> sourceDao.getItemsCountForAll()
-                is PostRepository.PostSource.Popular -> 0
-                is PostRepository.PostSource.User -> {
+                is PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
+                is PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
+                is PostSource.All -> sourceDao.getItemsCountForAll()
+                is PostSource.Popular -> 0
+                is PostSource.User -> {
                     when (postSource.retrievalOption) {
-                        PostRepository.RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
-                        PostRepository.RetrievalOption.Comments -> sourceDao.getItemsCountForUserComments()
-                        PostRepository.RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
-                        PostRepository.RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
-                        PostRepository.RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
-                        PostRepository.RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
-                        PostRepository.RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
+                        RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
+                        RetrievalOption.Comments -> sourceDao.getItemsCountForUserComments()
+                        RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
+                        RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
+                        RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
+                        RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
+                        RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
                     }
                 }
             }
