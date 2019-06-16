@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.*
 import com.relic.R
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.relic.presentation.media.DisplayImageFragment
@@ -51,7 +52,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     private lateinit var postFullName: String
     private lateinit var subredditName: String
-    private lateinit var postSource: PostRepository.PostSource
+    private lateinit var postSource: PostSource
     private var enableVisitSub = false
 
     private lateinit var rootView : View
@@ -68,7 +69,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         arguments?.apply {
             getString(ARG_POST_FULLNAME)?.let { postFullName = it }
             getString(ARG_SUB_NAME)?.let { subredditName = it }
-            getParcelable<PostRepository.PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
+            getParcelable<PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
         }
     }
@@ -272,7 +273,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
          * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
          * continuously chaining open subreddit actions
          */
-        fun create(postId : String, subreddit : String, postSource: PostRepository.PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
+        fun create(postId : String, subreddit : String, postSource: PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
             // create a new bundle for the post id
             val bundle = Bundle().apply {
                 putString(ARG_POST_FULLNAME, postId)

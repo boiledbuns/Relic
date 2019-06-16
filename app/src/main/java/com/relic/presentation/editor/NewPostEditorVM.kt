@@ -1,7 +1,9 @@
 package com.relic.presentation.editor
 
 import com.relic.data.CommentRepository
+import com.relic.data.PostDraft
 import com.relic.data.PostRepository
+import com.relic.data.PostType
 import com.relic.presentation.base.RelicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,8 +41,8 @@ class NewPostEditorVM constructor(
     override fun submit() {
         launch(Dispatchers.Main) {
             postRepo.postPost(
-                PostRepository.PostDraft(title = currentTitle, body = currentBody, subreddit = subreddit),
-                PostRepository.PostType.Self()
+                PostDraft(title = currentTitle, body = currentBody, subreddit = subreddit),
+                PostType.Self()
             )
         }
     }
@@ -49,7 +51,7 @@ class NewPostEditorVM constructor(
         launch(Dispatchers.Main) {
             // create a new post item to save
             postRepo.saveDraft(
-                PostRepository.PostDraft(title = currentTitle, body = currentBody, subreddit = subreddit)
+                PostDraft(title = currentTitle, body = currentBody, subreddit = subreddit)
             )
         }
     }

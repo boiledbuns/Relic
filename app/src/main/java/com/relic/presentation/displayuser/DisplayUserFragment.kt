@@ -14,12 +14,14 @@ import android.support.v7.widget.Toolbar
 import android.view.*
 import com.relic.R
 import com.relic.data.PostRepository
-import com.relic.presentation.media.DisplayImageFragment
+import com.relic.data.SortScope
+import com.relic.data.SortType
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
 import com.relic.presentation.displaysub.SubNavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.util.RelicEvent
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -57,7 +59,6 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindViewModel(viewLifecycleOwner)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
             contentFragments.add(PostsTabFragment.create(UserTab.Submitted))
@@ -94,8 +95,8 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
-        var sortType : PostRepository.SortType? = null
-        var sortScope : PostRepository.SortScope? = null
+        var sortType : SortType? = null
+        var sortScope : SortScope? = null
 
         when (item?.itemId) {
             // when the sorting type is changed
@@ -141,8 +142,8 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        displayUserVM.userLiveData.nonNull().observe (lifecycleOwner) { userUserPreview.setUser(it) }
-        displayUserVM.navigationLiveData.nonNull().observe (lifecycleOwner) { handleNavigation(it) }
+        displayUserVM.userLiveData.nonNull().observe(lifecycleOwner) { userUserPreview.setUser(it) }
+        displayUserVM.navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
     }
 
     private fun handleNavigation(navEvent : RelicEvent<SubNavigationData>) {

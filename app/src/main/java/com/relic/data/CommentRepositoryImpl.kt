@@ -40,15 +40,15 @@ class CommentRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getComments(retrievalOption: PostRepository.RetrievalOption): LiveData<List<CommentModel>> {
+    override fun getComments(retrievalOption: RetrievalOption): LiveData<List<CommentModel>> {
         return when (retrievalOption) {
-            PostRepository.RetrievalOption.Submitted -> MutableLiveData()
-            PostRepository.RetrievalOption.Comments -> appDB.userPostingDao.getUserComments()
-            PostRepository.RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedComments()
-            PostRepository.RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedComments()
-            PostRepository.RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedComments()
-            PostRepository.RetrievalOption.Gilded -> appDB.userPostingDao.getUserGildedComments()
-            PostRepository.RetrievalOption.Hidden -> appDB.userPostingDao.getUserHiddenComments()
+            RetrievalOption.Submitted -> MutableLiveData()
+            RetrievalOption.Comments -> appDB.userPostingDao.getUserComments()
+            RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedComments()
+            RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedComments()
+            RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedComments()
+            RetrievalOption.Gilded -> appDB.userPostingDao.getUserGildedComments()
+            RetrievalOption.Hidden -> appDB.userPostingDao.getUserHiddenComments()
         }
     }
 

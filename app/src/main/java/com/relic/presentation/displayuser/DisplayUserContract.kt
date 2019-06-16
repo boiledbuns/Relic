@@ -20,7 +20,6 @@ interface DisplayUserContract {
 sealed class UserTab(
     val tabName : String
 ) : Parcelable {
-
     @Parcelize object Submitted: UserTab("Submitted")
     @Parcelize object Comments: UserTab("Comments")
     @Parcelize object Saved: UserTab("Saved")
@@ -28,4 +27,8 @@ sealed class UserTab(
     @Parcelize object Downvoted: UserTab("Downvoted")
     @Parcelize object Gilded: UserTab("Gilded")
     @Parcelize object Hidden: UserTab("Hidden")
+}
+
+sealed class ErrorData {
+    data class NoMorePosts(val tab : UserTab) : ErrorData()
 }

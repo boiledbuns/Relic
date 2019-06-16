@@ -2,8 +2,10 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.os.Parcelable
+import com.relic.api.response.Listing
 
 import com.relic.data.gateway.PostGateway
+import com.relic.domain.models.ListingItem
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.network.request.RelicRequestError
@@ -18,11 +20,35 @@ interface PostRepository {
     fun getPosts(postSource: PostSource): LiveData<List<PostModel>>
 
     /**
+     * clears all current posts for this subreddit and retrieves new ones based on the sorting
+     * method specified
+     * @param sortType
+     * @param sortScope
+     */
+    @Throws(RelicRequestError::class)
+    suspend fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
+
+    /**
      * Retrieves posts for a subreddit
      * @param postSource origin of the post
      * @param listingAfter after value associated with the listing of the current set of posts
      */
     suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
+
+    /**
+     * this method is used specifically to retrieve listings that can have both post and comments.
+     * currently, this is only used when displaying users.
+     */
+    suspend fun retrieveUserListing(
+        source: PostSource.User,
+        sortType: SortType,
+        sortScope: SortScope
+    ) : Listing<out ListingItem>
+
+    suspend fun retrieveNextListing(
+        source: PostSource,
+        after : String
+    ) : Listing<out ListingItem>
 
     /**
      * Retrieves the "after" values to be used for the next post listing
@@ -49,19 +75,6 @@ interface PostRepository {
         postSource: PostSource
     )
 
-    /**
-     * clears all current posts for this subreddit and retrieves new ones based on the sorting
-     * method specified
-     * @param sortType
-     * @param sortScope
-     */
-    @Throws(RelicRequestError::class)
-    suspend fun retrieveSortedPosts(
-        postSource: PostSource,
-        sortType: SortType,
-        sortScope: SortScope
-    )
-
     suspend fun searchSubPosts(
         subredditName: String,
         query : String,
@@ -75,70 +88,71 @@ interface PostRepository {
 
     suspend fun loadDraft(subreddit : String) : PostDraft?
 
-    data class SubSearchResult(
-        val posts : List<PostModel>,
-        val after : String?
-    )
-
     /**
      * //TODO tentative -> should expose or not
      * need to decide whether the viewModel should handle this or not
      * @param postSource
      */
     suspend fun clearAllPostsFromSource(postSource: PostSource)
+}
 
-    enum class SortType {
-        DEFAULT, BEST, CONTROVERSIAL, HOT, NEW, RISING, TOP
-    }
+data class SubSearchResult(
+    val posts : List<PostModel>,
+    val after : String?
+)
 
-    enum class SortScope {
-        NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
-    }
+enum class SortType {
+    DEFAULT, BEST, CONTROVERSIAL, HOT, NEW, RISING, TOP
+}
 
-    /**
-     * Used to represent how a post is being accessed
-     * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
-     */
-    sealed class PostSource : Parcelable {
-        @Parcelize
-        object Frontpage : PostSource()
+enum class SortScope {
+    NONE, HOUR, DAY, WEEK, MONTH, YEAR, ALL
+}
 
-        @Parcelize
-        object All : PostSource()
+/**
+ * Used to represent how a post is being accessed
+ * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
+ */
+sealed class PostSource : Parcelable {
 
-        @Parcelize
-        object Popular : PostSource()
+    @Parcelize
+    object Frontpage : PostSource()
 
-        @Parcelize
-        data class Subreddit(
-            val subredditName : String
-        ) : PostSource()
+    @Parcelize
+    object All : PostSource()
 
-        @Parcelize
-        data class User(
-            val username : String,
-            val retrievalOption: RetrievalOption
-        ) : PostSource()
-    }
+    @Parcelize
+    object Popular : PostSource()
 
-    enum class RetrievalOption {
-        Submitted, Comments,
-        // these should only be available for the current user
-        Saved, Upvoted, Downvoted, Gilded, Hidden
-    }
+    @Parcelize
+    data class Subreddit(
+        val subredditName : String
+    ) : PostSource()
 
-    data class PostDraft(
-        val title : String,
-        val body : String?,
-        val subreddit : String,
-        val nsfw : Boolean = false,
-        val spoiler : Boolean = false,
-        val resubmit : Boolean = false,
-        val sendReplies : Boolean = true
-    )
+    @Parcelize
+    data class User(
+        val username : String,
+        val retrievalOption: RetrievalOption
+    ) : PostSource()
+}
 
-    sealed class PostType {
-        class Self : PostType()
-        class Link : PostType()
-    }
+enum class RetrievalOption {
+    Submitted, Comments,
+    // these should only be available for the current user
+    Saved, Upvoted, Downvoted, Gilded, Hidden
+}
+
+data class PostDraft(
+    val title : String,
+    val body : String?,
+    val subreddit : String,
+    val nsfw : Boolean = false,
+    val spoiler : Boolean = false,
+    val resubmit : Boolean = false,
+    val sendReplies : Boolean = true
+)
+
+sealed class PostType {
+    class Self : PostType()
+    class Link : PostType()
 }

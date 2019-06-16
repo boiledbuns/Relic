@@ -110,4 +110,5 @@
     <string name="submit_post">submit post</string>
     <string name="save_draft">save draft</string>
 
+    <string name="no_posts">No posts loaded</string>
 </resources>

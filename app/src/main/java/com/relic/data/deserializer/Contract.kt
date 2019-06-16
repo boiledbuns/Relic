@@ -1,6 +1,8 @@
 package com.relic.data.deserializer
 
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
+import com.relic.data.SubSearchResult
 import com.relic.data.entities.*
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.UserModel
@@ -17,13 +19,13 @@ interface Contract {
     interface PostDeserializer {
         suspend fun parsePosts(
             response: String,
-            postSource: PostRepository.PostSource,
+            postSource: PostSource,
             listingKey : String
         ) : ParsedPostsData
 
         suspend fun parsePost(response: String) : ParsedPostData
 
-        suspend fun parseSearchSubPostsResponse(response: String): PostRepository.SubSearchResult
+        suspend fun parseSearchSubPostsResponse(response: String): SubSearchResult
     }
 
     interface CommentDeserializer {

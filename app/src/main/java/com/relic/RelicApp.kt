@@ -10,6 +10,7 @@ import com.relic.dagger.modules.AuthModule
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import timber.log.Timber
 import javax.inject.Inject
 
 class RelicApp : Application(), HasActivityInjector{
@@ -20,6 +21,12 @@ class RelicApp : Application(), HasActivityInjector{
     override fun onCreate() {
         AppInjector.init(this)
         super.onCreate()
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(ReleaseTree())
+        }
 
         // opted not to provide GfyCore instance through dagger di since it's already a singleton
         GfyCoreInitializer.initialize(
@@ -32,5 +39,11 @@ class RelicApp : Application(), HasActivityInjector{
 
     override fun activityInjector(): AndroidInjector<Activity> {
         return dispatchingAndroidInjector
+    }
+
+    inner class ReleaseTree : Timber.Tree() {
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+            // TODO add firebase crashlytics
+        }
     }
 }

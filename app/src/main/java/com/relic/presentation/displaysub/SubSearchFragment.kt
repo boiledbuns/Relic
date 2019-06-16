@@ -20,6 +20,7 @@ import android.widget.Toast
 import com.relic.R
 import com.relic.presentation.main.RelicError
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
@@ -39,7 +40,7 @@ class SubSearchFragment : RelicFragment() {
         }).get(DisplaySubVM::class.java)
     }
 
-    private lateinit var source : PostRepository.PostSource
+    private lateinit var source : PostSource
     private lateinit var postAdapter: PostItemAdapter
 
     private var scrollLocked = true
@@ -47,7 +48,7 @@ class SubSearchFragment : RelicFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        source = arguments?.getParcelable(ARG_SOURCE) as PostRepository.PostSource
+        source = arguments?.getParcelable(ARG_SOURCE) as PostSource
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -146,7 +147,7 @@ class SubSearchFragment : RelicFragment() {
     companion object {
         val ARG_SOURCE = "post_source"
 
-        fun create(source  : PostRepository.PostSource) : SubSearchFragment {
+        fun create(source  : PostSource) : SubSearchFragment {
             val bundle = Bundle()
             bundle.putParcelable(ARG_SOURCE, source)
 

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.relic.R
 import com.relic.data.PostRepository
+import com.relic.data.PostSource
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
@@ -45,7 +46,7 @@ class LinkHandlerActivity : RelicActivity() {
                         displayFragment(
                             DisplayPostFragment.create(
                                 postId = "t3_" + urlDetails[3],
-                                postSource = PostRepository.PostSource.Subreddit(urlDetails[1]),
+                                postSource = PostSource.Subreddit(urlDetails[1]),
                                 enableVisitSub = true,
                                 subreddit = urlDetails[1]
                             )

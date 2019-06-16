@@ -114,8 +114,10 @@ class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserialize
 
             var deferredCommentData: Deferred<ParsedCommentData>? = null
             val commentEntity = gson.fromJson(commentPOJO.toString(), CommentEntity::class.java).apply {
-                parentPostId = removeTypePrefix(commentPOJO["link_id"] as String)
+
                 position = commentPosition
+                val parentPostId = removeTypePrefix(commentPOJO["link_id"] as String)
+                this.parentPostId = parentPostId
 
                 commentPOJO["replies"]?.let { childJson ->
                     // try to parse the child json as nested replies
@@ -131,7 +133,7 @@ class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserialize
                         }
                     }
                 }
-
+                submitter = commentPOJO["is_submitter"] as Boolean
                 // converts fields that have already been unmarshalled by gson
                 parent_id = removeTypePrefix(parent_id)
                 author_flair_text?.let {
@@ -157,6 +159,10 @@ class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserialize
                     editedDate = formatDate(commentPOJO["edited"] as Double)
                 } catch (e: Exception) {
 
+                }
+
+                if (author == null) {
+                    Log.d(TAG, "author is null")
                 }
             }
 

@@ -7,19 +7,21 @@ import com.relic.data.DomainTransfer
 import com.relic.data.repository.RepoConstants
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostGatewayImpl @Inject constructor(
     private val appDB : ApplicationDB,
-    private val requestManager: NetworkRequestManager
+    private val requestManager: NetworkRequestManager,
+    private val moshi : Moshi
 ) : PostGateway {
     var TAG = "POST_GATEWAY"
 
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint
-        var ending = RepoConstants.ENDPOINT + "api/vote?id=" + fullname + "&dir=$voteStatus"
+        val ending = RepoConstants.ENDPOINT + "api/vote?id=" + fullname + "&dir=$voteStatus"
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, ending)
             Log.d(TAG, "Success voting on post : $fullname to $voteStatus")

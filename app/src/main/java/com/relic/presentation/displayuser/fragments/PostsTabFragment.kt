@@ -3,6 +3,7 @@ package com.relic.presentation.displayuser.fragments
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import com.relic.domain.models.ListingItem
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
+import com.relic.presentation.displayuser.ErrorData
 import com.relic.presentation.displayuser.UserTab
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -20,7 +22,11 @@ import kotlinx.android.synthetic.main.display_user_submissions.*
 import kotlinx.android.synthetic.main.display_user_submissions.view.*
 
 class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate {
-    private lateinit var postsTabVM : DisplayUserVM
+
+    private val postsTabVM by lazy {
+        ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
+    }
+
     private lateinit var selectedUserTab : UserTab
 
     private lateinit var userPostsAdapter : ListingItemAdapter
@@ -29,29 +35,25 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        postsTabVM = ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
-
-        userPostsAdapter = ListingItemAdapter(postsTabVM)
-
         arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_user_submissions, container, false).apply {
-            userTabRecyclerView.apply {
-                adapter = userPostsAdapter
-                layoutManager = LinearLayoutManager(context)
-            }
-            userTabSwipeRefreshLayout.isRefreshing = true
-        }
+        return inflater.inflate(R.layout.display_user_submissions, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bindViewModel(viewLifecycleOwner)
+        userPostsAdapter = ListingItemAdapter(postsTabVM)
+        userTabRecyclerView.apply {
+            adapter = userPostsAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+        userTabSwipeRefreshLayout.isRefreshing = true
+
         attachScrollListeners()
     }
 
@@ -60,6 +62,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         postsTabVM.getTabPostsLiveData(selectedUserTab).nonNull().observe (lifecycleOwner) {
             setListingItems(it)
         }
+        postsTabVM.errorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
     }
 
     private fun attachScrollListeners() {
@@ -71,6 +74,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
                     // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
                     scrollLocked = true
+                    tabProgress.visibility = View.VISIBLE
                     // fetch the next post listing
                     postsTabVM.requestPosts(selectedUserTab, false)
                 }
@@ -84,10 +88,13 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     }
 
     private fun setListingItems(listingItems : List<ListingItem>) {
+        tabProgress.visibility = View.GONE
         if (listingItems.isNotEmpty()) {
             userPostsAdapter.setItems(listingItems)
             userTabSwipeRefreshLayout.isRefreshing = false
             scrollLocked = false
+        } else {
+            Snackbar.make(userTabRoot, getString(R.string.no_posts), Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -97,6 +104,19 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         userPostsAdapter.clear()
 
         userTabSwipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun handleError(errorData: ErrorData) {
+        when(errorData) {
+            is ErrorData.NoMorePosts -> {
+                if (selectedUserTab == errorData.tab) {
+                    Snackbar.make(view!!, "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
+                    tabProgress.visibility = View.GONE
+                    userTabSwipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }
+
     }
 
     // region delegate functions

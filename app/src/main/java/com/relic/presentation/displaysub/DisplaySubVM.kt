@@ -4,10 +4,9 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.relic.data.*
 import com.relic.presentation.main.RelicError
 
-import com.relic.data.PostRepository
-import com.relic.data.SubRepository
 import com.relic.data.gateway.PostGateway
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
@@ -23,7 +22,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 open class DisplaySubVM (
-    private val postSource: PostRepository.PostSource,
+    private val postSource: PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
     private val postGateway: PostGateway,
@@ -36,13 +35,13 @@ open class DisplaySubVM (
         private val postGateway: PostGateway,
         private val networkUtil : NetworkUtil
     ) {
-        fun create (postSource : PostRepository.PostSource) : DisplaySubVM {
+        fun create (postSource : PostSource) : DisplaySubVM {
             return DisplaySubVM(postSource, subRepo, postRepo, postGateway, networkUtil)
         }
     }
 
-    private var currentSortingType = PostRepository.SortType.DEFAULT
-    private var currentSortingScope = PostRepository.SortScope.NONE
+    private var currentSortingType = SortType.DEFAULT
+    private var currentSortingScope = SortScope.NONE
     private var retrievalInProgress = true
     private var after : String? = null
     private var query : String? = null
@@ -74,9 +73,9 @@ open class DisplaySubVM (
         }
 
         when (postSource) {
-            is PostRepository.PostSource.Subreddit -> initializeSubredditInformation(postSource.subredditName)
-            is PostRepository.PostSource.Frontpage -> {}
-            is PostRepository.PostSource.All -> {}
+            is PostSource.Subreddit -> initializeSubredditInformation(postSource.subredditName)
+            is PostSource.Frontpage -> {}
+            is PostSource.All -> {}
         }
 
         _subInfoLiveData.postValue(DisplaySubInfoData(
@@ -155,7 +154,7 @@ open class DisplaySubVM (
      * @param sortType : code corresponding to sort type
      * @param sortScope : code corresponding to sort scope
      */
-    override fun changeSortingMethod(sortType: PostRepository.SortType?, sortScope: PostRepository.SortScope?) {
+    override fun changeSortingMethod(sortType: SortType?, sortScope: SortScope?) {
         // update the current sorting method and scope if it has changed
         sortType?.let { currentSortingType = it }
         sortScope?.let { currentSortingScope = it }
@@ -181,7 +180,7 @@ open class DisplaySubVM (
     }
 
     override fun updateSubStatus(subscribe: Boolean) {
-        if (postSource is PostRepository.PostSource.Subreddit) {
+        if (postSource is PostSource.Subreddit) {
             val subName = postSource.subredditName
             Log.d(TAG, "Changing to subscribed $subscribe")
 
@@ -230,7 +229,7 @@ open class DisplaySubVM (
         this.query = query
         launch(Dispatchers.Main) {
             val results = when (postSource) {
-                is PostRepository.PostSource.Subreddit -> {
+                is PostSource.Subreddit -> {
                     postRepo.searchSubPosts(postSource.subredditName, query, true)
                 }
                 else -> {
@@ -250,7 +249,7 @@ open class DisplaySubVM (
         launch(Dispatchers.Main) {
             if (after != null && currQuery != null){
                 val results = when (postSource) {
-                    is PostRepository.PostSource.Subreddit -> {
+                    is PostSource.Subreddit -> {
                         postRepo.searchSubPosts(postSource.subredditName, currQuery, true, after)
                     }
                     else -> {

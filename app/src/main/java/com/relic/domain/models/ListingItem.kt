@@ -1,13 +1,22 @@
 package com.relic.domain.models
 
+import com.relic.api.qualifier.Likes
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 open class ListingItem {
 
     // the id is the "full name" of an item
+    @Json(name = "name")
     open var fullName = ""
-    lateinit var author: String
+    var author: String = ""
 
     var visited: Boolean = false
-    var userUpvoted: Int = 0
+
+    @Json(name = "likes")
+    @Likes var userUpvoted: Int = 0
+
     var saved: Boolean = false
     var subreddit : String? = null
 
