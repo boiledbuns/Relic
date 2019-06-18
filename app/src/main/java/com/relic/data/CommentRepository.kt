@@ -1,8 +1,10 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
+import com.relic.api.response.Listing
 
 import com.relic.domain.models.CommentModel
+import com.relic.domain.models.PostModel
 
 interface CommentRepository {
 
@@ -21,7 +23,7 @@ interface CommentRepository {
      * @param postFullName id of a post
      * @param refresh whether to refresh comments or get next
      */
-    suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean)
+    suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) : CommentsAndPostData
 
     suspend fun retrieveCommentChildren(moreChildrenComment: CommentModel)
 
@@ -38,3 +40,8 @@ interface CommentRepository {
      */
     suspend fun postComment(parent: String, text : String)
 }
+
+data class CommentsAndPostData(
+    val post : PostModel,
+    val commentListing : Listing<out CommentModel>
+)

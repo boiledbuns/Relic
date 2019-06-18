@@ -71,7 +71,7 @@
     <!-- display post error strings -->
     <string name="network_unavailable">Network unavailable</string>
     <string name="unknown_error">An unknown error occurred</string>
-    <string name="no_comments">This post has no comments</string>
+    <string name="no_comments">Doesn\'t look like anything\'s here</string>
     <string name="retry">retry</string>
     <string name="refresh">refresh</string>
 

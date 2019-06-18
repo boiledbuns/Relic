@@ -1,5 +1,7 @@
 package com.relic.data.deserializer
 
+import com.relic.api.response.Listing
+import com.relic.data.CommentsAndPostData
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.SubSearchResult
@@ -7,6 +9,7 @@ import com.relic.data.entities.*
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.UserModel
 import com.relic.domain.exception.RelicException
+import com.relic.domain.models.PostModel
 import org.json.simple.JSONObject
 
 /**
@@ -29,6 +32,8 @@ interface Contract {
     }
 
     interface CommentDeserializer {
+        suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData
+
         suspend fun parseCommentsResponse(
             postFullName: String,
             response: String
@@ -88,4 +93,4 @@ data class ParsedSubsData(
     val after : String?
 )
 
-class RelicParseException(response : String, cause : Throwable) : RelicException("error parsing response : `$response`", cause)
+class RelicParseException(response : String, cause : Throwable? = null) : RelicException("error parsing response : `$response`", cause)

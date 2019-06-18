@@ -14,12 +14,6 @@ interface DisplayPostContract {
 
     interface ViewModel {
         fun refreshData()
-
-        /**
-         * Hook for view to tell the ViewModel to retrieve more comments
-         * @param refresh whether the comments should be refreshed or not
-         */
-        fun retrieveMoreComments(refresh: Boolean = false)
     }
 
     interface PostViewDelegate {

@@ -4,7 +4,6 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.ToJson
-import org.jetbrains.annotations.Nullable
 
 @JsonQualifier
 internal annotation class Likes

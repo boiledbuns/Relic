@@ -1,5 +1,6 @@
 package com.relic.domain.models
 
+import com.relic.api.response.Listing
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -46,6 +47,8 @@ class CommentModel : ListingItem() {
         set(value: String) {
             super.fullName = value
         }
+
+//    var replies: Listing<CommentModel>? = null
 
     companion object {
         var UPVOTE = 1

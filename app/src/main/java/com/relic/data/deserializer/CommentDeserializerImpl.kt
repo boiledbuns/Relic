@@ -3,15 +3,21 @@ package com.relic.data.deserializer
 import android.text.Html
 import android.util.Log
 import com.google.gson.GsonBuilder
+import com.relic.api.response.Listing
+import com.relic.data.CommentsAndPostData
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.domain.models.CommentModel
+import com.relic.domain.models.ListingItem
+import com.relic.domain.models.PostModel
+import com.squareup.moshi.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
+import timber.log.Timber
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,7 +27,9 @@ import kotlin.math.pow
 
 // TODO convert to object and add interface so this can be injected
 @Singleton
-class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserializer {
+class CommentDeserializerImpl @Inject constructor(
+    private val moshi: Moshi
+): Contract.CommentDeserializer {
     private val TAG = "COMMENT_DESERIALIZER"
 
     private val jsonParser: JSONParser = JSONParser()
@@ -29,13 +37,20 @@ class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserialize
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val currentYear = Date().year
 
+
+    private val commentType = Types.newParameterizedType(Listing::class.java, CommentModel::class.java)
+    private val commentListingAdapter = moshi.adapter<Listing<CommentModel>>(commentType)
+
+    private val postType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
+    private val postListingAdapter = moshi.adapter<Listing<PostModel>>(postType)
+
     // region interface methods
 
     override suspend fun parseCommentsResponse(
         postFullName: String,
         response: String
     ) : ParsedCommentData {
-        // the comment data is nested as the first element within an array
+        // the comment data is nested as the second element within an array
         val requestData = jsonParser.parse(response) as JSONArray
         val parentPostId = removeTypePrefix(postFullName)
 
@@ -45,6 +60,29 @@ class CommentDeserializerImpl @Inject constructor(): Contract.CommentDeserialize
             throw RelicParseException(response, e)
         }
     }
+
+    override suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData {
+        return try {
+            // the comment data is nested as the second element within an array
+            val parentChildList = jsonParser.parse(response) as JSONArray
+
+            Timber.log(0, "parse comments child ${parentChildList[1].toString()}")
+            val postListing = postListingAdapter.fromJson(parentChildList[0].toString()) ?: throw RelicParseException(response)
+            val commentListing= commentListingAdapter.fromJson(parentChildList[1].toString()) ?: throw RelicParseException(response)
+
+            CommentsAndPostData(postListing.data.children!!.first(), commentListing)
+        } catch (e : ParseException) {
+            throw RelicParseException(response, e)
+        }
+    }
+
+//    inner class CommentResponseAdapter() {
+//        @FromJson
+//
+//        @ToJson
+//        fun toJson
+//    }
+
 
     /**
      * Only use this method to parse the return from "morechildren" since it uses a different

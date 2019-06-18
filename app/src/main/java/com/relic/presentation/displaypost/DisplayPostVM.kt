@@ -4,24 +4,24 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
+import com.relic.data.repository.NetworkException
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
-import com.relic.data.repository.NetworkException
 import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -65,8 +65,11 @@ class DisplayPostVM (
     private var retrievalInProgress = true
 
     init {
-        observeLiveData()
-        refreshData()
+        if (networkUtil.checkConnection()) {
+            refreshData()
+        } else {
+            observeLiveData()
+        }
     }
 
     /**
@@ -90,29 +93,19 @@ class DisplayPostVM (
 
     override fun refreshData() {
         if (networkUtil.checkConnection()) {
-
             launch(Dispatchers.Main) {
-                val commentJob = launch { retrieveMoreComments(true) }
-                val postJob = launch { postRepo.retrievePost(subName, postFullname, postSource) }
+                commentRepo.clearAllCommentsFromSource(postFullname)
+                commentRepo.retrieveComments(subName, postFullname, refresh = true).let {
+                    _postLiveData.postValue(it.post)
+                    _commentListLiveData.postValue(it.commentListing.data.children)
+                }
 
-                joinAll(commentJob, postJob)
                 retrievalInProgress = false
             }
         }
         else {
             publishException(PostErrorData.NetworkUnavailable)
             retrievalInProgress = false
-        }
-    }
-
-    override fun retrieveMoreComments(refresh: Boolean) {
-        // TODO check if there is connection
-        // retrieves post and comments from network
-        launch(Dispatchers.Main) {
-            if (refresh) {
-                commentRepo.clearAllCommentsFromSource(postFullname)
-            }
-            commentRepo.retrieveComments(subName, postFullname, refresh)
         }
     }
 

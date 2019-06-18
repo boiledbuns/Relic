@@ -3,16 +3,16 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-
 import com.relic.data.deserializer.Contract
-import com.relic.network.NetworkRequestManager
 import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
-import com.relic.domain.models.CommentModel
 import com.relic.data.repository.RepoConstants
+import com.relic.domain.models.CommentModel
+import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import dagger.Reusable
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @Reusable
@@ -52,7 +52,7 @@ class CommentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) {
+    override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) : CommentsAndPostData {
         val postName = commentDeserializer.removeTypePrefix(postFullName)
         var url = "${RepoConstants.ENDPOINT}r/$subName/comments/$postName?count=20"
 
@@ -65,12 +65,7 @@ class CommentRepositoryImpl @Inject constructor(
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
             Log.d(TAG, "$response")
 
-            val parsedData = commentDeserializer.parseCommentsResponse(
-                postFullName = postFullName,
-                response = response
-            )
-
-            insertComments(parsedData.commentList, parsedData.listingEntity)
+            return commentDeserializer.parseCommentsAndPost(response)
         }
         catch (e : Exception) {
             throw DomainTransfer.handleException("retrieve comments", e) ?: e
@@ -144,7 +139,6 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     // endregion interface
-
 
     /**
      * only use this function to insert comments to ensure they're inserted with an associated
