@@ -43,5 +43,5 @@ interface CommentRepository {
 
 data class CommentsAndPostData(
     val post : PostModel,
-    val commentListing : Listing<out CommentModel>
+    val comments : List<CommentModel>
 )

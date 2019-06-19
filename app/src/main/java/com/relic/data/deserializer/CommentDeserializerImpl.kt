@@ -18,11 +18,13 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import timber.log.Timber
+import java.lang.ClassCastException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 import kotlin.math.pow
 
 // TODO convert to object and add interface so this can be injected
@@ -37,9 +39,12 @@ class CommentDeserializerImpl @Inject constructor(
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val currentYear = Date().year
 
-
+    private val commentAdapter = moshi.adapter(CommentModel::class.java)
     private val commentType = Types.newParameterizedType(Listing::class.java, CommentModel::class.java)
     private val commentListingAdapter = moshi.adapter<Listing<CommentModel>>(commentType)
+
+    private val commentListType = Types.newParameterizedType(List::class.java, CommentModel::class.java)
+    private val commentListAdapter = moshi.adapter<List<CommentModel>>(commentListType)
 
     private val postType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
     private val postListingAdapter = moshi.adapter<Listing<PostModel>>(postType)
@@ -62,19 +67,60 @@ class CommentDeserializerImpl @Inject constructor(
     }
 
     override suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData {
-        return try {
+        try {
             // the comment data is nested as the second element within an array
             val parentChildList = jsonParser.parse(response) as JSONArray
 
-            Timber.log(0, "parse comments child ${parentChildList[1].toString()}")
+            Timber.d("parse comments child ${parentChildList[1].toString()}")
             val postListing = postListingAdapter.fromJson(parentChildList[0].toString()) ?: throw RelicParseException(response)
-            val commentListing= commentListingAdapter.fromJson(parentChildList[1].toString()) ?: throw RelicParseException(response)
+            val commentListing= parseComments(parentChildList[1] as JSONObject)
 
-            CommentsAndPostData(postListing.data.children!!.first(), commentListing)
+             return CommentsAndPostData(postListing.data.children!!.first(), commentListing)
         } catch (e : ParseException) {
             throw RelicParseException(response, e)
         }
     }
+
+    private suspend fun parseComments(listing : JSONObject) : MutableList<CommentModel> {
+        // moshi can't handle this, so we have no choice but to parse the nested replies separate
+        // from how individual comments are parsed.
+        val replies = listing.unwrapListing().children()
+        return replies.fold(ArrayList()) { accum, commentJson ->
+            val comment = (commentJson as JSONObject).unwrapChild()
+            val currentComment : CommentModel = commentAdapter.fromJson(commentJson.toString())!!
+
+            // apparently this could be a string as well
+            var repliesListingJson : JSONObject? = null
+            try {
+                repliesListingJson = comment["replies"] as JSONObject?
+            } catch (e : ClassCastException) { }
+
+            // recursive call to parse replies to this comment
+            val children = if (repliesListingJson != null) parseComments(repliesListingJson) else null
+
+            Timber.d("current comment $currentComment")
+            Timber.d("replies ${children?.size} : $repliesListingJson")
+            
+            // accumulate comment and its replies
+            accum.apply {
+                if (currentComment != null) add(currentComment)
+                if (children != null) addAll(children)
+            }
+        }
+    }
+
+    private fun JSONObject.unwrapListing() : JSONObject {
+        return get("data") as JSONObject
+    }
+
+    private fun JSONObject.unwrapChild() : JSONObject {
+        return get("data") as JSONObject
+    }
+
+    private fun JSONObject.children() : JSONArray {
+        return get("children") as JSONArray
+    }
+
 
 //    inner class CommentResponseAdapter() {
 //        @FromJson

@@ -1,13 +1,14 @@
 package com.relic.domain.models
 
-import com.relic.api.response.Listing
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class CommentModel : ListingItem() {
+class CommentModel: ListingItem() {
 
     var id: String? = null
+
+    @Json(name = "body_html")
     var body: String = ""
     var created: String? = null
     var score: Int = 0
@@ -47,8 +48,6 @@ class CommentModel : ListingItem() {
         set(value: String) {
             super.fullName = value
         }
-
-//    var replies: Listing<CommentModel>? = null
 
     companion object {
         var UPVOTE = 1

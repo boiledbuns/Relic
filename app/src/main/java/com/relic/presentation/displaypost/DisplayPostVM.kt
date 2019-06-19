@@ -97,7 +97,7 @@ class DisplayPostVM (
                 commentRepo.clearAllCommentsFromSource(postFullname)
                 commentRepo.retrieveComments(subName, postFullname, refresh = true).let {
                     _postLiveData.postValue(it.post)
-                    _commentListLiveData.postValue(it.commentListing.data.children)
+                    _commentListLiveData.postValue(it.comments)
                 }
 
                 retrievalInProgress = false
