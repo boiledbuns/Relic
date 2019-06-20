@@ -21,7 +21,7 @@ class CommentEntity {
     var parentPostId: String? = null
 
     // parent comment id
-    @ColumnInfo(name = "parentId")
+    @ColumnInfo(name = "parentFullname")
     var parent_id: String = ""
 
     @ColumnInfo(name = "body")

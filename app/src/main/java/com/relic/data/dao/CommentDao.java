@@ -23,8 +23,8 @@ public abstract class CommentDao {
 
     @Query("SELECT * FROM CommentEntity " +
         "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE parentId = :parentId AND depth < :depth ORDER BY depth ASC")
-    public abstract LiveData<List<CommentModel>> getChildrenByLevel(String parentId, int depth);
+        "WHERE parentPostId = :postId AND depth < :depth ORDER BY depth ASC")
+    public abstract LiveData<List<CommentModel>> getChildrenByLevel(String postId, int depth);
 
     @Query("DELETE from CommentEntity WHERE parentPostId = :postId")
     public abstract void deletePostComments(String postId);

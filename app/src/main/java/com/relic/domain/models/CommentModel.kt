@@ -13,11 +13,13 @@ class CommentModel: ListingItem() {
     var created: String? = null
     var score: Int = 0
 
-    // post parent fullname, NOT id
-    var parentPostId: String = ""
+    // fullname of this comment's direct ancestor (could be a post or comment)
+    @Json(name = "parent_id")
+    var parentFullname: String = ""
 
-    // fullname of the parent post
-    @Json(name = "link_id") var parentPost: String? = null
+    // fullname of this comment's root post
+    @Json(name = "link_id")
+    var linkFullname: String? = null
 
     var authorFlairText: String? = null
 
@@ -42,12 +44,6 @@ class CommentModel: ListingItem() {
 
     val isLoadMore: Boolean
         get() = author == ""
-
-    override var fullName: String
-        get() = if (id == null) "" else "t1_$id"
-        set(value: String) {
-            super.fullName = value
-        }
 
     companion object {
         var UPVOTE = 1

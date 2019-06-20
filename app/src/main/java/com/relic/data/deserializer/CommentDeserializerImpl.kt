@@ -11,9 +11,7 @@ import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -67,17 +65,19 @@ class CommentDeserializerImpl @Inject constructor(
     }
 
     override suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData {
-        try {
-            // the comment data is nested as the second element within an array
-            val parentChildList = jsonParser.parse(response) as JSONArray
+        return withContext(Dispatchers.Default) {
+            try {
+                // the comment data is nested as the second element within an array
+                val parentChildList = jsonParser.parse(response) as JSONArray
 
-            Timber.d("parse comments child ${parentChildList[1].toString()}")
-            val postListing = postListingAdapter.fromJson(parentChildList[0].toString()) ?: throw RelicParseException(response)
-            val commentListing= parseComments(parentChildList[1] as JSONObject)
+                Timber.d("parse comments child ${parentChildList[1].toString()}")
+                val postListing = postListingAdapter.fromJson(parentChildList[0].toString()) ?: throw RelicParseException(response)
+                val commentListing= parseComments(parentChildList[1] as JSONObject)
 
-             return CommentsAndPostData(postListing.data.children!!.first(), commentListing)
-        } catch (e : ParseException) {
-            throw RelicParseException(response, e)
+                CommentsAndPostData(postListing.data.children!!.first(), commentListing)
+            } catch (e : ParseException) {
+                throw RelicParseException(response, e)
+            }
         }
     }
 
@@ -87,7 +87,7 @@ class CommentDeserializerImpl @Inject constructor(
         val replies = listing.unwrapListing().children()
         return replies.fold(ArrayList()) { accum, commentJson ->
             val comment = (commentJson as JSONObject).unwrapChild()
-            val currentComment : CommentModel = commentAdapter.fromJson(commentJson.toString())!!
+            val currentComment = commentAdapter.fromJson(commentJson.toString())!!
 
             // apparently this could be a string as well
             var repliesListingJson : JSONObject? = null
@@ -103,7 +103,7 @@ class CommentDeserializerImpl @Inject constructor(
             
             // accumulate comment and its replies
             accum.apply {
-                if (currentComment != null) add(currentComment)
+                add(currentComment)
                 if (children != null) addAll(children)
             }
         }
@@ -162,7 +162,7 @@ class CommentDeserializerImpl @Inject constructor(
 
                     val moreComment = unmarshallMore(
                         moreData,
-                        moreChildrenComment.parentPostId,
+                        moreChildrenComment.parentFullname,
                         moreChildrenComment.position + commentCount*scale
                     )
                     commentCount += 1

@@ -62,31 +62,17 @@ class DisplayPostVM (
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
     val errorLiveData : LiveData<PostErrorData> = _errorLiveData
 
-    private var retrievalInProgress = true
-
     init {
+        _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
+            _postLiveData.postValue(post)
+        }
+
         if (networkUtil.checkConnection()) {
             refreshData()
         } else {
-            observeLiveData()
-        }
-    }
-
-    /**
-     * Add sources and listeners to all local livedata
-     */
-    private fun observeLiveData() {
-        _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
-            post?.let {
-                _postLiveData.postValue(it)
-            }
-        }
-
-        _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { nullableComments ->
-            nullableComments?.let { comments ->
-                if (!retrievalInProgress) {
-                    _commentListLiveData.postValue(comments)
-                }
+            // add source if the network is available to prevent sending empty comments
+            _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
+                _commentListLiveData.postValue(comments)
             }
         }
     }
@@ -99,13 +85,10 @@ class DisplayPostVM (
                     _postLiveData.postValue(it.post)
                     _commentListLiveData.postValue(it.comments)
                 }
-
-                retrievalInProgress = false
             }
         }
         else {
             publishException(PostErrorData.NetworkUnavailable)
-            retrievalInProgress = false
         }
     }
 

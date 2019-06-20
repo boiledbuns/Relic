@@ -9,7 +9,7 @@ open class ListingItem {
 
     // the id is the "full name" of an item
     @Json(name = "name")
-    open var fullName = ""
+    var fullName = ""
     var author: String = ""
 
     var visited: Boolean = false

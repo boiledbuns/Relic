@@ -13,6 +13,7 @@ import com.relic.network.request.RelicOAuthRequest
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @Reusable
@@ -63,7 +64,7 @@ class CommentRepositoryImpl @Inject constructor(
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
-            Log.d(TAG, "$response")
+            Timber.d("$response")
 
             return commentDeserializer.parseCommentsAndPost(response)
         }
@@ -82,7 +83,7 @@ class CommentRepositoryImpl @Inject constructor(
             put("api_type", "json")
             put("children", idList.toString())
             put("limit_children", "false")
-            put("link_id", "t3_" + moreChildrenComment.parentPostId)
+            put("link_id", "t3_" + moreChildrenComment.parentFullname)
             put("sort", "confidence")
         }
 

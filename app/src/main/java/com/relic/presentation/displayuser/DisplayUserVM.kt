@@ -180,7 +180,7 @@ class DisplayUserVM(
                     postSource
             )
             is CommentModel -> SubNavigationData.ToPost(
-                    listingItem.parentPost!!,
+                    listingItem.linkFullname!!,
                     listingItem.subreddit!!,
                     postSource,
                     listingItem.fullName
