@@ -92,14 +92,6 @@ class DisplayPostVM (
         }
     }
 
-    private fun insertReplies (position : Int, replies : List<CommentModel>) {
-        _commentListLiveData.value?.let { commentList ->
-            _commentListLiveData.postValue(commentList.toMutableList().apply {
-                addAll(position + 1, replies)
-            })
-        }
-    }
-
     private fun removeReplies (position : Int) {
         _commentListLiveData.value?.toMutableList()?.let { commentList ->
             val parentDepth = commentList[position].depth
@@ -137,26 +129,21 @@ class DisplayPostVM (
 
     //  region view action delegate
 
-    override fun onExpandReplies(commentId: String, expanded : Boolean) {
-        val commentPosition = _commentListLiveData.value!!.indexOfFirst { it.fullName == commentId }
-        val commentModel = _commentListLiveData.value!![commentPosition]
+    override fun onExpandReplies(commentId: String,  expanded : Boolean) {
+        val parentPos = _commentListLiveData.value!!.indexOfFirst { it.fullName == commentId }
+        val commentModel = _commentListLiveData.value!![parentPos]
 
         if (expanded) {
-            removeReplies(commentPosition)
+            removeReplies(parentPos)
         } else {
-            val commentSource = commentRepo.getReplies(commentModel.fullName)
-            _commentListLiveData.addSource(commentSource) { replies ->
-                replies?.let {
-                    if (it.isNotEmpty()) {
-                        insertReplies(commentPosition, it)
-                    } else {
-                        launch(Dispatchers.Main) {
-                            // TODO retrieve comments from server if replies are not loaded
-                            commentRepo.retrieveCommentChildren(commentModel)
-                        }
-                    }
-                    // remove this as a source since this is a one off to retrieve replies
-                    _commentListLiveData.removeSource(commentSource)
+            launch(Dispatchers.Main){
+                val moreReplies = commentRepo.retrieveCommentChildren(postFullname, commentModel)
+
+                _commentListLiveData.value?.let { commentList ->
+                    _commentListLiveData.postValue(commentList.toMutableList().apply {
+                        removeAt(parentPos)
+                        addAll(parentPos, moreReplies)
+                    })
                 }
             }
         }

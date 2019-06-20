@@ -41,33 +41,33 @@ abstract class UserPostingDao {
     abstract fun getUserHidden(): LiveData<List<PostModel>>
 
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userCommentsPosition >= 0 ORDER BY userCommentsPosition ASC")
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE CommentModel.userCommentsPosition >= 0 ORDER BY CommentModel.userCommentsPosition ASC")
     abstract fun getUserComments(): LiveData<List<CommentModel>>
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userSavedPosition >= 0 ORDER BY userSavedPosition ASC")
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE CommentModel.userSavedPosition >= 0 ORDER BY CommentModel.userSavedPosition ASC")
     abstract fun getUserSavedComments(): LiveData<List<CommentModel>>
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userUpvotedPosition >= 0 ORDER BY userUpvotedPosition ASC")
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE CommentModel.userUpvotedPosition >= 0 ORDER BY CommentModel.userUpvotedPosition ASC")
     abstract fun getUserUpvotedComments(): LiveData<List<CommentModel>>
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE  userDownvotedPosition >= 0 ORDER BY userDownvotedPosition ASC")
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE CommentModel.userDownvotedPosition >= 0 ORDER BY CommentModel.userDownvotedPosition ASC")
     abstract fun getUserDownvotedComments(): LiveData<List<CommentModel>>
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userGildedPosition >= 0 ORDER BY userGildedPosition ASC")
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE CommentModel.userGildedPosition >= 0 ORDER BY CommentModel.userGildedPosition ASC")
     abstract fun getUserGildedComments(): LiveData<List<CommentModel>>
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE userHiddenPosition >= 0 ORDER BY userHiddenPosition ASC")
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE CommentModel.userHiddenPosition >= 0 ORDER BY CommentModel.userHiddenPosition ASC")
     abstract fun getUserHiddenComments(): LiveData<List<CommentModel>>
 }

@@ -42,12 +42,7 @@ interface Contract {
         suspend fun parseMoreCommentsResponse(
             moreChildrenComment: CommentModel,
             response : String
-        ) : List<CommentEntity>
-
-        suspend fun unmarshallComment(
-            commentChild : JSONObject,
-            commentPosition : Float
-        ) : List<CommentEntity>
+        ) : List<CommentModel>
 
         fun removeTypePrefix(fullName : String) : String
     }
@@ -78,13 +73,13 @@ data class ParsedPostData(
 data class ParsedPostsData(
     val postSourceEntities:List<PostSourceEntity>,
     val postEntities : List<PostEntity>,
-    val commentEntities : List<CommentEntity>,
+    val commentEntities : List<CommentModel>,
     val listingEntity: ListingEntity
 )
 
 data class ParsedCommentData(
     val listingEntity : ListingEntity,
-    val commentList : List<CommentEntity>,
+    val commentList : List<CommentModel>,
     val replyCount : Int
 )
 

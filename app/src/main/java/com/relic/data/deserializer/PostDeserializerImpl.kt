@@ -4,10 +4,10 @@ import android.text.Html
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.relic.data.*
-import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
+import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
@@ -72,7 +72,7 @@ class PostDeserializerImpl @Inject constructor(
         listingKey : String
     ) : ParsedPostsData = coroutineScope {
         val postEntities = ArrayList<PostEntity>()
-        val commentEntities = ArrayList<CommentEntity>()
+        val commentEntities = ArrayList<CommentModel>()
         val postSourceEntities = ArrayList<PostSourceEntity>()
         val listing = ListingEntity()
 
@@ -95,32 +95,18 @@ class PostDeserializerImpl @Inject constructor(
             val fullEntityJson = (postIterator.next() as JSONObject)
 
             try {
-                var postSourceEntity: PostSourceEntity?
-                val postKind = fullEntityJson["kind"] as String
+                val post = fullEntityJson["data"] as JSONObject
+                val newPost = extractPost(post)
+                postEntities.add(newPost)
 
-                if (postKind.equals(TYPE_POST)) {
+                val existingPostSource = async(Dispatchers.IO) {
+                    appDB.postSourceDao.getPostSource(newPost.name)
+                }.await()
 
-                    val post = fullEntityJson["data"] as JSONObject
-                    val newPost = extractPost(post)
-                    postEntities.add(newPost)
-
-                    val existingPostSource = async(Dispatchers.IO) {
-                        appDB.postSourceDao.getPostSource(newPost.name)
-                    }.await()
-
-                    postSourceEntity = existingPostSource?.apply {
-                        sourceId = newPost.name
-                        subreddit = newPost.subreddit
-                    } ?: PostSourceEntity(newPost.name, newPost.subreddit)
-                } else {
-                    val newComment = commentDeserializer.unmarshallComment(
-                        commentChild = fullEntityJson,
-                        commentPosition = 0F
-                    ).first()
-                    commentEntities.add(newComment)
-
-                    postSourceEntity = PostSourceEntity(newComment.id, newComment.subreddit)
-                }
+                val postSourceEntity = existingPostSource?.apply {
+                    sourceId = newPost.name
+                    subreddit = newPost.subreddit
+                } ?: PostSourceEntity(newPost.name, newPost.subreddit)
 
                 setSource(postSourceEntity, postSource, postCount)
                 postSourceEntities.add(postSourceEntity)

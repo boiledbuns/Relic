@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.relic.data.deserializer.Contract
-import com.relic.data.entities.CommentEntity
 import com.relic.data.entities.ListingEntity
 import com.relic.data.repository.RepoConstants
 import com.relic.domain.models.CommentModel
@@ -73,17 +72,16 @@ class CommentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun retrieveCommentChildren(moreChildrenComment: CommentModel) {
+    override suspend fun retrieveCommentChildren(postFullName: String, moreChildrenComment: CommentModel) : List<CommentModel> {
         val url = "${RepoConstants.ENDPOINT}api/morechildren"
 
-        val removedQuotations = moreChildrenComment.body.replace("\"", "")
-        val idList = removedQuotations.subSequence(1, removedQuotations.length - 1)
+        val idList = moreChildrenComment.more!!.toString().drop(1).dropLast(1)
 
         val postData = HashMap<String, String>().apply {
             put("api_type", "json")
-            put("children", idList.toString())
+            put("children", idList)
             put("limit_children", "false")
-            put("link_id", "t3_" + moreChildrenComment.parentFullname)
+            put("link_id", postFullName)
             put("sort", "confidence")
         }
 
@@ -94,12 +92,7 @@ class CommentRepositoryImpl @Inject constructor(
                 data = postData
             )
 
-            val commentEntities = commentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
-
-            withContext (Dispatchers.IO) {
-                commentDao.deleteComment(moreChildrenComment.fullName)
-                commentDao.insertComments(commentEntities)
-            }
+            return commentDeserializer.parseMoreCommentsResponse(moreChildrenComment, response)
         } catch (e : Exception) {
             throw DomainTransfer.handleException("retrieve comment children", e) ?: e
         }
@@ -145,7 +138,7 @@ class CommentRepositoryImpl @Inject constructor(
      * only use this function to insert comments to ensure they're inserted with an associated
      * listing
      */
-    private suspend fun insertComments(comments : List<CommentEntity>, listing : ListingEntity) {
+    private suspend fun insertComments(comments : List<CommentModel>, listing : ListingEntity) {
         withContext(Dispatchers.IO) {
             commentDao.insertComments(comments)
             appDB.listingDAO.insertListing(listing)

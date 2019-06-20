@@ -1,12 +1,17 @@
 package com.relic.domain.models
 
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
+import com.relic.api.qualifier.More
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class CommentModel: ListingItem() {
+@Entity
+open class CommentModel: ListingItem() {
 
-    var id: String? = null
+    @PrimaryKey
+    var id: String = ""
 
     @Json(name = "body_html")
     var body: String = ""
@@ -27,6 +32,7 @@ class CommentModel: ListingItem() {
     var gold: Int = 0
     var silver: Int = 0
 
+    @Json(name = "is_submitter")
     var isSubmitter: Boolean = false
 
 //    var edited: String? = null
@@ -40,10 +46,15 @@ class CommentModel: ListingItem() {
     @Json(name = "link_author")
     var linkAuthor: String? = null
 
-    var position: Float = 0.toFloat()
+    var position: Float = 0F
 
     val isLoadMore: Boolean
         get() = author == ""
+
+    // use only if this is a "more" comment in which case this will be a list of ids
+    @More
+    @Json(name = "children")
+    var more : List<String>? = null
 
     companion object {
         var UPVOTE = 1

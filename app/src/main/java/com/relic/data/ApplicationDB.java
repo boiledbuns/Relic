@@ -3,6 +3,7 @@ package com.relic.data;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.relic.data.dao.AccountDao;
@@ -14,12 +15,12 @@ import com.relic.data.dao.SubredditDao;
 import com.relic.data.dao.TokenStoreDao;
 import com.relic.data.dao.UserPostingDao;
 import com.relic.data.entities.AccountEntity;
-import com.relic.data.entities.CommentEntity;
 import com.relic.data.entities.ListingEntity;
 import com.relic.data.entities.PostEntity;
 import com.relic.data.entities.PostSourceEntity;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.entities.TokenStoreEntity;
+import com.relic.domain.models.CommentModel;
 
 @Database(
     entities = {
@@ -27,13 +28,14 @@ import com.relic.data.entities.TokenStoreEntity;
         PostEntity.class,
         PostSourceEntity.class,
         ListingEntity.class,
-        CommentEntity.class,
+        CommentModel.class,
         AccountEntity.class,
         TokenStoreEntity.class
     },
     version = 7,
     exportSchema = false
 )
+@TypeConverters(com.relic.data.TypeConverters.class)
 public abstract class ApplicationDB extends RoomDatabase{
   private static ApplicationDB INSTANCE;
 

@@ -6,7 +6,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.relic.data.entities.CommentEntity;
 import com.relic.domain.models.CommentModel;
 
 import java.util.List;
@@ -14,21 +13,21 @@ import java.util.List;
 @Dao
 public abstract class CommentDao {
     @Insert (onConflict = OnConflictStrategy.REPLACE)
-    public abstract void insertComments(List<CommentEntity> commentEntities);
+    public abstract void insertComments(List<CommentModel> commentEntities);
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE parentPostId = :postId ORDER BY position")
-    public abstract LiveData<List<CommentModel>> getAllComments(String postId);
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE linkFullname = :postFullname ORDER BY position")
+    public abstract LiveData<List<CommentModel>> getAllComments(String postFullname);
 
-    @Query("SELECT * FROM CommentEntity " +
-        "LEFT JOIN PostSourceEntity ON CommentEntity.id = PostSourceEntity.sourceId " +
-        "WHERE parentPostId = :postId AND depth < :depth ORDER BY depth ASC")
-    public abstract LiveData<List<CommentModel>> getChildrenByLevel(String postId, int depth);
+    @Query("SELECT * FROM CommentModel " +
+        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "WHERE linkFullname = :postFullname AND depth < :depth ORDER BY depth ASC")
+    public abstract LiveData<List<CommentModel>> getChildrenByLevel(String postFullname, int depth);
 
-    @Query("DELETE from CommentEntity WHERE parentPostId = :postId")
-    public abstract void deletePostComments(String postId);
+    @Query("DELETE from CommentModel WHERE linkFullname = :postFullname")
+    public abstract void deletePostComments(String postFullname);
 
-    @Query("DELETE from CommentEntity WHERE id = :commentFullName")
+    @Query("DELETE from CommentModel WHERE id = :commentFullName")
     public abstract void deleteComment(String commentFullName);
 }
