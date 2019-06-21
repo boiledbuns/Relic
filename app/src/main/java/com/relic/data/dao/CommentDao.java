@@ -15,15 +15,13 @@ public abstract class CommentDao {
     @Insert (onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertComments(List<CommentModel> commentEntities);
 
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE linkFullname = :postFullname ORDER BY position")
-    public abstract LiveData<List<CommentModel>> getAllComments(String postFullname);
+    @Query("SELECT * FROM CommentModel WHERE linkFullname = :postFullname")
+    public abstract List<CommentModel> getAllComments(String postFullname);
 
     @Query("SELECT * FROM CommentModel " +
         "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
         "WHERE linkFullname = :postFullname AND depth < :depth ORDER BY depth ASC")
-    public abstract LiveData<List<CommentModel>> getChildrenByLevel(String postFullname, int depth);
+    public abstract List<CommentModel> getChildrenByLevel(String postFullname, int depth);
 
     @Query("DELETE from CommentModel WHERE linkFullname = :postFullname")
     public abstract void deletePostComments(String postFullname);

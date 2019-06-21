@@ -22,20 +22,15 @@ class CommentRepositoryImpl @Inject constructor(
     private val listingRepo: ListingRepository,
     private val commentDeserializer: Contract.CommentDeserializer
 ) : CommentRepository {
-    private val TAG = "COMMENT_REPO"
-
     private val commentDao = appDB.commentDAO
 
-    // region interface
-
-    override fun getComments(postFullName : String, displayNRows: Int): LiveData<List<CommentModel>> {
-        val postId = commentDeserializer.removeTypePrefix(postFullName)
+    override suspend fun getComments(postFullName : String, displayNRows: Int): List<CommentModel> {
         return when {
             (displayNRows > 0) -> {
-                commentDao.getChildrenByLevel(postId, displayNRows)
+                withContext(Dispatchers.IO) { commentDao.getChildrenByLevel(postFullName, displayNRows) }
             }
             else -> {
-                commentDao.getAllComments(postId)
+                withContext(Dispatchers.IO) { commentDao.getAllComments(postFullName) }
             }
         }
     }
@@ -98,19 +93,14 @@ class CommentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun clearAllCommentsFromSource(postFullName: String) {
-        withContext(Dispatchers.IO){
-            commentDao.deletePostComments(commentDeserializer.removeTypePrefix(postFullName))
-        }
+    override suspend fun insertComments(comments : List<CommentModel>)= withContext(Dispatchers.IO) {
+        commentDao.insertComments(comments)
     }
 
-    override fun getReplies(parentId: String): LiveData<List<CommentModel>> {
-        return commentDao.getAllComments(parentId)
+    override suspend fun deleteComments(postFullName: String) = withContext(Dispatchers.IO){
+        commentDao.deletePostComments(postFullName)
     }
 
-    /**
-     *
-     */
     override suspend fun postComment(parent: String, text: String) {
         var url = "${RepoConstants.ENDPOINT}api/comment"
 
@@ -126,23 +116,9 @@ class CommentRepositoryImpl @Inject constructor(
                 data = data
             )
 
-            Log.d(TAG, response)
+            Timber.d(response)
         } catch (e : Exception) {
             throw DomainTransfer.handleException("post comment", e) ?: e
         }
     }
-
-    // endregion interface
-
-    /**
-     * only use this function to insert comments to ensure they're inserted with an associated
-     * listing
-     */
-    private suspend fun insertComments(comments : List<CommentModel>, listing : ListingEntity) {
-        withContext(Dispatchers.IO) {
-            commentDao.insertComments(comments)
-            appDB.listingDAO.insertListing(listing)
-        }
-    }
-    
 }

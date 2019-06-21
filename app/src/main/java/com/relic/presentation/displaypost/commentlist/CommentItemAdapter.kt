@@ -87,10 +87,6 @@ class CommentItemAdapter (
 
     // region OnClick handlers
 
-    override fun displayCommentReplies(itemId : String, commentExpanded : Boolean) {
-        actionDelegate.onExpandReplies(itemId, commentExpanded)
-    }
-
     override fun voteOnComment(itemPosition : Int, voteValue : Int) {
         commentList[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
@@ -113,7 +109,7 @@ class CommentItemAdapter (
     }
 
     override fun loadMoreComments(itemPosition: Int, displayReplies : Boolean) {
-        actionDelegate.onExpandReplies(commentList[itemPosition].fullName, displayReplies)
+        actionDelegate.onExpandReplies(commentList[itemPosition], displayReplies)
     }
 
     // endregion OnClick handlers

@@ -152,8 +152,6 @@ class ListingItemAdapter(
     // TODO consider refactoring onclicks for both posts and comments to consolidate them into a single interface
     // region comment adapter delegate
 
-    override fun displayCommentReplies(itemId: String, commentExpanded: Boolean) {}
-
     override fun voteOnComment(itemPosition: Int, voteValue: Int) {
         if (voteValue == 1) {
             onPostUpvotePressed(itemPosition)

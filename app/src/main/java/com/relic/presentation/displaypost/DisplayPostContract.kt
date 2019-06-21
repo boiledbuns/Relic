@@ -17,7 +17,7 @@ interface DisplayPostContract {
     }
 
     interface PostViewDelegate {
-        fun onExpandReplies(commentId: String, expanded : Boolean)
+        fun onExpandReplies(comment : CommentModel, expanded : Boolean)
         fun onPostVoted(voteValue: Int)
         fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int
         fun onLinkPressed()
@@ -27,7 +27,6 @@ interface DisplayPostContract {
     }
 
     interface CommentAdapterDelegate {
-        fun displayCommentReplies(itemId : String, commentExpanded : Boolean)
         fun voteOnComment(itemPosition : Int, voteValue : Int)
         fun replyToComment(itemPosition : Int, text: String)
         fun visitComment(itemPosition : Int)

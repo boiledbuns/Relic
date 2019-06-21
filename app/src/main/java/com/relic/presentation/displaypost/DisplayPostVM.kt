@@ -20,8 +20,9 @@ import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -70,21 +71,31 @@ class DisplayPostVM (
         if (networkUtil.checkConnection()) {
             refreshData()
         } else {
-            // add source if the network is available to prevent sending empty comments
-            _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { comments ->
-                _commentListLiveData.postValue(comments)
+            launch(Dispatchers.IO) {
+                val localComments = commentRepo.getComments(postFullname)
+                Timber.d(localComments.size.toString())
+                _commentListLiveData.postValue(localComments)
             }
+
+            publishException(PostErrorData.NetworkUnavailable)
         }
     }
 
     override fun refreshData() {
         if (networkUtil.checkConnection()) {
             launch(Dispatchers.Main) {
-                commentRepo.clearAllCommentsFromSource(postFullname)
-                commentRepo.retrieveComments(subName, postFullname, refresh = true).let {
-                    _postLiveData.postValue(it.post)
-                    _commentListLiveData.postValue(it.comments)
+                val commentsAndPost = commentRepo.retrieveComments(subName, postFullname, refresh = true)
+
+
+                // TODO when adding the preferences manager, check if user wants to save comments
+                launch {
+                    // remove previous comments for this post and stores new results
+                    commentRepo.deleteComments(postFullname)
+                    commentRepo.insertComments(commentsAndPost.comments)
                 }
+
+                _postLiveData.postValue(commentsAndPost.post)
+                _commentListLiveData.postValue(commentsAndPost.comments)
             }
         }
         else {
@@ -129,21 +140,24 @@ class DisplayPostVM (
 
     //  region view action delegate
 
-    override fun onExpandReplies(commentId: String,  expanded : Boolean) {
-        val parentPos = _commentListLiveData.value!!.indexOfFirst { it.fullName == commentId }
-        val commentModel = _commentListLiveData.value!![parentPos]
+    override fun onExpandReplies(comment: CommentModel, expanded : Boolean) {
+        launch(Dispatchers.Main){
+            val deferredParentPos = async { _commentListLiveData.value!!.indexOfFirst { it.fullName == comment.fullName } }
 
-        if (expanded) {
-            removeReplies(parentPos)
-        } else {
-            launch(Dispatchers.Main){
-                val moreReplies = commentRepo.retrieveCommentChildren(postFullname, commentModel)
+            if (expanded) {
+                removeReplies(deferredParentPos.await())
+            } else {
+
+                val moreReplies = commentRepo.retrieveCommentChildren(postFullname, comment)
 
                 _commentListLiveData.value?.let { commentList ->
-                    _commentListLiveData.postValue(commentList.toMutableList().apply {
+                    val newList = commentList.toMutableList().apply {
+                        val parentPos = deferredParentPos.await()
                         removeAt(parentPos)
                         addAll(parentPos, moreReplies)
-                    })
+                    }
+
+                    _commentListLiveData.postValue(newList)
                 }
             }
         }
@@ -211,6 +225,7 @@ class DisplayPostVM (
             is NetworkException -> PostErrorData.NetworkUnavailable
             else -> PostErrorData.UnexpectedException
         }
-        _errorLiveData.postValue(postE)
+
+        publishException(postE)
     }
 }

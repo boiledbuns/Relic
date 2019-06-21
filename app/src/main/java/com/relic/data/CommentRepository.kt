@@ -2,6 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import com.relic.api.response.Listing
+import com.relic.data.entities.ListingEntity
 
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
@@ -13,7 +14,7 @@ interface CommentRepository {
      * @param postFullName full name of a post
      * @param displayNRows if greater than 0, displays top x comments loaded
      */
-    fun getComments(postFullName: String, displayNRows: Int = 0): LiveData<List<CommentModel>>
+    suspend fun getComments(postFullName: String, displayNRows: Int = 0): List<CommentModel>
 
     fun getComments(retrievalOption: RetrievalOption): LiveData<List<CommentModel>>
 
@@ -27,13 +28,13 @@ interface CommentRepository {
 
     suspend fun retrieveCommentChildren(postFullName: String, moreChildrenComment: CommentModel) : List<CommentModel>
 
+    suspend fun insertComments(comments : List<CommentModel>)
+
     /**
      * clears all locally stored comments
      * @param postFullName full name of the post to clear the comments for
      */
-    suspend fun clearAllCommentsFromSource(postFullName: String)
-
-    fun getReplies(parentId : String) : LiveData<List<CommentModel>>
+    suspend fun deleteComments(postFullName: String)
 
     /**
      * @param parent full name of the parent
