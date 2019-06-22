@@ -2,6 +2,7 @@ package com.relic.domain.models
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import com.relic.api.qualifier.Date
 import com.relic.api.qualifier.More
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -15,7 +16,6 @@ open class CommentModel: ListingItem() {
 
     @Json(name = "body_html")
     var body: String = ""
-    var created: String? = null
     var score: Int = 0
 
     // fullname of this comment's direct ancestor (could be a post or comment)
@@ -35,7 +35,9 @@ open class CommentModel: ListingItem() {
     @Json(name = "is_submitter")
     var isSubmitter: Boolean = false
 
-//    var edited: String? = null
+    @Date
+    var edited: java.util.Date? = null
+
     var depth: Int = 0
     var replyCount: Int = 0
     var replyLink: String? = null

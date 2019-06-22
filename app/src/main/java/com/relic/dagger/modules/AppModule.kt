@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room
 import com.relic.api.Type
 import com.relic.api.adapter.CommentAdapter
 import com.relic.api.adapter.PostAdapter
+import com.relic.api.qualifier.DateAdapter
 import com.relic.api.qualifier.LikesAdapter
 import com.relic.api.qualifier.MoreAdapter
 import com.relic.data.ApplicationDB
@@ -32,6 +33,7 @@ class AppModule {
         return Moshi.Builder()
             .add(LikesAdapter())
             .add(MoreAdapter())
+            .add(DateAdapter())
             .add(
                 PolymorphicJsonAdapterFactory.of(ListingItem::class.java, "kind")
                     .withSubtype(PostModel::class.java, Type.Post.name)

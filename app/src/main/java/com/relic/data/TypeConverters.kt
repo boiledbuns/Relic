@@ -1,6 +1,7 @@
 package com.relic.data
 
 import android.arch.persistence.room.TypeConverter
+import java.util.*
 
 class TypeConverters {
     @TypeConverter
@@ -40,5 +41,15 @@ class TypeConverters {
         }
 
         return children
+    }
+
+    @TypeConverter
+    fun fromDate(date : Date?): Long? {
+        return date?.time
+    }
+
+    @TypeConverter
+    fun toDate(timestamp:  Long?): Date? {
+        return timestamp?.let { Date(it) }
     }
 }

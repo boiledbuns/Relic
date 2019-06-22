@@ -7,7 +7,6 @@ import com.squareup.moshi.JsonClass
 open class PostModel : ListingItem() {
 
     var title: String = ""
-    var created: String = ""
 
     var selftext: String? = null
 

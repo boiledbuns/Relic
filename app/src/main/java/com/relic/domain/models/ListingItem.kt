@@ -1,5 +1,6 @@
 package com.relic.domain.models
 
+import com.relic.api.qualifier.Date
 import com.relic.api.qualifier.Likes
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -11,6 +12,9 @@ open class ListingItem {
     @Json(name = "name")
     var fullName = ""
     var author: String = ""
+
+    @Date
+    var created: java.util.Date? = null
 
     var visited: Boolean = false
 

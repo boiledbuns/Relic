@@ -15,6 +15,7 @@ import com.relic.presentation.preferences.PreferenceLink
 import com.relic.preference.PreferencesManager
 import com.relic.preference.PreferencesManagerImpl
 import kotlinx.android.synthetic.main.preferences_theme.*
+import java.util.*
 
 class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
@@ -83,7 +84,7 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
             author ="boiledbuns"
             selftext = resources.getString(R.string.long_placeholder_text)
             subreddit = "theme_editor"
-            created ="300 years ago"
+            created = Date()
         }
     }
 
