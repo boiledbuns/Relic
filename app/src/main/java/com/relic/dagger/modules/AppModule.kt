@@ -16,6 +16,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
+import org.json.simple.parser.JSONParser
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -44,4 +46,9 @@ class AppModule {
             .build()
     }
 
+    @Singleton
+    @Provides
+    fun provideJSONParser() : JSONParser{
+        return JSONParser()
+    }
 }

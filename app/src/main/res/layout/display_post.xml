@@ -37,13 +37,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:fitsSystemWindows="true">
+                android:fitsSystemWindows="true"
+                android:paddingBottom="@dimen/comment_list_padding_bottom">
 
                 <com.relic.presentation.displaypost.FullPostView
                     android:id="@+id/fullPostView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/displaypost_bottommargin"/>
+                    android:layout_marginBottom="@dimen/displaypost_bottommargin"
+                    tools:visibility="gone"/>
 
                 <!-- recyclerview for the comments -->
                 <android.support.v7.widget.RecyclerView
@@ -51,8 +53,7 @@
                     android:nestedScrollingEnabled="false"
                     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/comment_list_padding_bottom"/>
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/postNoComments"
@@ -61,8 +62,9 @@
                     android:text="@string/no_comments"
                     android:visibility="gone"
                     android:textSize="@dimen/title_text_m"
+                    android:layout_marginTop="@dimen/padding_xl"
                     android:layout_gravity="center"
-                    tools:text="doesn't look like anything's here"
+                    tools:text="@string/no_comments"
                     tools:visibility="visible"/>
 
             </LinearLayout>

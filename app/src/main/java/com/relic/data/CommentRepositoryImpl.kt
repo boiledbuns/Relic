@@ -2,9 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.relic.data.deserializer.Contract
-import com.relic.data.entities.ListingEntity
 import com.relic.data.repository.RepoConstants
 import com.relic.domain.models.CommentModel
 import com.relic.network.NetworkRequestManager
@@ -69,9 +67,7 @@ class CommentRepositoryImpl @Inject constructor(
 
     override suspend fun retrieveCommentChildren(postFullName: String, moreChildrenComment: CommentModel) : List<CommentModel> {
         val url = "${RepoConstants.ENDPOINT}api/morechildren"
-
         val idList = moreChildrenComment.more!!.toString().drop(1).dropLast(1)
-
         val postData = HashMap<String, String>().apply {
             put("api_type", "json")
             put("children", idList)
@@ -102,8 +98,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     override suspend fun postComment(parent: String, text: String) {
-        var url = "${RepoConstants.ENDPOINT}api/comment"
-
+        val url = "${RepoConstants.ENDPOINT}api/comment"
         val data = HashMap<String, String>().apply {
             put("thing_id", parent)
             put("text", text)

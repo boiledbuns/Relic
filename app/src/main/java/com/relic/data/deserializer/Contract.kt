@@ -1,16 +1,12 @@
 package com.relic.data.deserializer
 
-import com.relic.api.response.Listing
 import com.relic.data.CommentsAndPostData
-import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.SubSearchResult
 import com.relic.data.entities.*
+import com.relic.domain.exception.RelicException
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.UserModel
-import com.relic.domain.exception.RelicException
-import com.relic.domain.models.PostModel
-import org.json.simple.JSONObject
 
 /**
  * Decoupled from the repository package because deserializers should be responsible
@@ -33,11 +29,6 @@ interface Contract {
 
     interface CommentDeserializer {
         suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData
-
-        suspend fun parseCommentsResponse(
-            postFullName: String,
-            response: String
-        ) : ParsedCommentData
 
         suspend fun parseMoreCommentsResponse(
             moreChildrenComment: CommentModel,
@@ -75,12 +66,6 @@ data class ParsedPostsData(
     val postEntities : List<PostEntity>,
     val commentEntities : List<CommentModel>,
     val listingEntity: ListingEntity
-)
-
-data class ParsedCommentData(
-    val listingEntity : ListingEntity,
-    val commentList : List<CommentModel>,
-    val replyCount : Int
 )
 
 data class ParsedSubsData(
