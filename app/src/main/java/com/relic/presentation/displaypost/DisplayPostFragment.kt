@@ -1,5 +1,6 @@
 package com.relic.presentation.displaypost
 
+import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -14,17 +15,16 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import com.relic.R
-import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
-import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.media.DisplayGfycatFragment
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.util.MediaHelper.determineType
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.nonNull
@@ -55,8 +55,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     private lateinit var postSource: PostSource
     private var enableVisitSub = false
 
-    private lateinit var rootView : View
-    private lateinit var myToolbar: Toolbar
     private lateinit var commentAdapter: CommentItemAdapter
     private var previousError : PostErrorData? = null
 
@@ -74,33 +72,26 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.display_post, container, false)
-
-        myToolbar = rootView.findViewById(R.id.displayPostToolbar)
-        (activity as AppCompatActivity).apply {
-            setSupportActionBar(myToolbar)
-        }
-
-        initializeToolbar()
-
-        rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView).apply {
-            commentAdapter = CommentItemAdapter(displayPostVM)
-            adapter = commentAdapter
-        }
-
-        rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).isRefreshing = true
-        attachViewListeners()
-        return rootView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.display_post, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindViewModel()
+
+        (activity as AppCompatActivity).apply {
+            setSupportActionBar(displayPostToolbar as Toolbar)
+        }
+
+        initializeToolbar()
+
+        postCommentRecyclerView.apply {
+            commentAdapter = CommentItemAdapter(displayPostVM)
+            adapter = commentAdapter
+        }
+
+        displayPostSwipeRefresh.isRefreshing = true
+        attachViewListeners()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -123,11 +114,13 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     // endregion lifecycle hooks
 
-    private fun bindViewModel() {
-        displayPostVM.postLiveData.nonNull().observe(this) { displayPost(it) }
-        displayPostVM.commentListLiveData.nonNull().observe(this) { displayComments(it) }
-        displayPostVM.postNavigationLiveData.nonNull().observe(this) { handleNavigation(it) }
-        displayPostVM.errorLiveData.observe(this) { handleError(it) }
+    override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
+        displayPostVM.apply {
+            postLiveData.nonNull().observe(lifecycleOwner) { displayPost(it) }
+            commentListLiveData.nonNull().observe(lifecycleOwner) { displayComments(it) }
+            postNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
+            errorLiveData.observe(lifecycleOwner) { handleError(it) }
+        }
     }
 
     // region live data handlers
@@ -142,6 +135,12 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             // notify the adapter and set the new list
             commentAdapter.setComments(commentList) {
 //                displayPostSwipeRefresh.isRefreshing = false
+            }
+            // display empty comment list message
+            if (commentList.isEmpty()) {
+                postNoComments.visibility = View.VISIBLE
+            } else {
+                postNoComments.visibility = View.GONE
             }
             displayPostSwipeRefresh.isRefreshing = false
         }
@@ -204,7 +203,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        myToolbar.apply {
+        (displayPostToolbar as Toolbar).apply {
             setNavigationOnClickListener { activity?.onBackPressed() }
             if (enableVisitSub) setOnClickListener {
                 val subFragment = DisplaySubFragment.create(subredditName)
@@ -219,20 +218,19 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
      * view is scrolled all the way to the bottom
      */
     private fun attachViewListeners() {
-        rootView.findViewById<RecyclerView>(R.id.postCommentRecyclerView)
-            .addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
+//        postCommentRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+//                super.onScrollStateChanged(recyclerView, newState)
+//
+//                // if recycler view reaches bottom
+//                if (!recyclerView.canScrollVertically(1)) {
+//                    Log.d(TAG, "Bottom reached")
+//                    displayPostVM.retrieveMoreComments(false)
+//                }
+//            }
+//        })
 
-                    // if recycler view reaches bottom
-                    if (!recyclerView.canScrollVertically(1)) {
-                        Log.d(TAG, "Bottom reached")
-                        displayPostVM.retrieveMoreComments(false)
-                    }
-                }
-            })
-
-        rootView.findViewById<SwipeRefreshLayout>(R.id.displayPostSwipeRefresh).apply {
+        displayPostSwipeRefresh.apply {
             setOnRefreshListener {
                 displayPostVM.refreshData()
             }

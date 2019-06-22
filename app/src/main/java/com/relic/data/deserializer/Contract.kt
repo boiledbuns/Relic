@@ -1,13 +1,12 @@
 package com.relic.data.deserializer
 
-import com.relic.data.PostRepository
+import com.relic.data.CommentsAndPostData
 import com.relic.data.PostSource
 import com.relic.data.SubSearchResult
 import com.relic.data.entities.*
+import com.relic.domain.exception.RelicException
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.UserModel
-import com.relic.domain.exception.RelicException
-import org.json.simple.JSONObject
 
 /**
  * Decoupled from the repository package because deserializers should be responsible
@@ -29,20 +28,12 @@ interface Contract {
     }
 
     interface CommentDeserializer {
-        suspend fun parseCommentsResponse(
-            postFullName: String,
-            response: String
-        ) : ParsedCommentData
+        suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData
 
         suspend fun parseMoreCommentsResponse(
             moreChildrenComment: CommentModel,
             response : String
-        ) : List<CommentEntity>
-
-        suspend fun unmarshallComment(
-            commentChild : JSONObject,
-            commentPosition : Float
-        ) : List<CommentEntity>
+        ) : List<CommentModel>
 
         fun removeTypePrefix(fullName : String) : String
     }
@@ -73,14 +64,8 @@ data class ParsedPostData(
 data class ParsedPostsData(
     val postSourceEntities:List<PostSourceEntity>,
     val postEntities : List<PostEntity>,
-    val commentEntities : List<CommentEntity>,
+    val commentEntities : List<CommentModel>,
     val listingEntity: ListingEntity
-)
-
-data class ParsedCommentData(
-    val listingEntity : ListingEntity,
-    val commentList : List<CommentEntity>,
-    val replyCount : Int
 )
 
 data class ParsedSubsData(
@@ -88,4 +73,4 @@ data class ParsedSubsData(
     val after : String?
 )
 
-class RelicParseException(response : String, cause : Throwable) : RelicException("error parsing response : `$response`", cause)
+class RelicParseException(response : String, cause : Throwable? = null) : RelicException("error parsing response : `$response`", cause)

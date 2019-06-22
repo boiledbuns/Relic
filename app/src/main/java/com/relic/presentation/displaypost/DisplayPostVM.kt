@@ -4,24 +4,25 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
+import com.relic.data.repository.NetworkException
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
-import com.relic.data.repository.NetworkException
 import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.editor.EditorContract
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -62,65 +63,43 @@ class DisplayPostVM (
     val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
     val errorLiveData : LiveData<PostErrorData> = _errorLiveData
 
-    private var retrievalInProgress = true
-
     init {
-        observeLiveData()
-        refreshData()
-    }
-
-    /**
-     * Add sources and listeners to all local livedata
-     */
-    private fun observeLiveData() {
         _postLiveData.addSource<PostModel>(postRepo.getPost(postFullname)) { post ->
-            post?.let {
-                _postLiveData.postValue(it)
-            }
+            _postLiveData.postValue(post)
         }
 
-        _commentListLiveData.addSource(commentRepo.getComments(postFullname)) { nullableComments ->
-            nullableComments?.let { comments ->
-                if (!retrievalInProgress) {
-                    _commentListLiveData.postValue(comments)
-                }
+        if (networkUtil.checkConnection()) {
+            refreshData()
+        } else {
+            launch(Dispatchers.IO) {
+                val localComments = commentRepo.getComments(postFullname)
+                Timber.d(localComments.size.toString())
+                _commentListLiveData.postValue(localComments)
             }
+
+            publishException(PostErrorData.NetworkUnavailable)
         }
     }
 
     override fun refreshData() {
         if (networkUtil.checkConnection()) {
-
             launch(Dispatchers.Main) {
-                val commentJob = launch { retrieveMoreComments(true) }
-                val postJob = launch { postRepo.retrievePost(subName, postFullname, postSource) }
+                val commentsAndPost = commentRepo.retrieveComments(subName, postFullname, refresh = true)
 
-                joinAll(commentJob, postJob)
-                retrievalInProgress = false
+
+                // TODO when adding the preferences manager, check if user wants to save comments
+                launch {
+                    // remove previous comments for this post and stores new results
+                    commentRepo.deleteComments(postFullname)
+                    commentRepo.insertComments(commentsAndPost.comments)
+                }
+
+                _postLiveData.postValue(commentsAndPost.post)
+                _commentListLiveData.postValue(commentsAndPost.comments)
             }
         }
         else {
             publishException(PostErrorData.NetworkUnavailable)
-            retrievalInProgress = false
-        }
-    }
-
-    override fun retrieveMoreComments(refresh: Boolean) {
-        // TODO check if there is connection
-        // retrieves post and comments from network
-        launch(Dispatchers.Main) {
-            if (refresh) {
-                commentRepo.clearAllCommentsFromSource(postFullname)
-            }
-            commentRepo.retrieveComments(subName, postFullname, refresh)
-        }
-    }
-
-    private fun insertReplies (position : Int, replies : List<CommentModel>) {
-        _commentListLiveData.value?.let { commentList ->
-            _commentListLiveData.postValue(commentList.toMutableList().apply {
-                addAll(position + 1, replies)
-            })
         }
     }
 
@@ -161,26 +140,24 @@ class DisplayPostVM (
 
     //  region view action delegate
 
-    override fun onExpandReplies(commentId: String, expanded : Boolean) {
-        val commentPosition = _commentListLiveData.value!!.indexOfFirst { it.fullName == commentId }
-        val commentModel = _commentListLiveData.value!![commentPosition]
+    override fun onExpandReplies(comment: CommentModel, expanded : Boolean) {
+        launch(Dispatchers.Main){
+            val deferredParentPos = async { _commentListLiveData.value!!.indexOfFirst { it.fullName == comment.fullName } }
 
-        if (expanded) {
-            removeReplies(commentPosition)
-        } else {
-            val commentSource = commentRepo.getReplies(commentModel.fullName)
-            _commentListLiveData.addSource(commentSource) { replies ->
-                replies?.let {
-                    if (it.isNotEmpty()) {
-                        insertReplies(commentPosition, it)
-                    } else {
-                        launch(Dispatchers.Main) {
-                            // TODO retrieve comments from server if replies are not loaded
-                            commentRepo.retrieveCommentChildren(commentModel)
-                        }
+            if (expanded) {
+                removeReplies(deferredParentPos.await())
+            } else {
+
+                val moreReplies = commentRepo.retrieveCommentChildren(postFullname, comment)
+
+                _commentListLiveData.value?.let { commentList ->
+                    val newList = commentList.toMutableList().apply {
+                        val parentPos = deferredParentPos.await()
+                        removeAt(parentPos)
+                        addAll(parentPos, moreReplies)
                     }
-                    // remove this as a source since this is a one off to retrieve replies
-                    _commentListLiveData.removeSource(commentSource)
+
+                    _commentListLiveData.postValue(newList)
                 }
             }
         }
@@ -248,6 +225,7 @@ class DisplayPostVM (
             is NetworkException -> PostErrorData.NetworkUnavailable
             else -> PostErrorData.UnexpectedException
         }
-        _errorLiveData.postValue(postE)
+
+        publishException(postE)
     }
 }

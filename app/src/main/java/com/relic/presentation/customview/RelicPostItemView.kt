@@ -73,7 +73,7 @@ class RelicPostItemView @JvmOverloads constructor(
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
-            postDateView.text = postModel.created
+            postDateView.text = postModel.created.toString()
             titleView.text = postModel.title
             postItemAuthorView.text = resources.getString(R.string.user_prefix_label, postModel.author)
             setPostTags(postModel)

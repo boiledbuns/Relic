@@ -16,7 +16,10 @@ class CommentMoreItemsVH (
     }
 
     fun bindLoadMore(commentModel : CommentModel){
-        moreCommentsItem.displayLoadMore(commentModel.replyCount)
+        commentModel.more?.let { more ->
+            if (more.isNotEmpty()) moreCommentsItem.displayLoadMore(more.size)
+        }
+
         moreCommentsItem.displayReplyDepth(commentModel.depth)
     }
 }
