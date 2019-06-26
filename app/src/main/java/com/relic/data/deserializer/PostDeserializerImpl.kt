@@ -37,10 +37,6 @@ class PostDeserializerImpl @Inject constructor(
 
     private val postAdapter = moshi.adapter(PostModel::class.java)
 
-    // initialize the date formatter and date for "now"
-    private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
-    private val current = Date()
-
     override suspend fun parsePost(response: String) : ParsedPostData {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
         val child = (data["children"] as JSONArray)[0] as JSONObject
@@ -142,49 +138,6 @@ class PostDeserializerImpl @Inject constructor(
         return moshi.adapter(PostModel::class.java)
             .fromJson((child["data"] as JSONObject).toString())
     }
-
-    /**
-     * This is fine for now because I'm still working on finalizing which fields to use/not use
-     * There will be a lot more experimentation and changes to come in this method as a result
-     */
-//    private fun extractPost(post: JSONObject) : PostModel {
-//        // use "api" prefix to indicate fields accessed directly from api
-//        return gson.fromJson(post.toJSONString(), PostModel::class.java).apply {
-//            //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
-//            //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
-//            //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
-//            //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
-//            Log.d(TAG, "link_flair_richtext : " + post["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
-//            //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
-//            //Log.d(TAG, "post keys " + post.keySet().toString())
-//            // unmarshall the object and add it into a list
-//
-//            val apiLikes = post["likes"] as Boolean?
-//            userUpvoted = if (apiLikes == null) 0 else if (apiLikes) 1 else -1
-//
-//            // TODO create parse class/switch to a more efficient method of removing html
-//            val authorFlair = post["author_flair_text"] as String?
-//            author_flair_text = if (authorFlair != null && !authorFlair.isEmpty()) {
-//                Html.fromHtml(authorFlair).toString()
-//            } else null
-//
-//            // add year to stamp if the post year doesn't match the current one
-//            Log.d(TAG, "epoch = " + post["created"])
-//            val apiCreated = Date((post["created"] as Double).toLong() * 1000)
-//            created = if (current.year != apiCreated.year) {
-//                apiCreated.year.toString() + " " + formatter.format(apiCreated)
-//            } else {
-//                formatter.format(apiCreated)
-//            }
-//
-//            // get the gildings
-//            (post["gildings"] as JSONObject?)?.let { gilding ->
-//                (gilding["gid_1"] as Long?)?.let { platinum = it.toInt() }
-//                (gilding["gid_2"] as Long?)?.let { gold = it.toInt() }
-//                (gilding["gid_3"] as Long?)?.let { silver = it.toInt() }
-//            }
-//        }
-//    }
 
     private fun setSource(entity : PostSourceEntity, src: PostSource, position : Int) {
         entity.apply {

@@ -16,7 +16,6 @@ open class CommentModel: ListingItem() {
 
     @Json(name = "body_html")
     var body: String = ""
-    var score: Int = 0
 
     // fullname of this comment's direct ancestor (could be a post or comment)
     @Json(name = "parent_id")

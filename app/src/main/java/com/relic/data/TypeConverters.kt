@@ -1,9 +1,15 @@
 package com.relic.data
 
 import android.arch.persistence.room.TypeConverter
+import com.relic.domain.models.Gildings
+import com.squareup.moshi.Moshi
 import java.util.*
+import javax.inject.Inject
 
 class TypeConverters {
+
+    val gildingsAdapter = moshi.adapter(Gildings::class.java)!!
+
     @TypeConverter
     fun fromMoreList(moreList: List<String>?): String? {
         if (moreList == null) return null
@@ -51,5 +57,23 @@ class TypeConverters {
     @TypeConverter
     fun toDate(timestamp:  Long?): Date? {
         return timestamp?.let { Date(it) }
+    }
+
+
+    @TypeConverter
+    fun fromGildings(gildings: Gildings?): String? {
+        return when (gildings) {
+            null -> null
+            else -> gildingsAdapter.toJson(gildings)
+        }
+    }
+
+    @TypeConverter
+    fun toGildings(gildings:  String?): Gildings? {
+        return gildings?.let { gildingsAdapter.fromJson(it)}
+    }
+
+    companion object {
+        lateinit var moshi : Moshi
     }
 }

@@ -12,6 +12,7 @@ open class ListingItem {
     @Json(name = "name")
     var fullName = ""
     var author: String = ""
+    var score: Int = 0
 
     @Date
     var created: java.util.Date? = null
@@ -20,6 +21,8 @@ open class ListingItem {
 
     @Json(name = "likes")
     @Likes var userUpvoted: Int = 0
+
+    var gildings : Gildings? = null
 
     var saved: Boolean = false
     open var subreddit : String? = null
