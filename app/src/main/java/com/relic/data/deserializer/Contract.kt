@@ -6,6 +6,7 @@ import com.relic.data.SubSearchResult
 import com.relic.data.entities.*
 import com.relic.domain.exception.RelicException
 import com.relic.domain.models.CommentModel
+import com.relic.domain.models.PostModel
 import com.relic.domain.models.UserModel
 
 /**
@@ -58,13 +59,13 @@ interface Contract {
 
 data class ParsedPostData(
     val postSourceEntity:PostSourceEntity,
-    val postEntity : PostEntity
+    val post : PostModel
 )
 
 data class ParsedPostsData(
     val postSourceEntities:List<PostSourceEntity>,
-    val postEntities : List<PostEntity>,
-    val commentEntities : List<CommentModel>,
+    val posts : List<PostModel>,
+    val comments : List<CommentModel>,
     val listingEntity: ListingEntity
 )
 

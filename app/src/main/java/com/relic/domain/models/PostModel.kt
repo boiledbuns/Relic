@@ -1,10 +1,16 @@
 package com.relic.domain.models
 
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
+@Entity
 open class PostModel : ListingItem() {
+
+    @PrimaryKey
+    var id: String = ""
 
     var title: String = ""
 
@@ -26,7 +32,7 @@ open class PostModel : ListingItem() {
         } else {
             field = thumbnail
         }
-
+    
     @Json(name = "author_flair_text")
     var authorFlair: String? = null
 

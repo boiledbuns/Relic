@@ -6,7 +6,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.relic.data.entities.PostEntity;
 import com.relic.domain.models.PostModel;
 
 import java.util.List;
@@ -16,59 +15,59 @@ public abstract class PostDao {
     // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
     // region get posts based on origin
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
         "WHERE subredditPosition >= 0 AND PostSourceEntity.subreddit = :subredditName ORDER BY subredditPosition ASC")
     public abstract LiveData<List<PostModel>> getPostsFromSubreddit(String subredditName);
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
         "WHERE frontpagePosition >= 0 ORDER BY frontpagePosition ASC")
     public abstract LiveData<List<PostModel>> getPostsFromFrontpage();
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
         "WHERE allPosition >= 0 ORDER BY allPosition ASC")
     public abstract LiveData<List<PostModel>> getPostsFromAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void insertPosts(List<PostEntity> posts);
+    public abstract void insertPosts(List<PostModel> posts);
 
-    @Query("DELETE FROM PostEntity WHERE PostEntity.fullName IN " +
+    @Query("DELETE FROM PostModel WHERE PostModel.fullName IN " +
         "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0 AND subreddit = :subName)")
     public abstract void deleteAllFromSub(String subName);
 
-    @Query("DELETE FROM PostEntity WHERE PostEntity.fullName IN " +
+    @Query("DELETE FROM PostModel WHERE PostModel.fullName IN " +
         "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0)")
     public abstract void deleteAllFromFrontpage();
 
-    @Query("DELETE FROM PostEntity WHERE PostEntity.fullName IN " +
+    @Query("DELETE FROM PostModel WHERE PostModel.fullName IN " +
         "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0)")
     public abstract void deleteAllFromAll();
 
-    @Query("SELECT * FROM PostEntity INNER JOIN PostSourceEntity ON fullName = sourceId WHERE fullName = :fullName")
+    @Query("SELECT * FROM PostModel INNER JOIN PostSourceEntity ON fullName = sourceId WHERE fullName = :fullName")
     public abstract LiveData<PostModel> getSinglePost(String fullName);
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
         "WHERE PostSourceEntity.subreddit = :subreddit AND fullName = '' AND author = ''")
     public abstract PostModel getPostDraft(String subreddit);
 
-    @Query("DELETE FROM PostEntity WHERE subreddit = :subreddit AND fullName = '' AND author = ''")
+    @Query("DELETE FROM PostModel WHERE subreddit = :subreddit AND fullName = '' AND author = ''")
     public abstract void deletePostDraft(String subreddit);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void insertPost(PostEntity post);
+    public abstract void insertPost(PostModel post);
 
-    @Query("UPDATE PostEntity SET visited = 1 where fullName = :postFullname")
+    @Query("UPDATE PostModel SET visited = 1 where fullName = :postFullname")
     public abstract void updateVisited(String postFullname);
 
-    @Query("UPDATE PostEntity SET userUpvoted = :vote  where fullName = :postFullname")
+    @Query("UPDATE PostModel SET userUpvoted = :vote  where fullName = :postFullname")
     public abstract void updateVote(String postFullname, int vote);
 
-    @Query("UPDATE PostEntity SET saved = :saved  where fullName = :postFullname")
+    @Query("UPDATE PostModel SET saved = :saved  where fullName = :postFullname")
     public abstract void updateSave(String postFullname, boolean saved);
 
-    @Query("SELECT * FROM PostEntity WHERE fullName = :postFullname LIMIT 1")
-    public abstract PostEntity getPostWithId(String postFullname);
+    @Query("SELECT * FROM PostModel WHERE fullName = :postFullname LIMIT 1")
+    public abstract PostModel getPostWithId(String postFullname);
 }

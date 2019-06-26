@@ -10,34 +10,34 @@ import com.relic.domain.models.PostModel
 abstract class UserPostingDao {
 // for user specific actions
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userSubmittedPosition >= 0 ORDER BY userSubmittedPosition ASC")
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
+        "WHERE PostSourceEntity.userSubmittedPosition >= 0 ORDER BY PostSourceEntity.userSubmittedPosition ASC")
     abstract fun getUserPosts(): LiveData<List<PostModel>>
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userSavedPosition >= 0 ORDER BY userSavedPosition ASC")
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
+        "WHERE PostSourceEntity.userSavedPosition >= 0 ORDER BY PostSourceEntity.userSavedPosition ASC")
     abstract fun getUserSavedPosts(): LiveData<List<PostModel>>
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userUpvotedPosition >= 0 ORDER BY userUpvotedPosition ASC")
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
+        "WHERE PostSourceEntity.userUpvotedPosition >= 0 ORDER BY PostSourceEntity.userUpvotedPosition ASC")
     abstract fun getUserUpvotedPosts(): LiveData<List<PostModel>>
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE  userDownvotedPosition >= 0 ORDER BY userDownvotedPosition ASC")
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
+        "WHERE  PostSourceEntity.userDownvotedPosition >= 0 ORDER BY PostSourceEntity.userDownvotedPosition ASC")
     abstract fun getUserDownvotedPosts(): LiveData<List<PostModel>>
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userGildedPosition >= 0 ORDER BY userGildedPosition ASC")
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
+        "WHERE PostSourceEntity.userGildedPosition >= 0 ORDER BY PostSourceEntity.userGildedPosition ASC")
     abstract fun getUserGilded(): LiveData<List<PostModel>>
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userHiddenPosition >= 0 ORDER BY userHiddenPosition ASC")
+    @Query("SELECT * FROM PostModel " +
+        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
+        "WHERE PostSourceEntity.userHiddenPosition >= 0 ORDER BY PostSourceEntity.userHiddenPosition ASC")
     abstract fun getUserHidden(): LiveData<List<PostModel>>
 
 

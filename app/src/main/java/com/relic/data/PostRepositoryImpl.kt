@@ -7,7 +7,6 @@ import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
 
 import com.relic.data.deserializer.ParsedPostsData
-import com.relic.data.entities.PostEntity
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
@@ -244,10 +243,10 @@ class PostRepositoryImpl @Inject constructor(
             )
 
             postDeserializer.parsePost(response).apply {
-                postEntity.visited = true
+                post.visited = true
 
                 withContext(Dispatchers.IO) {
-                    appDB.postDao.insertPost(postEntity)
+                    appDB.postDao.insertPost(post)
                     appDB.postSourceDao.insertPostSources(listOf(postSourceEntity))
                 }
             }
@@ -350,8 +349,8 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun saveDraft(postDraft: PostDraft) {
         withContext(Dispatchers.IO) {
-            val newPostDraft = PostEntity().apply {
-                name = ""
+            val newPostDraft = PostModel().apply {
+                fullName = ""
                 author = ""
                 title = postDraft.title
                 selftext = postDraft.body
@@ -382,8 +381,8 @@ class PostRepositoryImpl @Inject constructor(
     private suspend fun insertParsedPosts(parsedPosts : ParsedPostsData) {
         withContext(Dispatchers.IO) {
             parsedPosts.apply {
-                if (postEntities.isNotEmpty()) appDB.postDao.insertPosts(postEntities)
-                if (commentEntities.isNotEmpty()) appDB.commentDAO.insertComments(commentEntities)
+                if (posts.isNotEmpty()) appDB.postDao.insertPosts(posts)
+                if (comments.isNotEmpty()) appDB.commentDAO.insertComments(comments)
 
                 appDB.postSourceDao.insertPostSources(postSourceEntities)
                 appDB.listingDAO.insertListing(listingEntity)

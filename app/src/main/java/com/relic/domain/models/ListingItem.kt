@@ -22,7 +22,7 @@ open class ListingItem {
     @Likes var userUpvoted: Int = 0
 
     var saved: Boolean = false
-    var subreddit : String? = null
+    open var subreddit : String? = null
 
     var userSubmittedPosition: Int = 0
     var userCommentsPosition: Int = 0

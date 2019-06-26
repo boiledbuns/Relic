@@ -1,21 +1,24 @@
 package com.relic.data.deserializer
 
-import android.text.Html
 import android.util.Log
 import com.google.gson.GsonBuilder
-import com.relic.data.*
+import com.relic.data.ApplicationDB
+import com.relic.data.PostSource
+import com.relic.data.RetrievalOption
+import com.relic.data.SubSearchResult
 import com.relic.data.entities.ListingEntity
-import com.relic.data.entities.PostEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -32,6 +35,8 @@ class PostDeserializerImpl @Inject constructor(
     private val jsonParser: JSONParser = JSONParser()
     private val gson = GsonBuilder().create()
 
+    private val postAdapter = moshi.adapter(PostModel::class.java)
+
     // initialize the date formatter and date for "now"
     private val formatter = SimpleDateFormat("MMM dd',' hh:mm a", Locale.CANADA)
     private val current = Date()
@@ -39,24 +44,25 @@ class PostDeserializerImpl @Inject constructor(
     override suspend fun parsePost(response: String) : ParsedPostData {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
         val child = (data["children"] as JSONArray)[0] as JSONObject
-        val post = child["data"] as JSONObject
 
-        val newPost = try {
-            extractPost(post)
+        try {
+            val newPost = postAdapter.fromJson(child.toJSONString()) ?: throw RelicParseException(response)
+
+            // should probably be supplied instead of retrieved here
+            val existingPostSource = withContext(Dispatchers.IO) {
+                appDB.postSourceDao.getPostSource(newPost.fullName)
+            }
+
+            val postSourceEntity = existingPostSource?.apply {
+                sourceId = newPost.fullName
+                subreddit = newPost.subreddit!!
+            } ?: PostSourceEntity(newPost.fullName, newPost.subreddit!!)
+
+            return ParsedPostData(postSourceEntity, newPost)
+
         } catch (e : ParseException){
             throw RelicParseException(response, e)
         }
-        // should probably be supplied instead of retrieved here
-        val existingPostSource = withContext(Dispatchers.IO) {
-            appDB.postSourceDao.getPostSource(newPost.name)
-        }
-
-        val postSourceEntity = existingPostSource?.apply {
-            sourceId = newPost.name
-            subreddit = newPost.subreddit
-        } ?: PostSourceEntity(newPost.name, newPost.subreddit)
-
-        return ParsedPostData(postSourceEntity, newPost)
     }
 
     /**
@@ -71,7 +77,7 @@ class PostDeserializerImpl @Inject constructor(
         postSource: PostSource,
         listingKey : String
     ) : ParsedPostsData = coroutineScope {
-        val postEntities = ArrayList<PostEntity>()
+        val postEntities = ArrayList<PostModel>()
         val commentEntities = ArrayList<CommentModel>()
         val postSourceEntities = ArrayList<PostSourceEntity>()
         val listing = ListingEntity()
@@ -95,18 +101,17 @@ class PostDeserializerImpl @Inject constructor(
             val fullEntityJson = (postIterator.next() as JSONObject)
 
             try {
-                val post = fullEntityJson["data"] as JSONObject
-                val newPost = extractPost(post)
+                val newPost = postAdapter.fromJson(fullEntityJson.toJSONString()) ?: throw RelicParseException(response)
                 postEntities.add(newPost)
 
                 val existingPostSource = async(Dispatchers.IO) {
-                    appDB.postSourceDao.getPostSource(newPost.name)
+                    appDB.postSourceDao.getPostSource(newPost.fullName)
                 }.await()
 
                 val postSourceEntity = existingPostSource?.apply {
-                    sourceId = newPost.name
-                    subreddit = newPost.subreddit
-                } ?: PostSourceEntity(newPost.name, newPost.subreddit)
+                    sourceId = newPost.fullName
+                    subreddit = newPost.subreddit!!
+                } ?: PostSourceEntity(newPost.fullName, newPost.subreddit!!)
 
                 setSource(postSourceEntity, postSource, postCount)
                 postSourceEntities.add(postSourceEntity)
@@ -142,44 +147,44 @@ class PostDeserializerImpl @Inject constructor(
      * This is fine for now because I'm still working on finalizing which fields to use/not use
      * There will be a lot more experimentation and changes to come in this method as a result
      */
-    private fun extractPost(post: JSONObject) : PostEntity {
-        // use "api" prefix to indicate fields accessed directly from api
-        return gson.fromJson(post.toJSONString(), PostEntity::class.java).apply {
-            //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
-            //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
-            //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
-            //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
-            Log.d(TAG, "link_flair_richtext : " + post["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
-            //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
-            //Log.d(TAG, "post keys " + post.keySet().toString())
-            // unmarshall the object and add it into a list
-
-            val apiLikes = post["likes"] as Boolean?
-            userUpvoted = if (apiLikes == null) 0 else if (apiLikes) 1 else -1
-
-            // TODO create parse class/switch to a more efficient method of removing html
-            val authorFlair = post["author_flair_text"] as String?
-            author_flair_text = if (authorFlair != null && !authorFlair.isEmpty()) {
-                Html.fromHtml(authorFlair).toString()
-            } else null
-
-            // add year to stamp if the post year doesn't match the current one
-            Log.d(TAG, "epoch = " + post["created"])
-            val apiCreated = Date((post["created"] as Double).toLong() * 1000)
-            created = if (current.year != apiCreated.year) {
-                apiCreated.year.toString() + " " + formatter.format(apiCreated)
-            } else {
-                formatter.format(apiCreated)
-            }
-
-            // get the gildings
-            (post["gildings"] as JSONObject?)?.let { gilding ->
-                (gilding["gid_1"] as Long?)?.let { platinum = it.toInt() }
-                (gilding["gid_2"] as Long?)?.let { gold = it.toInt() }
-                (gilding["gid_3"] as Long?)?.let { silver = it.toInt() }
-            }
-        }
-    }
+//    private fun extractPost(post: JSONObject) : PostModel {
+//        // use "api" prefix to indicate fields accessed directly from api
+//        return gson.fromJson(post.toJSONString(), PostModel::class.java).apply {
+//            //Log.d(TAG, "post : " + post.get("title") + " "+ post.get("author"));
+//            //Log.d(TAG, "src : " + post.get("src") + ", media domain url = "+ post.get("media_domain_url"));
+//            //Log.d(TAG, "media embed : " + post.get("media_embed") + ", media = "+ post.get("media"));
+//            //Log.d(TAG, "preview : " + post.get("preview") + " "+ post.get("url"));
+//            Log.d(TAG, "link_flair_richtext : " + post["score"] + " " + post["ups"] + " " + post["wls"] + " " + post["likes"])
+//            //Log.d(TAG, "link_flair_richtext : " + post.get("visited") + " "+ post.get("views") + " "+ post.get("pwls") + " "+ post.get("gilded"));
+//            //Log.d(TAG, "post keys " + post.keySet().toString())
+//            // unmarshall the object and add it into a list
+//
+//            val apiLikes = post["likes"] as Boolean?
+//            userUpvoted = if (apiLikes == null) 0 else if (apiLikes) 1 else -1
+//
+//            // TODO create parse class/switch to a more efficient method of removing html
+//            val authorFlair = post["author_flair_text"] as String?
+//            author_flair_text = if (authorFlair != null && !authorFlair.isEmpty()) {
+//                Html.fromHtml(authorFlair).toString()
+//            } else null
+//
+//            // add year to stamp if the post year doesn't match the current one
+//            Log.d(TAG, "epoch = " + post["created"])
+//            val apiCreated = Date((post["created"] as Double).toLong() * 1000)
+//            created = if (current.year != apiCreated.year) {
+//                apiCreated.year.toString() + " " + formatter.format(apiCreated)
+//            } else {
+//                formatter.format(apiCreated)
+//            }
+//
+//            // get the gildings
+//            (post["gildings"] as JSONObject?)?.let { gilding ->
+//                (gilding["gid_1"] as Long?)?.let { platinum = it.toInt() }
+//                (gilding["gid_2"] as Long?)?.let { gold = it.toInt() }
+//                (gilding["gid_3"] as Long?)?.let { silver = it.toInt() }
+//            }
+//        }
+//    }
 
     private fun setSource(entity : PostSourceEntity, src: PostSource, position : Int) {
         entity.apply {
