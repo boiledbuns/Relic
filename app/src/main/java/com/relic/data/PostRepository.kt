@@ -26,14 +26,14 @@ interface PostRepository {
      * @param sortScope
      */
     @Throws(RelicRequestError::class)
-    suspend fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
+    suspend fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope) : Listing<PostModel>
 
     /**
      * Retrieves posts for a subreddit
      * @param postSource origin of the post
      * @param listingAfter after value associated with the listing of the current set of posts
      */
-    suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
+    suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String) : Listing<PostModel>
 
     /**
      * this method is used specifically to retrieve listings that can have both post and comments.

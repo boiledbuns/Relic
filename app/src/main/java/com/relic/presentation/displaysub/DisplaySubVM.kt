@@ -4,11 +4,11 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.relic.api.response.Listing
 import com.relic.data.*
 import com.relic.presentation.main.RelicError
 
 import com.relic.data.gateway.PostGateway
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
 import com.relic.data.repository.NetworkException
@@ -27,7 +27,7 @@ open class DisplaySubVM (
     private val postRepo: PostRepository,
     private val postGateway: PostGateway,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, DisplaySubContract.SearchVM {
+) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, DisplaySubContract.SearchVM {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
@@ -45,6 +45,7 @@ open class DisplaySubVM (
     private var retrievalInProgress = true
     private var after : String? = null
     private var query : String? = null
+    private var currentListing : Listing<PostModel>? = null
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
@@ -63,12 +64,14 @@ open class DisplaySubVM (
     override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
-        retrieveMorePosts(true)
-
-        // observe the list of posts stored locally
-        _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
-            if (!retrievalInProgress) {
-                _postListMediator.postValue(postModels)
+        if (networkUtil.checkConnection()) {
+            retrieveMorePosts(true)
+        } else {
+            // observe the list of posts stored locally
+            _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
+                if (!retrievalInProgress) {
+                    _postListMediator.postValue(postModels)
+                }
             }
         }
 
@@ -111,31 +114,22 @@ open class DisplaySubVM (
      */
     final override fun retrieveMorePosts(resetPosts: Boolean) {
         if (networkUtil.checkConnection()) {
-            // only indicate refreshing if connected to network
-            _refreshLiveData.postValue(true)
-
-            launch(Dispatchers.Main){
-                val request = async {
-                    if (resetPosts) {
-                        postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                    } else {
-                        // retrieve the "after" value for the next posting
-                        postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
-                    }
-                }
-
-                try {
-                    request.await()
-                    _errorLiveData.postValue(null)
-                } catch (e : Exception) {
-
-                    // display the associated error
-                    _errorLiveData.postValue(
-                        when (e) {
-                            is RelicRequestError -> RelicError.NetworkUnavailable
-                            else -> RelicError.Unexpected
+            launch {
+                if (resetPosts) {
+                    // only indicate refreshing if connected to network
+                    _refreshLiveData.postValue(true)
+                    val listing = postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
+                    currentListing = listing
+                    _postListMediator.postValue(listing.data.children)
+                } else {
+                    currentListing?.data?.after?.let { after ->
+                        val listing = postRepo.retrieveMorePosts(postSource, after)
+                        currentListing = listing
+                        val newPosts: List<PostModel> = _postListMediator.value!!.toMutableList().apply {
+                            listing.data.children?.let { addAll(it) }
                         }
-                    )
+                        _postListMediator.postValue(newPosts)
+                    }
                 }
 
                 retrievalInProgress = false
@@ -166,16 +160,6 @@ open class DisplaySubVM (
             _subInfoLiveData.postValue(
                 DisplaySubInfoData(sortingMethod = currentSortingType, sortingScope = currentSortingScope)
             )
-        }
-    }
-
-    override fun onNextListing(nextVal: String?) {
-        Log.d(TAG, "Retrieving next posts with $nextVal")
-        // retrieve the "after" value for the next posting
-        nextVal?.let {
-            launch(Dispatchers.Main) {
-                postRepo.retrieveMorePosts(postSource, it)
-            }
         }
     }
 

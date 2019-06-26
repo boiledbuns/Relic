@@ -127,7 +127,7 @@ class PostItemAdapter (
                 val oldPost = postList[oldItemPosition]
                 val newPost = newPostList[newItemPosition]
 
-                return oldPost.fullName == newPost.fullName && oldPost.visited == newPost.visited
+                return oldPost.visited == newPost.visited
             }
         })
     }

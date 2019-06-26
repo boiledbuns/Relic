@@ -1,7 +1,7 @@
 package com.relic.data.deserializer
 
-import android.util.Log
 import com.google.gson.GsonBuilder
+import com.relic.api.response.Listing
 import com.relic.data.ApplicationDB
 import com.relic.data.PostSource
 import com.relic.data.RetrievalOption
@@ -9,17 +9,17 @@ import com.relic.data.SubSearchResult
 import com.relic.data.entities.ListingEntity
 import com.relic.data.entities.PostSourceEntity
 import com.relic.domain.models.CommentModel
+import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -36,6 +36,9 @@ class PostDeserializerImpl @Inject constructor(
     private val gson = GsonBuilder().create()
 
     private val postAdapter = moshi.adapter(PostModel::class.java)
+
+    private val postType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
+    private val postListingAdapter = moshi.adapter<Listing<PostModel>>(postType)
 
     override suspend fun parsePost(response: String) : ParsedPostData {
         val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
@@ -72,54 +75,12 @@ class PostDeserializerImpl @Inject constructor(
         response: String,
         postSource: PostSource,
         listingKey : String
-    ) : ParsedPostsData = coroutineScope {
-        val postEntities = ArrayList<PostModel>()
-        val commentEntities = ArrayList<CommentModel>()
-        val postSourceEntities = ArrayList<PostSourceEntity>()
-        val listing = ListingEntity()
-
-        val listingJSON = jsonParser.parse(response) as JSONObject
-        val listingData = listingJSON["data"] as JSONObject?
-        val listingPosts = listingData!!["children"] as JSONArray?
-
-        // update listing entity fields
-        listing.apply {
-            this.listingKey = listingKey
-            afterPosting = listingData["after"] as String?
+    ) : Listing<PostModel> {
+        try {
+            return postListingAdapter.fromJson(response)!!
+        } catch (e : Exception) {
+            throw RelicParseException(response, e)
         }
-
-        val postIterator = listingPosts?.iterator()
-
-        var postCount: Int = getSourceCount(postSource)
-
-        // generate the list of posts using the json array
-        while (postIterator != null && postIterator.hasNext()) {
-            val fullEntityJson = (postIterator.next() as JSONObject)
-
-            try {
-                val newPost = postAdapter.fromJson(fullEntityJson.toJSONString()) ?: throw RelicParseException(response)
-                postEntities.add(newPost)
-
-                val existingPostSource = async(Dispatchers.IO) {
-                    appDB.postSourceDao.getPostSource(newPost.fullName)
-                }.await()
-
-                val postSourceEntity = existingPostSource?.apply {
-                    sourceId = newPost.fullName
-                    subreddit = newPost.subreddit!!
-                } ?: PostSourceEntity(newPost.fullName, newPost.subreddit!!)
-
-                setSource(postSourceEntity, postSource, postCount)
-                postSourceEntities.add(postSourceEntity)
-
-                postCount++
-                Log.d(TAG, "post count : $postCount")
-            } catch (e : Exception) {
-                throw RelicParseException(response, e)
-            }
-        }
-
-        ParsedPostsData(postSourceEntities, postEntities, commentEntities, listing)
     }
 
     override suspend fun parseSearchSubPostsResponse(response: String): SubSearchResult {

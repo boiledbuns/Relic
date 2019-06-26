@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 import java.lang.Exception
 
@@ -159,8 +160,7 @@ class PostRepositoryImpl @Inject constructor(
         postSource: PostSource,
         sortType: SortType,
         sortScope: SortScope
-    ) {
-        // convert into a builder to make it easier to build api url
+    ) : Listing<PostModel> {
         // generate the ending of the request url based on the source type
         var ending = ENDPOINT + when (postSource) {
             is PostSource.Subreddit -> "r/${postSource.subredditName}"
@@ -179,32 +179,26 @@ class PostRepositoryImpl @Inject constructor(
             if (sortTypesWithScope.contains(sortType)) ending += "?t=" + sortScope.name.toLowerCase()
         }
 
-        Log.d(TAG, "retrieve sorted posts api url : $ending")
-        coroutineScope {
-            try {
-                val response = requestManager.processRequest(
-                    method = RelicOAuthRequest.GET,
-                    url = ending
-                )
-                val clear = launch { clearAllPostsFromSource(postSource) }
-                Log.d(TAG, "retrieve posts response :  $response")
+        try {
+            val response = requestManager.processRequest(
+                method = RelicOAuthRequest.GET,
+                url = ending
+            )
 
-                val listingKey = getListingKey(postSource)
-                val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
-                Log.d(TAG, "retrieve more posts : after ${parsedData.listingEntity.afterPosting}")
+            val listingKey = getListingKey(postSource)
+            val listing = postDeserializer.parsePosts(response, postSource, listingKey)
+            Timber.d( "retrieve more posts : after ${listing.data.after}")
 
-                clear.join()
-                insertParsedPosts(parsedData)
-            } catch (e: Exception) {
-                throw DomainTransfer.handleException("retrieve sorted posts", e) ?: e
-            }
+            return listing
+        } catch (e: Exception) {
+            throw DomainTransfer.handleException("retrieve sorted posts", e) ?: e
         }
     }
 
     override suspend fun retrieveMorePosts(
         postSource: PostSource,
         listingAfter: String
-    ) {
+    ) : Listing<PostModel> {
         // change the api endpoint to access the next post listing
         val ending = when (postSource) {
             is PostSource.Subreddit -> "r/${postSource.subredditName}"
@@ -212,18 +206,14 @@ class PostRepositoryImpl @Inject constructor(
             else -> ""
         }
 
-        Log.d(TAG, "retrieve more posts : api url : $ENDPOINT$ending?after=$listingAfter")
         try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
                 url = "$ENDPOINT$ending?after=$listingAfter"
             )
-            Log.d(TAG, "more posts $response")
 
             val listingKey = getListingKey(postSource)
-            val parsedData = postDeserializer.parsePosts(response, postSource, listingKey)
-
-            insertParsedPosts(parsedData)
+            return postDeserializer.parsePosts(response, postSource, listingKey)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve more posts", e) ?: e
         }
@@ -381,8 +371,9 @@ class PostRepositoryImpl @Inject constructor(
     private suspend fun insertParsedPosts(parsedPosts : ParsedPostsData) {
         withContext(Dispatchers.IO) {
             parsedPosts.apply {
-                if (posts.isNotEmpty()) appDB.postDao.insertPosts(posts)
-                if (comments.isNotEmpty()) appDB.commentDAO.insertComments(comments)
+                postListing.data.children?.let { children ->
+                    if (children.isNotEmpty()) appDB.postDao.insertPosts(children)
+                }
 
                 appDB.postSourceDao.insertPostSources(postSourceEntities)
                 appDB.listingDAO.insertListing(listingEntity)

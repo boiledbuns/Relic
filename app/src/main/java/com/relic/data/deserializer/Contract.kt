@@ -1,5 +1,6 @@
 package com.relic.data.deserializer
 
+import com.relic.api.response.Listing
 import com.relic.data.CommentsAndPostData
 import com.relic.data.PostSource
 import com.relic.data.SubSearchResult
@@ -21,7 +22,7 @@ interface Contract {
             response: String,
             postSource: PostSource,
             listingKey : String
-        ) : ParsedPostsData
+        ) : Listing<PostModel>
 
         suspend fun parsePost(response: String) : ParsedPostData
 
@@ -64,8 +65,7 @@ data class ParsedPostData(
 
 data class ParsedPostsData(
     val postSourceEntities:List<PostSourceEntity>,
-    val posts : List<PostModel>,
-    val comments : List<CommentModel>,
+    val postListing : Listing<PostModel>,
     val listingEntity: ListingEntity
 )
 
