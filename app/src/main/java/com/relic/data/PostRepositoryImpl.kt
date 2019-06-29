@@ -3,6 +3,7 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.relic.api.response.Listing
+import com.relic.data.dao.PostSourceRelationDao
 import com.relic.data.deserializer.Contract
 import com.relic.data.entities.SourceAndPostRelation
 import com.relic.data.repository.RepoConstants.ENDPOINT
@@ -325,15 +326,15 @@ class PostRepositoryImpl @Inject constructor(
 
     // endregion interface methods
 
-    private suspend fun insertPosts (source : PostSource, posts : List<PostModel>) {
+    override suspend fun insertPosts (source : PostSource, posts : List<PostModel>) {
         val sourceName = source.getSourceName()
-        var initPosition = -1
 
         withContext(Dispatchers.IO) {
+            var position = appDB.postSourceDao.getItemsCountForSource(sourceName)
 
             val sourceRelations = posts.map {
-                initPosition ++
-                SourceAndPostRelation(source = sourceName, postId = it.id, position = initPosition)
+                position ++
+                SourceAndPostRelation(source = sourceName, postId = it.id, position = position)
             }
 
             postDao.insertPosts(posts)

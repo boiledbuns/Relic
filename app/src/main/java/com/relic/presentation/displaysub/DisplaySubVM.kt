@@ -6,18 +6,18 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.relic.api.response.Listing
 import com.relic.data.*
-import com.relic.presentation.main.RelicError
-
 import com.relic.data.gateway.PostGateway
+import com.relic.data.repository.NetworkException
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
-import com.relic.data.repository.NetworkException
-import com.relic.network.request.RelicRequestError
-import com.relic.presentation.helper.ImageHelper
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicViewModel
+import com.relic.presentation.helper.ImageHelper
+import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -64,14 +64,14 @@ open class DisplaySubVM (
     override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
+        // initial check for connection -> allows us to decide if we should use retrieve posts
+        // from the network or just display what we have locally
         if (networkUtil.checkConnection()) {
             retrieveMorePosts(true)
         } else {
             // observe the list of posts stored locally
             _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
-                if (!retrievalInProgress) {
-                    _postListMediator.postValue(postModels)
-                }
+                _postListMediator.postValue(postModels)
             }
         }
 
@@ -99,36 +99,42 @@ open class DisplaySubVM (
         //subRepo.getSubGateway().retrieveSubBanner(subName);
         _subredditMediator.addSource(subRepo.getSingleSub(subName)) { newModel ->
             if (newModel == null) {
-                Log.d(TAG, "No subreddit saved locally, retrieving from network")
+                Timber.d("No subreddit saved locally, retrieving from network")
                 launch(Dispatchers.Main) { subRepo.retrieveSingleSub(subName) }
             } else {
-                Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl())
+                Timber.d("Subreddit loaded " + newModel.getBannerUrl())
                 _subredditMediator.setValue(newModel)
             }
         }
     }
 
-    /**
-     * Method to retrieve more posts
-     * @param resetPosts : indicates whether the old posts should be cleared
-     */
     final override fun retrieveMorePosts(resetPosts: Boolean) {
         if (networkUtil.checkConnection()) {
             launch {
                 if (resetPosts) {
-                    // only indiLcate refreshing if connected to network
+                    // only indicate refreshing if connected to network
                     _refreshLiveData.postValue(true)
                     val listing = postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
                     currentListing = listing
-                    _postListMediator.postValue(listing.data.children)
+
+                    listing.data.children?.let { posts ->
+                        _postListMediator.postValue(posts)
+                        // TODO add preferences manager to let us check if user wants to store the loaded posts
+                        postRepo.clearAllPostsFromSource(postSource)
+                        postRepo.insertPosts(postSource, posts)
+                    }
                 } else {
                     currentListing?.data?.after?.let { after ->
                         val listing = postRepo.retrieveMorePosts(postSource, after)
                         currentListing = listing
-                        val newPosts: List<PostModel> = _postListMediator.value!!.toMutableList().apply {
-                            listing.data.children?.let { addAll(it) }
+
+                        listing.data.children?.let { posts ->
+                            val newPosts = _postListMediator.value!!.toMutableList()
+                            newPosts.addAll(posts)
+
+                            _postListMediator.postValue(newPosts)
+                            postRepo.insertPosts(postSource, posts)
                         }
-                        _postListMediator.postValue(newPosts)
                     }
                 }
 

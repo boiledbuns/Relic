@@ -76,6 +76,8 @@ interface PostRepository {
         postSource: PostSource
     )
 
+    suspend fun insertPosts (source : PostSource, posts : List<PostModel>)
+
     suspend fun searchSubPosts(
         subredditName: String,
         query : String,

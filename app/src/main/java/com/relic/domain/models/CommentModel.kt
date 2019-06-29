@@ -11,9 +11,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 open class CommentModel: ListingItem() {
 
-    @PrimaryKey
-    var id: String = ""
-
     @Json(name = "body_html")
     var body: String = ""
 

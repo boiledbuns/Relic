@@ -9,9 +9,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 open class PostModel : ListingItem() {
 
-    @PrimaryKey
-    var id: String = ""
-
     var title: String = ""
     var selftext: String? = null
 

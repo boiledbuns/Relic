@@ -1,5 +1,6 @@
 package com.relic.domain.models
 
+import android.arch.persistence.room.PrimaryKey
 import com.relic.api.qualifier.Date
 import com.relic.api.qualifier.Likes
 import com.squareup.moshi.Json
@@ -7,6 +8,9 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 open class ListingItem {
+
+    @PrimaryKey
+    var id: String = ""
 
     // the id is the "full name" of an item
     @Json(name = "name")

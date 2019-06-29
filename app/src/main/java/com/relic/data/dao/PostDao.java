@@ -12,10 +12,11 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
-    // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
-    // region get posts based on origin
-
-    @Query("SELECT * FROM PostModel INNER JOIN SourceAndPostRelation ON id = postId WHERE source = :sourceName ORDER BY position ASC")
+    @Query(
+        "SELECT Post.*, PostVisitRelation.visitedFullname IS NOT NULL as visited FROM" +
+        "   (SELECT * FROM PostModel INNER JOIN SourceAndPostRelation ON id = postId WHERE source = :sourceName ORDER BY position ASC) AS Post " +
+        "LEFT OUTER JOIN PostVisitRelation on fullName = visitedFullname"
+    )
     public abstract LiveData<List<PostModel>> getPostsFromSource(String sourceName);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -32,9 +33,6 @@ public abstract class PostDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPost(PostModel post);
-
-    @Query("UPDATE PostModel SET visited = 1 where fullName = :postFullname")
-    public abstract void updateVisited(String postFullname);
 
     @Query("UPDATE PostModel SET userUpvoted = :vote  where fullName = :postFullname")
     public abstract void updateVote(String postFullname, int vote);

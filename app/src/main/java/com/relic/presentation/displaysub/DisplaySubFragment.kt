@@ -5,14 +5,17 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.ColorInt
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -286,9 +289,14 @@ class DisplaySubFragment : RelicFragment() {
             }
 
             snackbar = Snackbar.make(displaySubRootView, message, displayLength).apply {
-                actionMessage?.let {
-                    setAction(it) { action.invoke() }
-                }
+                actionMessage?.let { setAction(actionMessage) { action() } }
+
+                //  TODO extract this into a common util class in presentation
+                val typedValue = TypedValue()
+                context.theme.resolveAttribute(R.attr.relicTitleColor, typedValue, true);
+                val color = typedValue.data;
+
+                setActionTextColor(color)
                 show()
             }
         } ?: snackbar?.dismiss()
