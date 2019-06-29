@@ -4,23 +4,17 @@ import com.google.gson.GsonBuilder
 import com.relic.api.response.Listing
 import com.relic.data.ApplicationDB
 import com.relic.data.PostSource
-import com.relic.data.RetrievalOption
 import com.relic.data.SubSearchResult
-import com.relic.data.entities.ListingEntity
-import com.relic.data.entities.PostSourceEntity
-import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
-import java.util.*
 import javax.inject.Inject
 
 class PostDeserializerImpl @Inject constructor(
@@ -40,25 +34,10 @@ class PostDeserializerImpl @Inject constructor(
     private val postType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
     private val postListingAdapter = moshi.adapter<Listing<PostModel>>(postType)
 
-    override suspend fun parsePost(response: String) : ParsedPostData {
-        val data = ((jsonParser.parse(response) as JSONArray)[0] as JSONObject)["data"] as JSONObject
-        val child = (data["children"] as JSONArray)[0] as JSONObject
-
+    override suspend fun parsePost(response: String) : PostModel {
         try {
-            val newPost = postAdapter.fromJson(child.toJSONString()) ?: throw RelicParseException(response)
-
-            // should probably be supplied instead of retrieved here
-            val existingPostSource = withContext(Dispatchers.IO) {
-                appDB.postSourceDao.getPostSource(newPost.fullName)
-            }
-
-            val postSourceEntity = existingPostSource?.apply {
-                sourceId = newPost.fullName
-                subreddit = newPost.subreddit!!
-            } ?: PostSourceEntity(newPost.fullName, newPost.subreddit!!)
-
-            return ParsedPostData(postSourceEntity, newPost)
-
+            // api returns a listing with a single post item as its child
+            return postListingAdapter.fromJson(response)!!.data.children!!.first()
         } catch (e : ParseException){
             throw RelicParseException(response, e)
         }
@@ -100,54 +79,11 @@ class PostDeserializerImpl @Inject constructor(
             .fromJson((child["data"] as JSONObject).toString())
     }
 
-    private fun setSource(entity : PostSourceEntity, src: PostSource, position : Int) {
-        entity.apply {
-            when (src) {
-                is PostSource.Subreddit -> {
-                    subredditPosition = position
-                }
-                is PostSource.Frontpage -> {
-                    frontpagePosition = position
-                }
-                is PostSource.All -> {
-                    allPosition = position
-                }
-                is PostSource.User -> {
-                    when (src.retrievalOption) {
-                        RetrievalOption.Submitted -> userSubmittedPosition = position
-                        RetrievalOption.Comments -> userCommentsPosition = position
-                        RetrievalOption.Saved -> userSavedPosition = position
-                        RetrievalOption.Upvoted -> userUpvotedPosition = position
-                        RetrievalOption.Downvoted -> userDownvotedPosition = position
-                        RetrievalOption.Gilded -> userGildedPosition = position
-                        RetrievalOption.Hidden -> userHiddenPosition = position
-                    }
-                }
-            }
-        }
-    }
-
     private suspend fun getSourceCount(postSource : PostSource) : Int {
         val sourceDao = appDB.postSourceDao
 
         return withContext(Dispatchers.IO) {
-            when (postSource) {
-                is PostSource.Subreddit -> sourceDao.getItemsCountForSubreddit(postSource.subredditName)
-                is PostSource.Frontpage -> sourceDao.getItemsCountForFrontpage()
-                is PostSource.All -> sourceDao.getItemsCountForAll()
-                is PostSource.Popular -> 0
-                is PostSource.User -> {
-                    when (postSource.retrievalOption) {
-                        RetrievalOption.Submitted -> sourceDao.getItemsCountForUserSubmitted()
-                        RetrievalOption.Comments -> sourceDao.getItemsCountForUserComments()
-                        RetrievalOption.Saved -> sourceDao.getItemsCountForUserSaved()
-                        RetrievalOption.Upvoted -> sourceDao.getItemsCountForUserUpvoted()
-                        RetrievalOption.Downvoted -> sourceDao.getItemsCountForUserDownvoted()
-                        RetrievalOption.Gilded -> sourceDao.getItemsCountForUserGilded()
-                        RetrievalOption.Hidden -> sourceDao.getItemsCountForUserHidden()
-                    }
-                }
-            }
+            sourceDao.getItemsCountForSource(postSource.getSourceName())
         }
     }
 }

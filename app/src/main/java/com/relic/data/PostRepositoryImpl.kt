@@ -2,30 +2,23 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
-
-import com.relic.data.deserializer.ParsedPostsData
-import com.relic.network.NetworkRequestManager
-import com.relic.network.request.RelicOAuthRequest
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
-import com.relic.domain.models.PostModel
+import com.relic.data.entities.SourceAndPostRelation
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.data.repository.RepoException
 import com.relic.domain.models.ListingItem
+import com.relic.domain.models.PostModel
+import com.relic.network.NetworkRequestManager
+import com.relic.network.request.RelicOAuthRequest
 import com.relic.network.request.RelicRequestError
+import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
-import java.lang.Exception
-
 import javax.inject.Inject
 
 /**
@@ -73,25 +66,13 @@ class PostRepositoryImpl @Inject constructor(
     private val type = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
     private val listingAdapter = moshi.adapter<Listing<ListingItem>>(type)
 
+    private val postDao = appDB.postDao
+    private val postSourceDao = appDB.postSourceDao
+
     // region interface methods
 
     override fun getPosts(postSource: PostSource) : LiveData<List<PostModel>> {
-        return when (postSource) {
-            is PostSource.Subreddit -> appDB.postDao.getPostsFromSubreddit(postSource.subredditName)
-            is PostSource.Frontpage -> appDB.postDao.postsFromFrontpage
-            is PostSource.User -> {
-                when (postSource.retrievalOption) {
-                    RetrievalOption.Submitted -> appDB.userPostingDao.getUserPosts()
-                    RetrievalOption.Comments -> MutableLiveData()
-                    RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedPosts()
-                    RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedPosts()
-                    RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedPosts()
-                    RetrievalOption.Gilded -> appDB.userPostingDao.getUserGilded()
-                    RetrievalOption.Hidden -> appDB.userPostingDao.getUserHidden()
-                }
-            }
-            else -> appDB.postDao.postsFromAll
-        }
+        return postDao.getPostsFromSource(postSource.getSourceName())
     }
 
     override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource) {
@@ -105,7 +86,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun getPost(postFullName: String): LiveData<PostModel> {
-        return appDB.postDao.getSinglePost(postFullName)
+        return postDao.getSinglePost(postFullName)
     }
 
     override suspend fun retrieveUserListing(
@@ -121,14 +102,11 @@ class PostRepositoryImpl @Inject constructor(
             // default (is "new", no need to manually specify it)
             else -> ""
         }
-        Log.d(TAG, "listing items sort $ENDPOINT$ending")
-
         try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
                 url = "$ENDPOINT$ending"
             )
-            Log.d(TAG, "listing items $response")
 
             return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve user listing", null)
         } catch (e: Exception) {
@@ -148,7 +126,6 @@ class PostRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = "$ENDPOINT$ending?after=$after"
             )
-            Log.d(TAG, "listing items $response")
             return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve next listing", null)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve next listing", e) ?: e
@@ -233,11 +210,12 @@ class PostRepositoryImpl @Inject constructor(
             )
 
             postDeserializer.parsePost(response).apply {
-                post.visited = true
+                visited = true
+                val postSourceRelation = SourceAndPostRelation(source = id, postId = id, position = 0)
 
                 withContext(Dispatchers.IO) {
-                    appDB.postDao.insertPost(post)
-                    appDB.postSourceDao.insertPostSources(listOf(postSourceEntity))
+                    postDao.insertPost(this@apply)
+                    postSourceDao.insertPostSourceRelations(listOf(postSourceRelation))
                 }
             }
 
@@ -247,28 +225,13 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearAllPostsFromSource(postSource: PostSource) {
+        val sourceName = postSource.getSourceName()
         withContext(Dispatchers.IO) {
-            when (postSource) {
-                is PostSource.Frontpage -> appDB.postSourceDao.removeAllFrontpageAsSource()
-                is PostSource.All -> appDB.postSourceDao.removeAllAllAsSource()
-                is PostSource.Subreddit -> appDB.postSourceDao.removeAllSubredditAsSource(postSource.subredditName)
-                is PostSource.User -> {
-                    appDB.postSourceDao.apply {
-                        when (postSource.retrievalOption) {
-                            RetrievalOption.Submitted -> removeAllUserSubmittedAsSource()
-                            RetrievalOption.Comments -> removeAllUserCommentsAsSource()
-                            RetrievalOption.Saved -> removeAllUserSavedAsSource()
-                            RetrievalOption.Upvoted -> removeAllUserUpvotedAsSource()
-                            RetrievalOption.Downvoted -> removeAllUserDownvotedAsSource()
-                            RetrievalOption.Gilded -> removeAllUserGildedAsSource()
-                            RetrievalOption.Hidden -> removeAllUserHiddenAsSource()
-                        }
-                    }
-                }
-            }
-
-            // remove all the source entities that no longer correspond to any remaining posts
-            appDB.postSourceDao.removeAllUnusedSources()
+            postSourceDao.removeAllFromSource(sourceName)
+            // TODO decide if we need this later on. Not sure if we do
+//            if (postSourceDao.getItemsCountForSource(sourceName) == 0) {
+//                postDao.deletePostsWithoutSources()
+//            }
         }
     }
 
@@ -287,8 +250,6 @@ class PostRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending
             )
-            Log.d(TAG, "ending $ending")
-            Log.d(TAG, "response $response")
             return postDeserializer.parseSearchSubPostsResponse(response)
 
         } catch (e: Exception) {
@@ -319,8 +280,6 @@ class PostRepositoryImpl @Inject constructor(
             }
         }
 
-        Log.d(TAG, "post post draft ${postDraft.sendReplies}  ${type}")
-
         try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.POST,
@@ -328,9 +287,8 @@ class PostRepositoryImpl @Inject constructor(
                 data = data
             )
 
-            Log.d(TAG, "post post $response")
             // delete the post draft when we've successfully submitted it
-            appDB.postDao.deletePostDraft(postDraft.subreddit)
+            postDao.deletePostDraft(postDraft.subreddit)
 
         } catch (e: Exception) {
             throw DomainTransfer.handleException("post post", e) ?: e
@@ -347,13 +305,13 @@ class PostRepositoryImpl @Inject constructor(
                 subreddit = postDraft.subreddit
             }
 
-            appDB.postDao.insertPost(newPostDraft)
+            postDao.insertPost(newPostDraft)
         }
     }
 
     override suspend fun loadDraft(subreddit : String) : PostDraft? {
         return withContext(Dispatchers.IO) {
-            val draftModel = appDB.postDao.getPostDraft(subreddit)
+            val draftModel = postDao.getPostDraft(subreddit)
 
             if (draftModel != null) {
                 PostDraft(
@@ -367,17 +325,20 @@ class PostRepositoryImpl @Inject constructor(
 
     // endregion interface methods
 
+    private suspend fun insertPosts (source : PostSource, posts : List<PostModel>) {
+        val sourceName = source.getSourceName()
+        var initPosition = -1
 
-    private suspend fun insertParsedPosts(parsedPosts : ParsedPostsData) {
         withContext(Dispatchers.IO) {
-            parsedPosts.apply {
-                postListing.data.children?.let { children ->
-                    if (children.isNotEmpty()) appDB.postDao.insertPosts(children)
-                }
 
-                appDB.postSourceDao.insertPostSources(postSourceEntities)
-                appDB.listingDAO.insertListing(listingEntity)
+            val sourceRelations = posts.map {
+                initPosition ++
+                SourceAndPostRelation(source = sourceName, postId = it.id, position = initPosition)
             }
+
+            postDao.insertPosts(posts)
+            postSourceDao.insertPostSourceRelations(sourceRelations)
+            // TODO also need to insert listing "after" but maybe separately
         }
     }
 

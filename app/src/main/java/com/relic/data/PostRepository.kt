@@ -9,6 +9,7 @@ import com.relic.domain.models.ListingItem
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.network.request.RelicRequestError
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 interface PostRepository {
@@ -113,27 +114,39 @@ enum class SortScope {
  * Used to represent how a post is being accessed
  * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
  */
-sealed class PostSource : Parcelable {
+abstract sealed class PostSource : Parcelable {
 
     @Parcelize
-    object Frontpage : PostSource()
+    object Frontpage : PostSource() {
+        override fun getSourceName() = "Frontpage"
+    }
 
     @Parcelize
-    object All : PostSource()
+    object All : PostSource() {
+        override fun getSourceName() = "All"
+    }
 
     @Parcelize
-    object Popular : PostSource()
+    object Popular : PostSource() {
+        override fun getSourceName() = "Popular"
+    }
 
     @Parcelize
     data class Subreddit(
         val subredditName : String
-    ) : PostSource()
+    ) : PostSource() {
+        override fun getSourceName() = subredditName
+    }
 
     @Parcelize
     data class User(
         val username : String,
         val retrievalOption: RetrievalOption
-    ) : PostSource()
+    ) : PostSource() {
+        override fun getSourceName() = username + "_" + retrievalOption
+    }
+
+    abstract fun getSourceName() : String
 }
 
 enum class RetrievalOption {

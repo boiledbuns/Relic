@@ -116,7 +116,7 @@ open class DisplaySubVM (
         if (networkUtil.checkConnection()) {
             launch {
                 if (resetPosts) {
-                    // only indicate refreshing if connected to network
+                    // only indiLcate refreshing if connected to network
                     _refreshLiveData.postValue(true)
                     val listing = postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
                     currentListing = listing

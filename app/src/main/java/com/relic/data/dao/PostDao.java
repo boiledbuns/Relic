@@ -15,42 +15,16 @@ public abstract class PostDao {
     // TODO : Currently can't use constants from entity class in query annotation so hardcoded for now
     // region get posts based on origin
 
-    @Query("SELECT * FROM PostModel " +
-        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
-        "WHERE subredditPosition >= 0 AND PostSourceEntity.subreddit = :subredditName ORDER BY subredditPosition ASC")
-    public abstract LiveData<List<PostModel>> getPostsFromSubreddit(String subredditName);
-
-    @Query("SELECT * FROM PostModel " +
-        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
-        "WHERE frontpagePosition >= 0 ORDER BY frontpagePosition ASC")
-    public abstract LiveData<List<PostModel>> getPostsFromFrontpage();
-
-    @Query("SELECT * FROM PostModel " +
-        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
-        "WHERE allPosition >= 0 ORDER BY allPosition ASC")
-    public abstract LiveData<List<PostModel>> getPostsFromAll();
+    @Query("SELECT * FROM PostModel INNER JOIN SourceAndPostRelation ON id = postId WHERE source = :sourceName ORDER BY position ASC")
+    public abstract LiveData<List<PostModel>> getPostsFromSource(String sourceName);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPosts(List<PostModel> posts);
 
-    @Query("DELETE FROM PostModel WHERE PostModel.fullName IN " +
-        "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0 AND subreddit = :subName)")
-    public abstract void deleteAllFromSub(String subName);
-
-    @Query("DELETE FROM PostModel WHERE PostModel.fullName IN " +
-        "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0)")
-    public abstract void deleteAllFromFrontpage();
-
-    @Query("DELETE FROM PostModel WHERE PostModel.fullName IN " +
-        "(SELECT sourceId FROM PostSourceEntity WHERE PostSourceEntity.sourceId >= 0)")
-    public abstract void deleteAllFromAll();
-
-    @Query("SELECT * FROM PostModel INNER JOIN PostSourceEntity ON fullName = sourceId WHERE fullName = :fullName")
+    @Query("SELECT * FROM PostModel INNER JOIN SourceAndPostRelation ON id = postId WHERE fullName = :fullName")
     public abstract LiveData<PostModel> getSinglePost(String fullName);
 
-    @Query("SELECT * FROM PostModel " +
-        "LEFT JOIN PostSourceEntity ON PostModel.fullName = PostSourceEntity.sourceId " +
-        "WHERE PostSourceEntity.subreddit = :subreddit AND fullName = '' AND author = ''")
+    @Query("SELECT * FROM PostModel WHERE subreddit = :subreddit AND fullName = '' AND author = ''")
     public abstract PostModel getPostDraft(String subreddit);
 
     @Query("DELETE FROM PostModel WHERE subreddit = :subreddit AND fullName = '' AND author = ''")
@@ -70,4 +44,7 @@ public abstract class PostDao {
 
     @Query("SELECT * FROM PostModel WHERE fullName = :postFullname LIMIT 1")
     public abstract PostModel getPostWithId(String postFullname);
+
+    @Query("DELETE FROM PostModel WHERE id IN ((SELECT id FROM SourceAndPostRelation) NOT IN (SELECT id FROM PostModel))")
+    public abstract void deletePostsWithoutSources();
 }

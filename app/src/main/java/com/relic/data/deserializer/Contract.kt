@@ -24,7 +24,7 @@ interface Contract {
             listingKey : String
         ) : Listing<PostModel>
 
-        suspend fun parsePost(response: String) : ParsedPostData
+        suspend fun parsePost(response: String) : PostModel
 
         suspend fun parseSearchSubPostsResponse(response: String): SubSearchResult
     }
@@ -57,17 +57,6 @@ interface Contract {
     }
 
 }
-
-data class ParsedPostData(
-    val postSourceEntity:PostSourceEntity,
-    val post : PostModel
-)
-
-data class ParsedPostsData(
-    val postSourceEntities:List<PostSourceEntity>,
-    val postListing : Listing<PostModel>,
-    val listingEntity: ListingEntity
-)
 
 data class ParsedSubsData(
     val subsList : List<SubredditEntity>,
