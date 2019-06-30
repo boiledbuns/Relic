@@ -4,20 +4,20 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.relic.api.response.Listing
 import com.relic.data.*
-import com.relic.presentation.main.RelicError
-
 import com.relic.data.gateway.PostGateway
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
+import com.relic.data.repository.NetworkException
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
-import com.relic.data.repository.NetworkException
-import com.relic.network.request.RelicRequestError
-import com.relic.presentation.helper.ImageHelper
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicViewModel
+import com.relic.presentation.helper.ImageHelper
+import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -26,22 +26,26 @@ open class DisplaySubVM (
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
     private val postGateway: PostGateway,
+    private val listingRepo : ListingRepository,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, RetrieveNextListingCallback, DisplaySubContract.SearchVM {
+) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, DisplaySubContract.SearchVM {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,
         private val postGateway: PostGateway,
+        private val listingRepo : ListingRepository,
         private val networkUtil : NetworkUtil
     ) {
         fun create (postSource : PostSource) : DisplaySubVM {
-            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, networkUtil)
+            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, listingRepo, networkUtil)
         }
     }
 
     private var currentSortingType = SortType.DEFAULT
     private var currentSortingScope = SortScope.NONE
+    private var subPostAfter : String? = null
+
     private var retrievalInProgress = true
     private var after : String? = null
     private var query : String? = null
@@ -63,12 +67,18 @@ open class DisplaySubVM (
     override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
-        retrieveMorePosts(true)
-
-        // observe the list of posts stored locally
-        _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
-            if (!retrievalInProgress) {
+        // initial check for connection -> allows us to decide if we should use retrieve posts
+        // from the network or just display what we have locally
+        if (networkUtil.checkConnection()) {
+            retrieveMorePosts(true)
+        } else {
+            // observe the list of posts stored locally
+            _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
                 _postListMediator.postValue(postModels)
+            }
+
+            launch {
+                subPostAfter = listingRepo.getAfter(postSource)
             }
         }
 
@@ -96,46 +106,47 @@ open class DisplaySubVM (
         //subRepo.getSubGateway().retrieveSubBanner(subName);
         _subredditMediator.addSource(subRepo.getSingleSub(subName)) { newModel ->
             if (newModel == null) {
-                Log.d(TAG, "No subreddit saved locally, retrieving from network")
+                Timber.d("No subreddit saved locally, retrieving from network")
                 launch(Dispatchers.Main) { subRepo.retrieveSingleSub(subName) }
             } else {
-                Log.d(TAG, "Subreddit loaded " + newModel.getBannerUrl())
+                Timber.d("Subreddit loaded ${newModel.getBannerUrl()}")
                 _subredditMediator.setValue(newModel)
             }
         }
     }
 
-    /**
-     * Method to retrieve more posts
-     * @param resetPosts : indicates whether the old posts should be cleared
-     */
     final override fun retrieveMorePosts(resetPosts: Boolean) {
         if (networkUtil.checkConnection()) {
-            // only indicate refreshing if connected to network
-            _refreshLiveData.postValue(true)
+            launch {
+                if (resetPosts) {
+                    // only indicate refreshing if connected to network
+                    _refreshLiveData.postValue(true)
+                    val listing = postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
+                    subPostAfter = listing.data.after
 
-            launch(Dispatchers.Main){
-                val request = async {
-                    if (resetPosts) {
-                        postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                    } else {
-                        // retrieve the "after" value for the next posting
-                        postRepo.getNextPostingVal(this@DisplaySubVM, postSource)
+                    listing.data.children?.let { posts ->
+                        _postListMediator.postValue(posts)
+                        // TODO add preferences manager to let us check if user wants to store the loaded posts
+                        postRepo.clearAllPostsFromSource(postSource)
+                        postRepo.insertPosts(postSource, posts)
                     }
-                }
 
-                try {
-                    request.await()
-                    _errorLiveData.postValue(null)
-                } catch (e : Exception) {
+                    listingRepo.insertAfter(postSource, listing.data.after)
+                } else {
+                    subPostAfter?.let { currentAfter ->
+                        val listing = postRepo.retrieveMorePosts(postSource, currentAfter)
+                        subPostAfter = listing.data.after
 
-                    // display the associated error
-                    _errorLiveData.postValue(
-                        when (e) {
-                            is RelicRequestError -> RelicError.NetworkUnavailable
-                            else -> RelicError.Unexpected
+                        listing.data.children?.let { posts ->
+                            val newPosts = _postListMediator.value!!.toMutableList()
+                            newPosts.addAll(posts)
+
+                            _postListMediator.postValue(newPosts)
+                            postRepo.insertPosts(postSource, posts)
                         }
-                    )
+
+                        listingRepo.insertAfter(postSource, listing.data.after)
+                    }
                 }
 
                 retrievalInProgress = false
@@ -169,20 +180,10 @@ open class DisplaySubVM (
         }
     }
 
-    override fun onNextListing(nextVal: String?) {
-        Log.d(TAG, "Retrieving next posts with $nextVal")
-        // retrieve the "after" value for the next posting
-        nextVal?.let {
-            launch(Dispatchers.Main) {
-                postRepo.retrieveMorePosts(postSource, it)
-            }
-        }
-    }
-
     override fun updateSubStatus(subscribe: Boolean) {
         if (postSource is PostSource.Subreddit) {
             val subName = postSource.subredditName
-            Log.d(TAG, "Changing to subscribed $subscribe")
+            Timber.d("Changing to subscribed $subscribe")
 
             launch(Dispatchers.Main) {
                 subRepo.getSubGateway().subscribe(subscribe, subName)
@@ -198,12 +199,12 @@ open class DisplaySubVM (
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
-        Log.d(TAG, "Voting on post " + postFullname + "value = " + voteValue)
+        Timber.d("Voting on post ${postFullname} value = {voteValue}")
         launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
     }
 
     override fun savePost(postFullname: String, save: Boolean) {
-        Log.d(TAG, "Saving on post " + postFullname + "save = " + save)
+        Timber.d("Saving on post ${postFullname} save = {save}")
         launch(Dispatchers.Main) { postGateway.savePost(postFullname, save) }
     }
 
@@ -228,7 +229,7 @@ open class DisplaySubVM (
     override fun search(query : String) {
         this.query = query
         launch(Dispatchers.Main) {
-            val results = when (postSource) {
+            val listing = when (postSource) {
                 is PostSource.Subreddit -> {
                     postRepo.searchSubPosts(postSource.subredditName, query, true)
                 }
@@ -237,9 +238,9 @@ open class DisplaySubVM (
                 }
             }
 
-            results?.let {
-                after = it.after
-                _searchResults.postValue(it.posts)
+            listing?.data?.let { data ->
+                after = data.after
+                _searchResults.postValue(data.children)
             }
         }
     }
@@ -248,7 +249,7 @@ open class DisplaySubVM (
         val currQuery = query
         launch(Dispatchers.Main) {
             if (after != null && currQuery != null){
-                val results = when (postSource) {
+                val listing = when (postSource) {
                     is PostSource.Subreddit -> {
                         postRepo.searchSubPosts(postSource.subredditName, currQuery, true, after)
                     }
@@ -257,22 +258,23 @@ open class DisplaySubVM (
                     }
                 }
 
-                results?.let { moreResult ->
-                    after = moreResult.after
+                listing?.data?.let { data ->
+                    after = data.after
+                    val children = data.children
                     // show appropriate message to user to indicate no more posts could be found
-                    if (moreResult.posts.isEmpty()) {
+                    if (children.isNullOrEmpty()) {
                         _errorLiveData.postValue(NoResults)
                     } else {
                         val newPosts = ArrayList<PostModel>()
                         _searchResults.value?.let { newPosts.addAll(it) }
-                        newPosts.addAll(moreResult.posts)
+                        newPosts.addAll(children)
 
                         _searchResults.postValue(newPosts)
                     }
                 }
 
             } else {
-                Log.d(TAG, "No more posts available for this query")
+                Timber.d("No more posts available for this query")
             }
         }
     }
@@ -288,6 +290,6 @@ open class DisplaySubVM (
         }
         _errorLiveData.postValue(subE)
 
-        Log.e(TAG, "caught exception", e)
+        Timber.e(e)
     }
 }

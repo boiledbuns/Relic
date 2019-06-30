@@ -1,6 +1,5 @@
 package com.relic.data.dao;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -19,7 +18,7 @@ public abstract class CommentDao {
     public abstract List<CommentModel> getAllComments(String postFullname);
 
     @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
+        "LEFT JOIN SourceAndPostRelation ON id = postId " +
         "WHERE linkFullname = :postFullname AND depth < :depth ORDER BY depth ASC")
     public abstract List<CommentModel> getChildrenByLevel(String postFullname, int depth);
 

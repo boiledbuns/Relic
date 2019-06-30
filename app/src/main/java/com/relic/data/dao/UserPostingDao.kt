@@ -10,64 +10,9 @@ import com.relic.domain.models.PostModel
 abstract class UserPostingDao {
 // for user specific actions
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userSubmittedPosition >= 0 ORDER BY userSubmittedPosition ASC")
-    abstract fun getUserPosts(): LiveData<List<PostModel>>
+    @Query("SELECT * FROM PostModel INNER JOIN SourceAndPostRelation ON id = postId WHERE source = :sourceName ORDER BY position ASC")
+    abstract fun getUserPosts(sourceName : String): LiveData<List<PostModel>>
 
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userSavedPosition >= 0 ORDER BY userSavedPosition ASC")
-    abstract fun getUserSavedPosts(): LiveData<List<PostModel>>
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userUpvotedPosition >= 0 ORDER BY userUpvotedPosition ASC")
-    abstract fun getUserUpvotedPosts(): LiveData<List<PostModel>>
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE  userDownvotedPosition >= 0 ORDER BY userDownvotedPosition ASC")
-    abstract fun getUserDownvotedPosts(): LiveData<List<PostModel>>
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userGildedPosition >= 0 ORDER BY userGildedPosition ASC")
-    abstract fun getUserGilded(): LiveData<List<PostModel>>
-
-    @Query("SELECT * FROM PostEntity " +
-        "LEFT JOIN PostSourceEntity ON PostEntity.fullName = PostSourceEntity.sourceId " +
-        "WHERE userHiddenPosition >= 0 ORDER BY userHiddenPosition ASC")
-    abstract fun getUserHidden(): LiveData<List<PostModel>>
-
-
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE CommentModel.userCommentsPosition >= 0 ORDER BY CommentModel.userCommentsPosition ASC")
-    abstract fun getUserComments(): LiveData<List<CommentModel>>
-
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE CommentModel.userSavedPosition >= 0 ORDER BY CommentModel.userSavedPosition ASC")
-    abstract fun getUserSavedComments(): LiveData<List<CommentModel>>
-
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE CommentModel.userUpvotedPosition >= 0 ORDER BY CommentModel.userUpvotedPosition ASC")
-    abstract fun getUserUpvotedComments(): LiveData<List<CommentModel>>
-
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE CommentModel.userDownvotedPosition >= 0 ORDER BY CommentModel.userDownvotedPosition ASC")
-    abstract fun getUserDownvotedComments(): LiveData<List<CommentModel>>
-
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE CommentModel.userGildedPosition >= 0 ORDER BY CommentModel.userGildedPosition ASC")
-    abstract fun getUserGildedComments(): LiveData<List<CommentModel>>
-
-    @Query("SELECT * FROM CommentModel " +
-        "LEFT JOIN PostSourceEntity ON CommentModel.id = PostSourceEntity.sourceId " +
-        "WHERE CommentModel.userHiddenPosition >= 0 ORDER BY CommentModel.userHiddenPosition ASC")
-    abstract fun getUserHiddenComments(): LiveData<List<CommentModel>>
+    @Query("SELECT * FROM CommentModel INNER JOIN SourceAndPostRelation ON id = postId WHERE source = :sourceName ORDER BY position ASC")
+    abstract fun getUserComments(sourceName : String): LiveData<List<CommentModel>>
 }

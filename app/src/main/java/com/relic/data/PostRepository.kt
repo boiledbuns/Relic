@@ -9,6 +9,7 @@ import com.relic.domain.models.ListingItem
 import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.network.request.RelicRequestError
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 interface PostRepository {
@@ -26,14 +27,14 @@ interface PostRepository {
      * @param sortScope
      */
     @Throws(RelicRequestError::class)
-    suspend fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope)
+    suspend fun retrieveSortedPosts(postSource: PostSource, sortType: SortType, sortScope: SortScope) : Listing<PostModel>
 
     /**
      * Retrieves posts for a subreddit
      * @param postSource origin of the post
      * @param listingAfter after value associated with the listing of the current set of posts
      */
-    suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String)
+    suspend fun retrieveMorePosts(postSource: PostSource, listingAfter: String) : Listing<PostModel>
 
     /**
      * this method is used specifically to retrieve listings that can have both post and comments.
@@ -49,13 +50,6 @@ interface PostRepository {
         source: PostSource,
         after : String
     ) : Listing<out ListingItem>
-
-    /**
-     * Retrieves the "after" values to be used for the next post listing
-     * @param callback callback to send the name to
-     * @param postSource source of the post
-     */
-    suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource)
 
     /**
      * exposes a single post model as livedata
@@ -75,12 +69,14 @@ interface PostRepository {
         postSource: PostSource
     )
 
+    suspend fun insertPosts (source : PostSource, posts : List<PostModel>)
+
     suspend fun searchSubPosts(
         subredditName: String,
         query : String,
         restrictToSub : Boolean = false,
         after : String? = null
-    ) : SubSearchResult
+    ) : Listing<PostModel>
 
     suspend fun postPost(postDraft: PostDraft, type : PostType)
 
@@ -113,27 +109,46 @@ enum class SortScope {
  * Used to represent how a post is being accessed
  * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
  */
-sealed class PostSource : Parcelable {
+abstract sealed class PostSource : Parcelable {
 
     @Parcelize
-    object Frontpage : PostSource()
+    object Frontpage : PostSource() {
+        override fun getSourceName() = "Frontpage"
+    }
 
     @Parcelize
-    object All : PostSource()
+    object All : PostSource() {
+        override fun getSourceName() = "All"
+    }
 
     @Parcelize
-    object Popular : PostSource()
+    object Popular : PostSource() {
+        override fun getSourceName() = "Popular"
+    }
 
     @Parcelize
     data class Subreddit(
         val subredditName : String
-    ) : PostSource()
+    ) : PostSource() {
+        override fun getSourceName() = subredditName
+    }
 
     @Parcelize
     data class User(
         val username : String,
         val retrievalOption: RetrievalOption
-    ) : PostSource()
+    ) : PostSource() {
+        override fun getSourceName() = username + "_" + retrievalOption
+    }
+
+    @Parcelize
+    data class Post(
+        val postFullname : String
+    ) : PostSource() {
+        override fun getSourceName() = postFullname
+    }
+
+    abstract fun getSourceName() : String
 }
 
 enum class RetrievalOption {

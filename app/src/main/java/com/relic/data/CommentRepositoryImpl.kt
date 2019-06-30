@@ -34,15 +34,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     override fun getComments(retrievalOption: RetrievalOption): LiveData<List<CommentModel>> {
-        return when (retrievalOption) {
-            RetrievalOption.Submitted -> MutableLiveData()
-            RetrievalOption.Comments -> appDB.userPostingDao.getUserComments()
-            RetrievalOption.Saved -> appDB.userPostingDao.getUserSavedComments()
-            RetrievalOption.Upvoted -> appDB.userPostingDao.getUserUpvotedComments()
-            RetrievalOption.Downvoted -> appDB.userPostingDao.getUserDownvotedComments()
-            RetrievalOption.Gilded -> appDB.userPostingDao.getUserGildedComments()
-            RetrievalOption.Hidden -> appDB.userPostingDao.getUserHiddenComments()
-        }
+        return appDB.userPostingDao.getUserComments(retrievalOption.name)
     }
 
     override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) : CommentsAndPostData {
@@ -50,7 +42,7 @@ class CommentRepositoryImpl @Inject constructor(
         var url = "${RepoConstants.ENDPOINT}r/$subName/comments/$postName?count=20"
 
         if (refresh) {
-            val after = listingRepo.getAfterString(postFullName)
+            val after = listingRepo.getAfter(PostSource.Post(postFullName))
             url += "&after=$after"
         }
 

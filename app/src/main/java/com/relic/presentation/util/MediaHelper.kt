@@ -35,7 +35,7 @@ object MediaHelper {
                 val lastThree = url.substring(url.length - 3)
                 if (validImageEndings.contains(lastThree)) {
                     type = MediaType.Image
-                } else if (!postModel.self) {
+                } else if (!postModel.isSelf) {
                     type = MediaType.Link
                 }
             }

@@ -1,22 +1,21 @@
 package com.relic.domain.models
 
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
+@Entity
 open class PostModel : ListingItem() {
 
     var title: String = ""
-
     var selftext: String? = null
-
-    //  public String subName;
-    //  public String stringDate;
-    var score: Int = 0
 
     @Json(name = "num_comments")
     var commentCount: Int = 0
-    var viewCount: Int = 0
+//    @Json(name = "view_count")
+//    var viewCount: Int = 0
 
     var domain: String? = null
     var url: String? = null
@@ -26,7 +25,7 @@ open class PostModel : ListingItem() {
         } else {
             field = thumbnail
         }
-
+    
     @Json(name = "author_flair_text")
     var authorFlair: String? = null
 
@@ -39,11 +38,26 @@ open class PostModel : ListingItem() {
     var pinned: Boolean = false
     var locked: Boolean = false
     var archived: Boolean = false
+    var spoiler : Boolean = false
 
     var platinum: Int = 0
     var gold: Int = 0
     var silver: Int = 0
-    var self: Boolean = false
+
+    @Json(name = "is_self")
+    var isSelf: Boolean = false
+    @Json(name = "is_video")
+    var isVideo : Boolean = false
+
+    var ups : Int = 0
+    var downs : Int = 0
+
+//    var preview : String? = null
+    var permalink : String? = null
+
+//    @Json(name = "media_embed")
+//    var embeddedMedia : String? = null
+//    var media : String? = null
 
     companion object {
         var TYPE = "t3"

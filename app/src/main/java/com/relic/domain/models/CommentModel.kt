@@ -11,12 +11,8 @@ import com.squareup.moshi.JsonClass
 @Entity
 open class CommentModel: ListingItem() {
 
-    @PrimaryKey
-    var id: String = ""
-
     @Json(name = "body_html")
     var body: String = ""
-    var score: Int = 0
 
     // fullname of this comment's direct ancestor (could be a post or comment)
     @Json(name = "parent_id")

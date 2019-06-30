@@ -1,5 +1,6 @@
 package com.relic.domain.models
 
+import android.arch.persistence.room.PrimaryKey
 import com.relic.api.qualifier.Date
 import com.relic.api.qualifier.Likes
 import com.squareup.moshi.Json
@@ -8,10 +9,14 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 open class ListingItem {
 
+    @PrimaryKey
+    var id: String = ""
+
     // the id is the "full name" of an item
     @Json(name = "name")
     var fullName = ""
     var author: String = ""
+    var score: Int = 0
 
     @Date
     var created: java.util.Date? = null
@@ -21,8 +26,10 @@ open class ListingItem {
     @Json(name = "likes")
     @Likes var userUpvoted: Int = 0
 
+    var gildings : Gildings? = null
+
     var saved: Boolean = false
-    var subreddit : String? = null
+    open var subreddit : String? = null
 
     var userSubmittedPosition: Int = 0
     var userCommentsPosition: Int = 0
