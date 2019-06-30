@@ -1,3 +1,6 @@
+# api keys
+secrets.xml
+
 # Built application files
 *.apk
 *.ap_
@@ -64,5 +67,5 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 
-# api keys (temporary)
-secrets.xml
+# mac
+.DS_Store
