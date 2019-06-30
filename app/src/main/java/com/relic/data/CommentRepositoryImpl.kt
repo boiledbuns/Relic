@@ -42,7 +42,7 @@ class CommentRepositoryImpl @Inject constructor(
         var url = "${RepoConstants.ENDPOINT}r/$subName/comments/$postName?count=20"
 
         if (refresh) {
-            val after = listingRepo.getAfterString(postFullName)
+            val after = listingRepo.getAfter(PostSource.Post(postFullName))
             url += "&after=$after"
         }
 

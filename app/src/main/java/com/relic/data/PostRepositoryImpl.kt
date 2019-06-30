@@ -11,7 +11,6 @@ import com.relic.domain.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.network.request.RelicRequestError
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.Reusable
@@ -44,26 +43,14 @@ import javax.inject.Inject
 class PostRepositoryImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
     private val appDB: ApplicationDB,
-    private val postDeserializer : Contract.PostDeserializer,
-    moshi: Moshi
+    private val postDeserializer : Contract.PostDeserializer
 ) : PostRepository {
-    private val TAG = "POST_REPO"
-
-    companion object {
-        // keys for the "after" value for listings
-        private const val KEY_FRONTPAGE = "frontpage"
-        private const val KEY_ALL = "all"
-        private const val KEY_OTHER = "other"
-    }
 
     private val sortTypesWithScope = arrayOf(
         SortType.HOT,
         SortType.RISING,
         SortType.TOP
     )
-
-    private val type = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
-    private val listingAdapter = moshi.adapter<Listing<ListingItem>>(type)
 
     private val postDao = appDB.postDao
     private val postSourceDao = appDB.postSourceDao
@@ -72,16 +59,6 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun getPosts(postSource: PostSource) : LiveData<List<PostModel>> {
         return postDao.getPostsFromSource(postSource.getSourceName())
-    }
-
-    override suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource) {
-        val key = getListingKey(postSource)
-
-        withContext(Dispatchers.IO) {
-            // get the "after" value for the most current sub listing
-            val subAfter = appDB.listingDAO.getNext(key)
-            callback.onNextListing(subAfter)
-        }
     }
 
     override fun getPost(postFullName: String): LiveData<PostModel> {
@@ -107,7 +84,7 @@ class PostRepositoryImpl @Inject constructor(
                 url = "$ENDPOINT$ending"
             )
 
-            return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve user listing", null)
+            return postDeserializer.parseListingItems(response)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve user listing", e) ?: e
         }
@@ -125,7 +102,7 @@ class PostRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = "$ENDPOINT$ending?after=$after"
             )
-            return listingAdapter.fromJson(response) ?: throw RepoException.ClientException("retrieve next listing", null)
+            return postDeserializer.parseListingItems(response)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve next listing", e) ?: e
         }
@@ -161,7 +138,6 @@ class PostRepositoryImpl @Inject constructor(
                 url = ending
             )
 
-            val listingKey = getListingKey(postSource)
             val listing = postDeserializer.parsePosts(response)
             Timber.d( "retrieve more posts : after ${listing.data.after}")
 
@@ -363,20 +339,6 @@ class PostRepositoryImpl @Inject constructor(
             postDao.insertPosts(posts)
             postSourceDao.insertPostSourceRelations(sourceRelations)
             // TODO also need to insert listing "after" but maybe separately
-        }
-    }
-
-    /**
-     * builds the key used for retrieving the "after" value for a listing using its associated
-     * post source
-     */
-    private fun getListingKey(postSource : PostSource) : String {
-        return when (postSource) {
-            is PostSource.Subreddit -> postSource.subredditName
-            is PostSource.Frontpage -> KEY_FRONTPAGE
-            is PostSource.All -> KEY_ALL
-            is PostSource.User -> postSource.username + postSource.retrievalOption.name
-            else -> KEY_OTHER
         }
     }
 }

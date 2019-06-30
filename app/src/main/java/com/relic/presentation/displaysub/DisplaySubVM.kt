@@ -26,6 +26,7 @@ open class DisplaySubVM (
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
     private val postGateway: PostGateway,
+    private val listingRepo : ListingRepository,
     private val networkUtil : NetworkUtil
 ) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, DisplaySubContract.SearchVM {
 
@@ -33,19 +34,21 @@ open class DisplaySubVM (
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,
         private val postGateway: PostGateway,
+        private val listingRepo : ListingRepository,
         private val networkUtil : NetworkUtil
     ) {
         fun create (postSource : PostSource) : DisplaySubVM {
-            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, networkUtil)
+            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, listingRepo, networkUtil)
         }
     }
 
     private var currentSortingType = SortType.DEFAULT
     private var currentSortingScope = SortScope.NONE
+    private var subPostAfter : String? = null
+
     private var retrievalInProgress = true
     private var after : String? = null
     private var query : String? = null
-    private var currentListing : Listing<PostModel>? = null
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
@@ -72,6 +75,10 @@ open class DisplaySubVM (
             // observe the list of posts stored locally
             _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
                 _postListMediator.postValue(postModels)
+            }
+
+            launch {
+                subPostAfter = listingRepo.getAfter(postSource)
             }
         }
 
@@ -115,7 +122,7 @@ open class DisplaySubVM (
                     // only indicate refreshing if connected to network
                     _refreshLiveData.postValue(true)
                     val listing = postRepo.retrieveSortedPosts(postSource, currentSortingType, currentSortingScope)
-                    currentListing = listing
+                    subPostAfter = listing.data.after
 
                     listing.data.children?.let { posts ->
                         _postListMediator.postValue(posts)
@@ -123,10 +130,12 @@ open class DisplaySubVM (
                         postRepo.clearAllPostsFromSource(postSource)
                         postRepo.insertPosts(postSource, posts)
                     }
+
+                    listingRepo.insertAfter(postSource, listing.data.after)
                 } else {
-                    currentListing?.data?.after?.let { after ->
-                        val listing = postRepo.retrieveMorePosts(postSource, after)
-                        currentListing = listing
+                    subPostAfter?.let { currentAfter ->
+                        val listing = postRepo.retrieveMorePosts(postSource, currentAfter)
+                        subPostAfter = listing.data.after
 
                         listing.data.children?.let { posts ->
                             val newPosts = _postListMediator.value!!.toMutableList()
@@ -135,6 +144,8 @@ open class DisplaySubVM (
                             _postListMediator.postValue(newPosts)
                             postRepo.insertPosts(postSource, posts)
                         }
+
+                        listingRepo.insertAfter(postSource, listing.data.after)
                     }
                 }
 
@@ -231,7 +242,6 @@ open class DisplaySubVM (
                 after = data.after
                 _searchResults.postValue(data.children)
             }
-
         }
     }
 

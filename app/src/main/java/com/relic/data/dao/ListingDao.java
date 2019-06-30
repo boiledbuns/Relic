@@ -10,15 +10,9 @@ import com.relic.data.entities.ListingEntity;
 
 @Dao
 public abstract class ListingDao {
-  @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :subName")
-  public abstract String getNext(String subName);
-
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   public abstract void insertListing(ListingEntity listing);
 
-  @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :fullName")
-  public abstract LiveData<String> getAfter(String fullName);
-
-  @Query("SELECT afterPosting FROM ListingEntity WHERE listingKey = :fullName")
-  public abstract String getAfterString(String fullName);
+  @Query("SELECT `after` FROM ListingEntity WHERE postSource = :sourceName")
+  public abstract String getAfterString(String sourceName);
 }

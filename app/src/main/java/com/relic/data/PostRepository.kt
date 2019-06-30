@@ -52,13 +52,6 @@ interface PostRepository {
     ) : Listing<out ListingItem>
 
     /**
-     * Retrieves the "after" values to be used for the next post listing
-     * @param callback callback to send the name to
-     * @param postSource source of the post
-     */
-    suspend fun getNextPostingVal(callback: RetrieveNextListingCallback, postSource: PostSource)
-
-    /**
      * exposes a single post model as livedata
      * @param postFullName a valid "full name" for a post
      * @return a model of the post wrapped in Livedata
@@ -146,6 +139,13 @@ abstract sealed class PostSource : Parcelable {
         val retrievalOption: RetrievalOption
     ) : PostSource() {
         override fun getSourceName() = username + "_" + retrievalOption
+    }
+
+    @Parcelize
+    data class Post(
+        val postFullname : String
+    ) : PostSource() {
+        override fun getSourceName() = postFullname
     }
 
     abstract fun getSourceName() : String

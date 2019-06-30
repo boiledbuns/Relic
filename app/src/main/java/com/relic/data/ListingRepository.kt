@@ -1,20 +1,8 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
-
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
-
 interface ListingRepository {
 
-    val key: LiveData<String>
+    suspend fun insertAfter(source: PostSource, after : String?)
 
-    /**
-     * Retrieves the "after" key and sends it back via the callback
-     * @param key the key to the "after" value stored in the database
-     */
-    fun retrieveKey(key: String)
-
-    fun getAfter(fullName: String): LiveData<String?>
-
-    suspend fun getAfterString(fullName: String): String?
+    suspend fun getAfter(source: PostSource): String?
 }

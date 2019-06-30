@@ -7,6 +7,7 @@ import com.relic.data.SubSearchResult
 import com.relic.data.entities.*
 import com.relic.domain.exception.RelicException
 import com.relic.domain.models.CommentModel
+import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.UserModel
 
@@ -18,6 +19,9 @@ import com.relic.domain.models.UserModel
 interface Contract {
 
     interface PostDeserializer {
+
+        suspend fun parseListingItems(response: String) : Listing<ListingItem>
+
         suspend fun parsePosts(response: String) : Listing<PostModel>
 
         suspend fun parsePost(response: String) : PostModel

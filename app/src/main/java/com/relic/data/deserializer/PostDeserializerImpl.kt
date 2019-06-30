@@ -13,11 +13,23 @@ class PostDeserializerImpl @Inject constructor(
     private val appDB : ApplicationDB,
     private val moshi : Moshi
 ) : Contract.PostDeserializer {
+    private val listingListingItemType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
+    private val listingListingItemAdapter = moshi.adapter<Listing<ListingItem>>(listingListingItemType)
+
     private val postType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)
     private val postListingAdapter = moshi.adapter<Listing<PostModel>>(postType)
 
     private val listingType = Types.newParameterizedType(List::class.java, postType)
     private val postListListingAdapter = moshi.adapter<List<Listing<PostModel>>>(listingType)
+
+    override suspend fun parseListingItems(response: String): Listing<ListingItem> {
+        try {
+            // api returns a listing with a single post item as its child
+            return listingListingItemAdapter.fromJson(response)!!
+        } catch (e : ParseException){
+            throw RelicParseException(response, e)
+        }
+    }
 
     override suspend fun parsePost(response: String) : PostModel {
         try {
