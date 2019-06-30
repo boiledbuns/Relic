@@ -10,4 +10,7 @@ import com.relic.data.entities.PostVisitRelation
 abstract class PostVisitedRelationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertVisited(postVisit: PostVisitRelation)
+
+    @Query("SELECT visitedFullname FROM PostVisitRelation WHERE visitedFullname IN (:postFullnames)")
+    abstract fun getVisited(postFullnames : List<String>) : List<String>
 }

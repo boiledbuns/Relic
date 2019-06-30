@@ -10,6 +10,7 @@ import com.relic.api.qualifier.LikesAdapter
 import com.relic.api.qualifier.MoreAdapter
 import com.relic.data.ApplicationDB
 import com.relic.data.TypeConverters
+import com.relic.data.deserializer.Deserializer
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
@@ -36,18 +37,7 @@ class AppModule {
     @Singleton
     @Provides
     fun provideMoshi() : Moshi {
-        return Moshi.Builder()
-            .add(LikesAdapter())
-            .add(MoreAdapter())
-            .add(DateAdapter())
-            .add(
-                PolymorphicJsonAdapterFactory.of(ListingItem::class.java, "kind")
-                    .withSubtype(PostModel::class.java, Type.Post.name)
-                    .withSubtype(CommentModel::class.java, Type.Comment.name)
-            )
-            .add(PostAdapter())
-            .add(CommentAdapter())
-            .build()
+        return Deserializer.getInstance()
     }
 
     @Singleton

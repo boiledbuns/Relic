@@ -83,7 +83,7 @@ interface PostRepository {
         query : String,
         restrictToSub : Boolean = false,
         after : String? = null
-    ) : SubSearchResult
+    ) : Listing<PostModel>
 
     suspend fun postPost(postDraft: PostDraft, type : PostType)
 

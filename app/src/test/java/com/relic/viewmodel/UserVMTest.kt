@@ -53,19 +53,16 @@ class UserVMTest {
 
     @Test
     fun `user retrieved on init`() = runBlockingTest {
-        launch(Dispatchers.Main) {
-            val mockUser = mock<UserModel>()
-            whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
+        val mockUser = mock<UserModel>()
+        whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
 
-            val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
+        val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
 
-            val observer : Observer<UserModel> = mock()
-            vm.userLiveData.observeForever(observer)
+        val observer : Observer<UserModel> = mock()
+        vm.userLiveData.observeForever(observer)
 
-            verify(userRepo, times(1)).retrieveUser(username)
-            verify(observer).onChanged(mockUser)
-        }
-        Unit
+        verify(userRepo, times(1)).retrieveUser(username)
+        verify(observer).onChanged(mockUser)
     }
 
     @Test

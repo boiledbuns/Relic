@@ -102,7 +102,7 @@ open class DisplaySubVM (
                 Timber.d("No subreddit saved locally, retrieving from network")
                 launch(Dispatchers.Main) { subRepo.retrieveSingleSub(subName) }
             } else {
-                Timber.d("Subreddit loaded " + newModel.getBannerUrl())
+                Timber.d("Subreddit loaded ${newModel.getBannerUrl()}")
                 _subredditMediator.setValue(newModel)
             }
         }
@@ -172,7 +172,7 @@ open class DisplaySubVM (
     override fun updateSubStatus(subscribe: Boolean) {
         if (postSource is PostSource.Subreddit) {
             val subName = postSource.subredditName
-            Log.d(TAG, "Changing to subscribed $subscribe")
+            Timber.d("Changing to subscribed $subscribe")
 
             launch(Dispatchers.Main) {
                 subRepo.getSubGateway().subscribe(subscribe, subName)
@@ -188,12 +188,12 @@ open class DisplaySubVM (
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
-        Log.d(TAG, "Voting on post " + postFullname + "value = " + voteValue)
+        Timber.d("Voting on post ${postFullname} value = {voteValue}")
         launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
     }
 
     override fun savePost(postFullname: String, save: Boolean) {
-        Log.d(TAG, "Saving on post " + postFullname + "save = " + save)
+        Timber.d("Saving on post ${postFullname} save = {save}")
         launch(Dispatchers.Main) { postGateway.savePost(postFullname, save) }
     }
 
@@ -218,7 +218,7 @@ open class DisplaySubVM (
     override fun search(query : String) {
         this.query = query
         launch(Dispatchers.Main) {
-            val results = when (postSource) {
+            val listing = when (postSource) {
                 is PostSource.Subreddit -> {
                     postRepo.searchSubPosts(postSource.subredditName, query, true)
                 }
@@ -227,10 +227,11 @@ open class DisplaySubVM (
                 }
             }
 
-            results?.let {
-                after = it.after
-                _searchResults.postValue(it.posts)
+            listing?.data?.let { data ->
+                after = data.after
+                _searchResults.postValue(data.children)
             }
+
         }
     }
 
@@ -238,7 +239,7 @@ open class DisplaySubVM (
         val currQuery = query
         launch(Dispatchers.Main) {
             if (after != null && currQuery != null){
-                val results = when (postSource) {
+                val listing = when (postSource) {
                     is PostSource.Subreddit -> {
                         postRepo.searchSubPosts(postSource.subredditName, currQuery, true, after)
                     }
@@ -247,22 +248,23 @@ open class DisplaySubVM (
                     }
                 }
 
-                results?.let { moreResult ->
-                    after = moreResult.after
+                listing?.data?.let { data ->
+                    after = data.after
+                    val children = data.children
                     // show appropriate message to user to indicate no more posts could be found
-                    if (moreResult.posts.isEmpty()) {
+                    if (children.isNullOrEmpty()) {
                         _errorLiveData.postValue(NoResults)
                     } else {
                         val newPosts = ArrayList<PostModel>()
                         _searchResults.value?.let { newPosts.addAll(it) }
-                        newPosts.addAll(moreResult.posts)
+                        newPosts.addAll(children)
 
                         _searchResults.postValue(newPosts)
                     }
                 }
 
             } else {
-                Log.d(TAG, "No more posts available for this query")
+                Timber.d("No more posts available for this query")
             }
         }
     }
@@ -278,6 +280,6 @@ open class DisplaySubVM (
         }
         _errorLiveData.postValue(subE)
 
-        Log.e(TAG, "caught exception", e)
+        Timber.e(e)
     }
 }

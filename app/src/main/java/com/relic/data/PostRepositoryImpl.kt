@@ -1,9 +1,7 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import com.relic.api.response.Listing
-import com.relic.data.dao.PostSourceRelationDao
 import com.relic.data.deserializer.Contract
 import com.relic.data.entities.SourceAndPostRelation
 import com.relic.data.repository.RepoConstants.ENDPOINT
@@ -164,10 +162,12 @@ class PostRepositoryImpl @Inject constructor(
             )
 
             val listingKey = getListingKey(postSource)
-            val listing = postDeserializer.parsePosts(response, postSource, listingKey)
+            val listing = postDeserializer.parsePosts(response)
             Timber.d( "retrieve more posts : after ${listing.data.after}")
 
-            return listing
+            return listing.apply {
+                data.children?.let { children -> convergeVisited(children) }
+            }
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve sorted posts", e) ?: e
         }
@@ -190,10 +190,33 @@ class PostRepositoryImpl @Inject constructor(
                 url = "$ENDPOINT$ending?after=$listingAfter"
             )
 
-            val listingKey = getListingKey(postSource)
-            return postDeserializer.parsePosts(response, postSource, listingKey)
+            return postDeserializer.parsePosts(response).apply {
+                data.children?.let { children -> convergeVisited(children) }
+            }
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve more posts", e) ?: e
+        }
+    }
+
+    private suspend fun convergeVisited(posts : List<PostModel>) {
+        // map fullname to position in list
+        val positionMap = HashMap<String, Int>()
+        var position = 0
+
+        val postNames = posts.map {
+            it.fullName.apply {
+                positionMap[this] = position
+                position ++
+            }
+        }
+
+        val visited = withContext(Dispatchers.IO){
+            appDB.postVisitedDao.getVisited(postNames)
+        }
+
+        for (visitedPost in visited) {
+            val postPos = positionMap[visitedPost]!!
+            posts[postPos].visited = true
         }
     }
 
@@ -241,7 +264,7 @@ class PostRepositoryImpl @Inject constructor(
         query : String,
         restrictToSub : Boolean,
         after : String?
-    ) : SubSearchResult {
+    ) : Listing<PostModel> {
         var ending = "r/$subredditName/search?q=$query"
         if (restrictToSub) ending += "&restrict_sr=true"
         if (after != null) ending += "&after=$after"
@@ -251,7 +274,7 @@ class PostRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending
             )
-            return postDeserializer.parseSearchSubPostsResponse(response)
+            return postDeserializer.parsePosts(response)
 
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve search results", e) ?: e

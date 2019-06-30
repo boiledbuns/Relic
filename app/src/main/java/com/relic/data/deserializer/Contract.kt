@@ -18,15 +18,9 @@ import com.relic.domain.models.UserModel
 interface Contract {
 
     interface PostDeserializer {
-        suspend fun parsePosts(
-            response: String,
-            postSource: PostSource,
-            listingKey : String
-        ) : Listing<PostModel>
+        suspend fun parsePosts(response: String) : Listing<PostModel>
 
         suspend fun parsePost(response: String) : PostModel
-
-        suspend fun parseSearchSubPostsResponse(response: String): SubSearchResult
     }
 
     interface CommentDeserializer {
