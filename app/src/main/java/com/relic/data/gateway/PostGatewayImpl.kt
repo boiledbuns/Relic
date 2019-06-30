@@ -4,12 +4,14 @@ import android.util.Log
 
 import com.relic.data.ApplicationDB
 import com.relic.data.DomainTransfer
+import com.relic.data.entities.PostVisitRelation
 import com.relic.data.repository.RepoConstants
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class PostGatewayImpl @Inject constructor(
@@ -66,9 +68,9 @@ class PostGatewayImpl @Inject constructor(
     }
 
     override suspend fun visitPost(postFullname: String){
-        Log.d(TAG, "Setting " + postFullname + "to visited")
+        Timber.d("Setting {postFullname} to visited")
         withContext(Dispatchers.IO) {
-            appDB.postDao.updateVisited(postFullname)
+            appDB.postVisitedDao.insertVisited(PostVisitRelation(postFullname))
         }
     }
 }

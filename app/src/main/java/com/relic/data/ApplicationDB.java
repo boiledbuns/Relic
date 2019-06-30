@@ -10,27 +10,30 @@ import com.relic.data.dao.AccountDao;
 import com.relic.data.dao.CommentDao;
 import com.relic.data.dao.ListingDao;
 import com.relic.data.dao.PostDao;
-import com.relic.data.dao.PostSourceDao;
+import com.relic.data.dao.PostSourceRelationDao;
+import com.relic.data.dao.PostVisitedRelationDao;
 import com.relic.data.dao.SubredditDao;
 import com.relic.data.dao.TokenStoreDao;
 import com.relic.data.dao.UserPostingDao;
 import com.relic.data.entities.AccountEntity;
 import com.relic.data.entities.ListingEntity;
-import com.relic.data.entities.PostEntity;
-import com.relic.data.entities.PostSourceEntity;
+import com.relic.data.entities.PostVisitRelation;
+import com.relic.data.entities.SourceAndPostRelation;
 import com.relic.data.entities.SubredditEntity;
 import com.relic.data.entities.TokenStoreEntity;
 import com.relic.domain.models.CommentModel;
+import com.relic.domain.models.PostModel;
 
 @Database(
     entities = {
         SubredditEntity.class,
-        PostEntity.class,
-        PostSourceEntity.class,
+        PostModel.class,
+        SourceAndPostRelation.class,
         ListingEntity.class,
         CommentModel.class,
         AccountEntity.class,
-        TokenStoreEntity.class
+        TokenStoreEntity.class,
+        PostVisitRelation.class
     },
     version = 7,
     exportSchema = false
@@ -41,12 +44,13 @@ public abstract class ApplicationDB extends RoomDatabase{
 
   public abstract SubredditDao getSubredditDao();
   public abstract PostDao getPostDao();
-  public abstract PostSourceDao getPostSourceDao();
+  public abstract PostSourceRelationDao getPostSourceDao();
   public abstract ListingDao getListingDAO();
   public abstract CommentDao getCommentDAO();
   public abstract UserPostingDao getUserPostingDao();
   public abstract AccountDao getAccountDao();
   public abstract TokenStoreDao getTokenStoreDao();
+  public abstract PostVisitedRelationDao getPostVisitedDao();
 
     public static ApplicationDB getDatabase(Context context) {
     if(INSTANCE == null) {

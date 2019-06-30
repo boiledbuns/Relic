@@ -7,6 +7,7 @@ import com.android.volley.VolleyError
 import com.relic.data.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -72,6 +73,7 @@ class NetworkRequestManager @Inject constructor(
             val request = RelicOAuthRequest(
                 method, url,
                 Response.Listener { response: String ->
+                    Timber.d("endpoint: %s \n response:  %s", url, response)
                     cont.resumeWith(Result.success(response))
                 },
                 Response.ErrorListener { e: VolleyError ->

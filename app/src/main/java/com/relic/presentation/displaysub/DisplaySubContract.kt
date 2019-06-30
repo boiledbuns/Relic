@@ -11,6 +11,11 @@ import com.relic.domain.models.PostModel
 interface DisplaySubContract {
     interface ViewModel {
         fun changeSortingMethod(sortType: SortType? = null, sortScope: SortScope? = null)
+
+        /**
+         * retrieves more posts from the network
+         * @param resetPosts : indicates whether the old posts should be cleared
+         */
         fun retrieveMorePosts(resetPosts: Boolean)
         fun updateSubStatus(subscribe: Boolean)
     }
