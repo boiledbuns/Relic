@@ -109,7 +109,7 @@ enum class SortScope {
  * Used to represent how a post is being accessed
  * Eg. Accessing a post from the Frontpage uses the "Frontpage" source
  */
-abstract sealed class PostSource : Parcelable {
+sealed class PostSource : Parcelable {
 
     @Parcelize
     object Frontpage : PostSource() {
