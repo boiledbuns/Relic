@@ -27,8 +27,8 @@ Consult the [wiki](https://github.com/13ABEL/Relic/wiki) for more info about [co
 - [x] display user previews
 - [x] setup the app to handle reddit links
 - [x] basic media handling (ie. imgur, gifs, v.reddit, etc)
-- [ ] create new posts
-- [ ] create new comments
+- [x] create new posts
+- [x] create new comments
 - [ ] search for subs, posts, and users
 - [ ] background post retrieval while app is inactive
 

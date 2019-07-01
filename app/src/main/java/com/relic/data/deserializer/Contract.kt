@@ -19,7 +19,9 @@ import com.relic.domain.models.UserModel
 interface Contract {
 
     interface PostDeserializer {
-
+        /**
+         * parse response that can contain both posts and comments
+         */
         suspend fun parseListingItems(response: String) : Listing<ListingItem>
 
         suspend fun parsePosts(response: String) : Listing<PostModel>
@@ -28,8 +30,15 @@ interface Contract {
     }
 
     interface CommentDeserializer {
+        /**
+         * parses a post and its associated comments
+         */
         suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData
 
+        /**
+         * Only use this method to parse the return from "morechildren" since it uses a different
+         * format than the traditional method for retrieving comments
+         */
         suspend fun parseMoreCommentsResponse(
             moreChildrenComment: CommentModel,
             response : String
