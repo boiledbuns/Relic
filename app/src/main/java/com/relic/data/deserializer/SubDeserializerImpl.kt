@@ -1,24 +1,33 @@
 package com.relic.data.deserializer
 
 import com.google.gson.GsonBuilder
-import com.relic.persistence.entities.SubredditEntity
+import com.relic.api.response.Listing
+import com.relic.domain.models.SubredditModel
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
-import java.util.ArrayList
+import java.util.*
 import javax.inject.Inject
 
-class SubDeserializerImpl @Inject constructor(): Contract.SubDeserializer {
+class SubDeserializerImpl @Inject constructor(
+    private val moshi : Moshi
+): Contract.SubDeserializer {
     private val TAG = "SUB_DESERIALIZER"
+
+
+    private val subType = Types.newParameterizedType(Listing::class.java, SubredditModel::class.java)
+    private val subListingAdapter = moshi.adapter<Listing<SubredditModel>>(subType)
 
     private val parser: JSONParser = JSONParser()
     private val gson = GsonBuilder().create()
 
-    override suspend fun parseSubredditResponse(response: String): SubredditEntity {
+    override suspend fun parseSubredditResponse(response: String): SubredditModel {
         // parse the response and add it to an arraylist to be inserted in the db
         val subredditObject = (parser.parse(response) as JSONObject)["data"] as JSONObject?
-        return gson.fromJson(subredditObject!!.toJSONString(), SubredditEntity::class.java)
+        return gson.fromJson(subredditObject!!.toJSONString(), SubredditModel::class.java)
     }
 
     /**
@@ -30,31 +39,12 @@ class SubDeserializerImpl @Inject constructor(): Contract.SubDeserializer {
     // TODO convert error to deserializer error -> classes using it should not be aware of what
     // this class uses to parse response
     @Throws(RelicParseException::class)
-    override suspend fun parseSubredditsResponse(response: String): ParsedSubsData {
-        val data = (parser.parse(response) as JSONObject)["data"] as JSONObject
-        val newAfter = data["after"] as String?
-
-        val subscribed = ArrayList<SubredditEntity>()
-
+    override suspend fun parseSubredditsResponse(response: String): Listing<SubredditModel> {
         try {
-            // get all the subs that the user is subscribed to
-            val subs = data["children"] as JSONArray?
-            for (sub in subs!!) {
-                val currentSub = (sub as JSONObject)["data"] as JSONObject
-                // Log.d(TAG, "keys = " + currentSub.keySet());
-                // Log.d(TAG, "banner url  = " + currentSub.get("banner_background_image") + " " + currentSub.get("banner_img"));
-                // Log.d(TAG, currentSub.get("display_name") + "banner url  = " + currentSub.get("community_icon") + " " + currentSub.get("icon_img"));
-                subscribed.add(gson.fromJson(currentSub.toJSONString(), SubredditEntity::class.java))
-            }
+            return subListingAdapter.fromJson(response)!!
         } catch (e : ParseException) {
             throw RelicParseException(response, e)
         }
-
-        //Log.d(TAG, subscribed.toString());
-        return ParsedSubsData(
-            subsList = subscribed,
-            after = newAfter
-        )
     }
 
 

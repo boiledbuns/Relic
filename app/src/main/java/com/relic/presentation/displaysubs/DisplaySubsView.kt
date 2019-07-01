@@ -190,7 +190,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
      */
     internal inner class OnClickSubItem : SubItemOnClick {
         override fun onClick(subItem: SubredditModel) {
-            val subFrag = DisplaySubFragment.create(subItem.name)
+            val subFrag = DisplaySubFragment.create(subItem.subName)
 
             // clear items before transition to ensure we don't hold too much in memory
             subAdapter.clearList()
@@ -202,7 +202,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
         override fun onLongClick(subItem: SubredditModel): Boolean {
             val args = Bundle().apply {
-                putString(ARG_SUB_NAME, subItem.name)
+                putString(ARG_SUB_NAME, subItem.subName)
             }
 
             val newDialog = SubInfoBottomSheetDialog()

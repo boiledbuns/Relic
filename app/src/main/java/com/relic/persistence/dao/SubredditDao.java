@@ -6,53 +6,52 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.relic.persistence.entities.SubredditEntity;
 import com.relic.domain.models.SubredditModel;
 
 import java.util.List;
 
 @Dao
 public abstract class SubredditDao {
-  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description FROM SubredditEntity")
+  @Query("SELECT * FROM SubredditModel")
   public abstract List<SubredditModel> getAll();
 
-  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description, subIcon FROM SubredditEntity ORDER BY name DESC")
+  @Query("SELECT * FROM SubredditModel ORDER BY subName DESC")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
-  @Query("SELECT id, name, bannerUrl, nsfw, isSubscribed, subscriberCount, description, subIcon FROM SubredditEntity " +
-          "WHERE pinned = 1 ORDER BY name DESC")
+  @Query("SELECT * FROM SubredditModel " +
+          "WHERE pinned = 1 ORDER BY subName DESC")
   public abstract LiveData<List<SubredditModel>> getAllPinnedSubs();
 
-  @Query("UPDATE SubredditEntity SET pinned = :pinned  WHERE name = :subredditName")
+  @Query("UPDATE SubredditModel SET pinned = :pinned  WHERE subName = :subredditName")
   public abstract void updatePinnedStatus(String subredditName, boolean pinned);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  public abstract void insertAll(List<SubredditEntity> subredditList);
+  public abstract void insertAll(List<SubredditModel> subredditList);
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  public abstract void insert(SubredditEntity subreddit);
+  public abstract void insert(SubredditModel subreddit);
 
-  @Query("DELETE FROM SubredditEntity WHERE pinned != 1")
+  @Query("DELETE FROM SubredditModel WHERE pinned != 1")
   public abstract void deleteAll();
 
-  @Query("DELETE FROM SubredditEntity WHERE isSubscribed AND pinned != 1")
+  @Query("DELETE FROM SubredditModel WHERE isSubscribed AND pinned != 1")
   public abstract void deleteAllSubscribed();
 
-  @Query("SELECT id, name, bannerImgUrl, nsfw, isSubscribed, subscriberCount, description, subIcon, submitText, headerTitle FROM SubredditEntity WHERE name = :subName")
+  @Query("SELECT * FROM SubredditModel WHERE subName = :subName")
   public abstract LiveData<SubredditModel> getSub(String subName);
 
-  @Query("SELECT * FROM SubredditEntity WHERE name LIKE :search")
+  @Query("SELECT * FROM SubredditModel WHERE subName LIKE :search")
   public abstract LiveData<List<SubredditModel>> findSubreddit(String search);
 
-  @Query("SELECT name FROM SubredditEntity WHERE name = :subName")
+  @Query("SELECT subName FROM SubredditModel WHERE subName = :subName")
   public abstract LiveData<List<String>> getSubscribed(String subName);
 
-  @Query("SELECT name FROM SubredditEntity WHERE name = :query")
+  @Query("SELECT subName FROM SubredditModel WHERE subName = :query")
   public abstract LiveData<List<String>> searchSubreddits(String query);
 
-  @Query("UPDATE SubredditEntity SET isSubscribed = :subscribed WHERE name = :subredditName")
+  @Query("UPDATE SubredditModel SET isSubscribed = :subscribed WHERE subName = :subredditName")
   public abstract void updateSubscription(boolean subscribed, String subredditName);
 
-  @Query("UPDATE SubredditEntity SET headerTitle = :headerTitle, description = :description,  submitText = :submitText WHERE name = :subredditName")
+  @Query("UPDATE SubredditModel SET headerTitle = :headerTitle, description = :description,  submitText = :submitText WHERE subName = :subredditName")
   public abstract void updateSubInfo(String subredditName, String headerTitle, String description, String submitText);
 }

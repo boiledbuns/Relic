@@ -49,21 +49,21 @@ class DisplaySubsVM (
      * Initialize observers for livedata
      */
     private fun initializeObservers() {
-        //subscribedSubsList.addSource(subRepo.getSubscribedSubs(), subscribedSubsList::setValue);
-        _subscribedSubsList.addSource <List<SubredditModel>> (subRepository.getSubscribedSubs()) { subscribedSubs ->
-
-            //      if (subscribedSubs.isEmpty()) {
-            //        // refresh the token even if the vm has already been initialized
-            //        subRepo.retrieveAllSubscribedSubs();
-            //        //authenticator.refreshToken(this);
-            //      } else {
-
-            if (!refreshing) {
-                Log.d(TAG, "subs loaded $subscribedSubs")
-                _subscribedSubsList.postValue(subscribedSubs)
-            }
-            //      }
-        }
+//        //subscribedSubsList.addSource(subRepo.getSubscribedSubs(), subscribedSubsList::setValue);
+//        _subscribedSubsList.addSource <List<SubredditModel>> (subRepository.getSubscribedSubs()) { subscribedSubs ->
+//
+//            //      if (subscribedSubs.isEmpty()) {
+//            //        // refresh the token even if the vm has already been initialized
+//            //        subRepo.retrieveAllSubscribedSubs();
+//            //        //authenticator.refreshToken(this);
+//            //      } else {
+//
+//            if (!refreshing) {
+//                Log.d(TAG, "subs loaded $subscribedSubs")
+//                _subscribedSubsList.postValue(subscribedSubs)
+//            }
+//            //      }
+//        }
     }
 
     /**
@@ -73,10 +73,10 @@ class DisplaySubsVM (
     override fun retrieveMoreSubs(resetPosts: Boolean) {
         if (resetPosts) {
             refreshing = true
-            launch(Dispatchers.Main) {
-                subRepository.retrieveAllSubscribedSubs(
-                    SubsLoadedCallback { refreshing = false }
-                )
+            launch {
+
+                _subscribedSubsList.postValue(subRepository.retrieveAllSubscribedSubs())
+                refreshing = false
             }
         }
     }

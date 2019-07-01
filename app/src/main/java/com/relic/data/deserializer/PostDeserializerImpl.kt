@@ -10,7 +10,6 @@ import org.json.simple.parser.ParseException
 import javax.inject.Inject
 
 class PostDeserializerImpl @Inject constructor(
-    private val appDB : ApplicationDB,
     private val moshi : Moshi
 ) : Contract.PostDeserializer {
     private val listingListingItemType = Types.newParameterizedType(Listing::class.java, ListingItem::class.java)

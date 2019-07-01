@@ -2,6 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.util.Log
+import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
 import com.relic.data.gateway.SubGateway
 import com.relic.data.gateway.SubGatewayImpl
@@ -32,12 +33,13 @@ class SubRepositoryImpl @Inject constructor(
         return subDao.allSubscribed
     }
 
-    override suspend fun retrieveAllSubscribedSubs(callback: SubsLoadedCallback) {
+    override suspend fun retrieveAllSubscribedSubs() : List<SubredditModel> {
         // since refreshing, set all subs loaded to reflect that not all subs are loaded
         // delete all locally stored subs
-        withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             subDao.deleteAllSubscribed()
-            retrieveMoreSubscribedSubs(null, callback)
+
+            retrieveMoreSubscribedSubs(null).data.children!!
         }
     }
 
@@ -53,7 +55,6 @@ class SubRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = url
             )
-            Log.d(TAG, response)
 
             val subreddit = subDeserializer.parseSubredditResponse(response)
 
@@ -100,7 +101,7 @@ class SubRepositoryImpl @Inject constructor(
      * Handles retrieval of subreddits from the network
      * @param after: null if retrieving from scratch, only include if retrieving *MORE* subs
      */
-    private suspend fun retrieveMoreSubscribedSubs(after: String?, callback: SubsLoadedCallback?) {
+    private suspend fun retrieveMoreSubscribedSubs(after: String?) : Listing<SubredditModel> {
         var ending = "subreddits/mine/subscriber?limit=30"
         after?.let { ending += "&after=$after" }
 
@@ -112,17 +113,16 @@ class SubRepositoryImpl @Inject constructor(
 
             val subsData = subDeserializer.parseSubredditsResponse(response)
 
-            withContext(Dispatchers.IO) { subDao.insertAll(subsData.subsList) }
+            withContext(Dispatchers.IO) { subDao.insertAll(subsData.data.children) }
 
-            if (subsData.after != null) {
-                Log.d(TAG, "after = " + subsData.after)
+            if (subsData.data.after != null) {
+                Log.d(TAG, "after = " + subsData.data.after)
                 // checks the after value of the listing for the current subs
                 // retrieve more subs without refreshing if the string is null
-                retrieveMoreSubscribedSubs(subsData.after, callback)
-            } else {
-                // if no after value, invoke callback method
-                callback?.callback()
+                retrieveMoreSubscribedSubs(subsData.data.after)
             }
+            // TODO removeplaceholder
+            return subsData
         } catch (e : Exception){
             throw DomainTransfer.handleException("retrieve more subsribed subs", e) ?: e
         }

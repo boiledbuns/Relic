@@ -109,7 +109,7 @@ open class DisplaySubVM (
                 Timber.d("No subreddit saved locally, retrieving from network")
                 launch(Dispatchers.Main) { subRepo.retrieveSingleSub(subName) }
             } else {
-                Timber.d("Subreddit loaded ${newModel.getBannerUrl()}")
+                Timber.d("Subreddit loaded ${newModel.bannerUrl}")
                 _subredditMediator.setValue(newModel)
             }
         }

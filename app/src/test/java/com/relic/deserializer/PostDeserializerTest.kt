@@ -39,7 +39,7 @@ class PostDeserializerTest {
 
     @Before
     fun setup() {
-        postDeserializer = PostDeserializerImpl(appDB = mock(), moshi = moshi)
+        postDeserializer = PostDeserializerImpl(moshi = moshi)
     }
 
     @After

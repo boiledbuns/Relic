@@ -22,7 +22,7 @@ interface SubRepository {
     /**
      * Fetches and stores more Subreddits from the Reddit API into the local database
      */
-    suspend fun retrieveAllSubscribedSubs(callback: SubsLoadedCallback)
+    suspend fun retrieveAllSubscribedSubs() : List<SubredditModel>
 
     /**
      * @param subName "friendly" subreddit name for the subreddit to retrieve
