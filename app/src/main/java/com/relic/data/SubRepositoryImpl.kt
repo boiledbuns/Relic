@@ -2,19 +2,18 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.util.Log
-
-import com.relic.data.dao.SubredditDao
 import com.relic.data.deserializer.Contract
 import com.relic.data.gateway.SubGateway
 import com.relic.data.gateway.SubGatewayImpl
-import com.relic.domain.models.SubredditModel
 import com.relic.data.repository.RepoConstants.ENDPOINT
+import com.relic.domain.models.SubredditModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import com.relic.persistence.ApplicationDB
+import com.relic.persistence.dao.SubredditDao
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
 
 @Reusable

@@ -3,13 +3,14 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
-import com.relic.data.entities.SourceAndPostRelation
+import com.relic.persistence.entities.SourceAndPostRelation
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.network.request.RelicRequestError
+import com.relic.persistence.ApplicationDB
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,12 +1,12 @@
 package com.relic.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import com.relic.data.deserializer.Contract
 import com.relic.data.repository.RepoConstants
 import com.relic.domain.models.CommentModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import com.relic.persistence.ApplicationDB
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -2,7 +2,7 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import com.relic.api.response.Listing
-import com.relic.data.entities.ListingEntity
+import com.relic.persistence.entities.ListingEntity
 
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel

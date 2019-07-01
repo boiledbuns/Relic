@@ -2,14 +2,13 @@ package com.relic.data.deserializer
 
 import com.relic.api.response.Listing
 import com.relic.data.CommentsAndPostData
-import com.relic.data.PostSource
-import com.relic.data.SubSearchResult
-import com.relic.data.entities.*
 import com.relic.domain.exception.RelicException
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.UserModel
+import com.relic.persistence.entities.AccountEntity
+import com.relic.persistence.entities.SubredditEntity
 
 /**
  * Decoupled from the repository package because deserializers should be responsible
