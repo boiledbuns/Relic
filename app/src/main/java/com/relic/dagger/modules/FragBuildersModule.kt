@@ -3,7 +3,7 @@ package com.relic.dagger.modules
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.SubSearchFragment
-import com.relic.presentation.displaysubs.DisplaySubsView
+import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
@@ -30,7 +30,7 @@ abstract class FragBuildersModule {
     // region main ui
 
     @ContributesAndroidInjector
-    abstract fun contributeDisplaySubs() : DisplaySubsView
+    abstract fun contributeDisplaySubs() : DisplaySubsFragment
 
     @ContributesAndroidInjector
     abstract fun contributeHome() : HomeFragment

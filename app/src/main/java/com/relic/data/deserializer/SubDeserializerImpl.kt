@@ -17,6 +17,7 @@ class SubDeserializerImpl @Inject constructor(
 ): Contract.SubDeserializer {
     private val TAG = "SUB_DESERIALIZER"
 
+    private val subAdapter = moshi.adapter(SubredditModel::class.java)
 
     private val subType = Types.newParameterizedType(Listing::class.java, SubredditModel::class.java)
     private val subListingAdapter = moshi.adapter<Listing<SubredditModel>>(subType)
@@ -25,9 +26,7 @@ class SubDeserializerImpl @Inject constructor(
     private val gson = GsonBuilder().create()
 
     override suspend fun parseSubredditResponse(response: String): SubredditModel {
-        // parse the response and add it to an arraylist to be inserted in the db
-        val subredditObject = (parser.parse(response) as JSONObject)["data"] as JSONObject?
-        return gson.fromJson(subredditObject!!.toJSONString(), SubredditModel::class.java)
+        return subAdapter.fromJson(response)!!
     }
 
     /**

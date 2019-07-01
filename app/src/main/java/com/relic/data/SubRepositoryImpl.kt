@@ -37,9 +37,26 @@ class SubRepositoryImpl @Inject constructor(
         // since refreshing, set all subs loaded to reflect that not all subs are loaded
         // delete all locally stored subs
         return withContext(Dispatchers.IO) {
-            subDao.deleteAllSubscribed()
+            val subs = ArrayList<SubredditModel>()
+            var after : String? = null
 
-            retrieveMoreSubscribedSubs(null).data.children!!
+            do {
+                retrieveMoreSubscribedSubs(after).data.let { data ->
+                    data.children?.let { subs.addAll(it) }
+                    after = data.after
+                }
+            } while (after != null)
+
+            subs.apply {
+                sortBy { it.subName }
+            }
+        }
+    }
+
+    override suspend fun clearAndInsertSubs(subs: List<SubredditModel>) {
+        withContext(Dispatchers.IO) {
+            subDao.deleteAllSubscribed()
+            subDao.insertAll(subs)
         }
     }
 
@@ -96,7 +113,6 @@ class SubRepositoryImpl @Inject constructor(
 
     // endregion interface methods
 
-
     /**
      * Handles retrieval of subreddits from the network
      * @param after: null if retrieving from scratch, only include if retrieving *MORE* subs
@@ -110,19 +126,7 @@ class SubRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending
             )
-
-            val subsData = subDeserializer.parseSubredditsResponse(response)
-
-            withContext(Dispatchers.IO) { subDao.insertAll(subsData.data.children) }
-
-            if (subsData.data.after != null) {
-                Log.d(TAG, "after = " + subsData.data.after)
-                // checks the after value of the listing for the current subs
-                // retrieve more subs without refreshing if the string is null
-                retrieveMoreSubscribedSubs(subsData.data.after)
-            }
-            // TODO removeplaceholder
-            return subsData
+            return subDeserializer.parseSubredditsResponse(response)
         } catch (e : Exception){
             throw DomainTransfer.handleException("retrieve more subsribed subs", e) ?: e
         }

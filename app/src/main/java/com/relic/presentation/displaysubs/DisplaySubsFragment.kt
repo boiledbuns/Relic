@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
+import com.relic.network.NetworkUtil
 import com.relic.presentation.adapter.SearchItemAdapter
 import com.relic.presentation.adapter.SearchSubItemOnClick
 import com.relic.presentation.adapter.SubItemAdapter
@@ -31,11 +32,12 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.display_subs.*
 
 import java.util.ArrayList
 import javax.inject.Inject
 
-class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
+class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     @Inject
     lateinit var factory : DisplaySubsVM.Factory
 
@@ -46,6 +48,9 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
             }
         }).get(DisplaySubsVM::class.java)
     }
+
+    @Inject
+    lateinit var networkUtil: NetworkUtil
 
     private lateinit var searchView: SearchView
     private lateinit var searchMenuItem: MenuItem
@@ -180,7 +185,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
                 // refresh the current list and retrieve more posts
                 subAdapter.clearList()
-                viewModel.retrieveMoreSubs(true)
+                viewModel.refreshSubs()
             }
         }
     }

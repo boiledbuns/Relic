@@ -11,13 +11,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 class SubredditModel : Parcelable {
 
-//    constructor(id: String, fullname: String, bannerUrl: String, nsfw: Boolean) {
-//        this.id = id
-//        this.bannerUrl = bannerUrl
-//        this.subName = fullname
-//        this.nsfw = nsfw
-//    }
-
     @PrimaryKey
     var id: String = ""
 

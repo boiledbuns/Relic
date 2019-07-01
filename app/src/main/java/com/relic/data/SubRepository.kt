@@ -19,10 +19,9 @@ interface SubRepository {
 
     fun getPinnedsubs(): LiveData<List<SubredditModel>>
 
-    /**
-     * Fetches and stores more Subreddits from the Reddit API into the local database
-     */
     suspend fun retrieveAllSubscribedSubs() : List<SubredditModel>
+
+    suspend fun clearAndInsertSubs(subs :List<SubredditModel>)
 
     /**
      * @param subName "friendly" subreddit name for the subreddit to retrieve

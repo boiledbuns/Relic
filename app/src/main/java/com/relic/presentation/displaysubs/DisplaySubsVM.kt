@@ -2,36 +2,36 @@ package com.relic.presentation.displaysubs
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
-import android.util.Log
 import com.relic.data.Auth
 
 import com.relic.data.ListingRepository
 import com.relic.data.SubRepository
-import com.relic.data.SubsLoadedCallback
 import com.relic.domain.models.SubredditModel
+import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import kotlinx.coroutines.*
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class DisplaySubsVM (
-        private val subRepository: SubRepository,
-        private val listingRepository: ListingRepository,
-        private val authenticator: Auth
+    private val subRepository: SubRepository,
+    private val listingRepository: ListingRepository,
+    private val networkUtil: NetworkUtil,
+    private val authenticator: Auth
 ) : RelicViewModel(), DisplaySubsContract.VM, SubInfoDialogContract.Delegate {
 
     class Factory @Inject constructor(
             private val subRepository: SubRepository,
             private val listingRepository: ListingRepository,
+            private val networkUtil: NetworkUtil,
             private val authenticator: Auth
     ) {
         fun create() : DisplaySubsVM{
-            return DisplaySubsVM(subRepository, listingRepository, authenticator)
+            return DisplaySubsVM(subRepository, listingRepository, networkUtil, authenticator)
         }
     }
-
-    private var refreshing: Boolean = false
 
     private val _subscribedSubsList = MediatorLiveData <List<SubredditModel>> ()
     val subscribedSubsList : LiveData<List<SubredditModel>> =  _subscribedSubsList
@@ -42,47 +42,22 @@ class DisplaySubsVM (
     val pinnedSubs : LiveData<List<SubredditModel>> = subRepository.getPinnedsubs()
 
     init {
-        initializeObservers()
+        _subscribedSubsList.addSource(subRepository.getSubscribedSubs()) { subscribedSubs ->
+            _subscribedSubsList.postValue(subscribedSubs)
+        }
+
+        refreshSubs()
     }
 
-    /**
-     * Initialize observers for livedata
-     */
-    private fun initializeObservers() {
-//        //subscribedSubsList.addSource(subRepo.getSubscribedSubs(), subscribedSubsList::setValue);
-//        _subscribedSubsList.addSource <List<SubredditModel>> (subRepository.getSubscribedSubs()) { subscribedSubs ->
-//
-//            //      if (subscribedSubs.isEmpty()) {
-//            //        // refresh the token even if the vm has already been initialized
-//            //        subRepo.retrieveAllSubscribedSubs();
-//            //        //authenticator.refreshToken(this);
-//            //      } else {
-//
-//            if (!refreshing) {
-//                Log.d(TAG, "subs loaded $subscribedSubs")
-//                _subscribedSubsList.postValue(subscribedSubs)
-//            }
-//            //      }
-//        }
-    }
-
-    /**
-     * Retrieves more posts either from the start or leading off the current "after" page
-     * @param resetPosts whether the post list should be restarted
-     */
-    override fun retrieveMoreSubs(resetPosts: Boolean) {
-        if (resetPosts) {
-            refreshing = true
-            launch {
-
-                _subscribedSubsList.postValue(subRepository.retrieveAllSubscribedSubs())
-                refreshing = false
-            }
+    override fun refreshSubs() {
+        launch (Dispatchers.Main) {
+            val posts = subRepository.retrieveAllSubscribedSubs()
+            subRepository.clearAndInsertSubs(posts)
         }
     }
 
     override fun retrieveSearchResults(query: String) {
-        Log.d(TAG, "Retrieving search results for $query")
+        Timber.d("Retrieving search results for $query")
 
         // retrieves search results only if the query is non empty
         // also ignores first query entry (always empty)
