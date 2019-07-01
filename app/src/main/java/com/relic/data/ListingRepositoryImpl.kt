@@ -1,9 +1,7 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.os.AsyncTask
-import com.relic.data.entities.ListingEntity
+import com.relic.persistence.ApplicationDB
+import com.relic.persistence.entities.ListingEntity
 import dagger.Reusable
 
 import kotlinx.coroutines.*

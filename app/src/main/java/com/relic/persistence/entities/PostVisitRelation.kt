@@ -1,4 +1,4 @@
-package com.relic.data.entities
+package com.relic.persistence.entities
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey

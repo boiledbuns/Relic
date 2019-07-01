@@ -1,4 +1,4 @@
-package com.relic.data.dao;
+package com.relic.persistence.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;

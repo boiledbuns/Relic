@@ -1,7 +1,7 @@
 package com.relic.data.deserializer
 
 import com.google.gson.GsonBuilder
-import com.relic.data.entities.SubredditEntity
+import com.relic.persistence.entities.SubredditEntity
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser

@@ -1,4 +1,4 @@
-package com.relic.data.dao;
+package com.relic.persistence.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.relic.data.entities.SubredditEntity;
+import com.relic.persistence.entities.SubredditEntity;
 import com.relic.domain.models.SubredditModel;
 
 import java.util.List;

@@ -2,14 +2,13 @@ package com.relic.data.deserializer
 
 import com.relic.api.response.Listing
 import com.relic.data.CommentsAndPostData
-import com.relic.data.PostSource
-import com.relic.data.SubSearchResult
-import com.relic.data.entities.*
 import com.relic.domain.exception.RelicException
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.UserModel
+import com.relic.persistence.entities.AccountEntity
+import com.relic.persistence.entities.SubredditEntity
 
 /**
  * Decoupled from the repository package because deserializers should be responsible
@@ -19,7 +18,9 @@ import com.relic.domain.models.UserModel
 interface Contract {
 
     interface PostDeserializer {
-
+        /**
+         * parse response that can contain both posts and comments
+         */
         suspend fun parseListingItems(response: String) : Listing<ListingItem>
 
         suspend fun parsePosts(response: String) : Listing<PostModel>
@@ -28,8 +29,15 @@ interface Contract {
     }
 
     interface CommentDeserializer {
+        /**
+         * parses a post and its associated comments
+         */
         suspend fun parseCommentsAndPost(response : String) : CommentsAndPostData
 
+        /**
+         * Only use this method to parse the return from "morechildren" since it uses a different
+         * format than the traditional method for retrieving comments
+         */
         suspend fun parseMoreCommentsResponse(
             moreChildrenComment: CommentModel,
             response : String

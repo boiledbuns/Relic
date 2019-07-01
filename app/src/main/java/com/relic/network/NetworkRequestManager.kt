@@ -4,7 +4,7 @@ import android.content.Context
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
-import com.relic.data.ApplicationDB
+import com.relic.persistence.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
 import kotlinx.coroutines.*
 import timber.log.Timber

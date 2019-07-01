@@ -2,7 +2,7 @@ package com.relic.data.deserializer
 
 import android.util.Log
 import com.google.gson.GsonBuilder
-import com.relic.data.entities.AccountEntity
+import com.relic.persistence.entities.AccountEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.simple.JSONObject

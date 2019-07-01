@@ -11,9 +11,10 @@ import android.util.Log
 import com.android.volley.Request
 import com.relic.R
 import com.relic.data.*
-import com.relic.data.entities.TokenStoreEntity
+import com.relic.persistence.entities.TokenStoreEntity
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import com.relic.persistence.ApplicationDB
 import com.relic.presentation.callbacks.AuthenticationCallback
 import dagger.Reusable
 import kotlinx.coroutines.*

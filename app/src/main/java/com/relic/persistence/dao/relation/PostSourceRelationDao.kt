@@ -1,9 +1,9 @@
-package com.relic.data.dao
+package com.relic.data.dao.relation
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
-import com.relic.data.entities.SourceAndPostRelation
+import com.relic.persistence.entities.SourceAndPostRelation
 
 @Dao
 abstract class PostSourceRelationDao {

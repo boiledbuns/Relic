@@ -1,14 +1,13 @@
-package com.relic.data
+package com.relic.persistence
 
 import android.arch.persistence.room.TypeConverter
 import com.relic.domain.models.Gildings
 import com.squareup.moshi.Moshi
 import java.util.*
-import javax.inject.Inject
 
 class TypeConverters {
 
-    val gildingsAdapter = moshi.adapter(Gildings::class.java)!!
+    private val gildingsAdapter = moshi.adapter(Gildings::class.java)!!
 
     @TypeConverter
     fun fromMoreList(moreList: List<String>?): String? {

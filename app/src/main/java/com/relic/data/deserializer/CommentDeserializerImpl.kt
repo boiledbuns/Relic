@@ -20,7 +20,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
-// TODO convert to object and add interface so this can be injected
 @Singleton
 class CommentDeserializerImpl @Inject constructor(
     private val moshi: Moshi,
@@ -90,11 +89,6 @@ class CommentDeserializerImpl @Inject constructor(
         }
     }
 
-
-    /**
-     * Only use this method to parse the return from "morechildren" since it uses a different
-     * format than the traditional method for retrieving comments
-     */
     override suspend fun parseMoreCommentsResponse(
         moreChildrenComment: CommentModel,
         response: String

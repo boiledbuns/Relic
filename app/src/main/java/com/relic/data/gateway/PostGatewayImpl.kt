@@ -2,9 +2,9 @@ package com.relic.data.gateway
 
 import android.util.Log
 
-import com.relic.data.ApplicationDB
+import com.relic.persistence.ApplicationDB
 import com.relic.data.DomainTransfer
-import com.relic.data.entities.PostVisitRelation
+import com.relic.persistence.entities.PostVisitRelation
 import com.relic.data.repository.RepoConstants
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest

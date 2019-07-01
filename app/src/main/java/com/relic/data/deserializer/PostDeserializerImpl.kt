@@ -1,7 +1,7 @@
 package com.relic.data.deserializer
 
 import com.relic.api.response.Listing
-import com.relic.data.ApplicationDB
+import com.relic.persistence.ApplicationDB
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.squareup.moshi.Moshi
