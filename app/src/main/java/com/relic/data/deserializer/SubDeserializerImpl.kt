@@ -1,15 +1,15 @@
 package com.relic.data.deserializer
 
-import com.google.gson.GsonBuilder
 import com.relic.api.response.Listing
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
-import java.util.*
 import javax.inject.Inject
 
 class SubDeserializerImpl @Inject constructor(
@@ -18,12 +18,12 @@ class SubDeserializerImpl @Inject constructor(
     private val TAG = "SUB_DESERIALIZER"
 
     private val subAdapter = moshi.adapter(SubredditModel::class.java)
+    private val subSearchAdapter = moshi.adapter(SubSearchResult::class.java)
 
     private val subType = Types.newParameterizedType(Listing::class.java, SubredditModel::class.java)
     private val subListingAdapter = moshi.adapter<Listing<SubredditModel>>(subType)
 
     private val parser: JSONParser = JSONParser()
-    private val gson = GsonBuilder().create()
 
     override suspend fun parseSubredditResponse(response: String): SubredditModel {
         return subAdapter.fromJson(response)!!
@@ -46,25 +46,21 @@ class SubDeserializerImpl @Inject constructor(
         }
     }
 
-
     /**
      * Parses the api response to obtain the list of subreddit names
      * @param response search_subreddits api response
      */
-    override suspend fun parseSearchSubsResponse(response: String): List<String> {
-        val parsedMatches = ArrayList<String>()
-
+    override suspend fun parseSearchSubsResponse(response: String): List<SubPreviewModel> {
         try {
-            val subreddits = (parser.parse(response) as JSONObject)["subreddits"] as JSONArray?
-            val subIterator = subreddits!!.iterator()
-
-            while (subIterator.hasNext()) {
-                parsedMatches.add((subIterator.next() as JSONObject)["name"] as String)
-            }
+            val subSearchResult = subSearchAdapter.fromJson(response)
+            return subSearchResult!!.subreddits
         } catch (e: ParseException) {
             throw RelicParseException(response, e)
         }
-
-        return parsedMatches
     }
+
+    @JsonClass(generateAdapter = true)
+    data class SubSearchResult(
+        val subreddits : List<SubPreviewModel>
+    )
 }

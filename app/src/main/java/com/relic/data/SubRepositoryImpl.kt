@@ -7,6 +7,7 @@ import com.relic.data.deserializer.Contract
 import com.relic.data.gateway.SubGateway
 import com.relic.data.gateway.SubGatewayImpl
 import com.relic.data.repository.RepoConstants.ENDPOINT
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
@@ -60,12 +61,18 @@ class SubRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun insertSub(sub: SubredditModel) {
+        withContext(Dispatchers.IO) {
+            subDao.insert(sub)
+        }
+    }
+
     override fun getSingleSub(subName: String): LiveData<SubredditModel> {
         return subDao.getSub(subName)
     }
 
-    override suspend fun retrieveSingleSub(subName: String) {
-        val url = "{ENDPOINT}r/{subName}/about"
+    override suspend fun retrieveSingleSub(subName: String) : SubredditModel{
+        val url = "${ENDPOINT}r/{subName}/about"
 
         try {
             val response = requestManager.processRequest(
@@ -73,29 +80,24 @@ class SubRepositoryImpl @Inject constructor(
                 url = url
             )
 
-            val subreddit = subDeserializer.parseSubredditResponse(response)
-
-            // create a new task to insert the subreddits on parse success
-            withContext(Dispatchers.IO) {
-                subDao.insert(subreddit)
-            }
+            return subDeserializer.parseSubredditResponse(response)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve single sub", e) ?: e
         }
     }
 
-    override suspend fun searchSubreddits(query: String) : List<String>{
-        val url = "{ENDPOINT}api/search_subreddits?query={query}"
+    override suspend fun searchSubreddits(query: String) : List<SubPreviewModel>{
+        val url = "${ENDPOINT}api/search_subreddits?query=$query"
 
-        return try {
+        try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.POST,
                 url = url
             )
 
-            subDeserializer.parseSearchSubsResponse(response)
+            return subDeserializer.parseSearchSubsResponse(response)
         } catch (e: Exception) {
-            throw DomainTransfer.handleException("retrieve single sub", e) ?: e
+            throw DomainTransfer.handleException("search subs", e) ?: e
         }
     }
 

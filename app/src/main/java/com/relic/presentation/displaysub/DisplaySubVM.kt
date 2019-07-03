@@ -3,8 +3,6 @@ package com.relic.presentation.displaysub
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
-import com.relic.api.response.Listing
 import com.relic.data.*
 import com.relic.data.gateway.PostGateway
 import com.relic.data.repository.NetworkException
@@ -71,6 +69,7 @@ open class DisplaySubVM (
         // from the network or just display what we have locally
         if (networkUtil.checkConnection()) {
             retrieveMorePosts(true)
+            retrieveSubreddit()
         } else {
             // observe the list of posts stored locally
             _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
@@ -80,12 +79,18 @@ open class DisplaySubVM (
             launch {
                 subPostAfter = listingRepo.getAfter(postSource)
             }
-        }
 
-        when (postSource) {
-            is PostSource.Subreddit -> initializeSubredditInformation(postSource.subredditName)
-            is PostSource.Frontpage -> {}
-            is PostSource.All -> {}
+            //subRepo.getSubGateway().retrieveSubBanner(subName);
+
+            when (postSource) {
+                is PostSource.Subreddit -> {
+                    _subredditMediator.addSource(subRepo.getSingleSub(postSource.subredditName)) {
+                        _subredditMediator.setValue(it)
+                    }
+                }
+                is PostSource.Frontpage -> {}
+                is PostSource.All -> {}
+            }
         }
 
         _subInfoLiveData.postValue(DisplaySubInfoData(
@@ -94,23 +99,24 @@ open class DisplaySubVM (
         ))
     }
 
-    private fun initializeSubredditInformation(subName : String ) {
-        // TODO: STILL TESTING retrieve the banner image from the subreddit css
-        launch(Dispatchers.Main) {
-            subRepo.getSubGateway().apply {
-                retrieveAdditionalSubInfo(subName)
-                retrieveSidebar(subName)
-            }
+    private fun retrieveSubreddit() {
+        val subName : String?  =  when (postSource) {
+            is PostSource.Subreddit -> postSource.subredditName
+            is PostSource.Frontpage -> ""
+            else -> null
         }
 
-        //subRepo.getSubGateway().retrieveSubBanner(subName);
-        _subredditMediator.addSource(subRepo.getSingleSub(subName)) { newModel ->
-            if (newModel == null) {
-                Timber.d("No subreddit saved locally, retrieving from network")
-                launch(Dispatchers.Main) { subRepo.retrieveSingleSub(subName) }
-            } else {
-                Timber.d("Subreddit loaded ${newModel.bannerUrl}")
-                _subredditMediator.setValue(newModel)
+        if (subName != null) {
+            // TODO: STILL TESTING retrieve the banner image from the subreddit css
+            launch(Dispatchers.Main) {
+                subRepo.getSubGateway().apply {
+                    retrieveAdditionalSubInfo(subName)
+                    retrieveSidebar(subName)
+                }
+
+                val sub = subRepo.retrieveSingleSub(subName)
+                _subredditMediator.postValue(sub)
+                subRepo.insertSub(sub)
             }
         }
     }

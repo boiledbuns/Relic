@@ -55,7 +55,7 @@ interface Contract {
     interface SubDeserializer {
         suspend fun parseSubredditResponse(response: String): SubredditModel
         suspend fun parseSubredditsResponse(response: String): Listing<SubredditModel>
-        suspend fun parseSearchSubsResponse(response: String): List<String>
+        suspend fun parseSearchSubsResponse(response: String): List<SubPreviewModel>
     }
 
 }

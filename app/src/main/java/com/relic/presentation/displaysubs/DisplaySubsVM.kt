@@ -53,6 +53,10 @@ class DisplaySubsVM (
         launch (Dispatchers.Main) {
             val posts = subRepository.retrieveAllSubscribedSubs()
             subRepository.clearAndInsertSubs(posts)
+
+            //TESTING
+            val subs = subRepository.searchSubreddits("hearthstone")
+            Timber.d(subs.toString())
         }
     }
 
