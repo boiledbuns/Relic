@@ -5,10 +5,7 @@ import android.arch.lifecycle.Observer
 import com.nhaarman.mockitokotlin2.*
 import com.relic.api.response.Data
 import com.relic.api.response.Listing
-import com.relic.data.PostRepository
-import com.relic.data.PostSource
-import com.relic.data.SubRepository
-import com.relic.data.UserRepository
+import com.relic.data.*
 import com.relic.data.gateway.PostGateway
 import com.relic.data.gateway.SubGateway
 import com.relic.domain.models.PostModel
@@ -39,6 +36,7 @@ class DisplaySubVMTest {
     private lateinit var userRepo: UserRepository
     private lateinit var subGateway: SubGateway
     private lateinit var postGateway: PostGateway
+    private lateinit var listingRepo: ListingRepository
 
     private val username = "testUsername"
 
@@ -51,6 +49,7 @@ class DisplaySubVMTest {
         userRepo = mock()
         subGateway = mock()
         postGateway = mock()
+        listingRepo = mock()
 
         whenever(subRepo.getSubGateway()).doReturn(subGateway)
         whenever(subRepo.getSingleSub(any())).doReturn(mock())
@@ -70,7 +69,7 @@ class DisplaySubVMTest {
         whenever(postRepo.retrieveSortedPosts(any(), any(), any())).doReturn(mockListing())
 
         val source = PostSource.Subreddit("test_sub")
-        val vm = DisplaySubVM(source, subRepo, postRepo, postGateway, mockNetworkUtil)
+        val vm = DisplaySubVM(source, subRepo, postRepo, postGateway, listingRepo, mockNetworkUtil)
 
         verify(postRepo, times(0)).getPosts(any())
         verify(postRepo, times(1)).retrieveSortedPosts(any(), any(), any())
@@ -84,7 +83,7 @@ class DisplaySubVMTest {
         whenever(postRepo.retrieveSortedPosts(any(), any(), any())).doReturn(mockListing())
 
         val source = PostSource.Subreddit("test_sub")
-        val vm = DisplaySubVM(source, subRepo, postRepo, postGateway, mockNetworkUtil)
+        val vm = DisplaySubVM(source, subRepo, postRepo, postGateway, listingRepo, mockNetworkUtil)
 
         verify(postRepo, times(1)).getPosts(any())
         verify(postRepo, times(0)).retrieveSortedPosts(any(), any(), any())
