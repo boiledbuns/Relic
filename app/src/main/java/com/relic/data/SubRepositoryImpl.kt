@@ -2,10 +2,12 @@ package com.relic.data
 
 import android.arch.lifecycle.LiveData
 import android.util.Log
+import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
 import com.relic.data.gateway.SubGateway
 import com.relic.data.gateway.SubGatewayImpl
 import com.relic.data.repository.RepoConstants.ENDPOINT
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
@@ -32,12 +34,36 @@ class SubRepositoryImpl @Inject constructor(
         return subDao.allSubscribed
     }
 
-    override suspend fun retrieveAllSubscribedSubs(callback: SubsLoadedCallback) {
+    override suspend fun retrieveAllSubscribedSubs() : List<SubredditModel> {
         // since refreshing, set all subs loaded to reflect that not all subs are loaded
         // delete all locally stored subs
+        return withContext(Dispatchers.IO) {
+            val subs = ArrayList<SubredditModel>()
+            var after : String? = null
+
+            do {
+                retrieveMoreSubscribedSubs(after).data.let { data ->
+                    data.children?.let { subs.addAll(it) }
+                    after = data.after
+                }
+            } while (after != null)
+
+            subs.apply {
+                sortBy { it.subName }
+            }
+        }
+    }
+
+    override suspend fun clearAndInsertSubs(subs: List<SubredditModel>) {
         withContext(Dispatchers.IO) {
             subDao.deleteAllSubscribed()
-            retrieveMoreSubscribedSubs(null, callback)
+            subDao.insertAll(subs)
+        }
+    }
+
+    override suspend fun insertSub(sub: SubredditModel) {
+        withContext(Dispatchers.IO) {
+            subDao.insert(sub)
         }
     }
 
@@ -45,39 +71,33 @@ class SubRepositoryImpl @Inject constructor(
         return subDao.getSub(subName)
     }
 
-    override suspend fun retrieveSingleSub(subName: String) {
-        val url = "{ENDPOINT}r/{subName}/about"
+    override suspend fun retrieveSingleSub(subName: String) : SubredditModel{
+        val url = "${ENDPOINT}r/$subName/about"
 
         try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.GET,
                 url = url
             )
-            Log.d(TAG, response)
 
-            val subreddit = subDeserializer.parseSubredditResponse(response)
-
-            // create a new task to insert the subreddits on parse success
-            withContext(Dispatchers.IO) {
-                subDao.insert(subreddit)
-            }
+            return subDeserializer.parseSubredditResponse(response)
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve single sub", e) ?: e
         }
     }
 
-    override suspend fun searchSubreddits(query: String) : List<String>{
-        val url = "{ENDPOINT}api/search_subreddits?query={query}"
+    override suspend fun searchSubreddits(query: String) : List<SubPreviewModel>{
+        val url = "${ENDPOINT}api/search_subreddits?query=$query"
 
-        return try {
+        try {
             val response = requestManager.processRequest(
                 method = RelicOAuthRequest.POST,
                 url = url
             )
 
-            subDeserializer.parseSearchSubsResponse(response)
+            return subDeserializer.parseSearchSubsResponse(response)
         } catch (e: Exception) {
-            throw DomainTransfer.handleException("retrieve single sub", e) ?: e
+            throw DomainTransfer.handleException("search subs", e) ?: e
         }
     }
 
@@ -95,12 +115,11 @@ class SubRepositoryImpl @Inject constructor(
 
     // endregion interface methods
 
-
     /**
      * Handles retrieval of subreddits from the network
      * @param after: null if retrieving from scratch, only include if retrieving *MORE* subs
      */
-    private suspend fun retrieveMoreSubscribedSubs(after: String?, callback: SubsLoadedCallback?) {
+    private suspend fun retrieveMoreSubscribedSubs(after: String?) : Listing<SubredditModel> {
         var ending = "subreddits/mine/subscriber?limit=30"
         after?.let { ending += "&after=$after" }
 
@@ -109,22 +128,9 @@ class SubRepositoryImpl @Inject constructor(
                 method = RelicOAuthRequest.GET,
                 url = ENDPOINT + ending
             )
-
-            val subsData = subDeserializer.parseSubredditsResponse(response)
-
-            withContext(Dispatchers.IO) { subDao.insertAll(subsData.subsList) }
-
-            if (subsData.after != null) {
-                Log.d(TAG, "after = " + subsData.after)
-                // checks the after value of the listing for the current subs
-                // retrieve more subs without refreshing if the string is null
-                retrieveMoreSubscribedSubs(subsData.after, callback)
-            } else {
-                // if no after value, invoke callback method
-                callback?.callback()
-            }
+            return subDeserializer.parseSubredditsResponse(response)
         } catch (e : Exception){
-            throw DomainTransfer.handleException("retrieve more subsribed subs", e) ?: e
+            throw DomainTransfer.handleException("retrieve more subsrcibed subs", e) ?: e
         }
     }
 }

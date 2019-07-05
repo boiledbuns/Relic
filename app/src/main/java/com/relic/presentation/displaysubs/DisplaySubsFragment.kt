@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import com.relic.R
 import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
+import com.relic.network.NetworkUtil
 import com.relic.presentation.adapter.SearchItemAdapter
 import com.relic.presentation.adapter.SearchSubItemOnClick
 import com.relic.presentation.adapter.SubItemAdapter
@@ -31,11 +32,12 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.display_subs.*
 
 import java.util.ArrayList
 import javax.inject.Inject
 
-class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
+class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     @Inject
     lateinit var factory : DisplaySubsVM.Factory
 
@@ -46,6 +48,9 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
             }
         }).get(DisplaySubsVM::class.java)
     }
+
+    @Inject
+    lateinit var networkUtil: NetworkUtil
 
     private lateinit var searchView: SearchView
     private lateinit var searchMenuItem: MenuItem
@@ -180,7 +185,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
                 // refresh the current list and retrieve more posts
                 subAdapter.clearList()
-                viewModel.retrieveMoreSubs(true)
+                viewModel.refreshSubs()
             }
         }
     }
@@ -190,7 +195,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
      */
     internal inner class OnClickSubItem : SubItemOnClick {
         override fun onClick(subItem: SubredditModel) {
-            val subFrag = DisplaySubFragment.create(subItem.name)
+            val subFrag = DisplaySubFragment.create(subItem.subName)
 
             // clear items before transition to ensure we don't hold too much in memory
             subAdapter.clearList()
@@ -202,7 +207,7 @@ class DisplaySubsView : RelicFragment(), AllSubsLoadedCallback {
 
         override fun onLongClick(subItem: SubredditModel): Boolean {
             val args = Bundle().apply {
-                putString(ARG_SUB_NAME, subItem.name)
+                putString(ARG_SUB_NAME, subItem.subName)
             }
 
             val newDialog = SubInfoBottomSheetDialog()

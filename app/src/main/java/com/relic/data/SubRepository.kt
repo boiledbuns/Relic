@@ -3,7 +3,10 @@ package com.relic.data
 import android.arch.lifecycle.LiveData
 
 import com.relic.data.gateway.SubGateway
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 interface SubRepository {
 
@@ -19,10 +22,11 @@ interface SubRepository {
 
     fun getPinnedsubs(): LiveData<List<SubredditModel>>
 
-    /**
-     * Fetches and stores more Subreddits from the Reddit API into the local database
-     */
-    suspend fun retrieveAllSubscribedSubs(callback: SubsLoadedCallback)
+    suspend fun retrieveAllSubscribedSubs() : List<SubredditModel>
+
+    suspend fun clearAndInsertSubs(subs : List<SubredditModel>)
+
+    suspend fun insertSub(sub : SubredditModel)
 
     /**
      * @param subName "friendly" subreddit name for the subreddit to retrieve
@@ -34,7 +38,7 @@ interface SubRepository {
      * Retrieves and parses the subreddit from network and
      * @param subName "friendly" subreddit name for subreddit to retrieve
      */
-    suspend fun retrieveSingleSub(subName: String)
+    suspend fun retrieveSingleSub(subName: String) : SubredditModel
 
     /**
      * Returns a list of subreddit names matching the search value
@@ -42,9 +46,8 @@ interface SubRepository {
      * @param liveResults the livedata results list to be updated when results are parsed form the api
      * @param query query to find matching subreddits for
      */
-    suspend fun searchSubreddits(query: String) :  List<String>
+    suspend fun searchSubreddits(query: String) :  List<SubPreviewModel>
 
 
     suspend fun pinSubreddit(subredditName: String, newPinnedStatus: Boolean)
 }
-

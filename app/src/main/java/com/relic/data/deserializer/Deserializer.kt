@@ -3,6 +3,7 @@ package com.relic.data.deserializer
 import com.relic.api.Type
 import com.relic.api.adapter.CommentAdapter
 import com.relic.api.adapter.PostAdapter
+import com.relic.api.adapter.SubAdapter
 import com.relic.api.qualifier.DateAdapter
 import com.relic.api.qualifier.LikesAdapter
 import com.relic.api.qualifier.MoreAdapter
@@ -30,6 +31,7 @@ class Deserializer {
                     )
                     .add(PostAdapter())
                     .add(CommentAdapter())
+                    .add(SubAdapter())
                     .build()
             }
 

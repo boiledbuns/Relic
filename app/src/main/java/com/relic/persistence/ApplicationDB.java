@@ -6,6 +6,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 
+import com.relic.domain.models.SubredditModel;
 import com.relic.persistence.dao.AccountDao;
 import com.relic.data.dao.relation.PostSourceRelationDao;
 import com.relic.data.dao.relation.PostVisitedRelationDao;
@@ -19,14 +20,13 @@ import com.relic.persistence.entities.AccountEntity;
 import com.relic.persistence.entities.ListingEntity;
 import com.relic.persistence.entities.PostVisitRelation;
 import com.relic.persistence.entities.SourceAndPostRelation;
-import com.relic.persistence.entities.SubredditEntity;
 import com.relic.persistence.entities.TokenStoreEntity;
 import com.relic.domain.models.CommentModel;
 import com.relic.domain.models.PostModel;
 
 @Database(
     entities = {
-        SubredditEntity.class,
+        SubredditModel.class,
         PostModel.class,
         SourceAndPostRelation.class,
         ListingEntity.class,

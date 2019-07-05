@@ -10,7 +10,7 @@ import android.view.*
 import com.relic.presentation.main.MainActivity
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysubs.DisplaySubsView
+import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import kotlinx.android.synthetic.main.home.view.*
 
@@ -25,7 +25,7 @@ class HomeFragment : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
-            tabFragments.add(DisplaySubsView())
+            tabFragments.add(DisplaySubsFragment())
             tabFragments.add(FrontpageFragment())
         }
     }

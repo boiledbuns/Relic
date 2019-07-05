@@ -3,7 +3,7 @@ package com.relic.presentation.displaysubs;
 public interface DisplaySubsContract {
   interface VM {
 
-    void retrieveMoreSubs(boolean resetPosts);
+    void refreshSubs();
 
     /**
      * Makes request for matches based on the query

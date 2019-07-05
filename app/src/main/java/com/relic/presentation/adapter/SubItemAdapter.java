@@ -87,7 +87,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
 
         @Override
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-          return (subList.get(oldItemPosition).id.equals(newSubs.get(newItemPosition).id));
+          return (subList.get(oldItemPosition).getId().equals(newSubs.get(newItemPosition).getId()));
         }
 
         @Override
