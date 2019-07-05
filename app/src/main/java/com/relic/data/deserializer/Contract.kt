@@ -5,6 +5,7 @@ import com.relic.data.CommentsAndPostData
 import com.relic.domain.exception.RelicException
 import com.relic.domain.models.*
 import com.relic.persistence.entities.AccountEntity
+import org.json.simple.parser.ParseException
 
 /**
  * Decoupled from the repository package because deserializers should be responsible
@@ -53,16 +54,12 @@ interface Contract {
     }
 
     interface SubDeserializer {
+        @Throws(RelicParseException::class)
         suspend fun parseSubredditResponse(response: String): SubredditModel
         suspend fun parseSubredditsResponse(response: String): Listing<SubredditModel>
         suspend fun parseSearchSubsResponse(response: String): List<SubPreviewModel>
     }
 
 }
-
-data class ParsedSubsData(
-    val subsList : List<SubredditModel>,
-    val after : String?
-)
 
 class RelicParseException(response : String, cause : Throwable? = null) : RelicException("error parsing response : `$response`", cause)

@@ -1,4 +1,4 @@
-package com.relic.deserializer
+package com.relic.deserializer.response
 
 /**
  * Just some example responses for testing. This is by no means exhaustive

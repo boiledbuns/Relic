@@ -1,27 +1,17 @@
 package com.relic.deserializer
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import com.nhaarman.mockitokotlin2.*
-import com.relic.data.PostRepository
-import com.relic.data.PostSource
-import com.relic.data.SubRepository
-import com.relic.data.UserRepository
 import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.Deserializer
 import com.relic.data.deserializer.PostDeserializerImpl
-import com.relic.data.gateway.PostGateway
-import com.relic.data.gateway.SubGateway
-import com.relic.network.NetworkUtil
-import com.relic.presentation.displaysub.DisplaySubVM
+import com.relic.deserializer.response.POSTS_RESPONSE
+import com.relic.deserializer.response.POST_RESPONSE
 import com.squareup.moshi.Moshi
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
 import org.junit.*
 
 /**

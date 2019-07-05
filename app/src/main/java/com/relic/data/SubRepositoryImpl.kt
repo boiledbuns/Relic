@@ -72,7 +72,7 @@ class SubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun retrieveSingleSub(subName: String) : SubredditModel{
-        val url = "${ENDPOINT}r/{subName}/about"
+        val url = "${ENDPOINT}r/$subName/about"
 
         try {
             val response = requestManager.processRequest(
@@ -130,7 +130,7 @@ class SubRepositoryImpl @Inject constructor(
             )
             return subDeserializer.parseSubredditsResponse(response)
         } catch (e : Exception){
-            throw DomainTransfer.handleException("retrieve more subsribed subs", e) ?: e
+            throw DomainTransfer.handleException("retrieve more subsrcibed subs", e) ?: e
         }
     }
 }
