@@ -14,7 +14,7 @@ jobs:
       - run: 
           name: "Setup custom environment variables"
           command: |
-            echo 'export MY_ENV_VAR=$SECRETS_URL' >> $BASH_ENV # Redirect MY_ENV_VAR into $BASH_ENV
+            echo 'export SECRETS_URL=$SECRETS_URL' >> $BASH_ENV # Redirect MY_ENV_VAR into $BASH_ENV
       - run:
           name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
           command: sudo chmod +x ./gradlew
