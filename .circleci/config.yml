@@ -20,8 +20,7 @@ jobs:
           name: chewck file
           command: |
             ls ~/code/
-            ls ~/code/Relic/
-            ls ~/code/Relic/app/src/main/res/values
+            ls ~/code/app/src/main/res/values
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
