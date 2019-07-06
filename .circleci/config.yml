@@ -5,8 +5,6 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
-        environment:
-          SECRETS_URL: $SECRETS_URL
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
