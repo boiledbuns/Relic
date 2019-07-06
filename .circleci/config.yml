@@ -18,7 +18,10 @@ jobs:
           command: wget -P ~/code/Relic/app/src/main/res/values $SECRETS_URL
       - run:
           name: chewck file
-          command: ls ~/code/Relic/app/src/main/res/values
+          command: |
+            ls ~/code/
+            ls ~/code/Relic/
+            ls ~/code/Relic/app/src/main/res/values
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
