@@ -5,16 +5,14 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
+        environment:
+          SECRETS_URL: $SECRETS_URL
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
       - checkout
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-      - run: 
-          name: "Setup custom environment variables"
-          command: |
-            echo 'export SECRETS_URL="$SECRETS_URL"' >> $BASH_ENV # Redirect MY_ENV_VAR into $BASH_ENV
       - run:
           name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
           command: sudo chmod +x ./gradlew
