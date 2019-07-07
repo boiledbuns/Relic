@@ -51,6 +51,7 @@ class DisplaySubFragment : RelicFragment() {
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(PostSource.Subreddit(subName)) as T
             }

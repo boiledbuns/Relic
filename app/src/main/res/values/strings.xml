@@ -111,4 +111,6 @@
     <string name="save_draft">save draft</string>
 
     <string name="no_posts">No posts loaded</string>
+    <string name="tag_banner">banner</string>
+
 </resources>

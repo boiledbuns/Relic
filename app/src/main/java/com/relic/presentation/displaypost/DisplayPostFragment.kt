@@ -8,11 +8,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.*
 import com.relic.R
 import com.relic.data.PostSource
@@ -44,6 +41,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return factory.create(subredditName, postFullName, postSource) as T
             }

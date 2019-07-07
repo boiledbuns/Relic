@@ -1,7 +1,9 @@
 package com.relic.presentation.customview
 
 import android.content.Context
+import android.support.v4.text.HtmlCompat
 import android.text.Html
+import android.text.Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -12,6 +14,7 @@ import com.relic.R
 import com.relic.domain.models.PostModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_span.view.*
+import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
         context: Context,
@@ -79,6 +82,7 @@ class RelicPostItemView @JvmOverloads constructor(
             setPostTags(postModel)
 
             if (!postModel.selftext.isNullOrEmpty()) {
+                @Suppress("DEPRECATION")
                 postBodyView.text = Html.fromHtml(postModel.selftext).toString()
                 postBodyView.visibility = View.VISIBLE
             }
@@ -112,11 +116,11 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {
-            Log.d(TAG, "URL = $thumbnailUrl")
+            Timber.d( "URL = $thumbnailUrl")
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postItemThumbnailView)
             postItemThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
-            Log.d(TAG, "Issue loading image " + e.toString())
+            Timber.d("Issue loading image %s", e.toString())
         }
     }
 
@@ -127,6 +131,8 @@ class RelicPostItemView @JvmOverloads constructor(
         postItemTagView.apply {
             if (postModel.linkFlair != null) {
                 text = postModel.linkFlair
+                // TODO replace with themes when adding proper theming
+                @Suppress("DEPRECATION")
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE
             } else { visibility = View.GONE }
@@ -135,6 +141,8 @@ class RelicPostItemView @JvmOverloads constructor(
         postItemAuthorFlairView.apply {
             if (postModel.authorFlair != null) {
                 text = postModel.authorFlair
+                // TODO replace with themes when adding proper theming
+                @Suppress("DEPRECATION")
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE
             } else { visibility = View.GONE }
