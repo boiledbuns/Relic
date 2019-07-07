@@ -29,7 +29,7 @@ class PreferencesManagerImpl(
         sharedPreferences.edit().apply {
             putInt(KEY_THEME, themeResId)
             // use commit b/c we want the changes to take place immediately
-            commit()
+            apply()
         }
 
     }

@@ -36,6 +36,7 @@ class DisplayUserFragment : RelicFragment() {
 
     private val displayUserVM : DisplayUserVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(username) as T
             }
@@ -95,8 +96,8 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         var override = true
-        var sortType : SortType? = null
-        var sortScope : SortScope? = null
+        var sortType : SortType?
+        var sortScope : SortScope?
 
         when (item?.itemId) {
             // when the sorting type is changed
