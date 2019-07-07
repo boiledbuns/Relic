@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/13ABEL/Relic.svg?style=svg)](https://circleci.com/gh/13ABEL/Relic)
 # Relic
 
 The project is currently a WIP. Updates and progress can be found [here](./docs/updates.md)
