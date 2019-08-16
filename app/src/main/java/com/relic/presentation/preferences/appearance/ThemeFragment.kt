@@ -3,20 +3,21 @@ package com.relic.presentation.preferences.appearance
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.view.ContextThemeWrapper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.preference.PreferencesManager
+import com.relic.preference.PreferencesManagerImpl
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.preferences.PreferenceChangedListener
 import com.relic.presentation.preferences.PreferenceLink
-import com.relic.preference.PreferencesManager
-import com.relic.preference.PreferencesManagerImpl
-import com.relic.preference.ViewPreferencesManager
 import kotlinx.android.synthetic.main.preferences_theme.*
-import java.util.*
 import javax.inject.Inject
 
 class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
@@ -35,7 +36,7 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
     // region android lifecycle hooks
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        previewPost = initializePreviewPost()
+        previewPost = ViewPreferencesHelper.initializePreviewPost(resources)
 
         activity?.let {
             preferencesManager = PreferencesManagerImpl.create(it.getPreferences(Context.MODE_PRIVATE))
@@ -82,16 +83,6 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
     // endregion android lifecycle hooks
 
     // region view helper functions
-
-    private fun initializePreviewPost() : PostModel {
-        return PostModel().apply {
-            title = resources.getString(R.string.preference_theme_instruction)
-            author ="boiledbuns"
-            selftext = resources.getString(R.string.long_placeholder_text)
-            subreddit = "theme_editor"
-            created = Date()
-        }
-    }
 
     private fun resetPostPreviewView() {
         val contextWrapper = ContextThemeWrapper(activity, currentTheme)

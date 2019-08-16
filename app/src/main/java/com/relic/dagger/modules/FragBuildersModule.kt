@@ -13,6 +13,7 @@ import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.relic.presentation.login.SignInFragment
 import com.relic.presentation.preferences.PreferencesFragment
+import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import dagger.Module
@@ -75,4 +76,7 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeTheme() : ThemeFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributePostLayout() : PostLayoutFragment
 }

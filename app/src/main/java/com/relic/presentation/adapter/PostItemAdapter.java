@@ -21,6 +21,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
+@Deprecated
 public class PostItemAdapter extends RecyclerView.Adapter<PostItemAdapter.PostItemVH>{
   private final String TAG = "POST_ADAPTER";
   private List<PostModel> postList;

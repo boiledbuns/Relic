@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
 import kotlinx.android.synthetic.main.preferences.*
 
@@ -49,13 +50,18 @@ class PreferencesFragment : RelicFragment() {
     // region view helper functions
 
     private fun initOnClicks() {
-        themeOptionView.setOnClickListener { handleNavigation(PreferenceLink.Theme)}
+        themeOptionView.setOnClickListener { handleNavigation(PreferenceLink.Theme) }
+        postLayoutOptionView.setOnClickListener { handleNavigation(PreferenceLink.PostLayout) }
     }
 
     // endregion view helper functions
 
     // region helper functions
 
+    /**
+     * handles navigation directly to specific option fragments (bypassing this fragment)
+     * for example: navigating to the post layout settings directly from the display subs screen
+     */
     private fun handleDirectNavigation(preferenceLink : PreferenceLink) {
         when (preferenceLink) {
 
@@ -64,9 +70,8 @@ class PreferencesFragment : RelicFragment() {
 
     private fun handleNavigation (preferenceLink : PreferenceLink) {
         val linkFragment : Fragment? = when (preferenceLink) {
-            PreferenceLink.Theme -> {
-                ThemeFragment.create(preferenceChangedListener)
-            }
+            PreferenceLink.Theme -> ThemeFragment.create(preferenceChangedListener)
+            PreferenceLink.PostLayout -> PostLayoutFragment.create(preferenceChangedListener)
             else -> null
         }
 
