@@ -31,6 +31,7 @@ import com.relic.data.PostSource
 import com.relic.data.SortType
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
@@ -48,6 +49,9 @@ import javax.inject.Inject
 class DisplaySubFragment : RelicFragment() {
     @Inject
     lateinit var factory : DisplaySubVM.Factory
+
+    @Inject
+    lateinit var viewPrefsManager : ViewPreferencesManager
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
@@ -89,7 +93,7 @@ class DisplaySubFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(displaySubVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM)
 
         subPostsRecyclerView.apply {
             adapter = postAdapter

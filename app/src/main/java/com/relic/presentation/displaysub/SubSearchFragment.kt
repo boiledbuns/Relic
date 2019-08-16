@@ -22,6 +22,7 @@ import com.relic.presentation.main.RelicError
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
@@ -39,6 +40,9 @@ class SubSearchFragment : RelicFragment() {
             }
         }).get(DisplaySubVM::class.java)
     }
+
+    @Inject
+    lateinit var viewPrefsManager : ViewPreferencesManager
 
     private lateinit var source : PostSource
     private lateinit var postAdapter: PostItemAdapter
@@ -58,7 +62,7 @@ class SubSearchFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postAdapter = PostItemAdapter(subSearchVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, subSearchVM)
         subSearchRV.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(context)

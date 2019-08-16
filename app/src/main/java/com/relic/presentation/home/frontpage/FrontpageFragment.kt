@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
@@ -28,6 +29,9 @@ import javax.inject.Inject
 class FrontpageFragment : RelicFragment() {
     @Inject
     lateinit var factory : FrontpageVM.Factory
+
+    @Inject
+    lateinit var viewPrefsManager : ViewPreferencesManager
 
     private val frontpageVM: FrontpageVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
@@ -52,7 +56,7 @@ class FrontpageFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(frontpageVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, frontpageVM)
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
             itemAnimator = null

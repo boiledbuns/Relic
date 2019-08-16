@@ -1,25 +1,24 @@
 package com.relic.presentation.customview
 
 import android.content.Context
-import android.support.v4.text.HtmlCompat
 import android.text.Html
-import android.text.Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.preference.POST_LAYOUT_CARD
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.post_item_span.view.*
+import kotlinx.android.synthetic.main.post_item_content.view.*
 import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
         context: Context,
         attrs : AttributeSet? = null,
-        defStyleAttr : Int = 0
+        defStyleAttr : Int = 0,
+        postLayout : Int
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private val TAG = "POST_ITEM_VIEW"
@@ -47,7 +46,11 @@ class RelicPostItemView @JvmOverloads constructor(
             stickiedColor = typedVal.data
         }
 
-        LayoutInflater.from(context).inflate(R.layout.post_item_span, this, true)
+        val layout = when (postLayout) {
+            POST_LAYOUT_CARD -> R.layout.post_item_card
+            else -> R.layout.post_item_span
+        }
+        LayoutInflater.from(context).inflate(layout, this, true)
     }
 
     fun setPost(postModel : PostModel) {

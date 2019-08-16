@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.domain.models.ListingItem
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
@@ -19,9 +20,11 @@ import com.relic.presentation.displayuser.UserTab
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_submissions.*
-import kotlinx.android.synthetic.main.display_user_submissions.view.*
+import javax.inject.Inject
 
 class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate {
+    @Inject
+    lateinit var viewPrefsManager : ViewPreferencesManager
 
     private val postsTabVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
@@ -47,7 +50,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userPostsAdapter = ListingItemAdapter(postsTabVM)
+        userPostsAdapter = ListingItemAdapter(viewPrefsManager, postsTabVM)
         userTabRecyclerView.apply {
             adapter = userPostsAdapter
             layoutManager = LinearLayoutManager(context)

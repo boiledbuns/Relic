@@ -14,10 +14,15 @@ import com.relic.presentation.preferences.PreferenceChangedListener
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.preference.PreferencesManager
 import com.relic.preference.PreferencesManagerImpl
+import com.relic.preference.ViewPreferencesManager
 import kotlinx.android.synthetic.main.preferences_theme.*
 import java.util.*
+import javax.inject.Inject
 
 class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
+
+    @Inject
+    lateinit var viewPrefsManager : ViewPreferencesManager
 
     private lateinit var previewPost : PostModel
     private lateinit var rootView : View
@@ -90,7 +95,7 @@ class ThemeFragment : RelicFragment(), AdapterView.OnItemSelectedListener {
 
     private fun resetPostPreviewView() {
         val contextWrapper = ContextThemeWrapper(activity, currentTheme)
-        val postItemView = RelicPostItemView(contextWrapper)
+        val postItemView = RelicPostItemView(contextWrapper, postLayout = viewPrefsManager.getPostCardStyle())
 
         postItemView.setPost(previewPost)
 

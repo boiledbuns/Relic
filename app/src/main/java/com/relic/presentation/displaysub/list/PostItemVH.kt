@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView
 import com.relic.domain.models.PostModel
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
-import kotlinx.android.synthetic.main.post_item_span.view.*
+import kotlinx.android.synthetic.main.post_item_content.view.*
 
 class PostItemVH (
     val postItemView : RelicPostItemView
