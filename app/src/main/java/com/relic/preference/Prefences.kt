@@ -4,6 +4,12 @@ package com.relic.preference
  * defines preference interfaces for each screen that may need it
 **/
 
+
+interface AppViewPreferences {
+    fun setAppTheme(themeId : Int)
+    fun getAppTheme() : Int
+}
+
 interface SubViewPreferences {
 
 }

@@ -20,18 +20,4 @@ class PreferencesManagerImpl(
             return INSTANCE
         }
     }
-
-    override fun getApplicationTheme(): Int {
-        return sharedPreferences.getInt(KEY_THEME, Context.MODE_PRIVATE)
-    }
-
-    override fun setApplicationTheme(themeResId: Int) {
-        sharedPreferences.edit().apply {
-            putInt(KEY_THEME, themeResId)
-            // use commit b/c we want the changes to take place immediately
-            apply()
-        }
-
-    }
-
 }

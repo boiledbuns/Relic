@@ -1,7 +1,6 @@
 package com.relic.presentation.preferences.appearance
 
 import android.os.Bundle
-import android.text.Selection.setSelection
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.preferences.PreferenceChangedListener
 import kotlinx.android.synthetic.main.preferences_post_layout.*
-import kotlinx.android.synthetic.main.preferences_theme.*
 import javax.inject.Inject
 
 class PostLayoutFragment : RelicFragment() {
@@ -53,7 +51,7 @@ class PostLayoutFragment : RelicFragment() {
             adapter = layoutSpinnerAdapter
 
             // we have to do this because spinner auto calls onItemSelected otherwise
-            setSelection(0)
+            setSelection(currentLayout)
             onItemSelectedListener = PostLayoutListener()
         }
 
@@ -69,7 +67,7 @@ class PostLayoutFragment : RelicFragment() {
         // only update post if layout not currently selected
         if (currentLayout != selectedLayout) {
             viewPrefsManager.setPostCardStyle(selectedLayout)
-            currentLayout= selectedLayout
+            currentLayout = selectedLayout
 
             resetPostPreviewView()
         }
@@ -90,7 +88,7 @@ class PostLayoutFragment : RelicFragment() {
         override fun onNothingSelected(p0: AdapterView<*>?) {}
 
         override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-            when (p0?.id) {
+            when(p0?.id) {
                 layoutSpinnerView.id -> onLayoutSelected(p2)
             }
         }

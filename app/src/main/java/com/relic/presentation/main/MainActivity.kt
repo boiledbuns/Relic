@@ -31,6 +31,7 @@ import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.preference.PreferencesManagerImpl
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
@@ -44,6 +45,9 @@ class MainActivity : RelicActivity() {
 
     @Inject
     lateinit var factory : MainVM.Factory
+
+    @Inject
+    lateinit var viewPrefsManager: ViewPreferencesManager
 
     private val mainVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
@@ -167,10 +171,7 @@ class MainActivity : RelicActivity() {
     }
 
     private fun setTheme() {
-        val themeId = PreferencesManagerImpl
-                .create(getPreferences(Context.MODE_PRIVATE))
-                .getApplicationTheme()
-
+        val themeId = viewPrefsManager.getAppTheme()
         setTheme(themeId)
     }
 
