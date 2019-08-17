@@ -20,7 +20,29 @@
         android:layout_height="wrap_content"
         android:id="@+id/previewPostLayoutFrameView"
         app:layout_constraintTop_toBottomOf="@id/postLayoutToolbarView"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/settingsLayout"
         android:orientation="vertical"/>
+
+    <RelativeLayout
+        android:id="@+id/settingsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/previewPostLayoutFrameView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="@dimen/padding_l">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change_layout"
+            android:textSize="@dimen/text_l"/>
+
+        <Spinner
+            android:id="@+id/layoutSpinnerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -10,6 +10,7 @@ interface SubViewPreferences {
 
 // posts being displayed together (ie. within a subreddit or profile page)
 interface PostViewPreferences {
+    fun setPostCardStyle(cardStyle : Int)
     fun getPostCardStyle() : Int
 }
 
@@ -18,7 +19,7 @@ interface FullPostViewPreferences {
 
 }
 
-const val POST_LAYOUT_FULL = 0
-const val POST_LAYOUT_CARD = 0
+const val POST_LAYOUT_SPAN = 0
+const val POST_LAYOUT_CARD = 1
 
 

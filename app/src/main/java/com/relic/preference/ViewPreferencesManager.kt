@@ -15,6 +15,7 @@ class ViewPreferencesManager @Inject constructor(
     private val sp = PreferenceManager.getDefaultSharedPreferences(app)
 
     // region PostViewPreferences
+    override fun setPostCardStyle(cardStyle : Int) = sp.edit().putInt(POST_CARD_STYLE, cardStyle).apply()
     override fun getPostCardStyle() : Int = sp.getInt(POST_CARD_STYLE, 0)
     // endregion PostViewPreferences
 }

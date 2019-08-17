@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<include
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/postitem_margin"
-    layout="@layout/post_item_content"
-    android:background="?attr/colorPrimary"/>
+    android:background="?attr/colorPrimary">
+
+    <include
+        layout="@layout/post_item_content"/>
+
+</LinearLayout>
 

@@ -102,6 +102,11 @@
         <item>Light</item>
     </string-array>
 
+    <string-array name="post_layout_options">
+        <item>Span</item>
+        <item>Card</item>
+    </string-array>
+
     <string name="log_in">log in</string>
     <string name="add_account">add account</string>
     <string name="switched_account">switched account to %s</string>
@@ -114,5 +119,7 @@
 
     <string name="no_posts">No posts loaded</string>
     <string name="tag_banner">banner</string>
+
+    <string name="change_layout">change layout</string>
 
 </resources>
