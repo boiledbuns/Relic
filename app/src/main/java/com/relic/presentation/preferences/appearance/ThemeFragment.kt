@@ -29,7 +29,7 @@ class ThemeFragment : RelicFragment() {
 
     private var currentTheme : Int = 0
 
-    // region android lifecycle hooks
+    // region lifecycle hooks
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         previewPost = ViewPreferencesHelper.initializePreviewPost(resources)
@@ -69,7 +69,7 @@ class ThemeFragment : RelicFragment() {
         resetPostPreviewView()
     }
 
-    // endregion android lifecycle hooks
+    // endregion lifecycle hooks
 
     private fun resetPostPreviewView() {
         val contextWrapper = ContextThemeWrapper(activity, currentTheme)
