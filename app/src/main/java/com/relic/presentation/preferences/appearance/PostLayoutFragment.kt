@@ -34,7 +34,7 @@ class PostLayoutFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postLayoutToolbarView.setOnClickListener { activity!!.onBackPressed() }
+        postLayoutToolbarView.setNavigationOnClickListener { activity!!.onBackPressed() }
 
         currentLayout = viewPrefsManager.getPostCardStyle()
 
