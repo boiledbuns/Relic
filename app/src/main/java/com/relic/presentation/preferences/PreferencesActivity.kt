@@ -7,19 +7,22 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.relic.R
 import com.relic.preference.PreferencesManagerImpl
+import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes
+import javax.inject.Inject
 
 class PreferencesActivity : RelicActivity(), PreferenceChangedListener  {
+
+    @Inject
+    lateinit var viewPrefsManager: ViewPreferencesManager
 
     private var changedPreferences = ArrayList<PreferenceLink>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val themeId = PreferencesManagerImpl
-            .create(getPreferences(Context.MODE_PRIVATE))
-            .getApplicationTheme()
+        val themeId = viewPrefsManager.getAppTheme()
 
         setTheme(themeId)
         setContentView(R.layout.activity_preferences)

@@ -80,6 +80,8 @@
 
     <!-- preferences menu -->
     <string name="preference_theme">Theme Editor</string>
+    <string name="preference_post_layout">Post Layout Editor</string>
+
     <string name="preference_theme_title">This is the theme selection screen</string>
     <string name="preference_theme_instruction">Select a theme for a preview of what it\'ll look like in the app</string>
 
@@ -100,6 +102,11 @@
         <item>Light</item>
     </string-array>
 
+    <string-array name="post_layout_options">
+        <item>Span</item>
+        <item>Card</item>
+    </string-array>
+
     <string name="log_in">log in</string>
     <string name="add_account">add account</string>
     <string name="switched_account">switched account to %s</string>
@@ -112,5 +119,7 @@
 
     <string name="no_posts">No posts loaded</string>
     <string name="tag_banner">banner</string>
+
+    <string name="change_layout">change layout</string>
 
 </resources>

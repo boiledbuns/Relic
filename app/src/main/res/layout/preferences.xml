@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
         android:background="?attr/colorPrimary"
-        app:title="@string/preference_theme"
+        app:title="@string/preferences"
         app:navigationIcon="?attr/homeAsUpIndicator"
         app:titleTextColor="?attr/relicTitleColor"
         app:layout_constraintTop_toTopOf="parent"
@@ -23,6 +23,15 @@
         android:text="@string/preference_theme"
         android:padding="@dimen/padding_l"
         app:layout_constraintTop_toBottomOf="@id/preferencesToolbarView"
+        app:layout_constraintStart_toStartOf="@id/postLayoutOptionView"/>
+
+    <TextView
+        android:id="@+id/postLayoutOptionView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/preference_post_layout"
+        android:padding="@dimen/padding_l"
+        app:layout_constraintTop_toBottomOf="@id/themeOptionView"
         app:layout_constraintStart_toStartOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

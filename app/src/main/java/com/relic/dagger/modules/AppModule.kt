@@ -4,6 +4,7 @@ import android.app.Application
 import com.relic.persistence.ApplicationDB
 import com.relic.persistence.TypeConverters
 import com.relic.data.deserializer.Deserializer
+import com.relic.preference.ViewPreferencesManager
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -32,5 +33,11 @@ class AppModule {
     @Provides
     fun provideJSONParser() : JSONParser{
         return JSONParser()
+    }
+
+    @Singleton
+    @Provides
+    fun provideViewPreferencesManager(app: Application) : ViewPreferencesManager {
+        return ViewPreferencesManager(app)
     }
 }

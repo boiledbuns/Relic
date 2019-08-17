@@ -116,4 +116,7 @@
 
     <dimen name="loading_size">90dp</dimen>
 
+
+    <dimen name="card_radius">4dp</dimen>
+
 </resources>

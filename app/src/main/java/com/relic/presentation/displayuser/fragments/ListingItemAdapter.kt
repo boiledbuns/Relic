@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
+import com.relic.preference.PostViewPreferences
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.commentlist.CommentItemVH
@@ -16,6 +17,7 @@ import com.relic.presentation.displayuser.DisplayUserContract
 import ru.noties.markwon.Markwon
 
 class ListingItemAdapter(
+    private val viewPrefsManager: PostViewPreferences,
     private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
 ) : RecyclerView.Adapter <RecyclerView.ViewHolder> (),
     DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentAdapterDelegate {
@@ -23,6 +25,7 @@ class ListingItemAdapter(
     private lateinit var markwon : Markwon
     private val VIEW_TYPE_POST = 0
     private val VIEW_TYPE_COMMENT = 1
+    private val postLayout = viewPrefsManager.getPostCardStyle()
 
     private var listingItems : List<ListingItem> = ArrayList()
 
@@ -37,7 +40,7 @@ class ListingItemAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_POST -> PostItemVH(RelicPostItemView(parent.context)).apply {
+            VIEW_TYPE_POST -> PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout)).apply {
                 initializeOnClicks(this@ListingItemAdapter)
             }
             // TODO complete the custom comment VH and view for displaying within the tab

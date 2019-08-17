@@ -15,4 +15,6 @@ sealed class PreferenceLink : Parcelable {
     object Appearance : PreferenceLink()
     @Parcelize
     object Theme : PreferenceLink()
+    @Parcelize
+    object PostLayout : PreferenceLink()
 }
