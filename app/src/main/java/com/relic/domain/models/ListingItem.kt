@@ -20,7 +20,7 @@ open class ListingItem {
 
     @Date
     @Json(name = "created_utc")
-    var created: java.util.Date? = null
+    lateinit var created: java.util.Date
 
     var visited: Boolean = false
 

@@ -95,23 +95,16 @@
     <!-- region comment info -->
 
     <TextView
-        android:id="@+id/commentScoreView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/commentAuthorView"
-        tools:text="100"/>
-
-    <TextView
         android:id="@+id/commentAuthorView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
-        app:layout_constraintStart_toEndOf="@id/commentScoreView"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/commentFlairView"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_bias="0"
         tools:text="user_name"/>
 
     <TextView
@@ -119,10 +112,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintStart_toEndOf="@id/commentAuthorView"
-        app:layout_constraintEnd_toStartOf="@id/commentCreatedView"
         app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintStart_toEndOf="@id/commentAuthorView"
+        app:layout_constraintEnd_toStartOf="@id/commentScoreView"
         tools:text="flair_boi"/>
+
+    <TextView
+        android:id="@+id/commentScoreView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/displaypost_paddingside"
+        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintStart_toEndOf="@id/commentFlairView"
+        app:layout_constraintEnd_toStartOf="@id/commentCreatedView"
+        tools:text="100"/>
 
     <TextView
         android:id="@+id/commentCreatedView"
@@ -130,7 +133,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
-        app:layout_constraintStart_toEndOf="@id/commentFlairView"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="24 hours ago"/>
 

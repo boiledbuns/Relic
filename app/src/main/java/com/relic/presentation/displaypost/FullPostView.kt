@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaType
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
@@ -34,7 +35,7 @@ class FullPostView @JvmOverloads constructor(
 
         postModel.apply {
             postTitleView.text = title
-            postAuthorView.text = resources.getString(R.string.user_and_time, author, created)
+            postAuthorView.text = resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created))
 
             if (nsfw) nsfwTag.visibility = View.VISIBLE
 

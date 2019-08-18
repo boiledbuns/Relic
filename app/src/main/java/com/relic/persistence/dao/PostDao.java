@@ -34,7 +34,7 @@ public abstract class PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPost(PostModel post);
 
-    @Query("UPDATE PostModel SET userUpvoted = :vote  where fullName = :postFullname")
+    @Query("UPDATE PostModel SET score = score + :vote - userUpvoted, userUpvoted = :vote  where fullName = :postFullname")
     public abstract void updateVote(String postFullname, int vote);
 
     @Query("UPDATE PostModel SET saved = :saved  where fullName = :postFullname")

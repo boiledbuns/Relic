@@ -193,12 +193,12 @@
         android:layout_marginTop="@dimen/padding_m"
         app:layout_constraintTop_toBottomOf="@id/contentBarrier"
         app:layout_constraintStart_toEndOf="@id/postItemCommentView"
-        app:layout_constraintEnd_toStartOf="@id/savedPostIconView"
+        app:layout_constraintEnd_toStartOf="@id/postItemSaveView"
         tools:visibility="visible"
         tools:text="123"/>
 
     <ImageView
-        android:id="@+id/savedPostIconView"
+        android:id="@+id/postItemSaveView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
         android:src="@drawable/ic_save"

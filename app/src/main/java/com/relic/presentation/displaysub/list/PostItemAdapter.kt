@@ -21,6 +21,8 @@ class PostItemAdapter (
 
     override fun getItemCount() = postList.size
 
+    override fun getItemId(position: Int): Long = postList[position].id.hashCode().toLong()
+
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
         markwon = Markwon.create(parent.context)
         val postItemView = RelicPostItemView(parent.context, postLayout = postLayout)
@@ -59,7 +61,7 @@ class PostItemAdapter (
             // update the view and local model to reflect onclick
             it.visited = true
         }
-        notifyItemChanged(itemPosition)
+        notifyDataSetChanged()
     }
 
     // initialize onclick for the upvote button
@@ -69,10 +71,11 @@ class PostItemAdapter (
             val newStatus = if (it.userUpvoted <= 0) 1 else 0
 
             // optimistic, update copy cached in adapter and make request to api to update in server
+            it.score = it.score + newStatus - it.userUpvoted
             it.userUpvoted = newStatus
             postAdapterDelegate.voteOnPost(it.fullName, newStatus)
         }
-        if (notify) notifyItemChanged(itemPosition)
+        if (notify) notifyDataSetChanged()
     }
 
     // initialize onclick for the downvote button
@@ -82,10 +85,11 @@ class PostItemAdapter (
             val newStatus = if (it.userUpvoted >= 0) -1 else 0
 
             // optimistic, update copy cached in adapter and make request to api to update in server
+            it.score = it.score + newStatus - it.userUpvoted
             it.userUpvoted = newStatus
             postAdapterDelegate.voteOnPost(it.fullName, newStatus)
         }
-        if (notify) notifyItemChanged(itemPosition)
+        if (notify) notifyDataSetChanged()
     }
 
     override fun onPostSavePressed (itemPosition : Int) {
@@ -97,7 +101,8 @@ class PostItemAdapter (
             // update the view and local model to reflect onclick
             it.saved = newStatus
         }
-        notifyItemChanged(itemPosition)
+
+        notifyDataSetChanged()
     }
 
     override fun onPostLinkPressed (itemPosition : Int) {

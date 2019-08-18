@@ -59,7 +59,6 @@ class FrontpageFragment : RelicFragment() {
         postAdapter = PostItemAdapter(viewPrefsManager, frontpageVM)
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
-            itemAnimator = null
             layoutManager = LinearLayoutManager(context)
             adapter = postAdapter
         }

@@ -1,6 +1,7 @@
 package com.relic.presentation.customview
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.text.Html
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -55,17 +56,15 @@ class RelicPostItemView @JvmOverloads constructor(
 
     fun setPost(postModel : PostModel) {
         postItemRootView?.apply {
-            if (postModel.visited) {
-                setBackgroundColor(backgroundVisitedColor)
-            } else {
-                setBackgroundColor(backgroundColor)
-            }
+            val backgroundColor = if (postModel.visited) backgroundVisitedColor else backgroundColor
+            setBackgroundColor(backgroundColor)
 
-            if (postModel.stickied) {
-                titleView.setTextColor(stickiedColor)
-            } else {
-                titleView.setTextColor(textColor)
-            }
+            val titleColor = if (postModel.stickied) stickiedColor else textColor
+            titleView.setTextColor(titleColor)
+
+            // TODO convert all icons to use style colors
+            val saveColor = if (postModel.saved) R.color.upvote else R.color.paleGray
+            postItemSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
 
             if (!postModel.thumbnail.isNullOrBlank()) {
                 val thumbnail = postModel.thumbnail!!

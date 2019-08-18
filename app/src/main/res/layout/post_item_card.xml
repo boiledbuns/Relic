@@ -7,7 +7,7 @@
     app:cardCornerRadius="@dimen/card_radius"
     android:layout_marginStart="@dimen/padding_xs"
     android:layout_marginEnd="@dimen/padding_xs"
-    android:layout_marginTop="@dimen/padding_s">
+    android:layout_marginTop="@dimen/padding_xs">
 
     <include
         layout="@layout/post_item_content"/>

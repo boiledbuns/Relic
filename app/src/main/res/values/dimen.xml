@@ -50,7 +50,7 @@
     <!-- display post -->
     <dimen name="displaypost_bottommargin">12dp</dimen>
     <dimen name="displaypost_paddingtop">6dp</dimen>
-    <dimen name="displaypost_paddingside">6dp</dimen>
+    <dimen name="displaypost_paddingside">4dp</dimen>
     <dimen name="displaypost_title_icon_padding">3dp</dimen>
     <dimen name="displaypost_title_size">18sp</dimen>
     <dimen name="displaypost_title_margin">8dp</dimen>

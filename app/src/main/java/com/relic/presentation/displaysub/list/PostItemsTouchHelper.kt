@@ -8,8 +8,10 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import com.relic.R
 import com.relic.presentation.displaysub.DisplaySubFragment
+import timber.log.Timber
 import kotlin.math.roundToInt
 
+// TODO add custom lengths for swipe and release actions - currently any length will trigger
 class PostItemsTouchHelper(
     private val fragment: DisplaySubFragment,
     private val context : Context
@@ -65,7 +67,7 @@ class PostItemsTouchHelper(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        Log.d("touch helper", dX.toString())
+        Timber.d("touch helper %s", dX.toString())
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
                 viewHolder.itemView.translationX = dX.times(translationScale).toFloat()
@@ -84,10 +86,10 @@ class PostItemsTouchHelper(
                     if (dX == 0F) {
                         // from right swipe to release
                         if (previousXTranslation > 0F) {
-                            Log.d("touch helper right", dX.toString())
+                            Timber.d("touch helper right %s", dX.toString())
                             fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.RIGHT)
                         } else if (previousXTranslation < 0F){
-                            Log.d("touch helper left", dX.toString())
+                            Timber.d("touch helper left %s", dX.toString())
                             fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.LEFT)
                         }
                     }

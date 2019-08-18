@@ -15,7 +15,7 @@ class PostItemVH (
     fun initializeOnClicks(adapter : DisplaySubContract.PostItemAdapterDelegate) {
         itemView.apply {
             setOnClickListener { adapter.onPostPressed(adapterPosition) }
-            savedPostIconView.setOnClickListener { adapter.onPostSavePressed(adapterPosition) }
+            postItemSaveView.setOnClickListener { adapter.onPostSavePressed(adapterPosition) }
             postItemUpvoteView.setOnClickListener { adapter.onPostUpvotePressed(adapterPosition) }
             postItemDownvoteView.setOnClickListener { adapter.onPostDownvotePressed(adapterPosition) }
             postItemThumbnailView.setOnClickListener { adapter.onPostLinkPressed(adapterPosition) }
