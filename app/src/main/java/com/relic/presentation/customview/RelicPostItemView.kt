@@ -10,8 +10,10 @@ import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.preference.POST_LAYOUT_CARD
+import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
+import kotlinx.android.synthetic.main.post_tags.view.*
 import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
@@ -20,8 +22,6 @@ class RelicPostItemView @JvmOverloads constructor(
         defStyleAttr : Int = 0,
         postLayout : Int
 ) : RelativeLayout(context, attrs, defStyleAttr) {
-
-    private val TAG = "POST_ITEM_VIEW"
     // TODO need to think about increasing min api level from 21
     // TODO set color based on theme, still trying to figure out the best way to do this
     private val textColor: Int
@@ -71,15 +71,15 @@ class RelicPostItemView @JvmOverloads constructor(
                 val thumbnail = postModel.thumbnail!!
                 postItemThumbnailView.visibility = View.VISIBLE
                 setThumbnail(thumbnail)
-                postItemLinkDomain.visibility = View.VISIBLE
-                postItemLinkDomain.text = postModel.domain
+                domainTag.visibility = View.VISIBLE
+                domainTag.text = postModel.domain
             } else {
                 postItemThumbnailView.visibility = View.GONE
-                postItemLinkDomain.visibility = View.GONE
+                domainTag.visibility = View.GONE
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
-            postDateView.text = postModel.created.toString()
+            postModel.created?.let { postDateView.text = DateHelper.getDateDifferenceString(it) }
             titleView.text = postModel.title
             postItemAuthorView.text = resources.getString(R.string.user_prefix_label, postModel.author)
             setPostTags(postModel)
@@ -129,9 +129,9 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setPostTags(postModel: PostModel) {
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        postItemNSFWView.visibility = if (postModel.nsfw) View.VISIBLE else View.GONE
+        nsfwTag.visibility = if (postModel.nsfw) View.VISIBLE else View.GONE
 
-        postItemTagView.apply {
+        postTag.apply {
             if (postModel.linkFlair != null) {
                 text = postModel.linkFlair
                 // TODO replace with themes when adding proper theming

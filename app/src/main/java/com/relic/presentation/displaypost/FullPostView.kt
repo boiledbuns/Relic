@@ -10,6 +10,7 @@ import com.relic.domain.models.PostModel
 import com.relic.presentation.util.MediaType
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
+import kotlinx.android.synthetic.main.post_tags.view.*
 import ru.noties.markwon.Markwon
 
 class FullPostView @JvmOverloads constructor(
@@ -35,13 +36,13 @@ class FullPostView @JvmOverloads constructor(
             postTitleView.text = title
             postAuthorView.text = resources.getString(R.string.user_and_time, author, created)
 
-            if (nsfw) postNSFWView.visibility = View.VISIBLE
+            if (nsfw) nsfwTag.visibility = View.VISIBLE
 
-            postTagView.text = linkFlair
-            if (!linkFlair.isNullOrEmpty()) postTagView.visibility = View.VISIBLE
+            postTag.text = linkFlair
+            if (!linkFlair.isNullOrEmpty()) postTag.visibility = View.VISIBLE
 
-            postAuthorFlairView.text = authorFlair
-            if (!authorFlair.isNullOrEmpty()) postAuthorFlairView.visibility = View.VISIBLE
+            authorFlairTag.text = authorFlair
+            if (!authorFlair.isNullOrEmpty()) authorFlairTag.visibility = View.VISIBLE
 
             if (!selftext.isNullOrEmpty()) {
                 val selfText = selftext!!

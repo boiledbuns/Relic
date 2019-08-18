@@ -38,7 +38,8 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/postTitleView"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="u/test_author"/>
+            tools:text="u/test_author"
+            tools:visibility="visible"/>
 
         <TextView
             android:id="@+id/postTitleView"
@@ -51,7 +52,8 @@
             app:layout_constraintTop_toBottomOf="@id/postAuthorView"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="Post Title"/>
+            tools:text="Post Title"
+            tools:visibility="visible"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/postTitleBarrier"
@@ -60,79 +62,33 @@
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="postTitleView"/>
 
-        <!-- TODO add style for tags to avoid repetition -->
-        <TextView
-            android:id="@+id/postNSFWView"
-            android:layout_width="wrap_content"
+        <include
+            android:id="@+id/postTags"
+            layout="@layout/post_tags"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_s"
-            android:layout_marginEnd="@dimen/padding_s"
-            android:background="@drawable/tag"
-            android:backgroundTint="@color/warning"
-            android:text="@string/nsfw"
-            android:textSize="@dimen/text_m2"
-            android:textColor="@color/negative_text"
-            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/postTitleBarrier"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/postTagView"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintHorizontal_bias="0"
-            tools:visibility="visible"/>
-
-        <TextView
-            android:id="@+id/postTagView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_s"
-            android:layout_marginEnd="@dimen/padding_s"
-            android:background="@drawable/tag"
-            android:backgroundTint="@color/positive"
-            android:textSize="@dimen/text_m2"
-            android:textColor="@color/negative_text"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/postTitleView"
-            app:layout_constraintStart_toEndOf="@id/postNSFWView"
-            app:layout_constraintEnd_toStartOf="@id/postAuthorFlairView"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            tools:text="tag"
-            tools:visibility="visible"/>
-
-        <TextView
-            android:id="@+id/postAuthorFlairView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_s"
-            android:background="@drawable/tag"
-            android:backgroundTint="@color/positive"
-            android:textSize="@dimen/text_m2"
-            android:textColor="@color/negative_text"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/postTitleView"
-            app:layout_constraintStart_toEndOf="@id/postTagView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            tools:text="author flair"
-            tools:visibility="visible"/>
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <android.support.constraint.Barrier
             android:id="@+id/postTagsBottomBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_m"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="postTitleView, postNSFWView, postTagView, postAuthorFlairView"/>
+            app:constraint_referenced_ids="postTags"/>
 
         <!-- card link displayed if the post is a link to another site -->
         <android.support.v7.widget.CardView
             android:id="@+id/postLinkCard"
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_thumbnail_size"
-            android:layout_marginTop="@dimen/padding_s"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_goneMarginBottom="@dimen/padding_m"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/postTagsBottomBarrier"
-            tools:visibility="visible"
-            app:cardBackgroundColor="?attr/relicBackgroundColor">
+            app:cardBackgroundColor="?attr/relicBackgroundColor"
+            tools:visibility="visible">
 
             <RelativeLayout
                 android:layout_width="match_parent"

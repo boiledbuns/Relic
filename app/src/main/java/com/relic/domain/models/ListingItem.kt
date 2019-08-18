@@ -19,6 +19,7 @@ open class ListingItem {
     var score: Int = 0
 
     @Date
+    @Json(name = "created_utc")
     var created: java.util.Date? = null
 
     var visited: Boolean = false
