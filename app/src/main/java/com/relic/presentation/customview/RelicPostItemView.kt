@@ -78,10 +78,11 @@ class RelicPostItemView @JvmOverloads constructor(
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
-            postModel.created?.let { postDateView.text = DateHelper.getDateDifferenceString(it) }
+            postDateView.text = DateHelper.getDateDifferenceString(postModel.created)
             titleView.text = postModel.title
             postItemAuthorView.text = resources.getString(R.string.user_prefix_label, postModel.author)
-            setPostTags(postModel)
+            postItemTags.setPostTags(postModel)
+            setAuthorFlair(postModel)
 
             if (!postModel.selftext.isNullOrEmpty()) {
                 @Suppress("DEPRECATION")
@@ -118,7 +119,7 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {
-            Timber.d( "URL = $thumbnailUrl")
+            Timber.d("URL = $thumbnailUrl")
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postItemThumbnailView)
             postItemThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
@@ -126,20 +127,7 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    private fun setPostTags(postModel: PostModel) {
-        //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        nsfwTag.visibility = if (postModel.nsfw) View.VISIBLE else View.GONE
-
-        postTag.apply {
-            if (postModel.linkFlair != null) {
-                text = postModel.linkFlair
-                // TODO replace with themes when adding proper theming
-                @Suppress("DEPRECATION")
-                background?.setTint(resources.getColor(R.color.discussion_tag))
-                visibility = View.VISIBLE
-            } else { visibility = View.GONE }
-        }
-
+    private fun setAuthorFlair(postModel: PostModel) {
         postItemAuthorFlairView.apply {
             if (postModel.authorFlair != null) {
                 text = postModel.authorFlair
@@ -150,5 +138,4 @@ class RelicPostItemView @JvmOverloads constructor(
             } else { visibility = View.GONE }
         }
     }
-
 }

@@ -11,7 +11,6 @@ import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaType
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
-import kotlinx.android.synthetic.main.post_tags.view.*
 import ru.noties.markwon.Markwon
 
 class FullPostView @JvmOverloads constructor(
@@ -37,14 +36,6 @@ class FullPostView @JvmOverloads constructor(
             postTitleView.text = title
             postAuthorView.text = resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created))
 
-            if (nsfw) nsfwTag.visibility = View.VISIBLE
-
-            postTag.text = linkFlair
-            if (!linkFlair.isNullOrEmpty()) postTag.visibility = View.VISIBLE
-
-            authorFlairTag.text = authorFlair
-            if (!authorFlair.isNullOrEmpty()) authorFlairTag.visibility = View.VISIBLE
-
             if (!selftext.isNullOrEmpty()) {
                 val selfText = selftext!!
                 markwon.setMarkdown(postSelfText, selfText)
@@ -69,6 +60,8 @@ class FullPostView @JvmOverloads constructor(
             postVoteCountView.text = score.toString()
             postCommentCountView.text = commentCount.toString()
         }
+
+        fullPostTags.setPostTags(postModel)
 
         fullPostRootView.visibility = View.VISIBLE
         initializeOnClicks(delegate)

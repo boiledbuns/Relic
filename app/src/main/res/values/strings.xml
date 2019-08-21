@@ -55,7 +55,7 @@
     <string name="user_prefix_label">u/%s</string>
     <string name="subscriber_count">%d subscribers</string>
     <string name="pinned_subs_count">%d pinned subreddits </string>
-    <string name="user_and_time">u/%s, posted on %s</string>
+    <string name="user_and_time">u/%s - %s</string>
     <string name="reply_count">%d replies</string>
     <string name="comment_score">%d points</string>
 

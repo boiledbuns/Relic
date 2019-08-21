@@ -45,79 +45,88 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="postSubNameView, postDateView"/>
 
-    <LinearLayout
-        android:id="@+id/titleGroupView"
+
+    <TextView
+        android:id="@+id/titleView"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:textSize="@dimen/text_l"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topRowBarrier"
+        app:layout_constraintEnd_toStartOf="@id/thumbnailContainer"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        tools:text="@string/long_placeholder_text"/>
+
+    <TextView
+        android:id="@+id/postItemAuthorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleView"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        tools:text="u/dank_monkey"/>
+
+    <TextView
+        android:id="@+id/postItemAuthorFlairView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_m"
+        app:layout_constraintTop_toBottomOf="@id/titleView"
+        app:layout_constraintStart_toEndOf="@id/postItemAuthorView"
+        tools:text="author flair"/>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/authorFlairBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="postItemAuthorView, postItemAuthorFlairView"/>
+
+    <com.relic.presentation.displaypost.view.PostTagsView
+        android:id="@+id/postItemTags"
+        android:layout_marginTop="@dimen/padding_s"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/topRowBarrier"
-        android:layout_marginBottom="@dimen/padding_m"
-        tools:text="random subreddit">
+        app:layout_constraintTop_toBottomOf="@id/authorFlairBarrier"/>
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+    <android.support.v7.widget.CardView
+        android:id="@+id/thumbnailContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_xs"
+        android:layout_marginStart="@dimen/postitem_selftext_margin"
+        app:cardCornerRadius="2dp"
+        app:layout_constraintStart_toEndOf="@id/titleView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topRowBarrier">
 
-            <TextView
-                android:id="@+id/titleView"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="@dimen/text_l"
-                android:textStyle="bold"
-                tools:text="@string/long_placeholder_text"/>
+        <ImageView
+            android:id="@+id/postItemThumbnailView"
+            android:layout_width="@dimen/postitem_image_width"
+            android:layout_height="@dimen/postitem_image_width"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
-            <TextView
-                android:id="@+id/postItemAuthorView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/titleView"
-                android:layout_marginEnd="@dimen/padding_m"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                tools:text="u/dank_monkey"/>
+    </android.support.v7.widget.CardView>
 
-            <TextView
-                android:id="@+id/postItemAuthorFlairView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/titleView"
-                android:layout_toEndOf="@id/postItemAuthorView"
-                tools:text="author flair"/>
+    <!-- since title could be taller/shorter than preview -->
+    <android.support.constraint.Barrier
+        android:id="@+id/titleGroupBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="postItemTags, thumbnailContainer"/>
 
-            <include
-                layout="@layout/post_tags"
-                android:layout_marginTop="@dimen/padding_s"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postItemAuthorView"/>
-
-        </RelativeLayout>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_xs"
-            android:layout_marginStart="@dimen/postitem_selftext_margin"
-            app:cardCornerRadius="2dp">
-
-            <ImageView
-                android:id="@+id/postItemThumbnailView"
-                android:layout_width="@dimen/postitem_image_width"
-                android:layout_height="@dimen/postitem_image_width"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"/>
-
-        </android.support.v7.widget.CardView>
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/postBodyView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/titleGroupView"
+        app:layout_constraintTop_toBottomOf="@id/titleGroupBarrier"
         android:layout_marginBottom="@dimen/padding_m"
         android:layout_marginTop="@dimen/padding_s"
         android:textSize="@dimen/text_m"
@@ -132,7 +141,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="titleGroupView, postBodyView"/>
+        app:constraint_referenced_ids="titleGroupBarrier, postBodyView"/>
 
     <!-- buttons and options row -->
     <ImageView

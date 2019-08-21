@@ -62,9 +62,8 @@
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="postTitleView"/>
 
-        <include
-            android:id="@+id/postTags"
-            layout="@layout/post_tags"
+        <com.relic.presentation.displaypost.view.PostTagsView
+            android:id="@+id/fullPostTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_s"
@@ -76,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="postTags"/>
+            app:constraint_referenced_ids="fullPostTags"/>
 
         <!-- card link displayed if the post is a link to another site -->
         <android.support.v7.widget.CardView
