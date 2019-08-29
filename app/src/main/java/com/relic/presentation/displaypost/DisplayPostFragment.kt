@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.*
 import com.relic.R
@@ -71,7 +72,9 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_post, container, false)
+        return inflater.inflate(R.layout.display_post, container, false).apply {
+            postCommentRecyclerView.layoutManager = LinearLayoutManager(context)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
