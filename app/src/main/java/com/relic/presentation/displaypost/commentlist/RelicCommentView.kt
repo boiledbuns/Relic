@@ -47,7 +47,7 @@ class RelicCommentView (
         commentScoreView.text = resources.getString(R.string.comment_score, commentModel.score)
         commentFlairView.text = commentModel.authorFlairText
         commentAuthorView.text = commentModel.author
-        commentCreatedView.text = DateHelper.getDateDifferenceString(commentModel.created)
+        commentModel.created?.let { commentCreatedView.text = DateHelper.getDateDifferenceString(it) }
 
         commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
         commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())

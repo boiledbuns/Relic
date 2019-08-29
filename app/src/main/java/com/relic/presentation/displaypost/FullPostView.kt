@@ -34,7 +34,7 @@ class FullPostView @JvmOverloads constructor(
 
         postModel.apply {
             postTitleView.text = title
-            postAuthorView.text = resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created))
+            postAuthorView.text = resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created!!))
 
             if (!selftext.isNullOrEmpty()) {
                 val selfText = selftext!!
