@@ -1,4 +1,4 @@
-package com.relic.presentation.displaypost.commentlist
+package com.relic.presentation.displaypost.list
 
 import android.content.Context
 import android.util.AttributeSet

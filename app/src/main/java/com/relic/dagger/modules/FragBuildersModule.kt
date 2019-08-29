@@ -12,6 +12,7 @@ import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.relic.presentation.login.SignInFragment
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
@@ -66,6 +67,8 @@ abstract class FragBuildersModule {
     @ContributesAndroidInjector
     abstract fun contributeSubSearch() : SubSearchFragment
 
+    @ContributesAndroidInjector
+    abstract fun contributeDisplayMedia() : DisplayImageFragment
     // endregion main ui
 
     @ContributesAndroidInjector

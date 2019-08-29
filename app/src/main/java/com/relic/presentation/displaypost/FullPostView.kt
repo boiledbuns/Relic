@@ -64,6 +64,13 @@ class FullPostView @JvmOverloads constructor(
 
         fullPostRootView.visibility = View.VISIBLE
         loadLinks(postModel)
+
+        // display empty comment list message
+        if (postModel.commentCount == 0) {
+            postNoComments.visibility = View.VISIBLE
+        } else {
+            postNoComments.visibility = View.GONE
+        }
     }
 
     fun setOnClicks(delegate : DisplayPostContract.PostViewDelegate) {

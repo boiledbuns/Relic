@@ -5,6 +5,10 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -33,6 +37,10 @@ class ReplyEditorFragment : RelicFragment() {
             getString(PARENT_ARG)?.let { parent = it } ?: dismiss()
             parentIsPost = getBoolean(IS_POST_ARG)
         } ?: dismiss()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.editor_reply, container, false)
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {

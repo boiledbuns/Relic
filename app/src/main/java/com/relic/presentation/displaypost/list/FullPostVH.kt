@@ -1,4 +1,4 @@
-package com.relic.presentation.displaypost.commentlist
+package com.relic.presentation.displaypost.list
 
 import android.support.v7.widget.RecyclerView
 import com.relic.domain.models.PostModel

@@ -1,10 +1,9 @@
-package com.relic.presentation.displaypost.commentlist
+package com.relic.presentation.displaypost.list
 
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.relic.domain.models.CommentModel
-import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.displaypost.DisplayPostContract
@@ -14,9 +13,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-private const val VIEW_TYPE_COMMENT = 0
-private const val VIEW_TYPE_LOAD_MORE = 1
-private const val VIEW_TYPE_POST = 2
+private const val VIEW_TYPE_POST = 0
+private const val VIEW_TYPE_COMMENT = 1
+private const val VIEW_TYPE_LOAD_MORE = 2
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
@@ -27,7 +26,7 @@ class CommentItemAdapter (
 
     private val TAG = "COMMENT_ADAPTER"
 
-    private fun postSize()= if (post != null) 1 else 0
+    private fun postSize() = if (post != null) 1 else 0
     override fun getItemCount(): Int = commentList.size + postSize()
 
     // helps us translate position in recyclerview to position in comment list because the actual
@@ -74,16 +73,15 @@ class CommentItemAdapter (
     fun setPost(postModel: PostModel) {
         if (post == null) {
             post = postModel
-            notifyItemInserted(0)
+            notifyDataSetChanged()
         } else {
             post = postModel
-            notifyItemChanged(0)
+            notifyDataSetChanged()
         }
     }
 
     fun setComments(newComments: List<CommentModel>, onPostsCalculated : () -> Unit) {
         launch {
-
             val diffResult = calculateCommentDiffs(newComments)
             withContext(Dispatchers.Main) {
                 onPostsCalculated()
@@ -152,7 +150,7 @@ class CommentItemAdapter (
 
             // optimistic, update copy cached in adapter and make request to api to update in server
             it.userUpvoted = newStatus
-            notifyItemChanged(commentPosition)
+            notifyDataSetChanged()
         }
     }
 

@@ -9,8 +9,8 @@ import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaypost.commentlist.CommentItemVH
-import com.relic.presentation.displaypost.commentlist.RelicCommentView
+import com.relic.presentation.displaypost.list.CommentItemVH
+import com.relic.presentation.displaypost.list.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.list.PostItemVH
 import com.relic.presentation.displayuser.DisplayUserContract

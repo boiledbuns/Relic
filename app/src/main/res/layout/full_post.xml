@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:visibility="gone"
-    tools:visibility="visible">
+    tools:visibility="visible"
+    android:orientation="vertical"
+    android:layout_marginBottom="@dimen/displaypost_bottommargin">
 
     <!-- image displayed if the post is an image link -->
     <ImageView
@@ -26,8 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_m"
-        android:background="?attr/colorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/postImageView">
+        android:background="?attr/colorPrimary">
 
         <TextView
             android:id="@+id/postAuthorView"
@@ -190,4 +191,16 @@
 
     </android.support.constraint.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/postNoComments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_comments"
+        android:visibility="gone"
+        android:textSize="@dimen/title_text_m"
+        android:layout_marginTop="@dimen/padding_xl"
+        android:layout_gravity="center"
+        tools:text="@string/no_comments"
+        tools:visibility="visible"/>
+
+</LinearLayout>

@@ -17,7 +17,7 @@ import com.relic.data.PostSource
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
+import com.relic.presentation.displaypost.list.CommentItemAdapter
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
@@ -27,7 +27,6 @@ import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
-import kotlinx.android.synthetic.main.full_post.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -129,13 +128,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     }
 
     private fun displayComments(commentList : List<CommentModel>) {
-        // display empty comment list message
-        if (commentList.isEmpty()) {
-            postNoComments.visibility = View.VISIBLE
-        } else {
-            postNoComments.visibility = View.GONE
-        }
-
         // notify the adapter and set the new list
         commentAdapter.setComments(commentList) {
             displayPostSwipeRefresh.isRefreshing = false

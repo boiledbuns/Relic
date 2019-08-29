@@ -1,7 +1,6 @@
-package com.relic.presentation.displaypost.commentlist
+package com.relic.presentation.displaypost.list
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
