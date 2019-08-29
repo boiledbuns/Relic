@@ -50,7 +50,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <com.relic.presentation.displaysubs.DisplayPinnedSubsView
+                    <com.relic.presentation.displaysubs.pinned.DisplayPinnedSubsView
                         android:id="@+id/pinnedSubsView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>

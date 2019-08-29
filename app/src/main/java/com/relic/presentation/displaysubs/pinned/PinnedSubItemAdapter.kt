@@ -1,4 +1,4 @@
-package com.relic.presentation.adapter
+package com.relic.presentation.displaysubs.pinned
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -21,7 +21,7 @@ class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSu
 
     var pinnedSubs : List <SubredditModel> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, position: Int): PinnedSubItemAdapter.PinnedSubVH {
+    override fun onCreateViewHolder(parent: ViewGroup, position: Int): PinnedSubVH {
         val viewHolder = PinnedSubVH(LayoutInflater
                 .from(parent.context)
                 .inflate(R.layout.pinned_sub_item, parent, false))

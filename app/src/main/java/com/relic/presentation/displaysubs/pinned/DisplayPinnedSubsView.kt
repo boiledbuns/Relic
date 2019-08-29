@@ -1,4 +1,4 @@
-package com.relic.presentation.displaysubs
+package com.relic.presentation.displaysubs.pinned
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.SubredditModel
-import com.relic.presentation.adapter.PinnedSubItemAdapter
 import kotlinx.android.synthetic.main.display_pinned_subs.view.*
 
 class DisplayPinnedSubsView @JvmOverloads constructor(

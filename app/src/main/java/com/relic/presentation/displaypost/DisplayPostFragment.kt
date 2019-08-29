@@ -23,7 +23,6 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.util.MediaHelper.determineType
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -32,7 +31,6 @@ import kotlinx.android.synthetic.main.full_post.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
@@ -72,9 +70,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_post, container, false).apply {
-            postCommentRecyclerView.layoutManager = LinearLayoutManager(context)
-        }
+        return inflater.inflate(R.layout.display_post, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -87,6 +83,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         initializeToolbar()
 
         postCommentRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
             commentAdapter = CommentItemAdapter(displayPostVM)
             adapter = commentAdapter
         }
@@ -127,24 +124,23 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     // region live data handlers
 
     private fun displayPost (postModel : PostModel) {
-        fullPostView.setPost(postModel, determineType(postModel), displayPostVM)
-        postAuthorView.setOnClickListener { displayPostVM.onUserPressed(postModel) }
+        commentAdapter.setPost(postModel)
+//        postAuthorView.setOnClickListener { displayPostVM.onUserPressed(postModel) }
     }
 
     private fun displayComments(commentList : List<CommentModel>) {
-        launch(Dispatchers.Main) {
-            // notify the adapter and set the new list
-            commentAdapter.setComments(commentList) {
-//                displayPostSwipeRefresh.isRefreshing = false
-            }
-            // display empty comment list message
-            if (commentList.isEmpty()) {
-                postNoComments.visibility = View.VISIBLE
-            } else {
-                postNoComments.visibility = View.GONE
-            }
+        // display empty comment list message
+        if (commentList.isEmpty()) {
+            postNoComments.visibility = View.VISIBLE
+        } else {
+            postNoComments.visibility = View.GONE
+        }
+
+        // notify the adapter and set the new list
+        commentAdapter.setComments(commentList) {
             displayPostSwipeRefresh.isRefreshing = false
         }
+//        displayPostSwipeRefresh.isRefreshing = false
     }
 
     private fun handleNavigation(navigationData : PostNavigationData) {

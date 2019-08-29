@@ -1,4 +1,4 @@
-package com.relic.presentation.adapter;
+package com.relic.presentation.displaysubs.subslist;
 
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import com.relic.R;
 import com.relic.domain.models.SubredditModel;
 import com.relic.databinding.SubItemBinding;
+import com.relic.presentation.adapter.SubItemOnClick;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,7 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
     this.onClick = onClick;
   }
 
-  /**
-   * Viewholder to cache data
-   */
+  // TODO extract to external class once we decide design for sub items
   class SubItemVH extends RecyclerView.ViewHolder {
     final SubItemBinding binding;
 
@@ -68,37 +67,32 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
    * @param newSubs list of all posts
    */
   public void setList(List<SubredditModel> newSubs) {
-    // set the entire list if the current list is null
-    if (subList.size() == 0) {
-      this.subList = newSubs;
-      notifyDataSetChanged();
-    }
-    else {
-      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-        @Override
-        public int getOldListSize() {
-          return subList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-          return newSubs.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-          return (subList.get(oldItemPosition).getId().equals(newSubs.get(newItemPosition).getId()));
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-          return true;
-        }
-      });
-
+      calculateDiff(newSubs).dispatchUpdatesTo(this);
       subList = newSubs;
-      diffResult.dispatchUpdatesTo(this);
-    }
+  }
+
+  private DiffUtil.DiffResult calculateDiff(List<SubredditModel>  newSubs) {
+    return DiffUtil.calculateDiff(new DiffUtil.Callback() {
+      @Override
+      public int getOldListSize() {
+        return subList.size();
+      }
+
+      @Override
+      public int getNewListSize() {
+        return newSubs.size();
+      }
+
+      @Override
+      public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        return (subList.get(oldItemPosition).getId().equals(newSubs.get(newItemPosition).getId()));
+      }
+
+      @Override
+      public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        return true;
+      }
+    });
   }
 
   @BindingAdapter({"bind:bannerUrl"})

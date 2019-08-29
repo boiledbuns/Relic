@@ -18,6 +18,8 @@ open class ListingItem {
     var author: String = ""
     var score: Int = 0
 
+    // it is possible for comments to not have created times
+    // posts will ALWAYS have non-null created times
     @Date
     @Json(name = "created_utc")
     var created: java.util.Date? = null

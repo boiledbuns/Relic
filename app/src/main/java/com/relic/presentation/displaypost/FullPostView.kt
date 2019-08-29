@@ -28,8 +28,7 @@ class FullPostView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
-    fun setPost(postModel : PostModel, displayType : MediaType?, delegate : DisplayPostContract.PostViewDelegate) {
-        viewDelegate = delegate
+    fun setPost(postModel : PostModel, displayType : MediaType?) {
         postDisplayType = displayType
 
         postModel.apply {
@@ -64,8 +63,12 @@ class FullPostView @JvmOverloads constructor(
         fullPostTags.setPostTags(postModel)
 
         fullPostRootView.visibility = View.VISIBLE
-        initializeOnClicks(delegate)
         loadLinks(postModel)
+    }
+
+    fun setOnClicks(delegate : DisplayPostContract.PostViewDelegate) {
+        viewDelegate = delegate
+        initializeOnClicks(delegate)
     }
 
     private fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {

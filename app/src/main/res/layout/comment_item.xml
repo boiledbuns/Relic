@@ -109,7 +109,7 @@
 
     <TextView
         android:id="@+id/commentFlairView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
         app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"

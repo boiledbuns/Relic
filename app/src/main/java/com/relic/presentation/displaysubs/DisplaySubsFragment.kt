@@ -23,7 +23,7 @@ import com.relic.databinding.DisplaySubsBinding
 import com.relic.network.NetworkUtil
 import com.relic.presentation.adapter.SearchItemAdapter
 import com.relic.presentation.adapter.SearchSubItemOnClick
-import com.relic.presentation.adapter.SubItemAdapter
+import com.relic.presentation.displaysubs.subslist.SubItemAdapter
 import com.relic.presentation.adapter.SubItemOnClick
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
@@ -32,7 +32,6 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
-import kotlinx.android.synthetic.main.display_subs.*
 
 import java.util.ArrayList
 import javax.inject.Inject

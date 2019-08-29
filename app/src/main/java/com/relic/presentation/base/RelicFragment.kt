@@ -6,11 +6,11 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.relic.R
 import com.relic.dagger.RelicInjectable
+import timber.log.Timber
 
 open class RelicFragment: Fragment(), RelicInjectable {
     protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
@@ -21,7 +21,7 @@ open class RelicFragment: Fragment(), RelicInjectable {
     }
 
     protected fun log(message : String) {
-        Log.d(TAG, message)
+        Timber.d(TAG, message)
     }
 
     protected fun dismiss() {
