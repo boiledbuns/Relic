@@ -15,8 +15,10 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
+import android.widget.TextView
 import com.relic.R
 import com.relic.data.PostSource
+import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
@@ -29,9 +31,12 @@ import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
+import kotlinx.android.synthetic.main.tabtitle_comment.*
+import kotlinx.android.synthetic.main.tabtitle_comment.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import timber.log.Timber
 import javax.inject.Inject
 
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
@@ -54,6 +59,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     private var enableVisitSub = false
 
     private lateinit var pagerAdapter : DisplayPostPagerAdapter
+    private lateinit var tabTitleView : View
     private var previousError : PostErrorData? = null
 
     // region lifecycle hooks
@@ -91,11 +97,14 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         displayPostViewPager.apply {
             adapter = pagerAdapter
             displayPostTabLayout.setupWithViewPager(this)
-            setupCustomTabs()
         }
 
-        displayPostSwipeRefresh.isRefreshing = true
-        attachViewListeners()
+        // use a custom view for the comment tab title
+        val commentTabPos = 1
+        displayPostTabLayout.getTabAt(commentTabPos)?.apply {
+            tabTitleView = LayoutInflater.from(context).inflate(R.layout.tabtitle_comment, null)
+            customView = tabTitleView
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -122,6 +131,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         displayPostVM.apply {
             postNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             errorLiveData.observe(lifecycleOwner) { handleError(it) }
+            postLiveData.nonNull().observe(lifecycleOwner) { handlePost(it) }
         }
     }
 
@@ -146,8 +156,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     private fun handleError(error : PostErrorData?) {
         if (previousError != error) {
-            displayPostSwipeRefresh.isRefreshing = false
-
             // default details for unhandled exceptions to be displayed
             var snackbarMessage = resources.getString(R.string.unknown_error)
             var displayLength = Snackbar.LENGTH_SHORT
@@ -172,6 +180,10 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
+    private fun handlePost(post : PostModel) {
+        tabTitleCommentCount.text = post.commentCount.toString()
+    }
+
     // endregion live data handlers
 
     private fun initializeToolbar() {
@@ -190,18 +202,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
                 val subFragment = DisplaySubFragment.create(subredditName)
                 activity!!.supportFragmentManager.beginTransaction()
                     .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
-            }
-        }
-    }
-
-    /**
-     * Attaches custom scroll listeners to allow more comments to be retrieved when the recycler
-     * view is scrolled all the way to the bottom
-     */
-    private fun attachViewListeners() {
-        displayPostSwipeRefresh.apply {
-            setOnRefreshListener {
-                displayPostVM.refreshData()
             }
         }
     }
@@ -228,18 +228,8 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
                 .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
     }
 
-    private fun setupCustomTabs() {
-        for (tabPos in 0 until displayPostTabLayout.tabCount) {
-            displayPostTabLayout.getTabAt(tabPos)?.apply {
-                val tabTitleView = LayoutInflater.from(context).inflate(R.layout.tabtitle_comment, null) as Chip
-                tabTitleView.text = pagerAdapter.tabFragmentTitles.get(tabPos)
-                customView = tabTitleView
-            }
-        }
-    }
-
     fun onPostDataLoaded() {
-        displayPostSwipeRefresh.isRefreshing = false
+//        displayPostSwipeRefresh.isRefreshing = false
     }
 
     companion object {

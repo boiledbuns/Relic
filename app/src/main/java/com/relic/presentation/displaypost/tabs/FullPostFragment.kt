@@ -22,11 +22,24 @@ class FullPostFragment : RelicFragment() {
         return inflater.inflate(R.layout.tab_fullpost, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        postTabSwipeRefresh.apply{
+            isRefreshing = true
+
+            setOnRefreshListener {
+                fullPostVM.refreshData()
+            }
+        }
+    }
+
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         super.bindViewModel(lifecycleOwner)
 
         fullPostVM.postLiveData.nonNull().observe(lifecycleOwner) {
             fullPostView.setPost(it)
+            postTabSwipeRefresh.isRefreshing = false
         }
 
         fullPostView.setOnClicks(fullPostVM)

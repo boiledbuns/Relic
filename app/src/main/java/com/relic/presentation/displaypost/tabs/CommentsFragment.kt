@@ -36,6 +36,13 @@ class CommentsFragment : RelicFragment() {
             commentAdapter = CommentItemAdapter(commentsVM)
             adapter = commentAdapter
         }
+
+        commentsTabSwipeRefresh.apply {
+            isRefreshing = true
+            setOnRefreshListener {
+                commentsVM.refreshData()
+            }
+        }
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -45,6 +52,8 @@ class CommentsFragment : RelicFragment() {
             commentAdapter.setComments(it) {
                 (parentFragment as DisplayPostFragment).onPostDataLoaded()
             }
+
+            commentsTabSwipeRefresh.isRefreshing = false
         }
     }
 }
