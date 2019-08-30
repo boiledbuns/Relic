@@ -2,7 +2,6 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/displayPostRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,13 +12,23 @@
         android:layout_height="wrap_content">
 
         <include layout="@layout/relic_toolbar"
-             android:id="@+id/displayPostToolbar"
-             android:layout_width="match_parent"
-             android:layout_height="@dimen/toolbar_height"
-             android:elevation="8dp"
-             app:layout_collapseMode="pin"/>
+            android:id="@+id/displayPostToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:elevation="8dp"
+            app:layout_collapseMode="pin"/>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/displayPostTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="fixed"
+            app:tabGravity="center"
+            app:tabSelectedTextColor="?attr/relicTitleColor"
+            app:tabTextColor="?android:textColor"/>
 
     </android.support.design.widget.AppBarLayout>
+
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/displayPostSwipeRefresh"
@@ -27,12 +36,11 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/postCommentRecyclerView"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/displayPostViewPager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingBottom="@dimen/comment_list_padding_bottom"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

@@ -11,7 +11,7 @@ class FullPostVH(
 ) : RecyclerView.ViewHolder(fullPost) {
 
     fun bindPost(post : PostModel) {
-        fullPost.setPost(post, MediaHelper.determineType(post))
+        fullPost.setPost(post)
     }
 
     fun initializeOnClicks(delegate : DisplayPostContract.PostViewDelegate) {

@@ -1,6 +1,8 @@
 package com.relic.dagger.modules
 
 import com.relic.presentation.displaypost.DisplayPostFragment
+import com.relic.presentation.displaypost.tabs.CommentsFragment
+import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.SubSearchFragment
 import com.relic.presentation.displaysubs.DisplaySubsFragment
@@ -45,6 +47,12 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributePost() : DisplayPostFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributesTabCommentsFragment() : CommentsFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributesTabFullPostFragment() : FullPostFragment
 
     @ContributesAndroidInjector
     abstract fun contributeUser() : DisplayUserFragment

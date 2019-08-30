@@ -31,7 +31,7 @@ class CommentItemAdapter (
 
     // helps us translate position in recyclerview to position in comment list because the actual
     // post and its comments are separate entities
-    private fun getCommentPosition(adapterPosition : Int) : Int = adapterPosition - 1
+    private fun getCommentPosition(adapterPosition : Int) : Int = adapterPosition - postSize()
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {

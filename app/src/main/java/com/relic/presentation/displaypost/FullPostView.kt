@@ -8,6 +8,7 @@ import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.presentation.helper.DateHelper
+import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
@@ -28,8 +29,8 @@ class FullPostView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
-    fun setPost(postModel : PostModel, displayType : MediaType?) {
-        postDisplayType = displayType
+    fun setPost(postModel : PostModel) {
+        postDisplayType = MediaHelper.determineType(postModel)
 
         postModel.apply {
             postTitleView.text = title

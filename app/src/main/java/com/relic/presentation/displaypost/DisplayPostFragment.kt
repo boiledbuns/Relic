@@ -7,17 +7,19 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.chip.Chip
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
 import android.view.*
 import com.relic.R
 import com.relic.data.PostSource
-import com.relic.domain.models.CommentModel
-import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.list.CommentItemAdapter
+import com.relic.presentation.displaypost.tabs.CommentsFragment
+import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
@@ -51,7 +53,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     private lateinit var postSource: PostSource
     private var enableVisitSub = false
 
-    private lateinit var commentAdapter: CommentItemAdapter
+    private lateinit var pagerAdapter : DisplayPostPagerAdapter
     private var previousError : PostErrorData? = null
 
     // region lifecycle hooks
@@ -65,6 +67,11 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             getString(ARG_SUB_NAME)?.let { subredditName = it }
             getParcelable<PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
+        }
+
+        pagerAdapter = DisplayPostPagerAdapter(childFragmentManager).apply {
+            tabFragments.add(FullPostFragment())
+            tabFragments.add(CommentsFragment())
         }
     }
 
@@ -81,10 +88,10 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
         initializeToolbar()
 
-        postCommentRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            commentAdapter = CommentItemAdapter(displayPostVM)
-            adapter = commentAdapter
+        displayPostViewPager.apply {
+            adapter = pagerAdapter
+            displayPostTabLayout.setupWithViewPager(this)
+            setupCustomTabs()
         }
 
         displayPostSwipeRefresh.isRefreshing = true
@@ -113,27 +120,12 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayPostVM.apply {
-            postLiveData.nonNull().observe(lifecycleOwner) { displayPost(it) }
-            commentListLiveData.nonNull().observe(lifecycleOwner) { displayComments(it) }
             postNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             errorLiveData.observe(lifecycleOwner) { handleError(it) }
         }
     }
 
     // region live data handlers
-
-    private fun displayPost (postModel : PostModel) {
-        commentAdapter.setPost(postModel)
-//        postAuthorView.setOnClickListener { displayPostVM.onUserPressed(postModel) }
-    }
-
-    private fun displayComments(commentList : List<CommentModel>) {
-        // notify the adapter and set the new list
-        commentAdapter.setComments(commentList) {
-            displayPostSwipeRefresh.isRefreshing = false
-        }
-//        displayPostSwipeRefresh.isRefreshing = false
-    }
 
     private fun handleNavigation(navigationData : PostNavigationData) {
         when (navigationData) {
@@ -207,18 +199,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
      * view is scrolled all the way to the bottom
      */
     private fun attachViewListeners() {
-//        postCommentRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//
-//                // if recycler view reaches bottom
-//                if (!recyclerView.canScrollVertically(1)) {
-//                    Log.d(TAG, "Bottom reached")
-//                    displayPostVM.retrieveMoreComments(false)
-//                }
-//            }
-//        })
-
         displayPostSwipeRefresh.apply {
             setOnRefreshListener {
                 displayPostVM.refreshData()
@@ -248,6 +228,20 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
                 .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
     }
 
+    private fun setupCustomTabs() {
+        for (tabPos in 0 until displayPostTabLayout.tabCount) {
+            displayPostTabLayout.getTabAt(tabPos)?.apply {
+                val tabTitleView = LayoutInflater.from(context).inflate(R.layout.tabtitle_comment, null) as Chip
+                tabTitleView.text = pagerAdapter.tabFragmentTitles.get(tabPos)
+                customView = tabTitleView
+            }
+        }
+    }
+
+    fun onPostDataLoaded() {
+        displayPostSwipeRefresh.isRefreshing = false
+    }
+
     companion object {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"
@@ -272,6 +266,21 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             return DisplayPostFragment().apply {
                 arguments = bundle
             }
+        }
+    }
+
+    private inner class DisplayPostPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+        val tabFragmentTitles = listOf("POST", "COMMENTS")
+        val tabFragments = ArrayList<Fragment>()
+
+        override fun getPageTitle(position: Int): CharSequence? {
+            return tabFragmentTitles[position]
+        }
+
+        override fun getCount() = tabFragments.size
+
+        override fun getItem(position: Int): Fragment {
+            return tabFragments[position]
         }
     }
 }
