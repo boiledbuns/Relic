@@ -55,6 +55,8 @@ class RelicCommentView (
         if (commentModel.isSubmitter) {
             commentAuthorView.setBackgroundResource(R.drawable.tag)
             commentAuthorView.background?.setTint(resources.getColor(R.color.discussion_tag))
+        } else {
+            commentAuthorView.setBackgroundResource(0)
         }
 
         when (commentModel.userUpvoted) {

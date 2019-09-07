@@ -148,7 +148,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // allows the list to be updated as subreddits are retrieved from the network
-        viewModel.subscribedSubsList.nonNull().observe(this) {
+        viewModel.subscribedSubsList.nonNull().observe(lifecycleOwner) {
             displaySubsBinding.displaySubsSwiperefreshlayout.isRefreshing = false
             subAdapter.setList(ArrayList(it))
         }
@@ -158,11 +158,11 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 //            if (it) handleOnAllSubsLoaded()
 //        }
 
-        viewModel.searchResults.nonNull().observe(this) { results ->
+        viewModel.searchResults.nonNull().observe(lifecycleOwner) { results ->
             searchItemAdapter.handleSearchResultsPayload(results)
         }
 
-        viewModel.pinnedSubs.nonNull().observe(this) { pinnedSubs ->
+        viewModel.pinnedSubs.nonNull().observe(lifecycleOwner) { pinnedSubs ->
             displaySubsBinding.pinnedSubsView.setPinnedSubreddits(pinnedSubs)
         }
     }

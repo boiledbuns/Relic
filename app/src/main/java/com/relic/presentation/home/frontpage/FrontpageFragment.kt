@@ -24,8 +24,13 @@ import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
+import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * consider changing to DisplayMultiFragment
+ * -> encompasses all multireddits
+ */
 class FrontpageFragment : RelicFragment() {
     @Inject
     lateinit var factory : FrontpageVM.Factory
@@ -88,6 +93,7 @@ class FrontpageFragment : RelicFragment() {
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
                     // lock scrolling until posts are loaded to prevent additional unwanted requests
                     scrollLocked = true
+                    frontpageProgress.visibility = View.VISIBLE
                     frontpageVM.retrieveMorePosts(false)
                 }
             }
@@ -103,8 +109,9 @@ class FrontpageFragment : RelicFragment() {
     // region live data handlers
 
     private fun handlePostsLoaded(postModels : List<PostModel>) {
-        Log.d(TAG, "size of frontpage" + postModels.size)
+        Timber.d("size of frontpage %s", postModels.size)
         postAdapter.setPostList(postModels)
+        frontpageProgress.visibility = View.GONE
 
         // turn off loading animation and unlock scrolling to allow more posts to be loaded
         frontpageSwipeRefreshLayout.isRefreshing = false

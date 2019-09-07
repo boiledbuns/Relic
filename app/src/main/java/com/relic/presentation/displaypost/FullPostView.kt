@@ -10,9 +10,11 @@ import com.relic.domain.models.PostModel
 import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
 import ru.noties.markwon.Markwon
+import java.lang.Exception
 
 class FullPostView @JvmOverloads constructor(
         context : Context,
@@ -34,7 +36,10 @@ class FullPostView @JvmOverloads constructor(
 
         postModel.apply {
             postTitleView.text = title
-            postAuthorView.text = resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created!!))
+
+            resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created!!)).apply {
+                postAuthorView.text = resources.getString( R.string.post_age, this)
+            }
 
             if (!selftext.isNullOrEmpty()) {
                 val selfText = selftext!!
@@ -58,7 +63,7 @@ class FullPostView @JvmOverloads constructor(
             }
 
             postVoteCountView.text = score.toString()
-            postCommentCountView.text = commentCount.toString()
+            postCommentCountView.text = resources.getString(R.string.comment_count, commentCount)
         }
 
         fullPostTags.setPostTags(postModel)
@@ -90,11 +95,34 @@ class FullPostView @JvmOverloads constructor(
     private fun loadLinks(postModel : PostModel) {
         when (postDisplayType) {
             MediaType.Image -> {
-                Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
+                displayPostProgress.visibility = View.VISIBLE
+                Picasso.get()
+                        .load(postModel.url).fit().centerCrop()
+                        .into(postImageView, object : Callback {
+                            override fun onSuccess() {
+                                displayPostProgress.visibility = View.GONE
+                            }
+
+                            override fun onError(e: Exception?) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
+                        })
+
                 postImageView.visibility = View.VISIBLE
             }
             MediaType.Gfycat -> {
-                Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postImageView)
+                displayPostProgress.visibility  = View.VISIBLE
+                Picasso.get()
+                        .load(postModel.thumbnail).fit().centerCrop()
+                        .into(postImageView, object : Callback {
+                            override fun onSuccess() {
+                                displayPostProgress.visibility = View.GONE
+                            }
+
+                            override fun onError(e: Exception?) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
+                        })
                 postImageView.visibility = View.VISIBLE
             }
             else -> {
