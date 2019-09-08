@@ -226,7 +226,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     }
 
     fun onPostDataLoaded() {
-        Toast.makeText(context, "Comments loaded", Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Comments loaded", Toast.LENGTH_SHORT).show()
     }
 
     companion object {
