@@ -1,25 +1,28 @@
 package com.relic.presentation.displaysub.list
 
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
-import com.relic.preference.ViewPreferencesManager
+import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
     private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
-) : RecyclerView.Adapter <PostItemVH> (), DisplaySubContract.PostItemAdapterDelegate {
+) : RelicAdapter <PostItemVH> (), DisplaySubContract.PostItemAdapterDelegate {
 
     private var postList: List<PostModel> = ArrayList()
     private lateinit var markwon : Markwon
     private val postLayout = viewPrefsManager.getPostCardStyle()
 
     override fun getItemCount() = postList.size
+
+    override fun getItemId(position: Int): Long = postList[position].id.hashCode().toLong()
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
         markwon = Markwon.create(parent.context)
@@ -37,17 +40,10 @@ class PostItemAdapter (
     fun clear() { setPostList(emptyList()) }
 
     fun setPostList(newPostList: List<PostModel>) {
-//        GlobalScope.launch {
-//            val diff = calculateDiff(newPostList)
-//
-//            GlobalScope.launch(Dispatchers.Main) {
-//                diff.dispatchUpdatesTo(this@PostItemAdapter)
-//                postList = newPostList
-//                Log.d("post_item_adapter", "post item test")
-//            }
-//        }
-        calculateDiff(newPostList).dispatchUpdatesTo(this)
-        postList = newPostList
+        launch {
+            calculateDiff(newPostList).dispatchUpdatesTo(this@PostItemAdapter)
+            postList = newPostList
+        }
     }
 
     // region onclick handlers
@@ -59,7 +55,7 @@ class PostItemAdapter (
             // update the view and local model to reflect onclick
             it.visited = true
         }
-        notifyItemChanged(itemPosition)
+        notifyDataSetChanged()
     }
 
     // initialize onclick for the upvote button
@@ -69,10 +65,11 @@ class PostItemAdapter (
             val newStatus = if (it.userUpvoted <= 0) 1 else 0
 
             // optimistic, update copy cached in adapter and make request to api to update in server
+            it.score = it.score + newStatus - it.userUpvoted
             it.userUpvoted = newStatus
             postAdapterDelegate.voteOnPost(it.fullName, newStatus)
         }
-        if (notify) notifyItemChanged(itemPosition)
+        if (notify) notifyDataSetChanged()
     }
 
     // initialize onclick for the downvote button
@@ -82,10 +79,11 @@ class PostItemAdapter (
             val newStatus = if (it.userUpvoted >= 0) -1 else 0
 
             // optimistic, update copy cached in adapter and make request to api to update in server
+            it.score = it.score + newStatus - it.userUpvoted
             it.userUpvoted = newStatus
             postAdapterDelegate.voteOnPost(it.fullName, newStatus)
         }
-        if (notify) notifyItemChanged(itemPosition)
+        if (notify) notifyDataSetChanged()
     }
 
     override fun onPostSavePressed (itemPosition : Int) {
@@ -97,7 +95,8 @@ class PostItemAdapter (
             // update the view and local model to reflect onclick
             it.saved = newStatus
         }
-        notifyItemChanged(itemPosition)
+
+        notifyDataSetChanged()
     }
 
     override fun onPostLinkPressed (itemPosition : Int) {
@@ -110,7 +109,7 @@ class PostItemAdapter (
 
     // end region for onclick handlers
 
-    private fun calculateDiff (newPostList: List<PostModel>) : DiffUtil.DiffResult {
+    private suspend fun calculateDiff (newPostList: List<PostModel>) : DiffUtil.DiffResult {
         return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
                 return postList.size

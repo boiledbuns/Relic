@@ -1,6 +1,7 @@
 package com.relic.presentation.customview
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.text.Html
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -10,8 +11,10 @@ import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.preference.POST_LAYOUT_CARD
+import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
+import kotlinx.android.synthetic.main.post_tags.view.*
 import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
@@ -20,8 +23,6 @@ class RelicPostItemView @JvmOverloads constructor(
         defStyleAttr : Int = 0,
         postLayout : Int
 ) : RelativeLayout(context, attrs, defStyleAttr) {
-
-    private val TAG = "POST_ITEM_VIEW"
     // TODO need to think about increasing min api level from 21
     // TODO set color based on theme, still trying to figure out the best way to do this
     private val textColor: Int
@@ -55,34 +56,33 @@ class RelicPostItemView @JvmOverloads constructor(
 
     fun setPost(postModel : PostModel) {
         postItemRootView?.apply {
-            if (postModel.visited) {
-                setBackgroundColor(backgroundVisitedColor)
-            } else {
-                setBackgroundColor(backgroundColor)
-            }
+            val backgroundColor = if (postModel.visited) backgroundVisitedColor else backgroundColor
+            setBackgroundColor(backgroundColor)
 
-            if (postModel.stickied) {
-                titleView.setTextColor(stickiedColor)
-            } else {
-                titleView.setTextColor(textColor)
-            }
+            val titleColor = if (postModel.stickied) stickiedColor else textColor
+            titleView.setTextColor(titleColor)
+
+            // TODO convert all icons to use style colors
+            val saveColor = if (postModel.saved) R.color.upvote else R.color.paleGray
+            postItemSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
 
             if (!postModel.thumbnail.isNullOrBlank()) {
                 val thumbnail = postModel.thumbnail!!
                 postItemThumbnailView.visibility = View.VISIBLE
                 setThumbnail(thumbnail)
-                postItemLinkDomain.visibility = View.VISIBLE
-                postItemLinkDomain.text = postModel.domain
+                domainTag.visibility = View.VISIBLE
+                domainTag.text = postModel.domain
             } else {
                 postItemThumbnailView.visibility = View.GONE
-                postItemLinkDomain.visibility = View.GONE
+                domainTag.visibility = View.GONE
             }
 
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
-            postDateView.text = postModel.created.toString()
+            postDateView.text = DateHelper.getDateDifferenceString(postModel.created!!)
             titleView.text = postModel.title
             postItemAuthorView.text = resources.getString(R.string.user_prefix_label, postModel.author)
-            setPostTags(postModel)
+            postItemTags.setPostTags(postModel)
+            setAuthorFlair(postModel)
 
             if (!postModel.selftext.isNullOrEmpty()) {
                 @Suppress("DEPRECATION")
@@ -119,7 +119,7 @@ class RelicPostItemView @JvmOverloads constructor(
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {
-            Timber.d( "URL = $thumbnailUrl")
+            Timber.d("URL = $thumbnailUrl")
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postItemThumbnailView)
             postItemThumbnailView.visibility = View.VISIBLE
         } catch (e: Error) {
@@ -127,20 +127,7 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    private fun setPostTags(postModel: PostModel) {
-        //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
-        postItemNSFWView.visibility = if (postModel.nsfw) View.VISIBLE else View.GONE
-
-        postItemTagView.apply {
-            if (postModel.linkFlair != null) {
-                text = postModel.linkFlair
-                // TODO replace with themes when adding proper theming
-                @Suppress("DEPRECATION")
-                background?.setTint(resources.getColor(R.color.discussion_tag))
-                visibility = View.VISIBLE
-            } else { visibility = View.GONE }
-        }
-
+    private fun setAuthorFlair(postModel: PostModel) {
         postItemAuthorFlairView.apply {
             if (postModel.authorFlair != null) {
                 text = postModel.authorFlair
@@ -151,5 +138,4 @@ class RelicPostItemView @JvmOverloads constructor(
             } else { visibility = View.GONE }
         }
     }
-
 }

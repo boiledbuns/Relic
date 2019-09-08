@@ -1,4 +1,4 @@
-package com.relic.presentation.displaypost.commentlist
+package com.relic.presentation.displaypost.comments
 
 import android.content.Context
 import android.text.Html
@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.presentation.helper.DateHelper
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
 
@@ -43,10 +44,10 @@ class RelicCommentView (
     }
 
     fun setPost(commentModel : CommentModel) {
-        commentScoreView.text = commentModel.score.toString() + " " + commentModel.depth
-        commentFlairView.text = " " + commentModel.position  + " " + commentModel.authorFlairText
+        commentScoreView.text = resources.getString(R.string.comment_score, commentModel.score)
+        commentFlairView.text = commentModel.authorFlairText
         commentAuthorView.text = commentModel.author
-        commentCreatedView.text = commentModel.created.toString()
+        commentModel.created?.let { commentCreatedView.text = DateHelper.getDateDifferenceString(it) }
 
         commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
         commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
@@ -54,6 +55,8 @@ class RelicCommentView (
         if (commentModel.isSubmitter) {
             commentAuthorView.setBackgroundResource(R.drawable.tag)
             commentAuthorView.background?.setTint(resources.getColor(R.color.discussion_tag))
+        } else {
+            commentAuthorView.setBackgroundResource(0)
         }
 
         when (commentModel.userUpvoted) {

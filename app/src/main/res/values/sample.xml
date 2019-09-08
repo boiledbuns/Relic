@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sample_post">hi, my name is Richard and I hope you can\'t read this example post :)</string>
+    <string name="sample_upvotes">100</string>
+    <string name="sample_comments">13</string>
+
+</resources>

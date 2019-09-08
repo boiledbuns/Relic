@@ -65,6 +65,16 @@ open class DisplaySubVM (
     override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
+        when (postSource) {
+            is PostSource.Subreddit -> {
+                _subredditMediator.addSource(subRepo.getSingleSub(postSource.subredditName)) {
+                    _subredditMediator.setValue(it)
+                }
+            }
+            is PostSource.Frontpage -> {}
+            is PostSource.All -> {}
+        }
+        
         // initial check for connection -> allows us to decide if we should use retrieve posts
         // from the network or just display what we have locally
         if (networkUtil.checkConnection()) {
@@ -81,16 +91,6 @@ open class DisplaySubVM (
             }
 
             //subRepo.getSubGateway().retrieveSubBanner(subName);
-
-            when (postSource) {
-                is PostSource.Subreddit -> {
-                    _subredditMediator.addSource(subRepo.getSingleSub(postSource.subredditName)) {
-                        _subredditMediator.setValue(it)
-                    }
-                }
-                is PostSource.Frontpage -> {}
-                is PostSource.All -> {}
-            }
         }
 
         _subInfoLiveData.postValue(DisplaySubInfoData(

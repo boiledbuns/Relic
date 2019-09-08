@@ -25,7 +25,7 @@ open class PostModel : ListingItem() {
         } else {
             field = thumbnail
         }
-    
+
     @Json(name = "author_flair_text")
     var authorFlair: String? = null
 

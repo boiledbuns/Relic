@@ -1,20 +1,18 @@
 package com.relic.presentation.media
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.gfycat.core.GfyCore
-
 import com.relic.R
+import com.relic.presentation.base.RelicFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.display_image.*
-import java.lang.Exception
 
-class DisplayImageFragment : Fragment() {
+class DisplayImageFragment : RelicFragment() {
+
     private var imageUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,9 +40,12 @@ class DisplayImageFragment : Fragment() {
         loadImage()
     }
 
-    private fun loadImage() {
-        // TODO add gif and video support
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Picasso.get().cancelRequest(fullImage)
+    }
 
+    private fun loadImage() {
         val callback = object : Callback {
             override fun onSuccess() {
                 displayImageProgress.visibility = View.GONE
@@ -55,9 +56,7 @@ class DisplayImageFragment : Fragment() {
             }
         }
 
-        if (imageUrl != null) {
-            Picasso.get().load(imageUrl).fit().centerInside().into(fullImage, callback)
-        }
+        Picasso.get().load(imageUrl).fit().centerInside().into(fullImage, callback)
     }
 
     companion object {

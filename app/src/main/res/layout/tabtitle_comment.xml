@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:orientation="horizontal">
+
+    <!--<android.support.design.chip.Chip-->
+        <!--android:id="@+id/tabTitleCommentCount"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="26dp"-->
+        <!--tools:text="test"-->
+        <!--android:visibility="gone"/>-->
+
+    <TextView
+        android:id="@+id/tabTitleCommentCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:layout_marginEnd="@dimen/padding_xs"
+        tools:text="10"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:text="@string/comments"/>
+</LinearLayout>

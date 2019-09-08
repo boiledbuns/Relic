@@ -8,30 +8,32 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
+import android.widget.Toast
 import com.relic.R
 import com.relic.data.PostSource
-import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.commentlist.CommentItemAdapter
+import com.relic.presentation.displaypost.tabs.CommentsFragment
+import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.util.MediaHelper.determineType
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
-import kotlinx.android.synthetic.main.full_post.*
+import kotlinx.android.synthetic.main.tabtitle_comment.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
@@ -53,7 +55,8 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     private lateinit var postSource: PostSource
     private var enableVisitSub = false
 
-    private lateinit var commentAdapter: CommentItemAdapter
+    private lateinit var pagerAdapter : DisplayPostPagerAdapter
+    private lateinit var tabTitleView : View
     private var previousError : PostErrorData? = null
 
     // region lifecycle hooks
@@ -67,6 +70,11 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             getString(ARG_SUB_NAME)?.let { subredditName = it }
             getParcelable<PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
+        }
+
+        pagerAdapter = DisplayPostPagerAdapter(childFragmentManager).apply {
+            tabFragments.add(FullPostFragment())
+            tabFragments.add(CommentsFragment())
         }
     }
 
@@ -83,13 +91,17 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
         initializeToolbar()
 
-        postCommentRecyclerView.apply {
-            commentAdapter = CommentItemAdapter(displayPostVM)
-            adapter = commentAdapter
+        displayPostViewPager.apply {
+            adapter = pagerAdapter
+            displayPostTabLayout.setupWithViewPager(this)
         }
 
-        displayPostSwipeRefresh.isRefreshing = true
-        attachViewListeners()
+        // use a custom view for the comment tab title
+        val commentTabPos = 1
+        displayPostTabLayout.getTabAt(commentTabPos)?.apply {
+            tabTitleView = LayoutInflater.from(context).inflate(R.layout.tabtitle_comment, null)
+            customView = tabTitleView
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -114,35 +126,13 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayPostVM.apply {
-            postLiveData.nonNull().observe(lifecycleOwner) { displayPost(it) }
-            commentListLiveData.nonNull().observe(lifecycleOwner) { displayComments(it) }
             postNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             errorLiveData.observe(lifecycleOwner) { handleError(it) }
+            postLiveData.nonNull().observe(lifecycleOwner) { handlePost(it) }
         }
     }
 
     // region live data handlers
-
-    private fun displayPost (postModel : PostModel) {
-        fullPostView.setPost(postModel, determineType(postModel), displayPostVM)
-        postAuthorView.setOnClickListener { displayPostVM.onUserPressed(postModel) }
-    }
-
-    private fun displayComments(commentList : List<CommentModel>) {
-        launch(Dispatchers.Main) {
-            // notify the adapter and set the new list
-            commentAdapter.setComments(commentList) {
-//                displayPostSwipeRefresh.isRefreshing = false
-            }
-            // display empty comment list message
-            if (commentList.isEmpty()) {
-                postNoComments.visibility = View.VISIBLE
-            } else {
-                postNoComments.visibility = View.GONE
-            }
-            displayPostSwipeRefresh.isRefreshing = false
-        }
-    }
 
     private fun handleNavigation(navigationData : PostNavigationData) {
         when (navigationData) {
@@ -163,8 +153,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     private fun handleError(error : PostErrorData?) {
         if (previousError != error) {
-            displayPostSwipeRefresh.isRefreshing = false
-
             // default details for unhandled exceptions to be displayed
             var snackbarMessage = resources.getString(R.string.unknown_error)
             var displayLength = Snackbar.LENGTH_SHORT
@@ -189,6 +177,10 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
+    private fun handlePost(post : PostModel) {
+        tabTitleCommentCount.text = post.commentCount.toString()
+    }
+
     // endregion live data handlers
 
     private fun initializeToolbar() {
@@ -207,30 +199,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
                 val subFragment = DisplaySubFragment.create(subredditName)
                 activity!!.supportFragmentManager.beginTransaction()
                     .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
-            }
-        }
-    }
-
-    /**
-     * Attaches custom scroll listeners to allow more comments to be retrieved when the recycler
-     * view is scrolled all the way to the bottom
-     */
-    private fun attachViewListeners() {
-//        postCommentRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//
-//                // if recycler view reaches bottom
-//                if (!recyclerView.canScrollVertically(1)) {
-//                    Log.d(TAG, "Bottom reached")
-//                    displayPostVM.retrieveMoreComments(false)
-//                }
-//            }
-//        })
-
-        displayPostSwipeRefresh.apply {
-            setOnRefreshListener {
-                displayPostVM.refreshData()
             }
         }
     }
@@ -257,6 +225,10 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
                 .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
     }
 
+    fun onPostDataLoaded() {
+        Toast.makeText(context, "Comments loaded", Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"
@@ -281,6 +253,21 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             return DisplayPostFragment().apply {
                 arguments = bundle
             }
+        }
+    }
+
+    private inner class DisplayPostPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+        val tabFragmentTitles = listOf("POST", "COMMENTS")
+        val tabFragments = ArrayList<Fragment>()
+
+        override fun getPageTitle(position: Int): CharSequence? {
+            return tabFragmentTitles[position]
+        }
+
+        override fun getCount() = tabFragments.size
+
+        override fun getItem(position: Int): Fragment {
+            return tabFragments[position]
         }
     }
 }

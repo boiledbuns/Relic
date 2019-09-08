@@ -1,8 +1,8 @@
 package com.relic.presentation.base
 
 import android.arch.lifecycle.ViewModel
-import android.util.Log
 import kotlinx.coroutines.*
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 abstract class RelicViewModel : ViewModel(), CoroutineScope {
@@ -10,7 +10,7 @@ abstract class RelicViewModel : ViewModel(), CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + CoroutineName(TAG) + SupervisorJob() + CoroutineExceptionHandler { context, e ->
         handleException(context, e)
-        Log.e(TAG, "caught exception", e)
+        Timber.e(e,  "caught exception")
     }
 
     abstract fun handleException(context: CoroutineContext, e : Throwable)

@@ -38,6 +38,7 @@
 
     <string name="nsfw">NSFW</string>
     <string name="reply">reply</string>
+    <string name="comments">comments</string>
     <string name="load_comments">load %d more comments…</string>
     <string name="empty_parent_body">This post has no text body</string>
 
@@ -55,8 +56,11 @@
     <string name="user_prefix_label">u/%s</string>
     <string name="subscriber_count">%d subscribers</string>
     <string name="pinned_subs_count">%d pinned subreddits </string>
-    <string name="user_and_time">u/%s, posted on %s</string>
+    <string name="user_and_time">u/%s - %s</string>
     <string name="reply_count">%d replies</string>
+    <string name="comment_count">%d comments</string>
+    <string name="comment_score">%d points</string>
+    <string name="post_age">%s ago</string>
 
     <!-- tool strings -->
     <string name="placeholder_text">placeholder_text</string>

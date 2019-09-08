@@ -2,7 +2,7 @@
 <!-- contains the content for a post item -->
 <!-- should aways be included in another xml layout for use -->
 <!-- ie. post_item_card and post_item_span -->
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -22,191 +22,201 @@
         android:textStyle="bold"
         android:textSize="@dimen/text_s"
         android:layout_marginEnd="@dimen/title_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/postDateView"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         tools:text="[r/preview]"/>
 
     <TextView
         android:id="@+id/postDateView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/postSubNameView"
+        app:layout_constraintEnd_toEndOf="parent"
         android:textSize="@dimen/text_s"
         tools:text="Dec 28th, 10:55 AM"/>
 
-    <ImageView
-        android:id="@+id/savedPostIconView"
-        android:layout_width="@dimen/ic_width_s"
-        android:layout_height="@dimen/ic_height_s"
-        android:src="@drawable/ic_save"
-        android:visibility="gone"
-        android:layout_alignParentEnd="true"/>
-
-    <ImageView
-        android:id="@+id/pinnedIconView"
+    <android.support.constraint.Barrier
+        android:id="@+id/topRowBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/savedPostIconView"
-        android:src="@drawable/ic_pinned"
-        android:visibility="gone"
-        android:layout_marginEnd="@dimen/padding_s"/>
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="postSubNameView, postDateView"/>
 
-    <LinearLayout
-        android:id="@+id/titleGroupView"
+
+    <TextView
+        android:id="@+id/titleView"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:textSize="@dimen/text_l"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topRowBarrier"
+        app:layout_constraintEnd_toStartOf="@id/thumbnailContainer"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        tools:text="@string/long_placeholder_text"/>
+
+    <TextView
+        android:id="@+id/postItemAuthorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleView"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        tools:text="u/dank_monkey"/>
+
+    <TextView
+        android:id="@+id/postItemAuthorFlairView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_m"
+        app:layout_constraintTop_toBottomOf="@id/titleView"
+        app:layout_constraintStart_toEndOf="@id/postItemAuthorView"
+        app:layout_constraintEnd_toStartOf="@id/thumbnailContainer"
+        tools:text="author flair"/>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/authorFlairBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="postItemAuthorView, postItemAuthorFlairView"/>
+
+    <com.relic.presentation.displaypost.view.PostTagsView
+        android:id="@+id/postItemTags"
+        android:layout_marginTop="@dimen/padding_s"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postSubNameView"
-        android:layout_marginBottom="@dimen/padding_m"
-        tools:text="random subreddit">
+        app:layout_constraintTop_toBottomOf="@id/authorFlairBarrier"/>
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+    <android.support.v7.widget.CardView
+        android:id="@+id/thumbnailContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_xs"
+        android:layout_marginStart="@dimen/postitem_selftext_margin"
+        app:cardCornerRadius="2dp"
+        app:layout_constraintStart_toEndOf="@id/titleView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topRowBarrier">
 
-            <TextView
-                android:id="@+id/titleView"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="@dimen/text_l"
-                android:textStyle="bold"
-                tools:text="@string/long_placeholder_text"/>
+        <ImageView
+            android:id="@+id/postItemThumbnailView"
+            android:layout_width="@dimen/postitem_image_width"
+            android:layout_height="@dimen/postitem_image_width"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
 
-            <TextView
-                android:id="@+id/postItemAuthorView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/titleView"
-                android:layout_marginBottom="@dimen/padding_xxs"
-                android:layout_marginEnd="@dimen/padding_m"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                tools:text="u/dank_monkey"/>
+    </android.support.v7.widget.CardView>
 
-            <TextView
-                android:id="@+id/postItemAuthorFlairView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/titleView"
-                android:layout_toEndOf="@id/postItemAuthorView"
-                tools:text="author flair"/>
+    <!-- since title could be taller/shorter than preview -->
+    <android.support.constraint.Barrier
+        android:id="@+id/titleGroupBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="postItemTags, thumbnailContainer"/>
 
-            <!-- TODO add style for tags -->
-            <TextView
-                android:id="@+id/postItemNSFWView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postItemAuthorView"
-                android:visibility="gone"
-                android:text="@string/nsfw"
-                android:layout_marginEnd="@dimen/padding_s"
-                android:background="@drawable/tag"
-                android:backgroundTint="@color/warning"
-                android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"
-                tools:visibility="visible"/>
-
-            <TextView
-                android:id="@+id/postItemTagView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postItemAuthorView"
-                android:layout_toEndOf="@id/postItemNSFWView"
-                android:visibility="gone"
-                android:layout_marginEnd="@dimen/padding_s"
-                android:background="@drawable/tag"
-                android:backgroundTint="@color/discussion_tag"
-                android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"
-                tools:visibility="visible"
-                tools:text="tag"/>
-
-            <TextView
-                android:id="@+id/postItemLinkDomain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/postItemAuthorView"
-                android:layout_toEndOf="@id/postItemTagView"
-                android:visibility="gone"
-                android:textSize="@dimen/text_m2"
-                android:textColor="@color/negative_text"
-                android:background="@drawable/tag"
-                android:backgroundTint="@color/domain_tag"
-                tools:visibility="visible"
-                tools:text="v.reddit"/>
-
-        </RelativeLayout>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_xs"
-            android:layout_marginStart="@dimen/postitem_selftext_margin"
-            app:cardCornerRadius="2dp">
-
-            <ImageView
-                android:id="@+id/postItemThumbnailView"
-                android:layout_width="@dimen/postitem_image_width"
-                android:layout_height="@dimen/postitem_image_width"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"/>
-
-        </android.support.v7.widget.CardView>
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/postBodyView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/titleGroupView"
+        app:layout_constraintTop_toBottomOf="@id/titleGroupBarrier"
         android:layout_marginBottom="@dimen/padding_m"
+        android:layout_marginTop="@dimen/padding_s"
         android:textSize="@dimen/text_m"
         android:visibility="gone"
         android:maxLines="3"
-        android:ellipsize="end"/>
+        android:ellipsize="end"
+        tools:text="123"
+        tools:visibility="visible"/>
 
-    <!-- buttons and options -->
+    <android.support.constraint.Barrier
+        android:id="@+id/contentBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="titleGroupBarrier, postBodyView"/>
+
+    <!-- buttons and options row -->
     <ImageView
         android:id="@+id/postItemUpvoteView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
-        android:layout_below="@id/postBodyView"
         android:layout_marginEnd="@dimen/padding_m"
-        android:src="@drawable/ic_upvote"/>
+        android:layout_marginTop="@dimen/padding_m"
+        android:src="@drawable/ic_upvote"
+        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/postItemScore"
+        app:layout_constraintHorizontal_bias="0"
+        tools:visibility="visible"/>
 
     <TextView
         android:id="@+id/postItemScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postItemUpvoteView"
-        android:layout_marginEnd="@dimen/padding_m"/>
+        android:layout_marginEnd="@dimen/padding_m"
+        android:layout_marginTop="@dimen/padding_m"
+        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
+        app:layout_constraintStart_toEndOf="@id/postItemUpvoteView"
+        app:layout_constraintEnd_toStartOf="@id/postItemDownvoteView"
+        app:layout_constraintHorizontal_bias="0"
+        tools:text="123"
+        tools:visibility="visible"/>
 
     <ImageView
         android:id="@+id/postItemDownvoteView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
-        android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postItemScore"
-        android:layout_marginEnd="@dimen/padding_m"
-        android:src="@drawable/ic_downvote"/>
+        android:layout_marginEnd="@dimen/padding_l"
+        android:layout_marginTop="@dimen/padding_m"
+        android:src="@drawable/ic_downvote"
+        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
+        app:layout_constraintStart_toEndOf="@id/postItemScore"
+        app:layout_constraintEnd_toStartOf="@id/postItemCommentView"
+        tools:visibility="visible"/>
 
     <ImageView
         android:id="@+id/postItemCommentView"
         android:layout_width="@dimen/ic_width_s"
         android:layout_height="@dimen/ic_height_s"
-        android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postItemDownvoteView"
         android:layout_marginEnd="@dimen/padding_m"
-        android:src="@drawable/ic_comment"/>
+        android:layout_marginTop="@dimen/padding_m"
+        android:src="@drawable/ic_comment"
+        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
+        app:layout_constraintStart_toEndOf="@id/postItemDownvoteView"
+        app:layout_constraintEnd_toStartOf="@id/postItemCommentCountView"
+        tools:visibility="visible"/>
 
     <TextView
         android:id="@+id/postItemCommentCountView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postBodyView"
-        android:layout_toRightOf="@id/postItemCommentView"/>
+        android:layout_marginTop="@dimen/padding_m"
+        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
+        app:layout_constraintStart_toEndOf="@id/postItemCommentView"
+        app:layout_constraintEnd_toStartOf="@id/postItemSaveView"
+        tools:visibility="visible"
+        tools:text="123"/>
 
-</RelativeLayout>
+    <ImageView
+        android:id="@+id/postItemSaveView"
+        android:layout_width="@dimen/ic_width_s"
+        android:layout_height="@dimen/ic_height_s"
+        android:src="@drawable/ic_save"
+        android:layout_marginTop="@dimen/padding_m"
+        android:layout_marginEnd="@dimen/padding_xxs"
+        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible"/>
+
+</android.support.constraint.ConstraintLayout>
 

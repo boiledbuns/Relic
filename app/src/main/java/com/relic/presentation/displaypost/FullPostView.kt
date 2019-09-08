@@ -7,10 +7,14 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.presentation.helper.DateHelper
+import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
 import ru.noties.markwon.Markwon
+import java.lang.Exception
 
 class FullPostView @JvmOverloads constructor(
         context : Context,
@@ -27,21 +31,15 @@ class FullPostView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
-    fun setPost(postModel : PostModel, displayType : MediaType?, delegate : DisplayPostContract.PostViewDelegate) {
-        viewDelegate = delegate
-        postDisplayType = displayType
+    fun setPost(postModel : PostModel) {
+        postDisplayType = MediaHelper.determineType(postModel)
 
         postModel.apply {
             postTitleView.text = title
-            postAuthorView.text = resources.getString(R.string.user_and_time, author, created)
 
-            if (nsfw) postNSFWView.visibility = View.VISIBLE
-
-            postTagView.text = linkFlair
-            if (!linkFlair.isNullOrEmpty()) postTagView.visibility = View.VISIBLE
-
-            postAuthorFlairView.text = authorFlair
-            if (!authorFlair.isNullOrEmpty()) postAuthorFlairView.visibility = View.VISIBLE
+            resources.getString(R.string.user_and_time, author, DateHelper.getDateDifferenceString(created!!)).apply {
+                postAuthorView.text = resources.getString( R.string.post_age, this)
+            }
 
             if (!selftext.isNullOrEmpty()) {
                 val selfText = selftext!!
@@ -65,12 +63,25 @@ class FullPostView @JvmOverloads constructor(
             }
 
             postVoteCountView.text = score.toString()
-            postCommentCountView.text = commentCount.toString()
+            postCommentCountView.text = resources.getString(R.string.comment_count, commentCount)
         }
 
+        fullPostTags.setPostTags(postModel)
+
         fullPostRootView.visibility = View.VISIBLE
-        initializeOnClicks(delegate)
         loadLinks(postModel)
+
+        // display empty comment list message
+        if (postModel.commentCount == 0) {
+            postNoComments.visibility = View.VISIBLE
+        } else {
+            postNoComments.visibility = View.GONE
+        }
+    }
+
+    fun setOnClicks(delegate : DisplayPostContract.PostViewDelegate) {
+        viewDelegate = delegate
+        initializeOnClicks(delegate)
     }
 
     private fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
@@ -84,11 +95,34 @@ class FullPostView @JvmOverloads constructor(
     private fun loadLinks(postModel : PostModel) {
         when (postDisplayType) {
             MediaType.Image -> {
-                Picasso.get().load(postModel.url).fit().centerCrop().into(postImageView)
+                displayPostProgress.visibility = View.VISIBLE
+                Picasso.get()
+                        .load(postModel.url).fit().centerCrop()
+                        .into(postImageView, object : Callback {
+                            override fun onSuccess() {
+                                displayPostProgress.visibility = View.GONE
+                            }
+
+                            override fun onError(e: Exception?) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
+                        })
+
                 postImageView.visibility = View.VISIBLE
             }
             MediaType.Gfycat -> {
-                Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postImageView)
+                displayPostProgress.visibility  = View.VISIBLE
+                Picasso.get()
+                        .load(postModel.thumbnail).fit().centerCrop()
+                        .into(postImageView, object : Callback {
+                            override fun onSuccess() {
+                                displayPostProgress.visibility = View.GONE
+                            }
+
+                            override fun onError(e: Exception?) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
+                        })
                 postImageView.visibility = View.VISIBLE
             }
             else -> {

@@ -1,13 +1,11 @@
 package com.relic.data.gateway
 
-import android.util.Log
-
-import com.relic.persistence.ApplicationDB
 import com.relic.data.DomainTransfer
-import com.relic.persistence.entities.PostVisitRelation
 import com.relic.data.repository.RepoConstants
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
+import com.relic.persistence.ApplicationDB
+import com.relic.persistence.entities.PostVisitRelation
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +24,7 @@ class PostGatewayImpl @Inject constructor(
         val ending = RepoConstants.ENDPOINT + "api/vote?id=" + fullname + "&dir=$voteStatus"
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, ending)
-            Log.d(TAG, "Success voting on post : $fullname to $voteStatus")
+            Timber.d(TAG, "Success voting on post : $fullname to $voteStatus")
 
             // update the local model appropriately
             withContext(Dispatchers.IO) {
@@ -43,7 +41,7 @@ class PostGatewayImpl @Inject constructor(
         val ending = RepoConstants.ENDPOINT + "api/" + saveString + "?id=" + fullname
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, ending)
-            Log.d(TAG, "Success post saved status for $fullname to $save")
+            Timber.d(TAG, "Success post saved status for $fullname to $save")
 
             // update the local model appropriately
             withContext(Dispatchers.IO) {
