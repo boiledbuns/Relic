@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.chip.Chip
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -15,7 +14,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
-import android.widget.TextView
+import android.widget.Toast
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
@@ -32,11 +31,9 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
 import kotlinx.android.synthetic.main.tabtitle_comment.*
-import kotlinx.android.synthetic.main.tabtitle_comment.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import timber.log.Timber
 import javax.inject.Inject
 
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
@@ -226,6 +223,10 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         // replace the current screen with the newly created fragment
         activity!!.supportFragmentManager.beginTransaction()
                 .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
+    }
+
+    fun onPostDataLoaded() {
+        Toast.makeText(context, "Comments loaded", Toast.LENGTH_SHORT).sh
     }
 
     companion object {

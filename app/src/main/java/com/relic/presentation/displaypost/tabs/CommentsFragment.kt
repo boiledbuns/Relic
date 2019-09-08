@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaypost.DisplayPostVM
 import com.relic.presentation.displaypost.comments.CommentItemAdapter
 import com.shopify.livedataktx.nonNull
@@ -48,7 +49,10 @@ class CommentsFragment : RelicFragment() {
         super.bindViewModel(lifecycleOwner)
 
         commentsVM.commentListLiveData.nonNull().observe(lifecycleOwner) {
-            commentAdapter.setComments(it)
+            commentAdapter.setComments(it) {
+                (parentFragment as DisplayPostFragment).onPostDataLoaded()
+            }
+
             commentsTabSwipeRefresh.isRefreshing = false
         }
     }
