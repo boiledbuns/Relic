@@ -22,7 +22,9 @@ interface DisplaySubContract {
 
     interface SearchVM {
         val searchResults : LiveData<List<PostModel>>
-        fun search(query : String)
+
+        fun updateQuery(query : String)
+        fun search()
         fun retrieveMoreSearchResults()
     }
 

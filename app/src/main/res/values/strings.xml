@@ -116,6 +116,7 @@
     <string name="switched_account">switched account to %s</string>
 
     <string name="search_sub">enter search</string>
+    <string name="search">search</string>
     <string name="search_sub_result_count">%d results loaded</string>
     <string name="create_post">create post</string>
     <string name="submit_post">submit post</string>

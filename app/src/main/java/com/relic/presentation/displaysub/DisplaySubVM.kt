@@ -231,13 +231,15 @@ open class DisplaySubVM (
     }
 
 
-    // region search vm
-    override fun search(query : String) {
+    override fun updateQuery(query: String){
         this.query = query
+    }
+
+    override fun search() {
         launch(Dispatchers.Main) {
             val listing = when (postSource) {
                 is PostSource.Subreddit -> {
-                    postRepo.searchSubPosts(postSource.subredditName, query, true)
+                    query?.let { postRepo.searchSubPosts(postSource.subredditName, it, true) }
                 }
                 else -> {
                     null

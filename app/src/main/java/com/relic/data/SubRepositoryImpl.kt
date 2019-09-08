@@ -86,7 +86,7 @@ class SubRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchSubreddits(query: String) : List<SubPreviewModel>{
+    override suspend fun searchSubreddits(query: String, displayNSFW : Boolean, exact : Boolean) : List<SubPreviewModel>{
         val url = "${ENDPOINT}api/search_subreddits?query=$query"
 
         try {

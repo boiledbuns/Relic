@@ -12,14 +12,22 @@
         android:id="@+id/subSearch"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="match_parent"
+        app:layout_constraintEnd_toStartOf="@id/searchButton"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/search_sub"
         android:layout_margin="@dimen/padding_m"
-        android:gravity="center"
         android:focusable="true"
         android:focusableInTouchMode="true"/>
+
+    <Button
+        android:id="@+id/searchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search"
+        android:layout_margin="@dimen/padding_m"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/subSearchResultCount"

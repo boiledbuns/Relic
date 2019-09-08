@@ -18,13 +18,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import com.relic.R
-import com.relic.presentation.main.RelicError
-import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub_search.*
@@ -74,8 +73,8 @@ class SubSearchFragment : RelicFragment() {
         getSystemService(requireContext(), InputMethodManager::class.java)
             ?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.RESULT_SHOWN)
 
-        bindViewModel(this)
         attachScrollListeners()
+        initOnClicks()
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -103,6 +102,12 @@ class SubSearchFragment : RelicFragment() {
         })
     }
 
+    private fun initOnClicks() {
+        searchButton.setOnClickListener {
+            subSearchVM.search()
+        }
+    }
+
     private fun handleSearchResults(results : List<PostModel>) {
         subSearchResultCount.text = getString(R.string.search_sub_result_count, results.size)
         postAdapter.setPostList(results)
@@ -116,7 +121,7 @@ class SubSearchFragment : RelicFragment() {
         editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 // TODO refine search experience -> basic idea is to start only search after user stops typing
-                subSearchVM.search(s.toString())
+                subSearchVM.updateQuery(s.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -138,7 +143,7 @@ class SubSearchFragment : RelicFragment() {
                     Snackbar.LENGTH_INDEFINITE
                 ).apply {
                     setAction(resources.getString(R.string.refresh)) {
-                        subSearchVM.search(subSearch.text.toString())
+                        subSearchVM.updateQuery(subSearch.text.toString())
                     }
                     show()
                 }
