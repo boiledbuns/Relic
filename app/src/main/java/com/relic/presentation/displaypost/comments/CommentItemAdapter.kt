@@ -1,4 +1,4 @@
-package com.relic.presentation.displaypost.list
+package com.relic.presentation.displaypost.comments
 
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView

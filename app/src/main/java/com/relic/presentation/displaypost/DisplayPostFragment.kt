@@ -228,10 +228,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
                 .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
     }
 
-    fun onPostDataLoaded() {
-//        displayPostSwipeRefresh.isRefreshing = false
-    }
-
     companion object {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"

@@ -1,4 +1,4 @@
-package com.relic.presentation.displaypost.list
+package com.relic.presentation.displaypost.comments
 
 import android.content.Context
 import android.text.Html
