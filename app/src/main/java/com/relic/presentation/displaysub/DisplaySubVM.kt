@@ -231,7 +231,8 @@ open class DisplaySubVM (
     }
 
 
-    override fun updateQuery(query: String){
+    override fun updateQuery(query: String) {
+
         this.query = query
     }
 

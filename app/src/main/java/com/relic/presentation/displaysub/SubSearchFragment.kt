@@ -23,6 +23,7 @@ import com.relic.domain.models.PostModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -47,6 +48,11 @@ class SubSearchFragment : RelicFragment() {
     private lateinit var postAdapter: PostItemAdapter
 
     private var scrollLocked = true
+
+    private var countDownTimer : SearchInputCountdown = SearchInputCountdown {
+        subSearchVM.search()
+    }
+
     // region lifecycle hooks
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +80,6 @@ class SubSearchFragment : RelicFragment() {
             ?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.RESULT_SHOWN)
 
         attachScrollListeners()
-        initOnClicks()
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -102,12 +107,6 @@ class SubSearchFragment : RelicFragment() {
         })
     }
 
-    private fun initOnClicks() {
-        searchButton.setOnClickListener {
-            subSearchVM.search()
-        }
-    }
-
     private fun handleSearchResults(results : List<PostModel>) {
         subSearchResultCount.text = getString(R.string.search_sub_result_count, results.size)
         postAdapter.setPostList(results)
@@ -120,7 +119,10 @@ class SubSearchFragment : RelicFragment() {
     private fun initSearchEditText(editText: EditText) {
         editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                // TODO refine search experience -> basic idea is to start only search after user stops typing
+
+                countDownTimer.cancel()
+                countDownTimer.start()
+
                 subSearchVM.updateQuery(s.toString())
             }
 
@@ -166,3 +168,5 @@ class SubSearchFragment : RelicFragment() {
         }
     }
 }
+
+
