@@ -18,6 +18,7 @@ import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
+import com.relic.presentation.search.PostsSearchResultsFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -77,6 +78,9 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeDisplayMedia() : DisplayImageFragment
+
+    @ContributesAndroidInjector
+    abstract fun postsSearchResults() : PostsSearchResultsFragment
 
     // endregion main ui
 

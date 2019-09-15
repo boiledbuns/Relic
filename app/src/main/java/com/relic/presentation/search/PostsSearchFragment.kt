@@ -1,29 +1,23 @@
 package com.relic.presentation.search
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.data.PostSource
-import com.relic.domain.models.PostModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.NoResults
-import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import kotlinx.android.synthetic.main.display_sub_search.*
@@ -36,6 +30,8 @@ class PostsSearchFragment : RelicFragment() {
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
+    private lateinit var pagerAdapter: PostsSearchPagerAdapter
+
     val searchResultsVM: SearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -46,36 +42,21 @@ class PostsSearchFragment : RelicFragment() {
     }
 
     private lateinit var postSource : PostSource
-    private lateinit var postAdapter: PostItemAdapter
-
-    private var scrollLocked = true
 
     private var countDownTimer : SearchInputCountdown = SearchInputCountdown {
         searchResultsVM.search()
-    }
-
-    override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        super.bindViewModel(lifecycleOwner)
-        searchResultsVM.apply {
-            postSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
-            postResultsLiveData.nonNull().observe(lifecycleOwner) { handlePostResults(it) }
-        }
-    }
-
-    private fun handlePostResults(results : List<PostModel>) {
-        subSearchResultCount.text = getString(R.string.search_sub_result_count, results.size)
-        postAdapter.setPostList(results)
-
-        // hide loading and allow load more again
-        scrollLocked = false
-        displaySearchProgress.visibility = View.GONE
     }
 
     // region lifecycle hooks
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         postSource = arguments?.getParcelable(ARG_SOURCE) as PostSource
+        pagerAdapter = PostsSearchPagerAdapter().apply {
+            fragments.add(PostsSearchResultsFragment.create(offline = true))
+            fragments.add(PostsSearchResultsFragment.create(offline = false))
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -85,63 +66,48 @@ class PostsSearchFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postAdapter = PostItemAdapter(viewPrefsManager, searchResultsVM)
-        subSearchRV.apply {
-            adapter = postAdapter
-            layoutManager = LinearLayoutManager(context)
-        }
+        postsSearchViewPager.adapter = pagerAdapter
+        postsSearchTabLayout.setupWithViewPager(postsSearchViewPager)
 
-        initSearchEditText(subSearch)
-        subSearch.requestFocus()
+        subSearch.initSearchWidget()
 
+        // show the keyboard
         ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
                 ?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.RESULT_SHOWN)
-
-        attachScrollListeners()
     }
 
+    private fun SearchView.initSearchWidget() {
+        setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-    private fun attachScrollListeners() {
-        subSearchRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                // checks if the recycler view can no longer scroll downwards
-                if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
-                    // lock scrolling until set of posts are loaded to prevent additional unwanted retrievals
-                    scrollLocked = true
-                    displaySearchProgress.visibility = View.VISIBLE
-
-                    // fetch the next post listing
-                    searchResultsVM.retrieveMorePostResults()
-                }
-            }
-        })
-    }
-
-    private fun initSearchEditText(editText: EditText) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-
+            override fun onQueryTextChange(newText: String?): Boolean {
                 countDownTimer.cancel()
                 countDownTimer.start()
 
-                searchResultsVM.updateQuery(s.toString())
+                searchResultsVM.updateQuery(newText.toString())
+
+                // action is handled by listener
+                return true
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchResultsVM.search()
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                // action is handled by listener
+                return true
+            }
         })
+//        subSearch.requestFocus()
+    }
+
+    override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
+        super.bindViewModel(lifecycleOwner)
+        searchResultsVM.apply {
+            postSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
+        }
     }
 
     private fun handleError(error : RelicError) {
-        displaySearchProgress.visibility = View.GONE
         when(error) {
-            is NoResults -> {
-                Toast.makeText(context, "No more results for query", Toast.LENGTH_SHORT).show()
-            }
             is RelicError.NetworkUnavailable -> {
                 Snackbar.make(
                         subSearchRoot,
@@ -171,5 +137,15 @@ class PostsSearchFragment : RelicFragment() {
                 arguments = bundle
             }
         }
+    }
+
+    private inner class PostsSearchPagerAdapter : FragmentPagerAdapter(childFragmentManager) {
+        val fragments = ArrayList<RelicFragment>()
+        val fragmentTitles = listOf("online results", "offline results")
+
+        override fun getCount(): Int = fragments.size
+
+        override fun getItem(p0: Int): Fragment = fragments[p0]
+        override fun getPageTitle(position: Int) = fragmentTitles[position]
     }
 }
