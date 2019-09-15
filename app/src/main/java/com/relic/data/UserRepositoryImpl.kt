@@ -12,6 +12,7 @@ import com.relic.network.request.RelicOAuthRequest
 import com.relic.persistence.ApplicationDB
 import dagger.Reusable
 import kotlinx.coroutines.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @Reusable
@@ -65,8 +66,8 @@ class UserRepositoryImpl @Inject constructor(
                 url = trophiesEndpoint
             )
 
-            Log.d(TAG, "more posts $userResponse")
-            Log.d(TAG, "trophies $trophiesResponse")
+            Timber.d("more posts $userResponse")
+            Timber.d("trophies $trophiesResponse")
 
             return userDeserializer.parseUser(userResponse, trophiesResponse)
         } catch (e: Exception) {
@@ -95,7 +96,7 @@ class UserRepositoryImpl @Inject constructor(
         val url = "$ENDPOINT/api/v1/me/prefs"
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
-            Log.d(TAG, response)
+            Timber.d(response)
 
             accountDeserializer.parseAccount(response).let { account ->
                 // need to manually specify name here
@@ -110,5 +111,13 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-
+    override suspend fun searchUsers(username: String) : List<UserModel>{
+        val url = "$ENDPOINT/profiles/search"
+        try {
+            val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
+            return userDeserializer.parseUsers(response)
+        } catch (e : Exception){
+            throw DomainTransfer.handleException("retrieve account", e) ?: e
+        }
+    }
 }

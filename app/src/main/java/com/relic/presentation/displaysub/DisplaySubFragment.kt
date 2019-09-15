@@ -30,6 +30,7 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.media.DisplayImageFragment
+import com.relic.presentation.search.PostsSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
@@ -140,7 +141,7 @@ class DisplaySubFragment : RelicFragment() {
         var override = true
         when (item?.itemId) {
             R.id.display_sub_searchitem -> {
-                val searchFrag = SubSearchFragment.create(PostSource.Subreddit(subName))
+                val searchFrag = PostsSearchFragment.create(PostSource.Subreddit(subName))
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()

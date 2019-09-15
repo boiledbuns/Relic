@@ -20,6 +20,8 @@ interface UserRepository {
     @Throws(UserRepoError::class)
     suspend fun retrieveAccount(name : String)
 
+    suspend fun searchUsers(username : String) : List<UserModel>
+
     fun getAccounts() : LiveData<List<AccountModel>>
 }
 

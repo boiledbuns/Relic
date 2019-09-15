@@ -1,12 +1,9 @@
 package com.relic.presentation.displaysub
 
-import androidx.lifecycle.LiveData
-import com.relic.presentation.main.RelicError
-import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.SortScope
 import com.relic.data.SortType
-import com.relic.domain.models.PostModel
+import com.relic.presentation.main.RelicError
 
 interface DisplaySubContract {
     interface ViewModel {
@@ -18,14 +15,6 @@ interface DisplaySubContract {
          */
         fun retrieveMorePosts(resetPosts: Boolean)
         fun updateSubStatus(subscribe: Boolean)
-    }
-
-    interface SearchVM {
-        val searchResults : LiveData<List<PostModel>>
-
-        fun updateQuery(query : String)
-        fun search()
-        fun retrieveMoreSearchResults()
     }
 
     interface PostAdapterDelegate {

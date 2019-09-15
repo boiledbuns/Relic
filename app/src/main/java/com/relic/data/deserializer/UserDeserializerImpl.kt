@@ -1,11 +1,11 @@
 package com.relic.data.deserializer
 
-import android.util.Log
 import com.relic.domain.models.UserModel
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
+import timber.log.Timber
 import javax.inject.Inject
 
 class UserDeserializerImpl @Inject constructor(): Contract.UserDeserializer {
@@ -24,7 +24,7 @@ class UserDeserializerImpl @Inject constructor(): Contract.UserDeserializer {
                 forEach { trophyJson ->
                     val trophyData = (trophyJson as JSONObject)
                     (trophyData["data"] as JSONObject).keys.forEach { key ->
-                        Log.d(TAG, "$key\n")
+                        Timber.d("$key\n")
                     }
                 }
             }
@@ -32,9 +32,9 @@ class UserDeserializerImpl @Inject constructor(): Contract.UserDeserializer {
             throw RelicParseException("error parsing user trophies", e)
         }
 
-        Log.d(TAG, "Keys : ${userData.keys}")
+        Timber.d("Keys : ${userData.keys}")
         userData.forEach { key ->
-            Log.d(TAG, "$key\n")
+            Timber.d("$key\n")
         }
 
         return UserModel().apply {
@@ -55,6 +55,10 @@ class UserDeserializerImpl @Inject constructor(): Contract.UserDeserializer {
                 throw RelicParseException("error parsing user", e)
             }
         }
+    }
+
+    override suspend fun parseUsers(usersResponse: String): List<UserModel> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun parseUsername(response: String): String {
