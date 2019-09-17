@@ -16,7 +16,7 @@
             type="com.relic.presentation.adapter.ImageOnClick"/>
     </data>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/postitem_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -116,7 +116,7 @@
                 android:visibility="@{postModel.selftext.empty ? View.GONE : View.VISIBLE}"
                 android:text="@{postModel.selftext}"/>
 
-            <android.support.design.chip.ChipGroup
+            <com.google.android.material.chip.ChipGroup
                 style="@style/Widget.MaterialComponents.ChipGroup"
                 android:id="@+id/postitem_extra_info"
                 android:layout_below="@id/postitem_selftext"
@@ -140,7 +140,7 @@
                     android:layout_centerHorizontal="true"
                     android:src="@{(postModel.userUpvoted == 1) ? @drawable/ic_upvote_active_s : @drawable/ic_upvote_s}"/>
 
-                <android.support.design.chip.Chip
+                <com.google.android.material.chip.Chip
                     android:id="@+id/display_post_votes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
                     android:layout_centerHorizontal="true"
                     android:src="@{(postModel.userUpvoted == -1) ? @drawable/ic_downvote_active_s : @drawable/ic_downvote_s}"/>
 
-                <android.support.design.chip.Chip
+                <com.google.android.material.chip.Chip
                     style="@style/RelicChip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -163,7 +163,7 @@
                     app:chipBackgroundColor="?attr/colorAccent"
                     android:textColor="@color/mainFont"/>
 
-                <android.support.design.chip.Chip
+                <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
@@ -172,11 +172,11 @@
                     app:chipText="@{Integer.toString(postModel.commentCount)}"
                     app:chipBackgroundColor="?attr/colorAccent"/>
 
-            </android.support.design.chip.ChipGroup>
+            </com.google.android.material.chip.ChipGroup>
 
 
         </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 </layout>

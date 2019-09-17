@@ -1,6 +1,6 @@
 package com.relic.presentation.displaysubinfo;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 
 import com.relic.data.SubRepository;
 import com.relic.domain.models.SubredditModel;

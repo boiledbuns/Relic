@@ -1,7 +1,7 @@
 package com.relic.presentation.displaysubs.pinned
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
@@ -21,7 +21,7 @@ class DisplayPinnedSubsView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.display_pinned_subs, this, true)
         pinnedSubsRecyclerView.apply {
             adapter = pinnedSubAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
         }
     }
 

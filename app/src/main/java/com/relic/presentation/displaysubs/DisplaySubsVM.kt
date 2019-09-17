@@ -1,7 +1,7 @@
 package com.relic.presentation.displaysubs
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.relic.data.Auth
 
 import com.relic.data.ListingRepository

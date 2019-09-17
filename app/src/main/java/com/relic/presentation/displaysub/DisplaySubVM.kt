@@ -1,8 +1,8 @@
 package com.relic.presentation.displaysub
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import com.relic.data.*
 import com.relic.data.gateway.PostGateway
 import com.relic.data.repository.NetworkException

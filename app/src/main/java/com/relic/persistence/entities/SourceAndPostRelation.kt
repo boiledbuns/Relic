@@ -1,6 +1,6 @@
 package com.relic.persistence.entities
 
-import android.arch.persistence.room.Entity
+import androidx.room.Entity
 
 /*
 Relation for a "Source" and a "Post"

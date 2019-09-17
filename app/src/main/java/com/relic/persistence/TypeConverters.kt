@@ -1,6 +1,6 @@
 package com.relic.persistence
 
-import android.arch.persistence.room.TypeConverter
+import androidx.room.TypeConverter
 import com.relic.domain.models.Gildings
 import com.squareup.moshi.Moshi
 import java.util.*

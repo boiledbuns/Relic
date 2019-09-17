@@ -1,13 +1,11 @@
 package com.relic.presentation.customview;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Rect;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.method.KeyListener;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;

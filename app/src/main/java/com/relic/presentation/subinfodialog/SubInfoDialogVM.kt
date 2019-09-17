@@ -1,7 +1,7 @@
 package com.relic.presentation.subinfodialog
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.relic.data.SubRepository
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel

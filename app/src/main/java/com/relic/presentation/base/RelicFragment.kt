@@ -1,18 +1,18 @@
 package com.relic.presentation.base
 
-import android.arch.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
 import android.view.MenuItem
 import android.view.View
 import com.relic.R
 import com.relic.dagger.RelicInjectable
 import timber.log.Timber
 
-open class RelicFragment: Fragment(), RelicInjectable {
+open class RelicFragment: androidx.fragment.app.Fragment(), RelicInjectable {
     protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
     protected var snackbar : Snackbar? = null
 
@@ -28,7 +28,7 @@ open class RelicFragment: Fragment(), RelicInjectable {
         childFragmentManager.popBackStackImmediate()
     }
 
-    protected fun transitionToFragment(fragment : Fragment, replace : Boolean = false) {
+    protected fun transitionToFragment(fragment : androidx.fragment.app.Fragment, replace : Boolean = false) {
         activity!!.supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.main_content_frame, fragment)

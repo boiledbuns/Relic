@@ -1,6 +1,6 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.relic.presentation.callbacks.AuthenticationCallback
 
 interface Auth {

@@ -1,9 +1,9 @@
 package com.relic.presentation.displaypost.tabs
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +32,7 @@ class CommentsFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         postCommentRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             commentAdapter = CommentItemAdapter(commentsVM)
             adapter = commentAdapter
         }

@@ -2,7 +2,7 @@
 <!-- contains the content for a post item -->
 <!-- should aways be included in another xml layout for use -->
 <!-- ie. post_item_card and post_item_span -->
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -38,7 +38,7 @@
         android:textSize="@dimen/text_s"
         tools:text="Dec 28th, 10:55 AM"/>
 
-    <android.support.constraint.Barrier
+    <androidx.constraintlayout.widget.Barrier
         android:id="@+id/topRowBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
         app:layout_constraintEnd_toStartOf="@id/thumbnailContainer"
         tools:text="author flair"/>
 
-    <android.support.constraint.Barrier
+    <androidx.constraintlayout.widget.Barrier
         android:id="@+id/authorFlairBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/authorFlairBarrier"/>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/thumbnailContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -112,10 +112,10 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackground"/>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
     <!-- since title could be taller/shorter than preview -->
-    <android.support.constraint.Barrier
+    <androidx.constraintlayout.widget.Barrier
         android:id="@+id/titleGroupBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -137,7 +137,7 @@
         tools:text="123"
         tools:visibility="visible"/>
 
-    <android.support.constraint.Barrier
+    <androidx.constraintlayout.widget.Barrier
         android:id="@+id/contentBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -218,5 +218,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible"/>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 

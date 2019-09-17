@@ -9,7 +9,7 @@
     </data>
 
     <!-- need constraint layout to keep the square shape -->
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:background="?attr/colorPrimary"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -41,5 +41,5 @@
                 app:bannerUrl="@{subredditItem.getBannerUrl}"
                 android:contentDescription="@string/tag_banner"/>
         </RelativeLayout>
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

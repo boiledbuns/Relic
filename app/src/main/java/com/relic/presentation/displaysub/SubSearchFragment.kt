@@ -1,14 +1,14 @@
 package com.relic.presentation.displaysub
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat.getSystemService
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -65,7 +65,7 @@ class SubSearchFragment : RelicFragment() {
         postAdapter = PostItemAdapter(viewPrefsManager, subSearchVM)
         subSearchRV.apply {
             adapter = postAdapter
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         }
 
         initSearchEditText(subSearch)
@@ -85,9 +85,9 @@ class SubSearchFragment : RelicFragment() {
     }
 
     private fun attachScrollListeners() {
-        subSearchRV.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        subSearchRV.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
 
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
                 // checks if the recycler view can no longer scroll downwards

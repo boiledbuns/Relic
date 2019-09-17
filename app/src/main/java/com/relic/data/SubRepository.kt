@@ -1,6 +1,6 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 
 import com.relic.data.gateway.SubGateway
 import com.relic.domain.models.SubPreviewModel

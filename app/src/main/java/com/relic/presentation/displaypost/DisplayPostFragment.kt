@@ -1,18 +1,18 @@
 package com.relic.presentation.displaypost
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import android.view.*
 import android.widget.Toast
 import com.relic.R
@@ -256,9 +256,9 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
-    private inner class DisplayPostPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private inner class DisplayPostPagerAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
         val tabFragmentTitles = listOf("POST", "COMMENTS")
-        val tabFragments = ArrayList<Fragment>()
+        val tabFragments = ArrayList<androidx.fragment.app.Fragment>()
 
         override fun getPageTitle(position: Int): CharSequence? {
             return tabFragmentTitles[position]
@@ -266,7 +266,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
         override fun getCount() = tabFragments.size
 
-        override fun getItem(position: Int): Fragment {
+        override fun getItem(position: Int): androidx.fragment.app.Fragment {
             return tabFragments[position]
         }
     }

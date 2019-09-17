@@ -1,14 +1,14 @@
 package com.relic.presentation.home.frontpage
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -47,7 +47,7 @@ class FrontpageFragment : RelicFragment() {
     }
 
     private lateinit var postAdapter: PostItemAdapter
-    private lateinit var frontpageRecyclerView : RecyclerView
+    private lateinit var frontpageRecyclerView : androidx.recyclerview.widget.RecyclerView
 
     private var scrollLocked: Boolean = false
 
@@ -64,7 +64,7 @@ class FrontpageFragment : RelicFragment() {
         postAdapter = PostItemAdapter(viewPrefsManager, frontpageVM)
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             adapter = postAdapter
         }
 
@@ -85,8 +85,8 @@ class FrontpageFragment : RelicFragment() {
         }
 
         // attach listener for checking if the user has scrolled to the bottom of the recycler view
-        frontpageRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+        frontpageRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 // TODO : add animation for loading posts
                 // checks if the recycler view can no longer scroll downwards

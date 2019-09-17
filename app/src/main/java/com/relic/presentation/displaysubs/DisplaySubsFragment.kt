@@ -1,15 +1,15 @@
 package com.relic.presentation.displaysubs
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.SearchView
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -80,13 +80,13 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         displaySubsBinding.apply {
 
             displaySubsRecyclerview.also {
-                it.layoutManager = GridLayoutManager(context, 3)
+                it.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
                 it.adapter = subAdapter
             }
 
             searchSubsRecyclerview.apply {
                 adapter = searchItemAdapter
-                layoutManager = LinearLayoutManager(context)
+                layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             }
         }
 
@@ -217,7 +217,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         }
     }
 
-    internal inner class OnClickSearchSubItem(fragment: Fragment) : SearchSubItemOnClick {
+    internal inner class OnClickSearchSubItem(fragment: androidx.fragment.app.Fragment) : SearchSubItemOnClick {
         override fun onClick(subName: String) {
 
             val subFrag = DisplaySubFragment.create(subName)

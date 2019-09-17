@@ -1,12 +1,13 @@
 package com.relic.presentation.home
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
 import android.view.*
+import androidx.core.view.GravityCompat
 import com.relic.presentation.main.MainActivity
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
@@ -43,7 +44,7 @@ class HomeFragment : RelicFragment() {
                 (activity as MainActivity).setSupportActionBar(toolbar)
                 initializeToolbar()
                 toolbar.setNavigationOnClickListener {
-                    (activity as MainActivity).getNavDrawer().openDrawer(Gravity.START)
+                    (activity as MainActivity).getNavDrawer().openDrawer(GravityCompat.START)
                 }
             }
         }
@@ -73,9 +74,9 @@ class HomeFragment : RelicFragment() {
         toggle.syncState()
     }
 
-    private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private inner class HomePagerAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
         val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
-        val tabFragments = ArrayList<Fragment>()
+        val tabFragments = ArrayList<androidx.fragment.app.Fragment>()
 
         override fun getPageTitle(position: Int): CharSequence? {
             return tabFragmentTitles[position]
@@ -83,7 +84,7 @@ class HomeFragment : RelicFragment() {
 
         override fun getCount() = tabFragments.size
 
-        override fun getItem(position: Int): Fragment {
+        override fun getItem(position: Int): androidx.fragment.app.Fragment {
             return tabFragments[position]
         }
     }

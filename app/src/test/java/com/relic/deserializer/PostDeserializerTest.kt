@@ -1,6 +1,6 @@
 package com.relic.deserializer
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.relic.data.deserializer.Contract
 import com.relic.data.deserializer.Deserializer
 import com.relic.data.deserializer.PostDeserializerImpl

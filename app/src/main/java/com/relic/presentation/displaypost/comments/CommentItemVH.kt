@@ -1,6 +1,6 @@
 package com.relic.presentation.displaypost.comments
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.CommentModel
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.comment_item.view.*
 
 class CommentItemVH (
     private val commentItem : RelicCommentView
-): RecyclerView.ViewHolder(commentItem) {
+): androidx.recyclerview.widget.RecyclerView.ViewHolder(commentItem) {
     private var commentId = ""
 
     fun initializeOnClicks(adapter : DisplayPostContract.CommentAdapterDelegate) {

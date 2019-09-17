@@ -1,7 +1,7 @@
 package com.relic.presentation.preferences.appearance
 
 import android.os.Bundle
-import android.support.v7.view.ContextThemeWrapper
+import androidx.appcompat.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

@@ -1,6 +1,6 @@
 package com.relic.domain.models
 
-import android.arch.persistence.room.PrimaryKey
+import androidx.room.PrimaryKey
 import com.relic.api.qualifier.Date
 import com.relic.api.qualifier.Likes
 import com.squareup.moshi.Json

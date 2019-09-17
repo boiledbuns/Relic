@@ -1,6 +1,6 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import android.os.Parcelable
 import com.relic.api.response.Listing
 

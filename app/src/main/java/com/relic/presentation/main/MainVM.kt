@@ -1,6 +1,6 @@
 package com.relic.presentation.main
 
-import android.arch.lifecycle.*
+import androidx.lifecycle.*
 import android.util.Log
 import com.relic.data.Auth
 import com.relic.data.auth.AuthImpl

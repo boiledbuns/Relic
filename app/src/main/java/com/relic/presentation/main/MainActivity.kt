@@ -1,15 +1,15 @@
 package com.relic.presentation.main
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.view.GestureDetectorCompat
-import android.support.v4.widget.DrawerLayout
+import androidx.core.view.GestureDetectorCompat
+import androidx.drawerlayout.widget.DrawerLayout
 
 import android.util.Log
 import android.view.GestureDetector
@@ -248,7 +248,7 @@ class MainActivity : RelicActivity() {
 
     // endregion navigation view handlers
 
-    fun getNavDrawer(): DrawerLayout = navigationDrawer!!
+    fun getNavDrawer(): androidx.drawerlayout.widget.DrawerLayout = navigationDrawer!!
 }
 
 

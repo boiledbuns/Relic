@@ -1,6 +1,6 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.relic.api.response.Listing
 import com.relic.persistence.entities.ListingEntity
 

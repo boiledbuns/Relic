@@ -1,6 +1,6 @@
 package com.relic.presentation.displaysub
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.relic.presentation.main.RelicError
 import com.relic.data.PostRepository
 import com.relic.data.PostSource

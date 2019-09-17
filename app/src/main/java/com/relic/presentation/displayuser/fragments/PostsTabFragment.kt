@@ -1,11 +1,11 @@
 package com.relic.presentation.displayuser.fragments
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +53,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         userPostsAdapter = ListingItemAdapter(viewPrefsManager, postsTabVM)
         userTabRecyclerView.apply {
             adapter = userPostsAdapter
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         }
         userTabSwipeRefreshLayout.isRefreshing = true
 
@@ -70,8 +70,8 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
 
     private fun attachScrollListeners() {
         // attach listener for checking if the user has scrolled to the bottom of the recyclerview
-        userTabRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+        userTabRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {

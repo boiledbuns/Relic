@@ -1,7 +1,7 @@
 package com.relic.presentation.editor
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.relic.data.CommentRepository
 import com.relic.data.PostRepository
 import com.relic.presentation.base.RelicViewModel

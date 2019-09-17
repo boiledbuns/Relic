@@ -1,7 +1,7 @@
 package com.relic.presentation.preferences
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,7 +69,7 @@ class PreferencesFragment : RelicFragment() {
     }
 
     private fun handleNavigation (preferenceLink : PreferenceLink) {
-        val linkFragment : Fragment? = when (preferenceLink) {
+        val linkFragment : androidx.fragment.app.Fragment? = when (preferenceLink) {
             PreferenceLink.Theme -> ThemeFragment.create(preferenceChangedListener)
             PreferenceLink.PostLayout -> PostLayoutFragment.create(preferenceChangedListener)
             else -> null

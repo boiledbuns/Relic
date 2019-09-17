@@ -16,7 +16,7 @@
     </data>
 
     <!-- TODO push up to activity xml and move appbar layout through it as well -->
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -36,13 +36,13 @@
 
         <!--</android.support.design.widget.AppBarLayout>-->
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/display_subs_swiperefreshlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-            <android.support.v4.widget.NestedScrollView
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -56,7 +56,7 @@
                         android:layout_height="wrap_content"/>
 
                     <!-- displays all subscribed subs-->
-                    <android.support.v7.widget.RecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/display_subs_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -67,7 +67,7 @@
                     <!--android:layout_below="@+id/display_subs_toolbar"-->
 
                     <!-- Displays search results -->
-                    <android.support.v7.widget.RecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/search_subs_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -75,10 +75,10 @@
 
                 </RelativeLayout>
 
-            </android.support.v4.widget.NestedScrollView>
+            </androidx.core.widget.NestedScrollView>
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

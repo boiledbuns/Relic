@@ -1,7 +1,7 @@
 package com.relic.viewmodel
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.nhaarman.mockitokotlin2.*
 import com.relic.api.response.Data
 import com.relic.api.response.Listing

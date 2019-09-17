@@ -1,6 +1,6 @@
 package com.relic.data
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.relic.data.deserializer.Contract
 import com.relic.data.repository.RepoConstants
 import com.relic.domain.models.CommentModel

@@ -1,16 +1,16 @@
 package com.relic.presentation.displayuser
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import android.view.*
 import com.relic.R
 import com.relic.data.PostRepository
@@ -196,7 +196,7 @@ class DisplayUserFragment : RelicFragment() {
         }
     }
 
-    private inner class UserContentPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm) {
+    private inner class UserContentPagerAdapter(fm : androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
         val contentFragmentTitles = listOf(
             UserTab.Submitted,
             UserTab.Comments,

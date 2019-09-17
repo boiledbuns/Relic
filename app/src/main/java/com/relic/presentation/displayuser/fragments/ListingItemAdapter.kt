@@ -1,7 +1,7 @@
 package com.relic.presentation.displayuser.fragments
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
@@ -19,7 +19,7 @@ import ru.noties.markwon.Markwon
 class ListingItemAdapter(
     private val viewPrefsManager: PostViewPreferences,
     private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
-) : RecyclerView.Adapter <RecyclerView.ViewHolder> (),
+) : androidx.recyclerview.widget.RecyclerView.Adapter <androidx.recyclerview.widget.RecyclerView.ViewHolder> (),
     DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentAdapterDelegate {
 
     private lateinit var markwon : Markwon
@@ -38,7 +38,7 @@ class ListingItemAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_POST -> PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout)).apply {
                 initializeOnClicks(this@ListingItemAdapter)
@@ -54,7 +54,7 @@ class ListingItemAdapter(
         }
     }
 
-    override fun onBindViewHolder(vh: RecyclerView.ViewHolder, position : Int) {
+    override fun onBindViewHolder(vh: androidx.recyclerview.widget.RecyclerView.ViewHolder, position : Int) {
         val item = listingItems[position]
         when (item) {
             is PostModel -> (vh as PostItemVH).bindPost(item)

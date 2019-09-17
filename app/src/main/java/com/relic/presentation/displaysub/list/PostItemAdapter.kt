@@ -1,6 +1,6 @@
 package com.relic.presentation.displaysub.list
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import android.view.ViewGroup
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
