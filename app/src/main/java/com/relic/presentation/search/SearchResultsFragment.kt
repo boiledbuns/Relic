@@ -1,9 +1,9 @@
 package com.relic.presentation.search
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel

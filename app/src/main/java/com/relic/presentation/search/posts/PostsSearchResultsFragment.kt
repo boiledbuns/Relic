@@ -1,14 +1,14 @@
-package com.relic.presentation.search
+package com.relic.presentation.search.posts
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
@@ -16,9 +16,9 @@ import com.relic.presentation.displaysub.NoResults
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.main.MainActivity
 import com.relic.presentation.main.RelicError
+import com.relic.presentation.search.SearchResultsVM
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
-import kotlinx.android.synthetic.main.post_results.*
 
 class PostsSearchResultsFragment : RelicFragment() {
     private val searchResultsVM by lazy {
@@ -79,11 +79,12 @@ class PostsSearchResultsFragment : RelicFragment() {
         super.bindViewModel(lifecycleOwner)
 
         searchResultsVM.apply {
+            postSearchErrorLiveData.observe(lifecycleOwner) { handleError(it) }
+
             if (offline) {
-                postSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
-                postResultsLiveData.nonNull().observe(lifecycleOwner) { handlePostResults(it) }
+                offlinePostResultsLiveData.nonNull().observe(lifecycleOwner) { handlePostResults(it) }
             } else {
-                // TODO add offline
+                postResultsLiveData.nonNull().observe(lifecycleOwner) { handlePostResults(it) }
             }
         }
     }
@@ -97,7 +98,7 @@ class PostsSearchResultsFragment : RelicFragment() {
         displaySearchProgress.visibility = View.GONE
     }
 
-    private fun handleError(error : RelicError) {
+    private fun handleError(error : RelicError?) {
         displaySearchProgress.visibility = View.GONE
         when(error) {
             is NoResults -> {

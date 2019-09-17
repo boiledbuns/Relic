@@ -4,7 +4,7 @@ import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.presentation.search.PostsSearchFragment
+import com.relic.presentation.search.posts.PostsSearchFragment
 import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
@@ -18,7 +18,7 @@ import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
-import com.relic.presentation.search.PostsSearchResultsFragment
+import com.relic.presentation.search.posts.PostsSearchResultsFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import dagger.Module
 import dagger.android.ContributesAndroidInjector

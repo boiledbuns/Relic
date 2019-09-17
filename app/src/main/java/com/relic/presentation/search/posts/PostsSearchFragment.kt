@@ -1,4 +1,4 @@
-package com.relic.presentation.search
+package com.relic.presentation.search.posts
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,6 +20,7 @@ import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
+import com.relic.presentation.search.SearchResultsVM
 import kotlinx.android.synthetic.main.display_sub_search.*
 import javax.inject.Inject
 
@@ -102,11 +103,11 @@ class PostsSearchFragment : RelicFragment() {
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         super.bindViewModel(lifecycleOwner)
         searchResultsVM.apply {
-            postSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
+            postSearchErrorLiveData.observe(lifecycleOwner) { handleError(it) }
         }
     }
 
-    private fun handleError(error : RelicError) {
+    private fun handleError(error : RelicError?) {
         when(error) {
             is RelicError.NetworkUnavailable -> {
                 Snackbar.make(
@@ -120,6 +121,9 @@ class PostsSearchFragment : RelicFragment() {
 //                    }
                     show()
                 }
+            }
+            null -> {
+                // TODO hide error snackbar
             }
         }
     }

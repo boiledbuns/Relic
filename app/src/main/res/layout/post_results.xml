@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="0 results loaded"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/subSearchRV"
         app:layout_constraintTop_toBottomOf="@id/subSearchResultCount"
         app:layout_constraintBottom_toBottomOf="parent"

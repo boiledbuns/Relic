@@ -1,7 +1,7 @@
 package com.relic.presentation.search
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
@@ -34,13 +34,17 @@ class SearchResultsVM(
     private val _subResultsLiveData = MutableLiveData<List<SubredditModel>>()
     private val _userResultsLiveData = MutableLiveData<List<UserModel>>()
     private val _postResultsLiveData = MutableLiveData<List<PostModel>>()
-    private val _postSearchErrorLiveData = MutableLiveData<RelicError>()
+    private val _offlinePostResultsLiveData = MutableLiveData<List<PostModel>>()
+
+    private val _postSearchErrorLiveData = MutableLiveData<RelicError?>()
 
     val subResultsLiveData : LiveData<List<SubredditModel>> = _subResultsLiveData
     val userResultsLiveData : LiveData<List<UserModel>> = _userResultsLiveData
-    override val postResultsLiveData: LiveData<List<PostModel>> = _postResultsLiveData
 
-    override val postSearchErrorLiveData: LiveData<RelicError> =  _postSearchErrorLiveData
+    override val postResultsLiveData: LiveData<List<PostModel>> = _postResultsLiveData
+    override val offlinePostResultsLiveData : LiveData<List<PostModel>> = _offlinePostResultsLiveData
+
+    override val postSearchErrorLiveData: LiveData<RelicError?> =  _postSearchErrorLiveData
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -57,9 +61,11 @@ class SearchResultsVM(
 
     override fun search() {
         launch(Dispatchers.Main) {
-            val listing = when (postSource) {
+            val listing = when(postSource) {
                 is PostSource.Subreddit -> {
-                    query?.let { postRepo.searchSubPosts(postSource.subredditName, it, true) }
+                    query?.let {
+                        postRepo.searchSubPosts(postSource.subredditName, it, true)
+                    }
                 }
                 else -> {
                     null
@@ -69,6 +75,16 @@ class SearchResultsVM(
             listing?.data?.let { data ->
                 postSearchAfter = data.after
                 _postResultsLiveData.postValue(data.children)
+            }
+
+            // search offline posts
+            when(postSource) {
+                is PostSource.Subreddit -> {
+                    query?.let {
+                        val offlinePosts = postRepo.searchOfflinePosts(postSource.subredditName, it, true)
+                        _offlinePostResultsLiveData.postValue(offlinePosts)
+                    }
+                }
             }
         }
     }

@@ -30,7 +30,7 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.search.PostsSearchFragment
+import com.relic.presentation.search.posts.PostsSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull

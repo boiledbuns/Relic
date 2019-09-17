@@ -78,6 +78,12 @@ interface PostRepository {
         after : String? = null
     ) : Listing<PostModel>
 
+    suspend fun searchOfflinePosts(
+        subredditName: String,
+        query : String,
+        restrictToSub : Boolean = false
+    ) : List<PostModel>
+
     suspend fun postPost(postDraft: PostDraft, type : PostType)
 
     suspend fun saveDraft(postDraft: PostDraft)
