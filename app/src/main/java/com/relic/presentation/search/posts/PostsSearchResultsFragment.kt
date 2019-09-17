@@ -19,6 +19,7 @@ import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.SearchResultsVM
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
+import kotlinx.android.synthetic.main.post_results.*
 
 class PostsSearchResultsFragment : RelicFragment() {
     private val searchResultsVM by lazy {
@@ -47,6 +48,7 @@ class PostsSearchResultsFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         postAdapter = PostItemAdapter(viewPrefsManager, searchResultsVM)
+
         subSearchRV.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(context)

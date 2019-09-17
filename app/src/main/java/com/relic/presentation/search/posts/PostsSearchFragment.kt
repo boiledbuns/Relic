@@ -21,6 +21,7 @@ import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.SearchResultsVM
+import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub_search.*
 import javax.inject.Inject
 
