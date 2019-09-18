@@ -20,6 +20,7 @@ import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
+import com.relic.presentation.search.SearchOptions
 import com.relic.presentation.search.SearchResultsVM
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub_search.*
@@ -46,7 +47,8 @@ class PostsSearchFragment : RelicFragment() {
     private lateinit var postSource : PostSource
 
     private var countDownTimer : SearchInputCountdown = SearchInputCountdown {
-        searchResultsVM.search()
+        val searchOptions = generateSearchOptions()
+        searchResultsVM.search(searchOptions)
     }
 
     // region lifecycle hooks
@@ -56,8 +58,8 @@ class PostsSearchFragment : RelicFragment() {
 
         postSource = arguments?.getParcelable(ARG_SOURCE) as PostSource
         pagerAdapter = PostsSearchPagerAdapter().apply {
-            fragments.add(PostsSearchResultsFragment.create(offline = true))
             fragments.add(PostsSearchResultsFragment.create(offline = false))
+            fragments.add(PostsSearchResultsFragment.create(offline = true))
         }
     }
 
@@ -78,6 +80,8 @@ class PostsSearchFragment : RelicFragment() {
                 ?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.RESULT_SHOWN)
     }
 
+    // endregion lifecycle hooks
+
     private fun SearchView.initSearchWidget() {
         setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -92,13 +96,19 @@ class PostsSearchFragment : RelicFragment() {
             }
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchResultsVM.search()
+                val options = generateSearchOptions()
+                searchResultsVM.search(options)
 
                 // action is handled by listener
                 return true
             }
         })
-//        subSearch.requestFocus()
+    }
+
+    private fun generateSearchOptions() : SearchOptions{
+        return SearchOptions(
+            restrictToSource = true
+        )
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -129,7 +139,6 @@ class PostsSearchFragment : RelicFragment() {
         }
     }
 
-    // endregion lifecycle hooks
 
     companion object {
         val ARG_SOURCE = "post_source"

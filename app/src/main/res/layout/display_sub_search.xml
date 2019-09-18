@@ -8,14 +8,15 @@
     android:background="?attr/relicBackgroundColor"
     android:id="@+id/subSearchRoot">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/postsSearchAppBarLayout"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/subSearchContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +31,7 @@
                 app:queryBackground="@android:color/transparent"
                 app:queryHint="@string/search_sub"/>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/postsSearchTabLayout"
@@ -41,7 +42,7 @@
             app:tabSelectedTextColor="?attr/relicTitleColor"
             app:tabTextColor="?android:textColor"/>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/postsSearchViewPager"

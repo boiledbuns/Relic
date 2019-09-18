@@ -59,32 +59,24 @@ class SearchResultsVM(
         this.query = query
     }
 
-    override fun search() {
-        launch(Dispatchers.Main) {
-            val listing = when(postSource) {
-                is PostSource.Subreddit -> {
-                    query?.let {
+    override fun search(options : SearchOptions) {
+        query?.let {
+            launch(Dispatchers.Main) {
+                val listing = when (postSource) {
+                    is PostSource.Subreddit -> {
                         postRepo.searchSubPosts(postSource.subredditName, it, true)
                     }
+                    else -> null
                 }
-                else -> {
-                    null
-                }
-            }
 
-            listing?.data?.let { data ->
-                postSearchAfter = data.after
-                _postResultsLiveData.postValue(data.children)
-            }
-
-            // search offline posts
-            when(postSource) {
-                is PostSource.Subreddit -> {
-                    query?.let {
-                        val offlinePosts = postRepo.searchOfflinePosts(postSource.subredditName, it, true)
-                        _offlinePostResultsLiveData.postValue(offlinePosts)
-                    }
+                listing?.data?.let { data ->
+                    postSearchAfter = data.after
+                    _postResultsLiveData.postValue(data.children)
                 }
+
+                // search offline posts
+                val offlinePosts = postRepo.searchOfflinePosts(postSource, it)
+                _offlinePostResultsLiveData.postValue(offlinePosts)
             }
         }
     }
@@ -110,7 +102,7 @@ class SearchResultsVM(
                         _postSearchErrorLiveData.postValue(NoResults)
                     } else {
                         // concat new results with current ones
-                        val newPosts = (_postResultsLiveData.value ?: emptyList<PostModel>()) + children
+                        val newPosts = (_postResultsLiveData.value ?: emptyList()) + children
                         _postResultsLiveData.postValue(newPosts)
                     }
                 }

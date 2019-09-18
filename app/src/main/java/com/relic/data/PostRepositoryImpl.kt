@@ -255,8 +255,15 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchOfflinePosts(subredditName: String, query: String, restrictToSub: Boolean): List<PostModel> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun searchOfflinePosts(sourceRestriction: PostSource?, query: String): List<PostModel> {
+         return withContext(Dispatchers.IO) {
+             if (sourceRestriction == null) {
+                 postDao.searchPosts("%$query%")
+             } else {
+                 val name = sourceRestriction.getSourceName()
+                 postDao.searchOfflineSourcePosts(name, "%$query%")
+             }
+         }
     }
 
     override suspend fun postPost(postDraft: PostDraft, type : PostType) {

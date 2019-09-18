@@ -79,9 +79,8 @@ interface PostRepository {
     ) : Listing<PostModel>
 
     suspend fun searchOfflinePosts(
-        subredditName: String,
-        query : String,
-        restrictToSub : Boolean = false
+        sourceRestriction: PostSource?,
+        query : String
     ) : List<PostModel>
 
     suspend fun postPost(postDraft: PostDraft, type : PostType)
