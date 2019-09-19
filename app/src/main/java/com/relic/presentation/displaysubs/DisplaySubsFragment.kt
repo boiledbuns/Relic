@@ -6,9 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.widget.SearchView
 import android.view.LayoutInflater
 import android.view.Menu
@@ -21,7 +18,7 @@ import com.relic.R
 import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.network.NetworkUtil
-import com.relic.presentation.adapter.SearchItemAdapter
+import com.relic.presentation.search.subs.SearchSubItemAdapter
 import com.relic.presentation.adapter.SearchSubItemOnClick
 import com.relic.presentation.displaysubs.subslist.SubItemAdapter
 import com.relic.presentation.adapter.SubItemOnClick
@@ -56,7 +53,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     private lateinit var displaySubsBinding: DisplaySubsBinding
     private lateinit var subAdapter: SubItemAdapter
-    private lateinit var searchItemAdapter: SearchItemAdapter
+    private lateinit var searchSubItemAdapter: SearchSubItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +63,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
         // initialize the adapter for the search subs recycler view
         val searchSubItemOnClick = OnClickSearchSubItem(this)
-        searchItemAdapter = SearchItemAdapter(searchSubItemOnClick)
+        searchSubItemAdapter = SearchSubItemAdapter(searchSubItemOnClick)
     }
 
     override fun onCreateView(
@@ -85,7 +82,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             }
 
             searchSubsRecyclerview.apply {
-                adapter = searchItemAdapter
+                adapter = searchSubItemAdapter
                 layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             }
         }
@@ -125,7 +122,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
                 }
 
                 // clear items in the adapter
-                searchItemAdapter.clearSearchResults()
+                searchSubItemAdapter.clearSearchResults()
                 return true
             }
         })
@@ -159,7 +156,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 //        }
 
         viewModel.searchResults.nonNull().observe(lifecycleOwner) { results ->
-            searchItemAdapter.handleSearchResultsPayload(results)
+            searchSubItemAdapter.handleSearchResultsPayload(results)
         }
 
         viewModel.pinnedSubs.nonNull().observe(lifecycleOwner) { pinnedSubs ->
@@ -222,7 +219,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
             val subFrag = DisplaySubFragment.create(subName)
             // clear items in the adapter
-            searchItemAdapter.clearSearchResults()
+            searchSubItemAdapter.clearSearchResults()
         }
     }
 }

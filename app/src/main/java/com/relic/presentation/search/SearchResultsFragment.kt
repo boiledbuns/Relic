@@ -10,25 +10,29 @@ import com.relic.domain.models.SubredditModel
 import com.relic.domain.models.UserModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.search.posts.PostsSearchResultsVM
 import javax.inject.Inject
 
 
-
+/**
+ * this fragment will allow the user to search everything
+ * TODO add user, sub, post, and comment search vm to this vm as delegates
+ */
 class SearchResultsFragment : RelicFragment() {
     @Inject
-    lateinit var factory : SearchResultsVM.Factory
+    lateinit var factory : PostsSearchResultsVM.Factory
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
-    val searchResultsVM: SearchResultsVM by lazy {
+    private val searchResultsVM: PostsSearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
                 return factory.create(postSource) as T
             }
-        }).get(SearchResultsVM::class.java)
+        }).get(PostsSearchResultsVM::class.java)
     }
 
     // we use all since we don't want to restrict search

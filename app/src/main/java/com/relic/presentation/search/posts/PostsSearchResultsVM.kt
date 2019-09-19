@@ -1,4 +1,4 @@
-package com.relic.presentation.search
+package com.relic.presentation.search.posts
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,22 +12,32 @@ import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.NoResults
 import com.relic.presentation.main.RelicError
+import com.relic.presentation.search.DisplaySearchContract
+import com.relic.presentation.search.PostSearchOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class SearchResultsVM(
+class PostsSearchResultsVM(
     private val postRepo: PostRepository,
     private val postGateway: PostGateway,
     private val postSource: PostSource
 ) :
     RelicViewModel(),
-    DisplaySearchContract.SearchVM,
     DisplaySearchContract.PostsSearchVM,
     DisplaySubContract.PostAdapterDelegate
 {
+    class Factory @Inject constructor(
+            private val postRepo: PostRepository,
+            private val postGateway: PostGateway
+    ) {
+        fun create(postSource: PostSource) : PostsSearchResultsVM {
+            return PostsSearchResultsVM(postRepo, postGateway, postSource)
+        }
+    }
+
     private var postSearchAfter : String? = null
     private var query : String? = null
 
@@ -46,20 +56,11 @@ class SearchResultsVM(
 
     override val postSearchErrorLiveData: LiveData<RelicError?> =  _postSearchErrorLiveData
 
-    class Factory @Inject constructor(
-        private val postRepo: PostRepository,
-        private val postGateway: PostGateway
-    ) {
-        fun create(postSource: PostSource) : SearchResultsVM {
-            return SearchResultsVM(postRepo, postGateway, postSource)
-        }
-    }
-
     override fun updateQuery(query: String) {
         this.query = query
     }
 
-    override fun search(options : SearchOptions) {
+    override fun search(options : PostSearchOptions) {
         query?.let {
             launch(Dispatchers.Main) {
                 val listing = when (postSource) {
@@ -109,6 +110,7 @@ class SearchResultsVM(
 
             } else {
                 Timber.d("No more posts available for this query")
+                _postSearchErrorLiveData.postValue(NoResults)
             }
         }
     }

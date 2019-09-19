@@ -16,14 +16,13 @@ import com.relic.presentation.displaysub.NoResults
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.main.MainActivity
 import com.relic.presentation.main.RelicError
-import com.relic.presentation.search.SearchResultsVM
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.post_results.*
 
 class PostsSearchResultsFragment : RelicFragment() {
     private val searchResultsVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(SearchResultsVM::class.java)
+        ViewModelProviders.of(parentFragment!!).get(PostsSearchResultsVM::class.java)
     }
 
     private val viewPrefsManager by lazy {

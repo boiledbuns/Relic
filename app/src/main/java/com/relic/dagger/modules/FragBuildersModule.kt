@@ -19,6 +19,7 @@ import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
 import com.relic.presentation.search.posts.PostsSearchResultsFragment
+import com.relic.presentation.search.subs.SubSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -74,13 +75,16 @@ abstract class FragBuildersModule {
     abstract fun contributeSubInfo() : SubInfoBottomSheetDialog
 
     @ContributesAndroidInjector
-    abstract fun contributePostsSearchFragment() : PostsSearchFragment
-
-    @ContributesAndroidInjector
     abstract fun contributeDisplayMedia() : DisplayImageFragment
 
     @ContributesAndroidInjector
+    abstract fun contributePostsSearchFragment() : PostsSearchFragment
+
+    @ContributesAndroidInjector
     abstract fun postsSearchResults() : PostsSearchResultsFragment
+
+    @ContributesAndroidInjector
+    abstract fun subSearchFragment() : SubSearchFragment
 
     // endregion main ui
 

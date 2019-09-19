@@ -20,28 +20,27 @@ import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
-import com.relic.presentation.search.SearchOptions
-import com.relic.presentation.search.SearchResultsVM
+import com.relic.presentation.search.PostSearchOptions
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub_search.*
 import javax.inject.Inject
 
 class PostsSearchFragment : RelicFragment() {
     @Inject
-    lateinit var factory : SearchResultsVM.Factory
+    lateinit var factory : PostsSearchResultsVM.Factory
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     private lateinit var pagerAdapter: PostsSearchPagerAdapter
 
-    val searchResultsVM: SearchResultsVM by lazy {
+    val searchResultsVM: PostsSearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(postSource) as T
             }
-        }).get(SearchResultsVM::class.java)
+        }).get(PostsSearchResultsVM::class.java)
     }
 
     private lateinit var postSource : PostSource
@@ -105,8 +104,8 @@ class PostsSearchFragment : RelicFragment() {
         })
     }
 
-    private fun generateSearchOptions() : SearchOptions{
-        return SearchOptions(
+    private fun generateSearchOptions() : PostSearchOptions{
+        return PostSearchOptions(
             restrictToSource = true
         )
     }

@@ -256,13 +256,11 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchOfflinePosts(sourceRestriction: PostSource?, query: String): List<PostModel> {
-         return withContext(Dispatchers.IO) {
-             if (sourceRestriction == null) {
-                 postDao.searchPosts("%$query%")
-             } else {
-                 val name = sourceRestriction.getSourceName()
-                 postDao.searchOfflineSourcePosts(name, "%$query%")
-             }
+        val restrictSource = sourceRestriction != null
+        val name = sourceRestriction?.getSourceName()
+
+        return withContext(Dispatchers.IO) {
+            postDao.searchOfflineSourcePosts(name, restrictSource, "%$query%")
          }
     }
 
