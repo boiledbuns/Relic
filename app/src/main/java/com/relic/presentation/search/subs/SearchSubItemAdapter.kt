@@ -3,37 +3,39 @@ package com.relic.presentation.search.subs
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.SubredditModel
-import com.relic.presentation.adapter.SearchSubItemOnClick
 import timber.log.Timber
 
-class SearchSubItemAdapter(private val onclick: SearchSubItemOnClick) : RecyclerView.Adapter<SearchSubItemVH>() {
-    private var searchResults: List<String> = emptyList()
-    private var subscribedResults: List<SubredditModel> = emptyList()
+class SearchSubItemAdapter: RecyclerView.Adapter<SearchSubItemAdapter.SearchSubItemVH>() {
+    private var searchResults: List<SubredditModel> = emptyList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, i: Int): SearchSubItemVH {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchSubItemVH {
         val searchItemView = SearchSubItemView(parent.context)
         return SearchSubItemVH(searchItemView)
     }
 
-    override fun onBindViewHolder(searchItemVH: SearchSubItemVH, position: Int) {
-        searchItemVH.bindSubreddit(subscribedResults[position])
+    override fun onBindViewHolder(vh: SearchSubItemVH, position: Int) {
+        vh.bindSubreddit(searchResults[position])
     }
 
-    override fun getItemCount(): Int {
-        return searchResults.size
-    }
+    override fun getItemCount(): Int = searchResults.size
 
     fun clearSearchResults() {
         searchResults = emptyList()
-        subscribedResults = emptyList()
         notifyDataSetChanged()
     }
 
-    fun handleSearchResultsPayload(searchResults: List<String>) {
-        if (searchResults != null) {
-            Timber.d("Search results received %s", searchResults)
-            this.searchResults = searchResults
-            notifyDataSetChanged()
+    fun updateSearchResults(searchResults: List<SubredditModel>) {
+        Timber.d("Search results received %s", searchResults)
+        this.searchResults = searchResults
+        notifyDataSetChanged()
+    }
+
+    inner class SearchSubItemVH(
+        val view : SearchSubItemView
+    ) : RecyclerView.ViewHolder(view) {
+
+        fun bindSubreddit(subModel : SubredditModel) {
+            view.bindSubreddit(subModel)
         }
     }
 

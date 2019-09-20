@@ -20,8 +20,8 @@ interface DisplaySearchContract {
 
     interface SubredditSearchVM {
         val subSearchErrorLiveData : LiveData<RelicError?>
-        val subredditResultsLiveData : LiveData<List<SubredditModel>>
-        val subscribedSubredditResultsLiveData : LiveData<List<PostModel>>
+        val subredditResultsLiveData : LiveData<List<String>>
+        val subscribedSubredditResultsLiveData : LiveData<List<SubredditModel>>
 
         fun updateQuery(query : String)
         fun search(options : SubredditSearchOptions)
@@ -33,6 +33,16 @@ sealed class SearchSource {
     data class Subreddit(
         val name : String
     )
+}
+
+sealed class SubredditSearchResult {
+    data class Name(
+        val name: String
+    ) : SubredditSearchResult()
+
+    data class Full(
+        val subreddit: SubredditModel
+    ) : SubredditSearchResult()
 }
 
 data class UserSearchOptions(

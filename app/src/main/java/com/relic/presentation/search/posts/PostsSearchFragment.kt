@@ -22,7 +22,7 @@ import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.PostSearchOptions
 import com.shopify.livedataktx.observe
-import kotlinx.android.synthetic.main.display_sub_search.*
+import kotlinx.android.synthetic.main.display_post_search.*
 import javax.inject.Inject
 
 class PostsSearchFragment : RelicFragment() {
@@ -63,7 +63,7 @@ class PostsSearchFragment : RelicFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_sub_search, container, false)
+        return inflater.inflate(R.layout.display_post_search, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -121,7 +121,7 @@ class PostsSearchFragment : RelicFragment() {
         when(error) {
             is RelicError.NetworkUnavailable -> {
                 Snackbar.make(
-                        subSearchRoot,
+                        postSearchRoot,
                         resources.getString(R.string.network_unavailable),
                         Snackbar.LENGTH_INDEFINITE
                 ).apply {

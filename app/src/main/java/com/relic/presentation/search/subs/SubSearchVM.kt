@@ -25,12 +25,12 @@ class SubSearchVM(
     }
 
     private val _subSearchErrorLiveData = MutableLiveData<RelicError?>()
-    private val _subredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
-    private val _subscribedSubredditResultsLiveData = MutableLiveData<List<PostModel>>()
+    private val _subredditResultsLiveData = MutableLiveData<List<String>>()
+    private val _subscribedSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
 
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
-    override val subredditResultsLiveData: LiveData<List<SubredditModel>> = _subredditResultsLiveData
-    override val subscribedSubredditResultsLiveData: LiveData<List<PostModel>> = _subscribedSubredditResultsLiveData
+    override val subredditResultsLiveData: LiveData<List<String>> = _subredditResultsLiveData
+    override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _subscribedSubredditResultsLiveData
 
     override fun updateQuery(query: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

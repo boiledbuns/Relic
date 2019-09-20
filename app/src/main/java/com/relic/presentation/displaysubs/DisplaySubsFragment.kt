@@ -63,7 +63,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
         // initialize the adapter for the search subs recycler view
         val searchSubItemOnClick = OnClickSearchSubItem(this)
-        searchSubItemAdapter = SearchSubItemAdapter(searchSubItemOnClick)
+        searchSubItemAdapter = SearchSubItemAdapter()
     }
 
     override fun onCreateView(
@@ -154,10 +154,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 //        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) {
 //            if (it) handleOnAllSubsLoaded()
 //        }
-
-        viewModel.searchResults.nonNull().observe(lifecycleOwner) { results ->
-            searchSubItemAdapter.handleSearchResultsPayload(results)
-        }
 
         viewModel.pinnedSubs.nonNull().observe(lifecycleOwner) { pinnedSubs ->
             displaySubsBinding.pinnedSubsView.setPinnedSubreddits(pinnedSubs)
