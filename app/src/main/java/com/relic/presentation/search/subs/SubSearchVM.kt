@@ -9,6 +9,7 @@ import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.DisplaySearchContract
 import com.relic.presentation.search.SubredditSearchOptions
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -32,12 +33,17 @@ class SubSearchVM(
     override val subredditResultsLiveData: LiveData<List<String>> = _subredditResultsLiveData
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _subscribedSubredditResultsLiveData
 
-    override fun updateQuery(query: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private var query : String? = null
+
+    override fun updateQuery(newQuery: String) {
+        query = newQuery
     }
 
-    override fun search(options: SubredditSearchOptions) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun search(newOptions: SubredditSearchOptions) {
+        launch {
+            val results = subRepo.searchOfflineSubreddits(query ?: "")
+            _subscribedSubredditResultsLiveData.postValue(results)
+        }
     }
 
     override fun retrieveMoreSubResults() {

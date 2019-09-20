@@ -23,8 +23,8 @@ interface DisplaySearchContract {
         val subredditResultsLiveData : LiveData<List<String>>
         val subscribedSubredditResultsLiveData : LiveData<List<SubredditModel>>
 
-        fun updateQuery(query : String)
-        fun search(options : SubredditSearchOptions)
+        fun updateQuery(newQuery : String)
+        fun search(newOptions : SubredditSearchOptions)
         fun retrieveMoreSubResults()
     }
 }

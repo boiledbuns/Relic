@@ -101,6 +101,12 @@ class SubRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchOfflineSubreddits(query: String) : List<SubredditModel> {
+        return withContext(Dispatchers.IO) {
+            subDao.searchSubreddits("%$query%")
+        }
+    }
+
     override fun getSubGateway(): SubGateway {
         return SubGatewayImpl(appDb, requestManager)
     }

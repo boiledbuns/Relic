@@ -47,6 +47,7 @@ interface SubRepository {
      */
     suspend fun searchSubreddits(query: String, displayNSFW : Boolean, exact : Boolean) :  List<SubPreviewModel>
 
+    suspend fun searchOfflineSubreddits(query : String) : List<SubredditModel>
 
     suspend fun pinSubreddit(subredditName: String, newPinnedStatus: Boolean)
 }

@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicFragment
@@ -33,8 +35,8 @@ class SubSearchFragment : RelicFragment() {
         }).get(SubSearchVM::class.java)
     }
 
-    lateinit var offlineResultsAdapter : SearchSubNameItemAdapter
-    lateinit var searchResultsAdapter : SearchSubItemAdapter
+    private lateinit var offlineResultsAdapter : SearchSubItemAdapter
+    private lateinit var searchResultsAdapter : SearchSubNameItemAdapter
 
     private var countDownTimer : SearchInputCountdown = SearchInputCountdown {
         val searchOptions = generateSearchOptions()
@@ -44,8 +46,8 @@ class SubSearchFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        offlineResultsAdapter = SearchSubNameItemAdapter()
-        searchResultsAdapter = SearchSubItemAdapter()
+        offlineResultsAdapter = SearchSubItemAdapter()
+        searchResultsAdapter = SearchSubNameItemAdapter()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,6 +57,16 @@ class SubSearchFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         subSearch.initSearchWidget()
+
+        localSubResultsRV.apply {
+            adapter = offlineResultsAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        searchSubResultsRV.apply {
+            adapter = searchResultsAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
     }
 
     private fun SearchView.initSearchWidget() {
@@ -63,7 +75,6 @@ class SubSearchFragment : RelicFragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 countDownTimer.cancel()
                 countDownTimer.start()
-
                 subSearchVM.updateQuery(newText.toString())
 
                 // action is handled by listener
@@ -90,20 +101,29 @@ class SubSearchFragment : RelicFragment() {
     }
 
     private fun handleSearchResults(subreddits : List<String>) {
-
+        searchResultsAdapter.updateSearchResults(subreddits)
     }
 
     private fun handleLocalSearchResults(subreddits : List<SubredditModel>) {
-
+        offlineResultsAdapter.updateSearchResults(subreddits)
     }
 
     private fun handleError(error : RelicError?) {
-
+        if (error == null) {
+            // hide the toast
+        } else {
+            Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
+        }
     }
-
 
     private fun generateSearchOptions() : SubredditSearchOptions{
         return SubredditSearchOptions()
+    }
+
+    companion object {
+        fun create() : SubSearchFragment {
+            return SubSearchFragment()
+        }
     }
 
 }

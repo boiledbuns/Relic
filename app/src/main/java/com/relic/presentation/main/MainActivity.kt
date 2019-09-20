@@ -33,6 +33,7 @@ import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESU
 import com.relic.preference.PreferencesManagerImpl
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
+import com.relic.presentation.search.subs.SubSearchFragment
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -239,6 +240,14 @@ class MainActivity : RelicActivity() {
 
     private fun handleNavMenuOnclick(item : MenuItem) : Boolean {
         when (item.itemId) {
+            R.id.search_subs -> SubSearchFragment.create().apply {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.main_content_frame, this)
+                    .addToBackStack(TAG)
+                    .commit()
+            }
+            R.id.search_users -> {}
             R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 

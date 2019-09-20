@@ -81,6 +81,8 @@
 
     <!-- navigation menu -->
     <string name="preferences">preferences</string>
+    <string name="search_subs">search subreddits</string>
+    <string name="search_users">search users</string>
 
     <!-- preferences menu -->
     <string name="preference_theme">Theme Editor</string>

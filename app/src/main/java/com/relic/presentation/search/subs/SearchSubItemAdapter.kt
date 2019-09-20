@@ -35,7 +35,7 @@ class SearchSubItemAdapter: RecyclerView.Adapter<SearchSubItemAdapter.SearchSubI
     ) : RecyclerView.ViewHolder(view) {
 
         fun bindSubreddit(subModel : SubredditModel) {
-            view.bindSubreddit(subModel)
+            view.bind(subModel)
         }
     }
 

@@ -47,7 +47,10 @@ public abstract class SubredditDao {
   public abstract LiveData<List<String>> getSubscribed(String subName);
 
   @Query("SELECT subName FROM SubredditModel WHERE subName = :query")
-  public abstract LiveData<List<String>> searchSubreddits(String query);
+  public abstract LiveData<List<String>> searchSubredditsByName(String query);
+
+  @Query("SELECT * FROM SubredditModel WHERE subName LIKE :query")
+  public abstract List<SubredditModel> searchSubreddits(String query);
 
   @Query("UPDATE SubredditModel SET isSubscribed = :subscribed WHERE subName = :subredditName")
   public abstract void updateSubscription(boolean subscribed, String subredditName);

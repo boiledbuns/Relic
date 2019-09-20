@@ -89,7 +89,7 @@ class DisplaySubFragment : RelicFragment() {
 
         subPostsRecyclerView.apply {
             adapter = postAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
         }
 
         initializeToolbar()
