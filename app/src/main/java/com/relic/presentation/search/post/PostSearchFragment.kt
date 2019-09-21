@@ -1,4 +1,4 @@
-package com.relic.presentation.search.posts
+package com.relic.presentation.search.post
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,22 +25,22 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post_search.*
 import javax.inject.Inject
 
-class PostsSearchFragment : RelicFragment() {
+class PostSearchFragment : RelicFragment() {
     @Inject
-    lateinit var factory : PostsSearchResultsVM.Factory
+    lateinit var factory : PostSearchResultsVM.Factory
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     private lateinit var pagerAdapter: PostsSearchPagerAdapter
 
-    val searchResultsVM: PostsSearchResultsVM by lazy {
+    val searchResultsVM: PostSearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(postSource) as T
             }
-        }).get(PostsSearchResultsVM::class.java)
+        }).get(PostSearchResultsVM::class.java)
     }
 
     private lateinit var postSource : PostSource
@@ -57,8 +57,8 @@ class PostsSearchFragment : RelicFragment() {
 
         postSource = arguments?.getParcelable(ARG_SOURCE) as PostSource
         pagerAdapter = PostsSearchPagerAdapter().apply {
-            fragments.add(PostsSearchResultsFragment.create(offline = false))
-            fragments.add(PostsSearchResultsFragment.create(offline = true))
+            fragments.add(PostSearchResultsFragment.create(offline = false))
+            fragments.add(PostSearchResultsFragment.create(offline = true))
         }
     }
 
@@ -142,11 +142,11 @@ class PostsSearchFragment : RelicFragment() {
     companion object {
         val ARG_SOURCE = "post_source"
 
-        fun create(source  : PostSource) : PostsSearchFragment {
+        fun create(source  : PostSource) : PostSearchFragment {
             val bundle = Bundle()
             bundle.putParcelable(ARG_SOURCE, source)
 
-            return PostsSearchFragment().apply {
+            return PostSearchFragment().apply {
                 arguments = bundle
             }
         }

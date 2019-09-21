@@ -1,4 +1,4 @@
-package com.relic.presentation.search.subs
+package com.relic.presentation.search.subreddit.view
 
 import android.content.Context
 import android.util.AttributeSet

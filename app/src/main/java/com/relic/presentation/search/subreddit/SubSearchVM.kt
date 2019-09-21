@@ -1,9 +1,8 @@
-package com.relic.presentation.search.subs
+package com.relic.presentation.search.subreddit
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.relic.data.SubRepository
-import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
@@ -36,18 +35,28 @@ class SubSearchVM(
 
     private var query : String? = null
 
+    init {
+        // init empty search results
+        _subredditResultsLiveData.postValue(emptyList())
+        _subscribedSubredditResultsLiveData.postValue(emptyList())
+    }
+
     override fun updateQuery(newQuery: String) {
         query = newQuery
     }
 
     override fun search(newOptions: SubredditSearchOptions) {
-        query?.let {
-            launch {
-                val onlineResults = subRepo.searchSubreddits(it, displayNSFW = true, exact = false)
-                _subredditResultsLiveData.postValue(onlineResults)
+        if (query.isNullOrEmpty()) {
+            _subredditResultsLiveData.postValue(emptyList())
+        } else {
+            query?.let {
+                launch {
+                    val onlineResults = subRepo.searchSubreddits(it, displayNSFW = true, exact = false)
+                    _subredditResultsLiveData.postValue(onlineResults)
 
-                val offlineResults = subRepo.searchOfflineSubreddits(it)
-                _subscribedSubredditResultsLiveData.postValue(offlineResults)
+                    val offlineResults = subRepo.searchOfflineSubreddits(it)
+                    _subscribedSubredditResultsLiveData.postValue(offlineResults)
+                }
             }
         }
     }

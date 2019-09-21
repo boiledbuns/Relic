@@ -1,4 +1,4 @@
-package com.relic.presentation.search.posts
+package com.relic.presentation.search.post
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,9 +20,9 @@ import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.post_results.*
 
-class PostsSearchResultsFragment : RelicFragment() {
+class PostSearchResultsFragment : RelicFragment() {
     private val searchResultsVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(PostsSearchResultsVM::class.java)
+        ViewModelProviders.of(parentFragment!!).get(PostSearchResultsVM::class.java)
     }
 
     private val viewPrefsManager by lazy {
@@ -111,11 +111,11 @@ class PostsSearchResultsFragment : RelicFragment() {
     companion object {
         val ARG_OFFLINE_RESULTS = "offline_results"
 
-        fun create(offline : Boolean) : PostsSearchResultsFragment {
+        fun create(offline : Boolean) : PostSearchResultsFragment {
             val bundle = Bundle()
             bundle.putBoolean(ARG_OFFLINE_RESULTS, offline)
 
-            return PostsSearchResultsFragment().apply {
+            return PostSearchResultsFragment().apply {
                 arguments = bundle
             }
         }

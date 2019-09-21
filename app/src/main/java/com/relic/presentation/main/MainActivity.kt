@@ -4,12 +4,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.view.GestureDetectorCompat
-import androidx.drawerlayout.widget.DrawerLayout
 
 import android.util.Log
 import android.view.GestureDetector
@@ -30,10 +27,10 @@ import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.preference.PreferencesManagerImpl
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
-import com.relic.presentation.search.subs.SubSearchFragment
+import com.relic.presentation.search.subreddit.SubSearchFragment
+import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -247,7 +244,13 @@ class MainActivity : RelicActivity() {
                     .addToBackStack(TAG)
                     .commit()
             }
-            R.id.search_users -> {}
+            R.id.search_users -> UserSearchFragment.create().apply {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.main_content_frame, this)
+                    .addToBackStack(TAG)
+                    .commit()
+            }
             R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 

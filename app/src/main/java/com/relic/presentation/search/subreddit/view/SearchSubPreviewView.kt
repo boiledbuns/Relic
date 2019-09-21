@@ -1,4 +1,4 @@
-package com.relic.presentation.search.subs
+package com.relic.presentation.search.subreddit.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -9,9 +9,9 @@ import com.relic.domain.models.SubPreviewModel
 import kotlinx.android.synthetic.main.sub_search_preview_item.view.*
 
 class SearchSubPreviewView @JvmOverloads constructor(
-        context: Context,
-        attrs : AttributeSet? = null,
-        defStyleAttr : Int = 0
+    context: Context,
+    attrs : AttributeSet? = null,
+    defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     init {

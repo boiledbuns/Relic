@@ -10,7 +10,6 @@ import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.TypedValue
@@ -30,7 +29,7 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.search.posts.PostsSearchFragment
+import com.relic.presentation.search.post.PostSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
@@ -141,7 +140,7 @@ class DisplaySubFragment : RelicFragment() {
         var override = true
         when (item?.itemId) {
             R.id.display_sub_searchitem -> {
-                val searchFrag = PostsSearchFragment.create(PostSource.Subreddit(subName))
+                val searchFrag = PostSearchFragment.create(PostSource.Subreddit(subName))
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()

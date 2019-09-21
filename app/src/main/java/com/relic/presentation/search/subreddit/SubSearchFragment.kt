@@ -1,4 +1,4 @@
-package com.relic.presentation.search.subs
+package com.relic.presentation.search.subreddit
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -103,10 +103,12 @@ class SubSearchFragment : RelicFragment() {
 
     private fun handleSearchResults(subreddits : List<SubPreviewModel>) {
         searchResultsAdapter.updateSearchResults(subreddits)
+        onlineSubsResultSize.text = getString(R.string.sub_search_results_size, subreddits.size)
     }
 
     private fun handleLocalSearchResults(subreddits : List<SubredditModel>) {
         offlineResultsAdapter.updateSearchResults(subreddits)
+        localSubsResultSize.text = getString(R.string.sub_search_results_size, subreddits.size)
     }
 
     private fun handleError(error : RelicError?) {

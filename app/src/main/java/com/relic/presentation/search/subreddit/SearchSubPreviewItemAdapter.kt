@@ -1,8 +1,9 @@
-package com.relic.presentation.search.subs
+package com.relic.presentation.search.subreddit
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.SubPreviewModel
+import com.relic.presentation.search.subreddit.view.SearchSubPreviewView
 
 class SearchSubPreviewItemAdapter : RecyclerView.Adapter<SearchSubPreviewItemAdapter.SearchSubNameVH>() {
     private var searchResults: List<SubPreviewModel> = emptyList()
@@ -20,11 +21,6 @@ class SearchSubPreviewItemAdapter : RecyclerView.Adapter<SearchSubPreviewItemAda
 
     fun updateSearchResults(newSearchResults: List<SubPreviewModel>) {
         searchResults = newSearchResults
-        notifyDataSetChanged()
-    }
-
-    fun clearSearchResults() {
-        searchResults = emptyList()
         notifyDataSetChanged()
     }
 

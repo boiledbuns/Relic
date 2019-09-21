@@ -18,7 +18,7 @@ import com.relic.R
 import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.network.NetworkUtil
-import com.relic.presentation.search.subs.SearchSubItemAdapter
+import com.relic.presentation.search.subreddit.SearchSubItemAdapter
 import com.relic.presentation.adapter.SearchSubItemOnClick
 import com.relic.presentation.displaysubs.subslist.SubItemAdapter
 import com.relic.presentation.adapter.SubItemOnClick

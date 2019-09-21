@@ -1,4 +1,4 @@
-package com.relic.presentation.search.posts
+package com.relic.presentation.search.post
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,21 +20,21 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class PostsSearchResultsVM(
+class PostSearchResultsVM(
     private val postRepo: PostRepository,
     private val postGateway: PostGateway,
     private val postSource: PostSource
 ) :
     RelicViewModel(),
-    DisplaySearchContract.PostsSearchVM,
+    DisplaySearchContract.PostSearchVM,
     DisplaySubContract.PostAdapterDelegate
 {
     class Factory @Inject constructor(
             private val postRepo: PostRepository,
             private val postGateway: PostGateway
     ) {
-        fun create(postSource: PostSource) : PostsSearchResultsVM {
-            return PostsSearchResultsVM(postRepo, postGateway, postSource)
+        fun create(postSource: PostSource) : PostSearchResultsVM {
+            return PostSearchResultsVM(postRepo, postGateway, postSource)
         }
     }
 

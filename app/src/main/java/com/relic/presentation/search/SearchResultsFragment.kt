@@ -10,7 +10,7 @@ import com.relic.domain.models.SubredditModel
 import com.relic.domain.models.UserModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.search.posts.PostsSearchResultsVM
+import com.relic.presentation.search.post.PostSearchResultsVM
 import javax.inject.Inject
 
 
@@ -20,19 +20,19 @@ import javax.inject.Inject
  */
 class SearchResultsFragment : RelicFragment() {
     @Inject
-    lateinit var factory : PostsSearchResultsVM.Factory
+    lateinit var factory : PostSearchResultsVM.Factory
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
-    private val searchResultsVM: PostsSearchResultsVM by lazy {
+    private val searchResultsVM: PostSearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
                 return factory.create(postSource) as T
             }
-        }).get(PostsSearchResultsVM::class.java)
+        }).get(PostSearchResultsVM::class.java)
     }
 
     // we use all since we don't want to restrict search

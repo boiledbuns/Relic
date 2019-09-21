@@ -1,8 +1,9 @@
-package com.relic.presentation.search.subs
+package com.relic.presentation.search.subreddit
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.SubredditModel
+import com.relic.presentation.search.subreddit.view.SearchSubItemView
 import timber.log.Timber
 
 class SearchSubItemAdapter: RecyclerView.Adapter<SearchSubItemAdapter.SearchSubItemVH>() {

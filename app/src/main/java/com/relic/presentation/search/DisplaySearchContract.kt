@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
+import com.relic.domain.models.UserModel
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.main.RelicError
 
 interface DisplaySearchContract {
 
-    interface PostsSearchVM : DisplaySubContract.PostAdapterDelegate {
+    interface PostSearchVM : DisplaySubContract.PostAdapterDelegate {
         val postSearchErrorLiveData : LiveData<RelicError?>
         val postResultsLiveData : LiveData<List<PostModel>>
         val offlinePostResultsLiveData : LiveData<List<PostModel>>
@@ -27,6 +28,15 @@ interface DisplaySearchContract {
         fun updateQuery(newQuery : String)
         fun search(newOptions : SubredditSearchOptions)
         fun retrieveMoreSubResults()
+    }
+
+    interface UserSearchVM {
+        val errorLiveData : LiveData<RelicError?>
+        val searchResults : LiveData<List<UserModel>>
+
+        fun updateQuery(newQuery : String)
+        fun search(newOptions : UserSearchOptions)
+        fun retrieveMoreUsers()
     }
 }
 
