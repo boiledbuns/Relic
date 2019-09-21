@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.relic.data.SubRepository
 import com.relic.domain.models.PostModel
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.main.RelicError
@@ -26,11 +27,11 @@ class SubSearchVM(
     }
 
     private val _subSearchErrorLiveData = MutableLiveData<RelicError?>()
-    private val _subredditResultsLiveData = MutableLiveData<List<String>>()
+    private val _subredditResultsLiveData = MutableLiveData<List<SubPreviewModel>>()
     private val _subscribedSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
 
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
-    override val subredditResultsLiveData: LiveData<List<String>> = _subredditResultsLiveData
+    override val subredditResultsLiveData: LiveData<List<SubPreviewModel>> = _subredditResultsLiveData
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _subscribedSubredditResultsLiveData
 
     private var query : String? = null
@@ -40,9 +41,14 @@ class SubSearchVM(
     }
 
     override fun search(newOptions: SubredditSearchOptions) {
-        launch {
-            val results = subRepo.searchOfflineSubreddits(query ?: "")
-            _subscribedSubredditResultsLiveData.postValue(results)
+        query?.let {
+            launch {
+                val onlineResults = subRepo.searchSubreddits(it, displayNSFW = true, exact = false)
+                _subredditResultsLiveData.postValue(onlineResults)
+
+                val offlineResults = subRepo.searchOfflineSubreddits(it)
+                _subscribedSubredditResultsLiveData.postValue(offlineResults)
+            }
         }
     }
 

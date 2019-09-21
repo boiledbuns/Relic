@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.helper.SearchInputCountdown
@@ -36,7 +37,7 @@ class SubSearchFragment : RelicFragment() {
     }
 
     private lateinit var offlineResultsAdapter : SearchSubItemAdapter
-    private lateinit var searchResultsAdapter : SearchSubNameItemAdapter
+    private lateinit var searchResultsAdapter : SearchSubPreviewItemAdapter
 
     private var countDownTimer : SearchInputCountdown = SearchInputCountdown {
         val searchOptions = generateSearchOptions()
@@ -47,7 +48,7 @@ class SubSearchFragment : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         offlineResultsAdapter = SearchSubItemAdapter()
-        searchResultsAdapter = SearchSubNameItemAdapter()
+        searchResultsAdapter = SearchSubPreviewItemAdapter()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -77,14 +78,14 @@ class SubSearchFragment : RelicFragment() {
                 countDownTimer.start()
                 subSearchVM.updateQuery(newText.toString())
 
+                val options = generateSearchOptions()
+                subSearchVM.search(options)
+
                 // action is handled by listener
                 return true
             }
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-                val options = generateSearchOptions()
-                subSearchVM.search(options)
-
                 // action is handled by listener
                 return true
             }
@@ -100,7 +101,7 @@ class SubSearchFragment : RelicFragment() {
         }
     }
 
-    private fun handleSearchResults(subreddits : List<String>) {
+    private fun handleSearchResults(subreddits : List<SubPreviewModel>) {
         searchResultsAdapter.updateSearchResults(subreddits)
     }
 

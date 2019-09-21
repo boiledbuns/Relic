@@ -2,14 +2,15 @@ package com.relic.presentation.search.subs
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.relic.domain.models.SubPreviewModel
 
-class SearchSubNameItemAdapter : RecyclerView.Adapter<SearchSubNameItemAdapter.SearchSubNameVH>() {
-    private var searchResults: List<String> = emptyList()
+class SearchSubPreviewItemAdapter : RecyclerView.Adapter<SearchSubPreviewItemAdapter.SearchSubNameVH>() {
+    private var searchResults: List<SubPreviewModel> = emptyList()
 
     override fun getItemCount(): Int = searchResults.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchSubNameVH {
-        val searchSubnameView = SearchSubnameView(parent.context)
+        val searchSubnameView = SearchSubPreviewView(parent.context)
         return SearchSubNameVH(searchSubnameView)
     }
 
@@ -17,7 +18,7 @@ class SearchSubNameItemAdapter : RecyclerView.Adapter<SearchSubNameItemAdapter.S
         holder.bindSubredditName(searchResults[position])
     }
 
-    fun updateSearchResults(newSearchResults: List<String>) {
+    fun updateSearchResults(newSearchResults: List<SubPreviewModel>) {
         searchResults = newSearchResults
         notifyDataSetChanged()
     }
@@ -28,11 +29,11 @@ class SearchSubNameItemAdapter : RecyclerView.Adapter<SearchSubNameItemAdapter.S
     }
 
     inner class SearchSubNameVH(
-        private val view : SearchSubnameView
+        private val view : SearchSubPreviewView
     ) : RecyclerView.ViewHolder(view) {
 
-        fun bindSubredditName(name : String) {
-            view.bindName(name)
+        fun bindSubredditName(name : SubPreviewModel) {
+            view.bind(name)
         }
     }
 }

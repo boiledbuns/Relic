@@ -2,6 +2,7 @@ package com.relic.presentation.search
 
 import androidx.lifecycle.LiveData
 import com.relic.domain.models.PostModel
+import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.main.RelicError
@@ -20,7 +21,7 @@ interface DisplaySearchContract {
 
     interface SubredditSearchVM {
         val subSearchErrorLiveData : LiveData<RelicError?>
-        val subredditResultsLiveData : LiveData<List<String>>
+        val subredditResultsLiveData : LiveData<List<SubPreviewModel>>
         val subscribedSubredditResultsLiveData : LiveData<List<SubredditModel>>
 
         fun updateQuery(newQuery : String)
