@@ -7,9 +7,6 @@ import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +16,7 @@ import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
-import com.relic.presentation.displaysub.SubNavigationData
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -118,10 +115,10 @@ class FrontpageFragment : RelicFragment() {
         scrollLocked = false
     }
 
-    private fun handleNavigation(subNavigationData: SubNavigationData) {
+    private fun handleNavigation(subNavigationData: NavigationData) {
         when (subNavigationData) {
             // navigates to display post
-            is SubNavigationData.ToPost -> {
+            is NavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
                     postId = subNavigationData.postId,
                     subreddit = subNavigationData.subredditName,
@@ -132,7 +129,7 @@ class FrontpageFragment : RelicFragment() {
                     .replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
             }
             // navigates to display image on top of current fragment
-            is SubNavigationData.ToImage -> {
+            is NavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
                     subNavigationData.thumbnail
                 )
@@ -140,7 +137,7 @@ class FrontpageFragment : RelicFragment() {
                     .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
             }
             // let browser handle navigation to url
-            is SubNavigationData.ToExternal -> {
+            is NavigationData.ToExternal -> {
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }

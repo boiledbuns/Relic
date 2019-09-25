@@ -228,10 +228,10 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     // TODO consider extracting this code outside of both this and the displaysubfragment
-    private fun handleNavigation(subNavigationData: SubNavigationData) {
+    private fun handleNavigation(subNavigationData: NavigationData) {
         when (subNavigationData) {
             // navigates to display post
-            is SubNavigationData.ToPost -> {
+            is NavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
                     subNavigationData.postId,
                     subNavigationData.subredditName,
@@ -243,7 +243,7 @@ class DisplaySubFragment : RelicFragment() {
                 fragmentOpened = true
             }
             // navigates to display image on top of current fragment
-            is SubNavigationData.ToImage -> {
+            is NavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
                     subNavigationData.thumbnail
                 )
@@ -251,11 +251,11 @@ class DisplaySubFragment : RelicFragment() {
                     .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
             }
             // let browser handle navigation to url
-            is SubNavigationData.ToExternal -> {
+            is NavigationData.ToExternal -> {
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }
-            is SubNavigationData.ToUserPreview -> {
+            is NavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(subNavigationData.username)
                     .show(this@DisplaySubFragment.fragmentManager, TAG)
             }

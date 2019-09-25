@@ -3,15 +3,21 @@ package com.relic.presentation.search.subreddit
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.SubredditModel
+import com.relic.presentation.search.SubredditSearchDelegate
 import com.relic.presentation.search.subreddit.view.SearchSubItemView
+import kotlinx.android.synthetic.main.sub_search_item.view.*
 import timber.log.Timber
 
-class SearchSubItemAdapter: RecyclerView.Adapter<SearchSubItemAdapter.SearchSubItemVH>() {
+class SearchSubItemAdapter(
+    private val subSearchDelegate : SubredditSearchDelegate
+): RecyclerView.Adapter<SearchSubItemAdapter.SearchSubItemVH>() {
     private var searchResults: List<SubredditModel> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchSubItemVH {
         val searchItemView = SearchSubItemView(parent.context)
-        return SearchSubItemVH(searchItemView)
+        return SearchSubItemVH(searchItemView).apply {
+            bindOnClick()
+        }
     }
 
     override fun onBindViewHolder(vh: SearchSubItemVH, position: Int) {
@@ -34,6 +40,14 @@ class SearchSubItemAdapter: RecyclerView.Adapter<SearchSubItemAdapter.SearchSubI
     inner class SearchSubItemVH(
         val view : SearchSubItemView
     ) : RecyclerView.ViewHolder(view) {
+
+        fun bindOnClick() {
+            view.apply {
+                subName.setOnClickListener {
+                    subSearchDelegate.visit(searchResults[adapterPosition].subName)
+                }
+            }
+        }
 
         fun bindSubreddit(subModel : SubredditModel) {
             view.bind(subModel)

@@ -7,19 +7,16 @@ import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.*
 import com.relic.R
-import com.relic.data.PostRepository
 import com.relic.data.SortScope
 import com.relic.data.SortType
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
-import com.relic.presentation.displaysub.SubNavigationData
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.util.RelicEvent
@@ -147,12 +144,12 @@ class DisplayUserFragment : RelicFragment() {
         displayUserVM.navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
     }
 
-    private fun handleNavigation(navEvent : RelicEvent<SubNavigationData>) {
+    private fun handleNavigation(navEvent : RelicEvent<NavigationData>) {
         if (!navEvent.consumed) {
             val navigation = navEvent.consume()
 
             when (navigation) {
-                is SubNavigationData.ToPost -> {
+                is NavigationData.ToPost -> {
                     val postFragment = DisplayPostFragment.create(
                         navigation.postId,
                         navigation.subredditName,
@@ -164,7 +161,7 @@ class DisplayUserFragment : RelicFragment() {
                         .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
                 }
                 // navigates to display image on top of current fragment
-                is SubNavigationData.ToImage -> {
+                is NavigationData.ToImage -> {
                     val imageFragment = DisplayImageFragment.create(
                         navigation.thumbnail
                     )
@@ -172,7 +169,7 @@ class DisplayUserFragment : RelicFragment() {
                         .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
                 }
                 // let browser handle navigation to url
-                is SubNavigationData.ToExternal -> {
+                is NavigationData.ToExternal -> {
                     val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
                     startActivity(openInBrowser)
                 }

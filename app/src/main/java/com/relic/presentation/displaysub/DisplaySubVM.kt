@@ -48,14 +48,14 @@ open class DisplaySubVM (
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
-    private val _navigationLiveData = SingleLiveData<SubNavigationData>()
+    private val _navigationLiveData = SingleLiveData<NavigationData>()
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     private val _refreshLiveData = MutableLiveData<Boolean>()
     private val _errorLiveData = SingleLiveData<RelicError>()
 
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
-    val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
+    val subNavigationLiveData : LiveData<NavigationData> = _navigationLiveData
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
     val refreshLiveData : LiveData<Boolean> = _refreshLiveData
     val errorLiveData : LiveData<RelicError> = _errorLiveData
@@ -197,7 +197,7 @@ open class DisplaySubVM (
 
     override fun visitPost(postFullname : String, subreddit : String) {
         launch(Dispatchers.Main) { postGateway.visitPost(postFullname) }
-        _navigationLiveData.value = SubNavigationData.ToPost(postFullname, subreddit, postSource)
+        _navigationLiveData.value = NavigationData.ToPost(postFullname, subreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
@@ -213,17 +213,17 @@ open class DisplaySubVM (
     override fun onLinkPressed(url: String) {
         val isImage = ImageHelper.isValidImage(url)
 
-        val subNavigation : SubNavigationData = if (isImage) {
-            SubNavigationData.ToImage(url)
+        val subNavigation : NavigationData = if (isImage) {
+            NavigationData.ToImage(url)
         } else {
-            SubNavigationData.ToExternal(url)
+            NavigationData.ToExternal(url)
         }
 
         _navigationLiveData.value = subNavigation
     }
 
     override fun previewUser(username: String) {
-        _navigationLiveData.value = SubNavigationData.ToUserPreview(username)
+        _navigationLiveData.value = NavigationData.ToUserPreview(username)
     }
 
     // endregion view action delegate

@@ -35,25 +35,30 @@ interface DisplaySubContract {
     }
 }
 
-sealed class SubNavigationData {
+sealed class NavigationData {
     data class ToPost (
         val postId : String,
         val subredditName : String,
         val postSource: PostSource,
         val commentId : String? = null
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 
+    data class ToPostSource (
+        val source : PostSource
+    ) : NavigationData ()
+
+    // specifically for posts
     data class ToImage (
         val thumbnail : String
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 
     data class ToExternal (
         val url : String
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 
     data class ToUserPreview (
         val username : String
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 }
 
 data class DisplaySubInfoData (

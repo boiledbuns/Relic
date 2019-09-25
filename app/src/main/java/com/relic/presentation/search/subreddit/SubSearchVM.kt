@@ -6,9 +6,11 @@ import com.relic.data.SubRepository
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.DisplaySearchContract
 import com.relic.presentation.search.SubredditSearchOptions
+import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -28,10 +30,12 @@ class SubSearchVM(
     private val _subSearchErrorLiveData = MutableLiveData<RelicError?>()
     private val _subredditResultsLiveData = MutableLiveData<List<SubPreviewModel>>()
     private val _subscribedSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
+    private val _navigationLiveData = SingleLiveData<NavigationData>()
 
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
     override val subredditResultsLiveData: LiveData<List<SubPreviewModel>> = _subredditResultsLiveData
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _subscribedSubredditResultsLiveData
+    override fun navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
     private var query : String? = null
 
@@ -60,6 +64,22 @@ class SubSearchVM(
             }
         }
     }
+
+    // region SubredditSearchDelegate
+
+    override fun preview(subreddit : String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(subreddit : String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun subscribe(subreddit : String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    // endregion SubredditSearchDelegate
 
     override fun retrieveMoreSubResults() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
