@@ -43,8 +43,13 @@ class SearchSubItemAdapter(
 
         fun bindOnClick() {
             view.apply {
-                subName.setOnClickListener {
+                root.setOnClickListener {
                     subSearchDelegate.visit(searchResults[adapterPosition].subName)
+                }
+
+                root.setOnLongClickListener {
+                    subSearchDelegate.preview(searchResults[adapterPosition].subName)
+                    true
                 }
             }
         }

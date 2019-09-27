@@ -57,9 +57,9 @@ object AppInjector {
         }
 
         // need to also register callbacks for an injectable fragment
-        if (activity is androidx.fragment.app.FragmentActivity) {
-            activity.supportFragmentManager.registerFragmentLifecycleCallbacks(object : androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
-                override fun onFragmentCreated(fm: androidx.fragment.app.FragmentManager, f: androidx.fragment.app.Fragment, savedInstanceState: Bundle?) {
+        if (activity is FragmentActivity) {
+            activity.supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+                override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
                     if (f is RelicInjectable) {
                         AndroidSupportInjection.inject(f)
                     }

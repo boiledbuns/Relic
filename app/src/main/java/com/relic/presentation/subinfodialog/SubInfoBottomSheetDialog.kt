@@ -16,6 +16,7 @@ import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subinfo_sheetdialog.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class SubInfoBottomSheetDialog : RelicBottomSheetDialog() {
@@ -58,7 +59,7 @@ class SubInfoBottomSheetDialog : RelicBottomSheetDialog() {
     private fun bindVm() {
         viewModel.subredditLiveData.nonNull().observe(this) { setSubredditData(it) }
         viewModel.sideBarLiveData.nonNull().observe(this) {
-            Log.d(TAG, "Sidebar $it")
+            Timber.d("Sidebar $it")
         }
     }
 
@@ -75,6 +76,16 @@ class SubInfoBottomSheetDialog : RelicBottomSheetDialog() {
         subDescriptionView.text = Html.fromHtml(Html.fromHtml(subredditModel.description).toString())
         // TODO create custom movement method class
         subDescriptionView.movementMethod
+    }
+
+    companion object {
+        fun create(subreddit : String) : SubInfoBottomSheetDialog{
+            return SubInfoBottomSheetDialog().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_SUB_NAME, subreddit)
+                }
+            }
+        }
     }
 
 }

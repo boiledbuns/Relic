@@ -1,36 +1,27 @@
 package com.relic.presentation.displaysubs
 
+import android.os.Bundle
+import android.view.*
+import androidx.appcompat.widget.SearchView
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.databinding.DataBindingUtil
-import android.os.Bundle
-import androidx.appcompat.widget.SearchView
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-
 import com.relic.R
-import com.relic.domain.models.SubredditModel
 import com.relic.databinding.DisplaySubsBinding
+import com.relic.domain.models.SubredditModel
 import com.relic.network.NetworkUtil
-import com.relic.presentation.search.subreddit.SearchSubItemAdapter
-import com.relic.presentation.adapter.SearchSubItemOnClick
-import com.relic.presentation.displaysubs.subslist.SubItemAdapter
 import com.relic.presentation.adapter.SubItemOnClick
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysub.DisplaySubFragment
+import com.relic.presentation.displaysubs.subslist.SubItemAdapter
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract.Companion.ARG_SUB_NAME
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
-
-import java.util.ArrayList
+import java.util.*
 import javax.inject.Inject
 
 class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
@@ -53,17 +44,12 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     private lateinit var displaySubsBinding: DisplaySubsBinding
     private lateinit var subAdapter: SubItemAdapter
-    private lateinit var searchSubItemAdapter: SearchSubItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setHasOptionsMenu(true)
         subAdapter = SubItemAdapter(OnClickSubItem())
-
-        // initialize the adapter for the search subs recycler view
-        val searchSubItemOnClick = OnClickSearchSubItem(this)
-        searchSubItemAdapter = SearchSubItemAdapter()
     }
 
     override fun onCreateView(
@@ -79,11 +65,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             displaySubsRecyclerview.also {
                 it.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
                 it.adapter = subAdapter
-            }
-
-            searchSubsRecyclerview.apply {
-                adapter = searchSubItemAdapter
-                layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
             }
         }
 
@@ -121,8 +102,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
                     subscribedListIsVisible = true
                 }
 
-                // clear items in the adapter
-                searchSubItemAdapter.clearSearchResults()
                 return true
             }
         })
@@ -207,15 +186,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             newDialog.show(fragmentManager, TAG)
 
             return true
-        }
-    }
-
-    internal inner class OnClickSearchSubItem(fragment: androidx.fragment.app.Fragment) : SearchSubItemOnClick {
-        override fun onClick(subName: String) {
-
-            val subFrag = DisplaySubFragment.create(subName)
-            // clear items in the adapter
-            searchSubItemAdapter.clearSearchResults()
         }
     }
 }

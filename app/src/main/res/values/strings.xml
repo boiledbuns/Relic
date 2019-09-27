@@ -125,7 +125,7 @@
     <string name="save_draft">save draft</string>
 
     <string name="online_search_results">All subreddits</string>
-    <string name="local_search_results">Subscribed subreddits</string>
+    <string name="local_search_results">Local subreddits</string>
 
     <string name="sub_search_results_size">%d results</string>
     <string name="user_search_results_size">%d results</string>

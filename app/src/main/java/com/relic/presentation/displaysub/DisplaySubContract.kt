@@ -47,6 +47,10 @@ sealed class NavigationData {
         val source : PostSource
     ) : NavigationData ()
 
+    data class PreviewPostSource (
+            val source : PostSource
+    ) : NavigationData ()
+
     // specifically for posts
     data class ToImage (
         val thumbnail : String

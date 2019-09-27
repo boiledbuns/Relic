@@ -6,6 +6,7 @@ import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.main.RelicError
 
 interface DisplaySearchContract {
@@ -24,6 +25,7 @@ interface DisplaySearchContract {
         val subSearchErrorLiveData : LiveData<RelicError?>
         val subredditResultsLiveData : LiveData<List<SubPreviewModel>>
         val subscribedSubredditResultsLiveData : LiveData<List<SubredditModel>>
+        val navigationLiveData : LiveData<NavigationData>
 
         fun updateQuery(newQuery : String)
         fun search(newOptions : SubredditSearchOptions)
@@ -43,7 +45,7 @@ interface DisplaySearchContract {
 interface SubredditSearchDelegate {
     fun visit(subreddit : String)
     fun preview(subreddit : String)
-    fun subscribe(subreddit : String)
+    fun subscribe(subscribe : Boolean, subreddit : String)
 }
 
 sealed class SearchSource {

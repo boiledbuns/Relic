@@ -2,6 +2,7 @@ package com.relic.presentation.search.subreddit
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.relic.data.PostSource
 import com.relic.data.SubRepository
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
@@ -11,6 +12,7 @@ import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.DisplaySearchContract
 import com.relic.presentation.search.SubredditSearchOptions
 import com.shopify.livedataktx.SingleLiveData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -35,7 +37,7 @@ class SubSearchVM(
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
     override val subredditResultsLiveData: LiveData<List<SubPreviewModel>> = _subredditResultsLiveData
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _subscribedSubredditResultsLiveData
-    override fun navigationLiveData : LiveData<NavigationData> = _navigationLiveData
+    override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
     private var query : String? = null
 
@@ -68,15 +70,19 @@ class SubSearchVM(
     // region SubredditSearchDelegate
 
     override fun preview(subreddit : String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val sub = PostSource.Subreddit(subreddit)
+        _navigationLiveData.postValue(NavigationData.PreviewPostSource(sub))
     }
 
     override fun visit(subreddit : String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val sub = PostSource.Subreddit(subreddit)
+        _navigationLiveData.postValue(NavigationData.ToPostSource(sub))
     }
 
-    override fun subscribe(subreddit : String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun subscribe(subscribe : Boolean, subreddit : String) {
+        launch(Dispatchers.Main) {
+            subRepo.getSubGateway().subscribe(subscribe, subreddit)
+        }
     }
 
     // endregion SubredditSearchDelegate
@@ -88,6 +94,5 @@ class SubSearchVM(
     override fun handleException(context: CoroutineContext, e: Throwable) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 
 }
