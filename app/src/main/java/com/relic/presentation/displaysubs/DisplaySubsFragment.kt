@@ -73,11 +73,11 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         return displaySubsBinding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater!!.inflate(R.menu.search_menu, menu)
+        inflater.inflate(R.menu.search_menu, menu)
 
-        searchMenuItem = menu!!.findItem(R.id.search_item)
+        searchMenuItem = menu.findItem(R.id.search_item)
         searchView = searchMenuItem.actionView as SearchView
 
         // initialize a few of the view properties for the searchvie
@@ -183,7 +183,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
             val newDialog = SubInfoBottomSheetDialog()
             newDialog.arguments= args
-            newDialog.show(fragmentManager, TAG)
+            newDialog.show(requireFragmentManager(), TAG)
 
             return true
         }

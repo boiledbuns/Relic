@@ -131,7 +131,7 @@ class SubSearchFragment : RelicFragment() {
             is NavigationData.PreviewPostSource -> {
                 if (navigationData.source is PostSource.Subreddit) {
                    SubInfoBottomSheetDialog.create(navigationData.source.subredditName)
-                           .show(fragmentManager, TAG)
+                           .show(activity!!.supportFragmentManager, TAG)
                 }
             }
         }

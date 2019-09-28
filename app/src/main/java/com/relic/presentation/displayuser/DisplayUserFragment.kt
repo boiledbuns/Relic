@@ -75,28 +75,28 @@ class DisplayUserFragment : RelicFragment() {
         userTabLayout.setupWithViewPager(userViewPager)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        menu?.clear()
-        inflater?.inflate(R.menu.display_user_menu, menu)
+        menu.clear()
+        inflater.inflate(R.menu.display_user_menu, menu)
 
         // have to first get the reference to the menu in charge of sorting
-        val userSortMenu = menu?.findItem(DisplaySubMenuHelper.userSortMenuId)?.subMenu
+        val userSortMenu = menu.findItem(DisplaySubMenuHelper.userSortMenuId)?.subMenu
 
         // inflate only sorting types that have a scope menu
         DisplaySubMenuHelper.sortMethodUserMenuIdsWithScope.forEach { userMenuId ->
             val sortingMethodSubMenu = userSortMenu?.findItem(userMenuId)?.subMenu
-            inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
+            inflater.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
         var sortType : SortType?
         var sortScope : SortScope?
 
-        when (item?.itemId) {
+        when (item.itemId) {
             // when the sorting type is changed
             R.id.user_sort_hot, R.id.user_sort_top -> {
                 sortType = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)

@@ -63,6 +63,7 @@ dependencies {
     def dagger_ver = "2.18"
     def kotlin_coroutines_ver = "1.1.1"
 
+    def android_appcompat_ver = "1.1.0"
     def retrofit_ver = "2.6.0"
     def shopify_livedata_ver = "1.0.1"
     def photoview_release_ver = "2.0.0"
@@ -86,9 +87,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.jakewharton.timber:timber:$timber_ver"
 
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation "androidx.appcompat:appcompat:$android_appcompat_ver"
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
-    //implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.android.material:material:1.0.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_ver"
 

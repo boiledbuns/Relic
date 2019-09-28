@@ -45,7 +45,7 @@ class DisplaySubFragment : RelicFragment() {
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     val displaySubVM: DisplaySubVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
+        ViewModelProviders.of(activity!!, object : ViewModelProvider.Factory{
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(PostSource.Subreddit(subName)) as T
@@ -118,39 +118,42 @@ class DisplaySubFragment : RelicFragment() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        menu?.clear()
-        inflater?.inflate(R.menu.display_sub_menu, menu)
+        menu.clear()
+        inflater.inflate(R.menu.display_sub_menu, menu)
 
         // have to first get the reference to the menu in charge of sorting
-        val sortMenu = menu?.findItem(DisplaySubMenuHelper.sortMenuId)?.subMenu
+        val sortMenu = menu.findItem(DisplaySubMenuHelper.sortMenuId)?.subMenu
 
         // inflate only sorting types that have a sub scope menu
         DisplaySubMenuHelper.sortMethodSubMenuIdsWithScope.forEach { subMenuId ->
             val sortingMethodSubMenu = sortMenu?.findItem(subMenuId)?.subMenu
-            inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
+            inflater.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
         }
     }
 
     // endregion fragment lifecycle hooks
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
-        when (item?.itemId) {
+        when (item.itemId) {
             R.id.display_sub_searchitem -> {
                 val searchFrag = PostSearchFragment.create(PostSource.Subreddit(subName))
-                // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()
+                    .add(R.id.main_content_frame, searchFrag)
+                    .addToBackStack(TAG)
+                    .commit()
                 fragmentOpened = true
             }
             R.id.display_sub_create_post -> {
                 val createPostFrag = NewPostEditorFragment.create(subName)
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, createPostFrag).addToBackStack(TAG).commit()
+                    .add(R.id.main_content_frame, createPostFrag)
+                    .addToBackStack(TAG)
+                    .commit()
                 fragmentOpened = true
             }
             // when the sorting type is changed
@@ -257,7 +260,7 @@ class DisplaySubFragment : RelicFragment() {
             }
             is NavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(subNavigationData.username)
-                    .show(this@DisplaySubFragment.fragmentManager, TAG)
+                    .show(requireFragmentManager(), TAG)
             }
         }
     }
@@ -322,7 +325,7 @@ class DisplaySubFragment : RelicFragment() {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
-                show(this@DisplaySubFragment.fragmentManager, TAG)
+                show(requireFragmentManager(), TAG)
             }
         }
     }

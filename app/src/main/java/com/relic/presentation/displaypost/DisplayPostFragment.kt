@@ -104,17 +104,17 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        menu?.clear()
-        inflater?.inflate(R.menu.display_post_menu, menu)
+        menu.clear()
+        inflater.inflate(R.menu.display_post_menu, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
 
-        when (item?.itemId) {
+        when (item.itemId) {
             R.id.post_menu_reply -> openPostReplyEditor(postFullName)
             else -> override = super.onOptionsItemSelected(item)
         }
@@ -146,7 +146,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
             }
             is PostNavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(navigationData.username)
-                    .show(fragmentManager, TAG)
+                    .show(requireFragmentManager(), TAG)
             }
         }
     }

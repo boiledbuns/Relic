@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.LifecycleOwner
@@ -18,6 +16,7 @@ import com.relic.R
 import com.relic.data.PostSource
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.PostSearchOptions
@@ -34,11 +33,15 @@ class PostSearchFragment : RelicFragment() {
 
     private lateinit var pagerAdapter: PostsSearchPagerAdapter
 
+    val displaySubVM: DisplaySubVM by lazy {
+        ViewModelProviders.of(activity!!).get(DisplaySubVM::class.java)
+    }
+
     val searchResultsVM: PostSearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(postSource) as T
+                return factory.create(postSource, displaySubVM) as T
             }
         }).get(PostSearchResultsVM::class.java)
     }
@@ -73,10 +76,6 @@ class PostSearchFragment : RelicFragment() {
         postsSearchTabLayout.setupWithViewPager(postsSearchViewPager)
 
         subSearch.initSearchWidget()
-
-        // show the keyboard
-        ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-                ?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.RESULT_SHOWN)
     }
 
     // endregion lifecycle hooks

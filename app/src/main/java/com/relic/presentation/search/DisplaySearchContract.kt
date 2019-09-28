@@ -29,15 +29,21 @@ interface DisplaySearchContract {
 
         fun updateQuery(newQuery : String)
         fun search(newOptions : SubredditSearchOptions)
-        fun retrieveMoreSubResults()
     }
 
     interface UserSearchVM {
         val errorLiveData : LiveData<RelicError?>
-        val searchResults : LiveData<UserModel?>
+        val searchResultsLiveData : LiveData<UserSearchResults>
+        val navigationLiveData : LiveData<NavigationData>
 
         fun updateQuery(newQuery : String)
         fun search(newOptions : UserSearchOptions)
+
+        /**
+         * opens profile for user with username as supplied query
+         * if username is not supplied -> uses the result of the most recent query
+         */
+        fun openUser(username : String?)
     }
 }
 
@@ -45,22 +51,6 @@ interface SubredditSearchDelegate {
     fun visit(subreddit : String)
     fun preview(subreddit : String)
     fun subscribe(subscribe : Boolean, subreddit : String)
-}
-
-sealed class SearchSource {
-    data class Subreddit(
-        val name : String
-    )
-}
-
-sealed class SubredditSearchResult {
-    data class Name(
-        val name: String
-    ) : SubredditSearchResult()
-
-    data class Full(
-        val subreddit: SubredditModel
-    ) : SubredditSearchResult()
 }
 
 data class UserSearchOptions(
@@ -77,4 +67,9 @@ data class PostSearchOptions(
 
 data class CommentSearchOptions(
     val restrictToSource : Boolean = false
+)
+
+data class UserSearchResults(
+    val query : String,
+    var user : UserModel?
 )

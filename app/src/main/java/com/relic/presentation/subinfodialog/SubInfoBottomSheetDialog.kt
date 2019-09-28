@@ -73,7 +73,7 @@ class SubInfoBottomSheetDialog : RelicBottomSheetDialog() {
         }
 
         subCountView.text = resources.getString(R.string.subscriber_count, subredditModel.subscriberCount)
-        subDescriptionView.text = Html.fromHtml(Html.fromHtml(subredditModel.description).toString())
+        subDescriptionView.text = Html.fromHtml(Html.fromHtml(subredditModel.description ?: "").toString())
         // TODO create custom movement method class
         subDescriptionView.movementMethod
     }

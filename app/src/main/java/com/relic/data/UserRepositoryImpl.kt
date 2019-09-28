@@ -2,6 +2,7 @@ package com.relic.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import com.android.volley.VolleyError
 import com.relic.api.response.Data
 import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
@@ -73,6 +74,9 @@ class UserRepositoryImpl @Inject constructor(
 
             return userDeserializer.parseUser(userResponse, trophiesResponse)
         } catch (e: Exception) {
+            if (e is VolleyError && e.networkResponse.statusCode == 404) {
+                return null
+            }
             throw DomainTransfer.handleException("retrieve user", e) ?: e
         }
     }

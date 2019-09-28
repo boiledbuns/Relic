@@ -14,6 +14,7 @@ import com.relic.presentation.search.SubredditSearchOptions
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -88,12 +89,8 @@ class SubSearchVM(
 
     // endregion SubredditSearchDelegate
 
-    override fun retrieveMoreSubResults() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun handleException(context: CoroutineContext, e: Throwable) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Timber.e(e)
     }
 
 }

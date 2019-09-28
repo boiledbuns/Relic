@@ -63,6 +63,10 @@ sealed class NavigationData {
     data class ToUserPreview (
         val username : String
     ) : NavigationData ()
+
+    data class ToUser (
+            val username : String
+    ) : NavigationData ()
 }
 
 data class DisplaySubInfoData (
