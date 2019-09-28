@@ -34,11 +34,10 @@ interface DisplaySearchContract {
 
     interface UserSearchVM {
         val errorLiveData : LiveData<RelicError?>
-        val searchResults : LiveData<List<UserModel>>
+        val searchResults : LiveData<UserModel?>
 
         fun updateQuery(newQuery : String)
         fun search(newOptions : UserSearchOptions)
-        fun retrieveMoreUsers()
     }
 }
 

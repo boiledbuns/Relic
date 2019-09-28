@@ -1,17 +1,19 @@
 package com.relic.data
 
-import androidx.lifecycle.LiveData
 import android.content.Context
-import android.util.Log
-import com.relic.data.deserializer.*
+import androidx.lifecycle.LiveData
+import com.relic.api.response.Data
+import com.relic.api.response.Listing
+import com.relic.data.deserializer.Contract
+import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
-import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.persistence.ApplicationDB
 import dagger.Reusable
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -107,16 +109,6 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
         catch (e : Exception){
-            throw DomainTransfer.handleException("retrieve account", e) ?: e
-        }
-    }
-
-    override suspend fun searchUsers(username: String) : List<UserModel>{
-        val url = "$ENDPOINT/profiles/search"
-        try {
-            val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
-            return userDeserializer.parseUsers(response)
-        } catch (e : Exception){
             throw DomainTransfer.handleException("retrieve account", e) ?: e
         }
     }

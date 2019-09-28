@@ -1,6 +1,7 @@
 package com.relic.data
 
 import androidx.lifecycle.LiveData
+import com.relic.api.response.Listing
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import java.lang.Exception
@@ -20,7 +21,7 @@ interface UserRepository {
     @Throws(UserRepoError::class)
     suspend fun retrieveAccount(name : String)
 
-    suspend fun searchUsers(username : String) : List<UserModel>
+    // search by username isn't actually supported by reddit api
 
     fun getAccounts() : LiveData<List<AccountModel>>
 }

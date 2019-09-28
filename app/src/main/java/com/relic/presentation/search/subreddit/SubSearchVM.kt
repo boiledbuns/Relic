@@ -31,12 +31,12 @@ class SubSearchVM(
 
     private val _subSearchErrorLiveData = MutableLiveData<RelicError?>()
     private val _subredditResultsLiveData = MutableLiveData<List<SubPreviewModel>>()
-    private val _subscribedSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
+    private val _localSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
     private val _navigationLiveData = SingleLiveData<NavigationData>()
 
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
     override val subredditResultsLiveData: LiveData<List<SubPreviewModel>> = _subredditResultsLiveData
-    override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _subscribedSubredditResultsLiveData
+    override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _localSubredditResultsLiveData
     override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
     private var query : String? = null
@@ -44,7 +44,7 @@ class SubSearchVM(
     init {
         // init empty search results
         _subredditResultsLiveData.postValue(emptyList())
-        _subscribedSubredditResultsLiveData.postValue(emptyList())
+        _localSubredditResultsLiveData.postValue(emptyList())
     }
 
     override fun updateQuery(newQuery: String) {
@@ -53,7 +53,8 @@ class SubSearchVM(
 
     override fun search(newOptions: SubredditSearchOptions) {
         if (query.isNullOrEmpty()) {
-            _subredditResultsLiveData.postValue(emptyList())
+            _subredditResultsLiveData.postValue(null)
+            _localSubredditResultsLiveData.postValue(null)
         } else {
             query?.let {
                 launch {
@@ -61,7 +62,7 @@ class SubSearchVM(
                     _subredditResultsLiveData.postValue(onlineResults)
 
                     val offlineResults = subRepo.searchOfflineSubreddits(it)
-                    _subscribedSubredditResultsLiveData.postValue(offlineResults)
+                    _localSubredditResultsLiveData.postValue(offlineResults)
                 }
             }
         }
