@@ -43,7 +43,7 @@ interface DisplaySearchContract {
          * opens profile for user with username as supplied query
          * if username is not supplied -> uses the result of the most recent query
          */
-        fun openUser(username : String?)
+        fun openUser(username : String? = null)
     }
 }
 

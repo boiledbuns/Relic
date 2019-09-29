@@ -43,9 +43,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:theme="@style/Theme.MaterialComponents.NoActionBar"
                 app:tabMode="scrollable"
-                app:tabTextColor="?attr/relicSTitleColor"/>
+                app:tabSelectedTextColor="?attr/relicTitleColor"
+                app:tabTextColor="?android:textColor"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

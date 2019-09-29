@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.relic.R
-import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragment
@@ -21,7 +20,6 @@ import com.relic.presentation.search.UserSearchResults
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_search.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class UserSearchFragment : RelicFragment() {
@@ -93,6 +91,10 @@ class UserSearchFragment : RelicFragment() {
             userPreviewContainer.apply {
                 visibility = View.VISIBLE
                 userSearchVM.search(generateSearchOptions())
+
+                setOnClickListener {
+                    userSearchVM.openUser()
+                }
             }
 
             username.text = user.name
