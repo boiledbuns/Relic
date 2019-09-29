@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 abstract class RelicActivity : AppCompatActivity(), HasSupportFragmentInjector {
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<androidx.fragment.app.Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
-    override fun supportFragmentInjector(): AndroidInjector<androidx.fragment.app.Fragment> = dispatchingAndroidInjector
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> = dispatchingAndroidInjector
 }
