@@ -43,11 +43,11 @@ interface SubRepository {
     /**
      * Returns a list of subreddit names matching the search value
      * TODO include additional search settings
-     * @param liveResults the livedata results list to be updated when results are parsed form the api
      * @param query query to find matching subreddits for
      */
-    suspend fun searchSubreddits(query: String) :  List<SubPreviewModel>
+    suspend fun searchSubreddits(query: String, displayNSFW : Boolean, exact : Boolean) :  List<SubPreviewModel>
 
+    suspend fun searchOfflineSubreddits(query : String) : List<SubredditModel>
 
     suspend fun pinSubreddit(subredditName: String, newPinnedStatus: Boolean)
 }

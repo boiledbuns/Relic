@@ -1,12 +1,9 @@
 package com.relic.presentation.displaysub
 
-import androidx.lifecycle.LiveData
-import com.relic.presentation.main.RelicError
-import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.SortScope
 import com.relic.data.SortType
-import com.relic.domain.models.PostModel
+import com.relic.presentation.main.RelicError
 
 interface DisplaySubContract {
     interface ViewModel {
@@ -18,12 +15,6 @@ interface DisplaySubContract {
          */
         fun retrieveMorePosts(resetPosts: Boolean)
         fun updateSubStatus(subscribe: Boolean)
-    }
-
-    interface SearchVM {
-        val searchResults : LiveData<List<PostModel>>
-        fun search(query : String)
-        fun retrieveMoreSearchResults()
     }
 
     interface PostAdapterDelegate {
@@ -44,25 +35,38 @@ interface DisplaySubContract {
     }
 }
 
-sealed class SubNavigationData {
+sealed class NavigationData {
     data class ToPost (
         val postId : String,
         val subredditName : String,
         val postSource: PostSource,
         val commentId : String? = null
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 
+    data class ToPostSource (
+        val source : PostSource
+    ) : NavigationData ()
+
+    data class PreviewPostSource (
+            val source : PostSource
+    ) : NavigationData ()
+
+    // specifically for posts
     data class ToImage (
         val thumbnail : String
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 
     data class ToExternal (
         val url : String
-    ) : SubNavigationData ()
+    ) : NavigationData ()
 
     data class ToUserPreview (
         val username : String
-    ) : SubNavigationData ()
+    ) : NavigationData ()
+
+    data class ToUser (
+            val username : String
+    ) : NavigationData ()
 }
 
 data class DisplaySubInfoData (

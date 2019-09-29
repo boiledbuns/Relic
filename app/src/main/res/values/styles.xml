@@ -2,6 +2,7 @@
 
     <style name="RelicBaseTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- add specific attrs here -->
+        <item name="actionBarSize">@dimen/toolbar_height</item>
     </style>
 
     <!-- REGION THEMES -->
@@ -18,7 +19,7 @@
         <item name="relicTitleColor">@color/white</item>
     </style>
 
-    <style name="RelicThemeLight" parent="Theme.AppCompat.NoActionBar">
+    <style name="RelicThemeLight" parent="RelicBaseTheme">
         <item name="colorPrimary">@color/white</item>
         <item name="colorAccent">@color/paleGray</item>
         <item name="relicBackgroundColor">@color/paleGray</item>

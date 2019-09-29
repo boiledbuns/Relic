@@ -81,6 +81,8 @@
 
     <!-- navigation menu -->
     <string name="preferences">preferences</string>
+    <string name="search_subs">search subreddits</string>
+    <string name="search_users">search users</string>
 
     <!-- preferences menu -->
     <string name="preference_theme">Theme Editor</string>
@@ -116,10 +118,18 @@
     <string name="switched_account">switched account to %s</string>
 
     <string name="search_sub">enter search</string>
+    <string name="search">search</string>
     <string name="search_sub_result_count">%d results loaded</string>
     <string name="create_post">create post</string>
     <string name="submit_post">submit post</string>
     <string name="save_draft">save draft</string>
+
+    <string name="online_search_results">All subreddits</string>
+    <string name="local_search_results">Local subreddits</string>
+    <string name="user_search_result">User u/%s not found</string>
+
+    <string name="sub_search_results_size">%d results</string>
+    <string name="user_search_results_size">%d results</string>
 
     <string name="no_posts">No posts loaded</string>
     <string name="tag_banner">banner</string>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/relicBackgroundColor"
+    android:id="@+id/subSearchRoot">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/userSearchAppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/userSearchContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_m">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/userSearch"
+                app:iconifiedByDefault="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/relicBackgroundColor"
+                app:queryBackground="@android:color/transparent"
+                app:queryHint="@string/search_sub"/>
+
+        </androidx.cardview.widget.CardView>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/userPreviewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_s"
+        app:layout_constraintTop_toBottomOf="@id/userSearchAppBarLayout"
+        app:cardBackgroundColor="?attr/relicBackgroundColorB"
+        app:contentPadding="@dimen/padding_m"
+        app:cardCornerRadius="@dimen/card_radius"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="@dimen/title_text_m"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="u/dank_monkey" />
+
+            <View
+                android:id="@+id/userPreviewRule"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="@dimen/padding_m"
+                android:layout_marginTop="@dimen/text_spacing_m"
+                android:layout_marginEnd="@dimen/padding_m"
+                android:background="?android:textColor"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/username" />
+
+            <com.relic.presentation.displayuser.UserPreviewView
+                android:id="@+id/userPreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_m"
+                app:layout_constraintTop_toBottomOf="@id/userPreviewRule" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/userNotFound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/title_text_m"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/padding_xl"
+        app:layout_constraintTop_toBottomOf="@id/userSearchAppBarLayout"
+        tools:text="user u/test not found" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

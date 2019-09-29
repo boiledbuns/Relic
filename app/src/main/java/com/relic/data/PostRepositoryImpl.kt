@@ -3,7 +3,6 @@ package com.relic.data
 import androidx.lifecycle.LiveData
 import com.relic.api.response.Listing
 import com.relic.data.deserializer.Contract
-import com.relic.persistence.entities.SourceAndPostRelation
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
@@ -11,6 +10,7 @@ import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.network.request.RelicRequestError
 import com.relic.persistence.ApplicationDB
+import com.relic.persistence.entities.SourceAndPostRelation
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -253,6 +253,15 @@ class PostRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve search results", e) ?: e
         }
+    }
+
+    override suspend fun searchOfflinePosts(sourceRestriction: PostSource?, query: String): List<PostModel> {
+        val restrictSource = sourceRestriction != null
+        val name = sourceRestriction?.getSourceName()
+
+        return withContext(Dispatchers.IO) {
+            postDao.searchOfflineSourcePosts(name, restrictSource, "%$query%")
+         }
     }
 
     override suspend fun postPost(postDraft: PostDraft, type : PostType) {

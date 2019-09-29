@@ -2,6 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group>
         <item
+            android:id="@+id/search_subs"
+            android:icon="@drawable/ic_search"
+            android:title="@string/search_subs"/>
+
+        <item
+            android:id="@+id/search_users"
+            android:icon="@drawable/ic_search"
+            android:title="@string/search_users"/>
+
+        <item
             android:id="@+id/preferences"
             android:icon="@drawable/ic_preferences"
             android:title="@string/preferences"/>

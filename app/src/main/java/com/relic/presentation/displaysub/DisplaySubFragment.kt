@@ -10,7 +10,6 @@ import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.TypedValue
@@ -30,6 +29,7 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.media.DisplayImageFragment
+import com.relic.presentation.search.post.PostSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
 import com.shopify.livedataktx.nonNull
@@ -45,7 +45,7 @@ class DisplaySubFragment : RelicFragment() {
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     val displaySubVM: DisplaySubVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
+        ViewModelProviders.of(activity!!, object : ViewModelProvider.Factory{
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(PostSource.Subreddit(subName)) as T
@@ -88,7 +88,7 @@ class DisplaySubFragment : RelicFragment() {
 
         subPostsRecyclerView.apply {
             adapter = postAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
         }
 
         initializeToolbar()
@@ -118,39 +118,42 @@ class DisplaySubFragment : RelicFragment() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        menu?.clear()
-        inflater?.inflate(R.menu.display_sub_menu, menu)
+        menu.clear()
+        inflater.inflate(R.menu.display_sub_menu, menu)
 
         // have to first get the reference to the menu in charge of sorting
-        val sortMenu = menu?.findItem(DisplaySubMenuHelper.sortMenuId)?.subMenu
+        val sortMenu = menu.findItem(DisplaySubMenuHelper.sortMenuId)?.subMenu
 
         // inflate only sorting types that have a sub scope menu
         DisplaySubMenuHelper.sortMethodSubMenuIdsWithScope.forEach { subMenuId ->
             val sortingMethodSubMenu = sortMenu?.findItem(subMenuId)?.subMenu
-            inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
+            inflater.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
         }
     }
 
     // endregion fragment lifecycle hooks
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
-        when (item?.itemId) {
+        when (item.itemId) {
             R.id.display_sub_searchitem -> {
-                val searchFrag = SubSearchFragment.create(PostSource.Subreddit(subName))
-                // intentionally because replacing then popping off back stack loses scroll position
+                val searchFrag = PostSearchFragment.create(PostSource.Subreddit(subName))
                 activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, searchFrag).addToBackStack(TAG).commit()
+                    .add(R.id.main_content_frame, searchFrag)
+                    .addToBackStack(TAG)
+                    .commit()
                 fragmentOpened = true
             }
             R.id.display_sub_create_post -> {
                 val createPostFrag = NewPostEditorFragment.create(subName)
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, createPostFrag).addToBackStack(TAG).commit()
+                    .add(R.id.main_content_frame, createPostFrag)
+                    .addToBackStack(TAG)
+                    .commit()
                 fragmentOpened = true
             }
             // when the sorting type is changed
@@ -228,10 +231,10 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     // TODO consider extracting this code outside of both this and the displaysubfragment
-    private fun handleNavigation(subNavigationData: SubNavigationData) {
+    private fun handleNavigation(subNavigationData: NavigationData) {
         when (subNavigationData) {
             // navigates to display post
-            is SubNavigationData.ToPost -> {
+            is NavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
                     subNavigationData.postId,
                     subNavigationData.subredditName,
@@ -243,7 +246,7 @@ class DisplaySubFragment : RelicFragment() {
                 fragmentOpened = true
             }
             // navigates to display image on top of current fragment
-            is SubNavigationData.ToImage -> {
+            is NavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
                     subNavigationData.thumbnail
                 )
@@ -251,13 +254,13 @@ class DisplaySubFragment : RelicFragment() {
                     .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
             }
             // let browser handle navigation to url
-            is SubNavigationData.ToExternal -> {
+            is NavigationData.ToExternal -> {
                 val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
                 startActivity(openInBrowser)
             }
-            is SubNavigationData.ToUserPreview -> {
+            is NavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(subNavigationData.username)
-                    .show(this@DisplaySubFragment.fragmentManager, TAG)
+                    .show(requireFragmentManager(), TAG)
             }
         }
     }
@@ -322,7 +325,7 @@ class DisplaySubFragment : RelicFragment() {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
-                show(this@DisplaySubFragment.fragmentManager, TAG)
+                show(requireFragmentManager(), TAG)
             }
         }
     }

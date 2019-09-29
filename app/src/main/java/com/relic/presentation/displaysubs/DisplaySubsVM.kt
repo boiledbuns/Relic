@@ -41,6 +41,9 @@ class DisplaySubsVM (
 
     val pinnedSubs : LiveData<List<SubredditModel>> = subRepository.getPinnedsubs()
 
+    private var searchDisplayNSFW : Boolean = false
+    private var searchExact : Boolean = false
+
     init {
         _subscribedSubsList.addSource(subRepository.getSubscribedSubs()) { subscribedSubs ->
             _subscribedSubsList.postValue(subscribedSubs)
@@ -63,7 +66,7 @@ class DisplaySubsVM (
         // also ignores first query entry (always empty)
         if (!query.isEmpty()) {
             // replaces the current livedata with a new one based on new query string
-            launch(Dispatchers.Main) { subRepository.searchSubreddits(query) }
+            launch(Dispatchers.Main) { subRepository.searchSubreddits(query, searchDisplayNSFW, searchExact) }
         }
     }
 

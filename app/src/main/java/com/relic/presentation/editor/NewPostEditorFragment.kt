@@ -79,17 +79,17 @@ class NewPostEditorFragment : RelicFragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        menu?.clear()
-        inflater?.inflate(R.menu.editor_new_post_menu, menu)
+        menu.clear()
+        inflater.inflate(R.menu.editor_new_post_menu, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
 
-        when (item?.itemId) {
+        when (item.itemId) {
             R.id.editor_new_post_submit -> {
                 newPostEditorVM.submit()
             }

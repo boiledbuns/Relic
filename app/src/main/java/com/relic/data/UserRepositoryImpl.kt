@@ -1,17 +1,21 @@
 package com.relic.data
 
-import androidx.lifecycle.LiveData
 import android.content.Context
-import android.util.Log
-import com.relic.data.deserializer.*
+import androidx.lifecycle.LiveData
+import com.android.volley.VolleyError
+import com.relic.api.response.Data
+import com.relic.api.response.Listing
+import com.relic.data.deserializer.Contract
+import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
-import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.persistence.ApplicationDB
 import dagger.Reusable
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @Reusable
@@ -65,11 +69,14 @@ class UserRepositoryImpl @Inject constructor(
                 url = trophiesEndpoint
             )
 
-            Log.d(TAG, "more posts $userResponse")
-            Log.d(TAG, "trophies $trophiesResponse")
+            Timber.d("more posts $userResponse")
+            Timber.d("trophies $trophiesResponse")
 
             return userDeserializer.parseUser(userResponse, trophiesResponse)
         } catch (e: Exception) {
+            if (e is VolleyError && e.networkResponse.statusCode == 404) {
+                return null
+            }
             throw DomainTransfer.handleException("retrieve user", e) ?: e
         }
     }
@@ -95,7 +102,7 @@ class UserRepositoryImpl @Inject constructor(
         val url = "$ENDPOINT/api/v1/me/prefs"
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
-            Log.d(TAG, response)
+            Timber.d(response)
 
             accountDeserializer.parseAccount(response).let { account ->
                 // need to manually specify name here
@@ -109,6 +116,4 @@ class UserRepositoryImpl @Inject constructor(
             throw DomainTransfer.handleException("retrieve account", e) ?: e
         }
     }
-
-
 }

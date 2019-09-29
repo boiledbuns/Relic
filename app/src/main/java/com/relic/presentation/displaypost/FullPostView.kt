@@ -104,7 +104,7 @@ class FullPostView @JvmOverloads constructor(
                             }
 
                             override fun onError(e: Exception?) {
-                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                                // TODO handle
                             }
                         })
 

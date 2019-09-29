@@ -11,7 +11,7 @@ import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.displaysub.SubNavigationData
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.presentation.util.RelicEvent
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +39,8 @@ class DisplayUserVM(
     private var _userLiveData = MutableLiveData<UserModel>()
     var userLiveData : LiveData<UserModel> = _userLiveData
 
-    private var _navigationLiveData = MutableLiveData<RelicEvent<SubNavigationData>>()
-    var navigationLiveData : LiveData<RelicEvent<SubNavigationData>> = _navigationLiveData
+    private var _navigationLiveData = MutableLiveData<RelicEvent<NavigationData>>()
+    var navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     private var _errorLiveData = MutableLiveData<ErrorData>()
     val errorLiveData : LiveData<ErrorData> = _errorLiveData
@@ -174,12 +174,12 @@ class DisplayUserVM(
         val postSource = PostSource.User(username, RetrievalOption.Submitted)
 
         val navData = when (listingItem) {
-            is PostModel -> SubNavigationData.ToPost(
+            is PostModel -> NavigationData.ToPost(
                     listingItem.fullName,
                     listingItem.subreddit!!,
                     postSource
             )
-            is CommentModel -> SubNavigationData.ToPost(
+            is CommentModel -> NavigationData.ToPost(
                     listingItem.linkFullname!!,
                     listingItem.subreddit!!,
                     postSource,
@@ -205,10 +205,10 @@ class DisplayUserVM(
         if (listingItem is PostModel){
             val isImage = ImageHelper.isValidImage(listingItem.url!!)
 
-            val subNavigation : SubNavigationData = if (isImage) {
-                SubNavigationData.ToImage(listingItem.url!!)
+            val subNavigation : NavigationData = if (isImage) {
+                NavigationData.ToImage(listingItem.url!!)
             } else {
-                SubNavigationData.ToExternal(listingItem.url!!)
+                NavigationData.ToExternal(listingItem.url!!)
             }
 
             _navigationLiveData.postValue(RelicEvent(subNavigation))

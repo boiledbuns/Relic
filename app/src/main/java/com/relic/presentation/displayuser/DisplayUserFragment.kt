@@ -7,19 +7,16 @@ import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.*
 import com.relic.R
-import com.relic.data.PostRepository
 import com.relic.data.SortScope
 import com.relic.data.SortType
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
-import com.relic.presentation.displaysub.SubNavigationData
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.util.RelicEvent
@@ -78,28 +75,28 @@ class DisplayUserFragment : RelicFragment() {
         userTabLayout.setupWithViewPager(userViewPager)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        menu?.clear()
-        inflater?.inflate(R.menu.display_user_menu, menu)
+        menu.clear()
+        inflater.inflate(R.menu.display_user_menu, menu)
 
         // have to first get the reference to the menu in charge of sorting
-        val userSortMenu = menu?.findItem(DisplaySubMenuHelper.userSortMenuId)?.subMenu
+        val userSortMenu = menu.findItem(DisplaySubMenuHelper.userSortMenuId)?.subMenu
 
         // inflate only sorting types that have a scope menu
         DisplaySubMenuHelper.sortMethodUserMenuIdsWithScope.forEach { userMenuId ->
             val sortingMethodSubMenu = userSortMenu?.findItem(userMenuId)?.subMenu
-            inflater?.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
+            inflater.inflate(R.menu.order_scope_menu, sortingMethodSubMenu)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
         var sortType : SortType?
         var sortScope : SortScope?
 
-        when (item?.itemId) {
+        when (item.itemId) {
             // when the sorting type is changed
             R.id.user_sort_hot, R.id.user_sort_top -> {
                 sortType = DisplaySubMenuHelper.convertMenuItemToSortType(item.itemId)
@@ -147,12 +144,12 @@ class DisplayUserFragment : RelicFragment() {
         displayUserVM.navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
     }
 
-    private fun handleNavigation(navEvent : RelicEvent<SubNavigationData>) {
+    private fun handleNavigation(navEvent : RelicEvent<NavigationData>) {
         if (!navEvent.consumed) {
             val navigation = navEvent.consume()
 
             when (navigation) {
-                is SubNavigationData.ToPost -> {
+                is NavigationData.ToPost -> {
                     val postFragment = DisplayPostFragment.create(
                         navigation.postId,
                         navigation.subredditName,
@@ -164,7 +161,7 @@ class DisplayUserFragment : RelicFragment() {
                         .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
                 }
                 // navigates to display image on top of current fragment
-                is SubNavigationData.ToImage -> {
+                is NavigationData.ToImage -> {
                     val imageFragment = DisplayImageFragment.create(
                         navigation.thumbnail
                     )
@@ -172,7 +169,7 @@ class DisplayUserFragment : RelicFragment() {
                         .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
                 }
                 // let browser handle navigation to url
-                is SubNavigationData.ToExternal -> {
+                is NavigationData.ToExternal -> {
                     val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
                     startActivity(openInBrowser)
                 }

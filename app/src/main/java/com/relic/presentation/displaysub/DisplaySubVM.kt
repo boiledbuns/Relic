@@ -26,7 +26,7 @@ open class DisplaySubVM (
     private val postGateway: PostGateway,
     private val listingRepo : ListingRepository,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate, DisplaySubContract.SearchVM {
+) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
@@ -45,24 +45,20 @@ open class DisplaySubVM (
     private var subPostAfter : String? = null
 
     private var retrievalInProgress = true
-    private var after : String? = null
-    private var query : String? = null
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
-    private val _navigationLiveData = SingleLiveData<SubNavigationData>()
+    private val _navigationLiveData = SingleLiveData<NavigationData>()
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     private val _refreshLiveData = MutableLiveData<Boolean>()
     private val _errorLiveData = SingleLiveData<RelicError>()
-    private val _searchResults = MutableLiveData<List<PostModel>>()
 
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
-    val subNavigationLiveData : LiveData<SubNavigationData> = _navigationLiveData
+    val subNavigationLiveData : LiveData<NavigationData> = _navigationLiveData
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
     val refreshLiveData : LiveData<Boolean> = _refreshLiveData
     val errorLiveData : LiveData<RelicError> = _errorLiveData
-    override val searchResults : LiveData<List<PostModel>> = _searchResults
 
     init {
         when (postSource) {
@@ -201,7 +197,7 @@ open class DisplaySubVM (
 
     override fun visitPost(postFullname : String, subreddit : String) {
         launch(Dispatchers.Main) { postGateway.visitPost(postFullname) }
-        _navigationLiveData.value = SubNavigationData.ToPost(postFullname, subreddit, postSource)
+        _navigationLiveData.value = NavigationData.ToPost(postFullname, subreddit, postSource)
     }
 
     override fun voteOnPost(postFullname: String, voteValue: Int) {
@@ -217,75 +213,18 @@ open class DisplaySubVM (
     override fun onLinkPressed(url: String) {
         val isImage = ImageHelper.isValidImage(url)
 
-        val subNavigation : SubNavigationData = if (isImage) {
-            SubNavigationData.ToImage(url)
+        val subNavigation : NavigationData = if (isImage) {
+            NavigationData.ToImage(url)
         } else {
-            SubNavigationData.ToExternal(url)
+            NavigationData.ToExternal(url)
         }
 
         _navigationLiveData.value = subNavigation
     }
 
     override fun previewUser(username: String) {
-        _navigationLiveData.value = SubNavigationData.ToUserPreview(username)
+        _navigationLiveData.value = NavigationData.ToUserPreview(username)
     }
-
-
-    // region search vm
-    override fun search(query : String) {
-        this.query = query
-        launch(Dispatchers.Main) {
-            val listing = when (postSource) {
-                is PostSource.Subreddit -> {
-                    postRepo.searchSubPosts(postSource.subredditName, query, true)
-                }
-                else -> {
-                    null
-                }
-            }
-
-            listing?.data?.let { data ->
-                after = data.after
-                _searchResults.postValue(data.children)
-            }
-        }
-    }
-
-    override fun retrieveMoreSearchResults() {
-        val currQuery = query
-        launch(Dispatchers.Main) {
-            if (after != null && currQuery != null){
-                val listing = when (postSource) {
-                    is PostSource.Subreddit -> {
-                        postRepo.searchSubPosts(postSource.subredditName, currQuery, true, after)
-                    }
-                    else -> {
-                        null
-                    }
-                }
-
-                listing?.data?.let { data ->
-                    after = data.after
-                    val children = data.children
-                    // show appropriate message to user to indicate no more posts could be found
-                    if (children.isNullOrEmpty()) {
-                        _errorLiveData.postValue(NoResults)
-                    } else {
-                        val newPosts = ArrayList<PostModel>()
-                        _searchResults.value?.let { newPosts.addAll(it) }
-                        newPosts.addAll(children)
-
-                        _searchResults.postValue(newPosts)
-                    }
-                }
-
-            } else {
-                Timber.d("No more posts available for this query")
-            }
-        }
-    }
-
-    // endregion search vm
 
     // endregion view action delegate
 

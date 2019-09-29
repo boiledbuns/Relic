@@ -5,7 +5,6 @@ import com.relic.data.CommentsAndPostData
 import com.relic.domain.exception.RelicException
 import com.relic.domain.models.*
 import com.relic.persistence.entities.AccountEntity
-import org.json.simple.parser.ParseException
 
 /**
  * Decoupled from the repository package because deserializers should be responsible
@@ -45,6 +44,8 @@ interface Contract {
 
     interface UserDeserializer {
         suspend fun parseUser(userResponse: String, trophiesResponse : String) : UserModel
+
+        suspend fun parseUsers(usersResponse: String) : List<UserModel>
 
         suspend fun parseUsername(response: String) : String
     }

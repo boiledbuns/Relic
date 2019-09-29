@@ -4,7 +4,7 @@ import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.presentation.displaysub.SubSearchFragment
+import com.relic.presentation.search.post.PostSearchFragment
 import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
@@ -18,6 +18,9 @@ import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
+import com.relic.presentation.search.post.PostSearchResultsFragment
+import com.relic.presentation.search.subreddit.SubSearchFragment
+import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -73,10 +76,20 @@ abstract class FragBuildersModule {
     abstract fun contributeSubInfo() : SubInfoBottomSheetDialog
 
     @ContributesAndroidInjector
-    abstract fun contributeSubSearch() : SubSearchFragment
+    abstract fun contributeDisplayMedia() : DisplayImageFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeDisplayMedia() : DisplayImageFragment
+    abstract fun contributePostsSearchFragment() : PostSearchFragment
+
+    @ContributesAndroidInjector
+    abstract fun postSearchResults() : PostSearchResultsFragment
+
+    @ContributesAndroidInjector
+    abstract fun subSearchFragment() : SubSearchFragment
+
+    @ContributesAndroidInjector
+    abstract fun userSearchFragment() : UserSearchFragment
+
     // endregion main ui
 
     @ContributesAndroidInjector
