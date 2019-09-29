@@ -3,7 +3,6 @@ package com.relic.presentation.search.user
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.relic.data.UserRepository
-import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.main.RelicError
