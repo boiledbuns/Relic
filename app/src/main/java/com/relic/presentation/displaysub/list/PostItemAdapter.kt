@@ -1,13 +1,12 @@
 package com.relic.presentation.displaysub.list
 
-import androidx.recyclerview.widget.DiffUtil
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaysub.DisplaySubContract
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 

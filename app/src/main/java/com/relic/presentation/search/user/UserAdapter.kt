@@ -6,7 +6,7 @@ import com.relic.domain.models.UserModel
 import com.relic.presentation.search.user.view.UserSearchItemView
 
 // TODO might use later to display local users but right now not used b/c no way to search
-// users on readdit
+// users on reddit
 class UserAdapter : RecyclerView.Adapter<UserAdapter.UserVH>() {
     private var userResults : List<UserModel> = emptyList()
 

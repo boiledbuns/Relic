@@ -69,7 +69,7 @@ class PreferencesFragment : RelicFragment() {
     }
 
     private fun handleNavigation (preferenceLink : PreferenceLink) {
-        val linkFragment : androidx.fragment.app.Fragment? = when (preferenceLink) {
+        val linkFragment : Fragment? = when (preferenceLink) {
             PreferenceLink.Theme -> ThemeFragment.create(preferenceChangedListener)
             PreferenceLink.PostLayout -> PostLayoutFragment.create(preferenceChangedListener)
             else -> null

@@ -10,6 +10,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.*
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import com.relic.R
 import com.relic.data.SortScope
 import com.relic.data.SortType
@@ -193,7 +195,7 @@ class DisplayUserFragment : RelicFragment() {
         }
     }
 
-    private inner class UserContentPagerAdapter(fm : androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
+    private inner class UserContentPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_SET_USER_VISIBLE_HINT) {
         val contentFragmentTitles = listOf(
             UserTab.Submitted,
             UserTab.Comments,

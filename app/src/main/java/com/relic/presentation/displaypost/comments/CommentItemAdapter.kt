@@ -1,8 +1,8 @@
 package com.relic.presentation.displaypost.comments
 
+import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import android.view.ViewGroup
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicAdapter
@@ -19,7 +19,7 @@ private const val VIEW_TYPE_LOAD_MORE = 2
 
 class CommentItemAdapter (
     private val actionDelegate : DisplayPostContract.PostViewDelegate
-) : RelicAdapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>(), DisplayPostContract.CommentAdapterDelegate {
+) : RelicAdapter<RecyclerView.ViewHolder>(), DisplayPostContract.CommentAdapterDelegate {
 
     private var post : PostModel? = null
     private var commentList : List<CommentModel> = ArrayList()
@@ -33,7 +33,7 @@ class CommentItemAdapter (
     // post and its comments are separate entities
     private fun getCommentPosition(adapterPosition : Int) : Int = adapterPosition - postSize()
 
-    override fun onBindViewHolder(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
             VIEW_TYPE_POST -> {
                 (viewHolder as FullPostVH).bindPost(post!!)
@@ -47,7 +47,7 @@ class CommentItemAdapter (
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_POST -> FullPostVH(FullPostView(parent.context)).apply {
                 initializeOnClicks(actionDelegate)

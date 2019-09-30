@@ -2,16 +2,13 @@ package com.relic.presentation.handler
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
 import com.relic.R
-import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displayuser.DisplayUserFragment
+import timber.log.Timber
 
 class LinkHandlerActivity : RelicActivity() {
     internal val TAG = "LINK_HANDLER_ACTIVITY"
@@ -33,7 +30,7 @@ class LinkHandlerActivity : RelicActivity() {
             val tokens = path.split("/")
             val urlDetails = tokens.subList(1, tokens.size - 1)
             // not first index is an empty string
-            Log.d(TAG, urlDetails.toString())
+            Timber.d(urlDetails.toString())
             // first index determines the view we're going to (ie. sub or user")
             when {
                 urlDetails[0] == "r" -> {

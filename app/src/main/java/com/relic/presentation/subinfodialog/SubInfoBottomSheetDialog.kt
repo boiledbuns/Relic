@@ -1,14 +1,13 @@
 package com.relic.presentation.subinfodialog
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.relic.R
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicBottomSheetDialog

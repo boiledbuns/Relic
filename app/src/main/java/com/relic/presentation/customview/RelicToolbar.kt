@@ -1,10 +1,9 @@
 package com.relic.presentation.customview
 
 import android.content.Context
-import androidx.appcompat.widget.Toolbar
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.RelativeLayout
+import androidx.appcompat.widget.Toolbar
 import com.relic.R
 import kotlinx.android.synthetic.main.relic_toolbar.view.*
 

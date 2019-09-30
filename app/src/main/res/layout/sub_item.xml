@@ -5,7 +5,7 @@
         <variable name="subredditItem"
                   type="com.relic.domain.models.SubredditModel"/>
         <variable name="subOnClick"
-                  type="com.relic.presentation.adapter.SubItemOnClick"/>
+                  type="com.relic.presentation.displaysubs.DisplaySubsContract.SubItemOnClick"/>
     </data>
 
     <!-- need constraint layout to keep the square shape -->

@@ -12,7 +12,6 @@ import com.relic.R
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.domain.models.SubredditModel
 import com.relic.network.NetworkUtil
-import com.relic.presentation.adapter.SubItemOnClick
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysub.DisplaySubFragment
@@ -164,7 +163,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     /**
      * onClick class for the xml file to hook to
      */
-    internal inner class OnClickSubItem : SubItemOnClick {
+    internal inner class OnClickSubItem : DisplaySubsContract.SubItemOnClick {
         override fun onClick(subItem: SubredditModel) {
             val subFrag = DisplaySubFragment.create(subItem.subName)
 

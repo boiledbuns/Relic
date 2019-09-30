@@ -1,16 +1,16 @@
 package com.relic.presentation.displaysubs.pinned
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.domain.models.SubredditModel
 import kotlinx.android.synthetic.main.pinned_sub_item.view.*
 
-class PinnedSubItemAdapter : androidx.recyclerview.widget.RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSubVH> () {
+class PinnedSubItemAdapter : RecyclerView.Adapter <PinnedSubItemAdapter.PinnedSubVH> () {
 
-    class PinnedSubVH(private val subItemView : View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(subItemView) {
+    class PinnedSubVH(private val subItemView : View) : RecyclerView.ViewHolder(subItemView) {
         fun bind (sub : SubredditModel) {
             subItemView.apply {
                 subNameTextView.text = subItemView.context.resources.getString(R.string.sub_prefix_name, sub.subName)

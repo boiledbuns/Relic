@@ -1,13 +1,7 @@
 package com.relic.presentation.main
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.view.GestureDetectorCompat
-
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MenuItem
@@ -17,25 +11,29 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.GestureDetectorCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.relic.R
-
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
+import com.relic.preference.ViewPreferencesManager
+import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.preference.ViewPreferencesManager
-import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
-
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
@@ -260,7 +258,7 @@ class MainActivity : RelicActivity() {
 
     // endregion navigation view handlers
 
-    fun getNavDrawer(): androidx.drawerlayout.widget.DrawerLayout = navigationDrawer!!
+    fun getNavDrawer(): DrawerLayout = navigationDrawer!!
 }
 
 

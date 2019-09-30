@@ -10,9 +10,9 @@ import com.relic.domain.models.PostModel
 import kotlinx.android.synthetic.main.post_tags.view.*
 
 class PostTagsView @JvmOverloads constructor(
-        context: Context,
-        attrs : AttributeSet? = null,
-        defStyleAttr : Int = 0
+    context: Context,
+    attrs : AttributeSet? = null,
+    defStyleAttr : Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     init {

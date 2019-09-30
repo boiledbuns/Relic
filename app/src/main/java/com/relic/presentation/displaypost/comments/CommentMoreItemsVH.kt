@@ -6,7 +6,7 @@ import com.relic.presentation.displaypost.DisplayPostContract
 
 class CommentMoreItemsVH (
     private val moreCommentsItem : RelicCommentMoreItemsView
-) : androidx.recyclerview.widget.RecyclerView.ViewHolder(moreCommentsItem) {
+) : RecyclerView.ViewHolder(moreCommentsItem) {
 
     fun initializeOnClicks(delegate : DisplayPostContract.CommentAdapterDelegate) {
         moreCommentsItem.setOnClickListener {

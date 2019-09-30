@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.comment_item.view.*
 
 class CommentItemVH (
     private val commentItem : RelicCommentView
-): androidx.recyclerview.widget.RecyclerView.ViewHolder(commentItem) {
+): RecyclerView.ViewHolder(commentItem) {
     private var commentId = ""
 
     fun initializeOnClicks(adapter : DisplayPostContract.CommentAdapterDelegate) {

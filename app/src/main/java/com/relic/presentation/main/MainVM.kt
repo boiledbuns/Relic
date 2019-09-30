@@ -1,15 +1,17 @@
 package com.relic.presentation.main
 
-import androidx.lifecycle.*
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.relic.data.Auth
-import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.callbacks.AuthenticationCallback
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 

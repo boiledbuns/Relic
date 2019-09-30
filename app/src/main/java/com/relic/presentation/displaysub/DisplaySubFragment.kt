@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import android.util.TypedValue
 import android.view.*
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.data.SortType
@@ -196,7 +197,7 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    fun handleVHSwipeAction(vh : androidx.recyclerview.widget.RecyclerView.ViewHolder, direction : Int) {
+    fun handleVHSwipeAction(vh : RecyclerView.ViewHolder, direction : Int) {
         // TODO don't handle manually -> need to check preferences
         when (direction) {
             ItemTouchHelper.LEFT -> {
@@ -349,8 +350,8 @@ class DisplaySubFragment : RelicFragment() {
 
     private fun attachScrollListeners() {
         // attach listener for checking if the user has scrolled to the bottom of the recyclerview
-        subPostsRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+        subPostsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
                 // checks if the recycler view can no longer scroll downwards
@@ -364,7 +365,7 @@ class DisplaySubFragment : RelicFragment() {
                 }
             }
 
-            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy < 0) onScrollUp() else onScrollDown()
             }
         })
