@@ -2,6 +2,7 @@ package com.relic.presentation.handler
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.presentation.base.RelicActivity
@@ -61,7 +62,7 @@ class LinkHandlerActivity : RelicActivity() {
         }
     }
 
-    private fun displayFragment(fragment: androidx.fragment.app.Fragment) {
+    private fun displayFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.link_handler_content_frame, fragment)

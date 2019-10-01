@@ -1,14 +1,14 @@
 package com.relic.persistence.dao;
 
-    import androidx.lifecycle.LiveData;
-    import androidx.room.Dao;
-    import androidx.room.Insert;
-    import androidx.room.OnConflictStrategy;
-    import androidx.room.Query;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
 
-    import com.relic.domain.models.PostModel;
+import com.relic.domain.models.PostModel;
 
-    import java.util.List;
+import java.util.List;
 
 @Dao
 public abstract class PostDao {

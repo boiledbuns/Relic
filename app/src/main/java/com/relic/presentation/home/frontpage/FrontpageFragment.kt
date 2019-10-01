@@ -10,6 +10,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.preference.ViewPreferencesManager
@@ -44,7 +46,7 @@ class FrontpageFragment : RelicFragment() {
     }
 
     private lateinit var postAdapter: PostItemAdapter
-    private lateinit var frontpageRecyclerView : androidx.recyclerview.widget.RecyclerView
+    private lateinit var frontpageRecyclerView : RecyclerView
 
     private var scrollLocked: Boolean = false
 
@@ -61,7 +63,7 @@ class FrontpageFragment : RelicFragment() {
         postAdapter = PostItemAdapter(viewPrefsManager, frontpageVM)
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             adapter = postAdapter
         }
 
@@ -82,8 +84,8 @@ class FrontpageFragment : RelicFragment() {
         }
 
         // attach listener for checking if the user has scrolled to the bottom of the recycler view
-        frontpageRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+        frontpageRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 // TODO : add animation for loading posts
                 // checks if the recycler view can no longer scroll downwards

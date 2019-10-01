@@ -10,7 +10,6 @@ interface  EditorContract {
         fun onBodyChanged(newBody : String)
     }
 
-
     interface ReplyEditor : Editor
 
     interface NewPostEditor : Editor {

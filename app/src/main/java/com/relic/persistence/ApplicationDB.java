@@ -1,28 +1,29 @@
 package com.relic.persistence;
 
 import android.app.Application;
+
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.relic.domain.models.CommentModel;
+import com.relic.domain.models.PostModel;
 import com.relic.domain.models.SubredditModel;
 import com.relic.persistence.dao.AccountDao;
-import com.relic.data.dao.relation.PostSourceRelationDao;
-import com.relic.data.dao.relation.PostVisitedRelationDao;
 import com.relic.persistence.dao.CommentDao;
 import com.relic.persistence.dao.ListingDao;
 import com.relic.persistence.dao.PostDao;
 import com.relic.persistence.dao.SubredditDao;
 import com.relic.persistence.dao.TokenStoreDao;
 import com.relic.persistence.dao.UserPostingDao;
+import com.relic.persistence.dao.relation.PostSourceRelationDao;
+import com.relic.persistence.dao.relation.PostVisitedRelationDao;
 import com.relic.persistence.entities.AccountEntity;
 import com.relic.persistence.entities.ListingEntity;
 import com.relic.persistence.entities.PostVisitRelation;
 import com.relic.persistence.entities.SourceAndPostRelation;
 import com.relic.persistence.entities.TokenStoreEntity;
-import com.relic.domain.models.CommentModel;
-import com.relic.domain.models.PostModel;
 
 @Database(
     entities = {
@@ -38,7 +39,7 @@ import com.relic.domain.models.PostModel;
     version = 7,
     exportSchema = false
 )
-@TypeConverters(com.relic.persistence.TypeConverters.class)
+@TypeConverters(com.relic.persistence.RoomTypeConverters.class)
 public abstract class ApplicationDB extends RoomDatabase{
     private static ApplicationDB INSTANCE;
 

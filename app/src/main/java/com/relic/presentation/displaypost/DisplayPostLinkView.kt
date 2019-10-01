@@ -2,12 +2,12 @@ package com.relic.presentation.displaypost
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.display_post_link.view.*
+import timber.log.Timber
 
 class DisplayPostLinkView @JvmOverloads constructor(
         context : Context,
@@ -27,7 +27,7 @@ class DisplayPostLinkView @JvmOverloads constructor(
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postLinkThumbnail)
         }
         catch (error: Error) {
-            Log.d("DISPLAYPOST_VIEW", "Issue loading image " + error.toString())
+            Timber.e("Issue loading image %s", error.toString())
             // TODO load an empty image into the thumbnail
         }
     }
