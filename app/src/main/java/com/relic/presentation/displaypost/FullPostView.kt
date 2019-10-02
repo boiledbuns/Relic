@@ -17,9 +17,9 @@ import ru.noties.markwon.Markwon
 import java.lang.Exception
 
 class FullPostView @JvmOverloads constructor(
-        context : Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr : Int = 0
+    context : Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private val TAG = "FULL_POST_VIEW"

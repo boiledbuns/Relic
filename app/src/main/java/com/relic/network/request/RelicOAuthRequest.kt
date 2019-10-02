@@ -11,18 +11,18 @@ import java.util.HashMap
  */
 
 class RelicOAuthRequest @JvmOverloads constructor(
-        method: Int,
-        url: String,
-        listener: Response.Listener<String>,
-        errorListener: Response.ErrorListener,
-        var authToken: String? = null,
-        private val headers: MutableMap<String, String>? = null,
-        private val data: MutableMap<String, String>? = null
+    method: Int,
+    url: String,
+    listener: Response.Listener<String>,
+    errorListener: Response.ErrorListener,
+    var authToken: String? = null,
+    private val headers: MutableMap<String, String>? = null,
+    private val data: MutableMap<String, String>? = null
 ) : StringRequest(method, url, listener, errorListener) {
 
     companion object {
-        const val GET = Request.Method.GET
-        const val POST = Request.Method.POST
+        const val GET = Method.GET
+        const val POST = Method.POST
     }
 
     private val userAgent = "android:com.relic.Relic (by /u/boiledbuns)"

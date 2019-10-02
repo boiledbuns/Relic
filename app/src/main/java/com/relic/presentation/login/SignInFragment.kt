@@ -3,8 +3,6 @@ package com.relic.presentation.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.fragment.app.FragmentActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,12 +11,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.data.Auth
-import com.relic.data.auth.AuthImpl
 import com.relic.data.UserRepository
-import com.relic.data.UserRepositoryImpl
-import com.relic.network.NetworkRequestManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.android.synthetic.main.web_auth.*

@@ -1,4 +1,4 @@
-package com.relic.presentation.displaysubinfo;
+package com.relic.presentation.displaysub;
 
 import androidx.lifecycle.LiveData;
 

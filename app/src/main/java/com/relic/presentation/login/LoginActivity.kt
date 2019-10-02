@@ -3,8 +3,6 @@ package com.relic.presentation.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-
 import com.relic.R
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes

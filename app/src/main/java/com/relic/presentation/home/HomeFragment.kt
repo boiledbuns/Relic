@@ -1,18 +1,21 @@
 package com.relic.presentation.home
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.Toolbar
-import android.view.*
-import androidx.core.view.GravityCompat
-import com.relic.presentation.main.MainActivity
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
+import com.relic.presentation.main.MainActivity
 import kotlinx.android.synthetic.main.home.view.*
 
 class HomeFragment : RelicFragment() {
@@ -74,9 +77,9 @@ class HomeFragment : RelicFragment() {
         toggle.syncState()
     }
 
-    private inner class HomePagerAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
+    private inner class HomePagerAdapter(fm: FragmentManager) :FragmentPagerAdapter(fm, BEHAVIOR_SET_USER_VISIBLE_HINT) {
         val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
-        val tabFragments = ArrayList<androidx.fragment.app.Fragment>()
+        val tabFragments = ArrayList<Fragment>()
 
         override fun getPageTitle(position: Int): CharSequence? {
             return tabFragmentTitles[position]
@@ -84,7 +87,7 @@ class HomeFragment : RelicFragment() {
 
         override fun getCount() = tabFragments.size
 
-        override fun getItem(position: Int): androidx.fragment.app.Fragment {
+        override fun getItem(position: Int): Fragment {
             return tabFragments[position]
         }
     }

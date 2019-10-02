@@ -32,7 +32,7 @@ class CommentsFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         postCommentRecyclerView.apply {
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             commentAdapter = CommentItemAdapter(commentsVM)
             adapter = commentAdapter
         }

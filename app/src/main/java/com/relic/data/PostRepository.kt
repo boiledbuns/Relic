@@ -1,15 +1,11 @@
 package com.relic.data
 
-import androidx.lifecycle.LiveData
 import android.os.Parcelable
+import androidx.lifecycle.LiveData
 import com.relic.api.response.Listing
-
-import com.relic.data.gateway.PostGateway
 import com.relic.domain.models.ListingItem
-import com.relic.presentation.callbacks.RetrieveNextListingCallback
 import com.relic.domain.models.PostModel
 import com.relic.network.request.RelicRequestError
-import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 interface PostRepository {

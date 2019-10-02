@@ -7,7 +7,7 @@ import com.relic.presentation.displaypost.FullPostView
 
 class FullPostVH(
     private val fullPost : FullPostView
-) : androidx.recyclerview.widget.RecyclerView.ViewHolder(fullPost) {
+) : RecyclerView.ViewHolder(fullPost) {
 
     fun bindPost(post : PostModel) {
         fullPost.setPost(post)

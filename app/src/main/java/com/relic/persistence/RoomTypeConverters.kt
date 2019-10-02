@@ -5,7 +5,7 @@ import com.relic.domain.models.Gildings
 import com.squareup.moshi.Moshi
 import java.util.*
 
-class TypeConverters {
+class RoomTypeConverters {
 
     private val gildingsAdapter = moshi.adapter(Gildings::class.java)!!
 

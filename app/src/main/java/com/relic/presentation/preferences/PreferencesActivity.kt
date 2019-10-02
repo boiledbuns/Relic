@@ -1,12 +1,9 @@
 package com.relic.presentation.preferences
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.relic.R
-import com.relic.preference.PreferencesManagerImpl
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.util.RequestCodes

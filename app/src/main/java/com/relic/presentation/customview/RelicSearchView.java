@@ -1,8 +1,6 @@
 package com.relic.presentation.customview;
 
 import android.content.Context;
-
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.method.KeyListener;
 import android.util.AttributeSet;

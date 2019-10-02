@@ -53,7 +53,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         userPostsAdapter = ListingItemAdapter(viewPrefsManager, postsTabVM)
         userTabRecyclerView.apply {
             adapter = userPostsAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
         }
         userTabSwipeRefreshLayout.isRefreshing = true
 
@@ -70,8 +70,8 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
 
     private fun attachScrollListeners() {
         // attach listener for checking if the user has scrolled to the bottom of the recyclerview
-        userTabRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+        userTabRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {

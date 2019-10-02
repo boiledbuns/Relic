@@ -2,7 +2,7 @@ package com.relic.dagger.modules
 
 import android.app.Application
 import com.relic.persistence.ApplicationDB
-import com.relic.persistence.TypeConverters
+import com.relic.persistence.RoomTypeConverters
 import com.relic.data.deserializer.Deserializer
 import com.relic.preference.ViewPreferencesManager
 import com.squareup.moshi.Moshi
@@ -19,7 +19,7 @@ class AppModule {
     fun provideDB(app: Application, moshi : Moshi) : ApplicationDB {
         return ApplicationDB.getDatabase(app).apply {
             // set the moshi adapter here bc we cannot inject moshi into type converter class
-            TypeConverters.moshi = moshi
+            RoomTypeConverters.moshi = moshi
         }
     }
 

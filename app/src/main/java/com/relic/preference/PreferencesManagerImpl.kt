@@ -1,6 +1,5 @@
 package com.relic.preference
 
-import android.content.Context
 import android.content.SharedPreferences
 
 class PreferencesManagerImpl(

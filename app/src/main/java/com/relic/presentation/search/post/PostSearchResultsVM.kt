@@ -1,13 +1,13 @@
 package com.relic.presentation.search.post
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.displaysub.NoResults
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.DisplaySearchContract

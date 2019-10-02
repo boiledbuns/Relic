@@ -6,7 +6,6 @@ import com.gfycat.core.GfyCoreInitializationBuilder
 import com.gfycat.core.GfyCoreInitializer
 import com.gfycat.core.GfycatApplicationInfo
 import com.relic.dagger.AppInjector
-import com.relic.dagger.modules.AuthModule
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector

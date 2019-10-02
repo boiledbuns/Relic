@@ -3,9 +3,8 @@ package com.relic.presentation.displaysub.list
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Rect
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
-import android.util.Log
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.presentation.displaysub.DisplaySubFragment
 import timber.log.Timber
@@ -27,29 +26,29 @@ class PostItemsTouchHelper(
     private val upvoteIcon = context.getDrawable(R.drawable.ic_upvote)
     private val downvoteIcon = context.getDrawable(R.drawable.ic_downvote)
 
-    override fun getMovementFlags(p0: androidx.recyclerview.widget.RecyclerView, p1: androidx.recyclerview.widget.RecyclerView.ViewHolder): Int {
-        return ItemTouchHelper.Callback.makeFlag(
+    override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int {
+        return makeFlag(
             ItemTouchHelper.ACTION_STATE_SWIPE,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         )
     }
 
     override fun onMove(
-            p0: androidx.recyclerview.widget.RecyclerView,
-            p1: androidx.recyclerview.widget.RecyclerView.ViewHolder,
-            p2: androidx.recyclerview.widget.RecyclerView.ViewHolder
+            p0: RecyclerView,
+            p1: RecyclerView.ViewHolder,
+            p2: RecyclerView.ViewHolder
     ): Boolean {
         // return false to indicate that we nothing has been moved
         return false
     }
 
-    override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         // full swipe not actually allowed because I currently don't have
         // any good solutions to return the viewholder to its original position
         // notifyItemChanged works, but it flashes which makes for terrible ux
     }
 
-    override fun getSwipeThreshold(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder): Float {
+    override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         return 10F
     }
 
@@ -60,8 +59,8 @@ class PostItemsTouchHelper(
 
     override fun onChildDraw(
             canvas: Canvas,
-            recyclerView: androidx.recyclerview.widget.RecyclerView,
-            viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
             dX: Float,
             dY: Float,
             actionState: Int,

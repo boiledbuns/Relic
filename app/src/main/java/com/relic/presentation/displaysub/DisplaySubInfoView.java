@@ -14,7 +14,6 @@ import com.relic.R;
 import com.relic.domain.models.SubredditModel;
 import com.relic.databinding.DisplaySubInfoBinding;
 import com.relic.presentation.base.RelicBottomSheetDialog;
-import com.relic.presentation.displaysubinfo.DisplaySubInfoContract;
 import com.squareup.picasso.Picasso;
 
 @Deprecated

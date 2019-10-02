@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import com.relic.R;
 import com.relic.domain.models.SubredditModel;
 import com.relic.databinding.SubItemBinding;
-import com.relic.presentation.adapter.SubItemOnClick;
+import com.relic.presentation.displaysubs.DisplaySubsContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +20,9 @@ import java.util.List;
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private final String TAG = "SUB_ITEM_ADAPTER";
   private List<SubredditModel> subList = new ArrayList<>();
-  private SubItemOnClick onClick;
+  private DisplaySubsContract.SubItemOnClick onClick;
 
-  public SubItemAdapter(SubItemOnClick onClick) {
+  public SubItemAdapter(DisplaySubsContract.SubItemOnClick onClick) {
     super();
     this.onClick = onClick;
   }

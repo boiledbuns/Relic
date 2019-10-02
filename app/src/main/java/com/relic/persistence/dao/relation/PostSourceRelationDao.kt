@@ -1,4 +1,4 @@
-package com.relic.data.dao.relation
+package com.relic.persistence.dao.relation
 
 import androidx.room.Dao
 import androidx.room.Insert
