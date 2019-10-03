@@ -84,6 +84,7 @@ dependencies {
     def android_appcompat_ver = "1.1.0"
     def lifecycle_ver = "2.0.0"
     def room_ver = "2.1.0"
+    def work_ver = "2.2.0"
 
     // ViewModel and LiveData
     implementation "androidx.appcompat:appcompat:$android_appcompat_ver"
@@ -95,6 +96,8 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_ver"
     annotationProcessor "androidx.room:room-compiler:$room_ver"
     kapt "androidx.room:room-compiler:$room_ver"
+
+    implementation "androidx.work:work-runtime-ktx:$work_ver"
 
     // endregion android libs
 
