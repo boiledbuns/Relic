@@ -136,4 +136,8 @@
 
     <string name="change_layout">change layout</string>
 
+
+    <string name="sync_time">repeats</string>
+
+
 </resources>

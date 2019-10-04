@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/repeatTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textStyle="bold"
+        android:textSize="@dimen/title_size_m"
+        tools:text="Repeats"/>
+
+    <TextView
+        android:id="@+id/syncRepeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/syncRepeatTime"
+        app:layout_constraintTop_toBottomOf="@id/repeatTitle"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        tools:text="Repeats daily/weekdays/weekends/custom"/>
+
+    <TextView
+        android:id="@+id/syncRepeatTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toEndOf="@id/syncRepeat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/repeatTitle"
+        tools:text="5:30 pm"/>
+
+    <TextView
+        android:id="@+id/optionsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        android:textStyle="bold"
+        android:textSize="@dimen/title_size_m"
+        android:layout_marginTop="@dimen/padding_m"
+        app:layout_constraintTop_toBottomOf="@id/syncRepeat"
+        tools:text="Sync settings for frontpage"/>
+
+    <TextView
+        android:id="@+id/syncPages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/syncPagesEdit"
+        app:layout_constraintTop_toBottomOf="@id/optionsTitle"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        tools:text="Number of pages to sync"/>
+
+    <Spinner
+        android:id="@+id/syncPagesEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toEndOf="@id/syncPages"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/optionsTitle"/>
+
+    <TextView
+        android:id="@+id/syncComments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/syncCommentsEdit"
+        app:layout_constraintTop_toBottomOf="@id/syncPages"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        tools:text="Sync comments"/>
+
+    <RadioButton
+        android:id="@+id/syncCommentsEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toEndOf="@id/syncComments"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/syncPages"/>
+
+    <TextView
+        android:id="@+id/syncCommentPages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/syncCommentPagesEdit"
+        app:layout_constraintTop_toBottomOf="@id/syncComments"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        tools:text="Number of comments to sync"/>
+
+    <Spinner
+        android:id="@+id/syncCommentPagesEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_time"
+        app:layout_constraintStart_toEndOf="@id/syncCommentPages"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/syncComments"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
