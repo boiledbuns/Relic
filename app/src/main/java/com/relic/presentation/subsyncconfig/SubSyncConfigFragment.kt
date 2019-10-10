@@ -2,17 +2,56 @@ package com.relic.presentation.subsyncconfig
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.presentation.base.RelicFragment
+import kotlinx.android.synthetic.main.config_sub_sync.*
 
 class SubSyncConfigFragment : RelicFragment() {
+
+    private lateinit var postSource: PostSource
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.apply {
+            getParcelable<PostSource>(ARG_SUB_SOURCE)?.let {
+                postSource = it
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initializeToolbar()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.config_sub_sync, container, false)
     }
+
+    private fun initializeToolbar() {
+        val pActivity = (activity as AppCompatActivity)
+
+        (sync_config_toolbar as Toolbar).apply {
+            pActivity.setSupportActionBar(this)
+
+            title = postSource.getSourceName()
+            subtitle = getString(R.string.sync_config_menu)
+            setNavigationOnClickListener { activity?.onBackPressed() }
+        }
+
+        pActivity.supportActionBar?.apply {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+
 
     companion object {
         const val ARG_SUB_SOURCE = "arg_sub_source"

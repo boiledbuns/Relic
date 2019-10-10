@@ -10,6 +10,7 @@
 
     <!-- search strings-->
     <string name="searchmenu_title">Search</string>
+    <string name="sync_config_menu">sync settings</string>
     <string name="search_subreddit_hint">subreddit name</string>
 
     <!-- appbarlayout --> 
@@ -139,5 +140,7 @@
 
     <string name="sync_time">repeats</string>
 
+    <string name="sync_sub_title">repeats</string>
+    <string name="sync_comments_title">repeats</string>
 
 </resources>

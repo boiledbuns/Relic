@@ -12,8 +12,8 @@ class ScheduleManager(
     private val workManager = WorkManager.getInstance(appContext)
 
     fun setupPostSync() {
-        val postSyncReq = PeriodicWorkRequestBuilder<PostSyncWorker>(1, TimeUnit.DAYS)
-            .build()
-        workManager.enqueue(postSyncReq)
+//        val postSyncReq = PeriodicWorkRequestBuilder<PostSyncWorker>(1, TimeUnit.DAYS)
+//            .build()
+//        workManager.enqueue(postSyncReq)
     }
 }

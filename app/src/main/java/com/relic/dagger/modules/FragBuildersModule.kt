@@ -22,6 +22,7 @@ import com.relic.presentation.search.post.PostSearchResultsFragment
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
+import com.relic.presentation.subsyncconfig.SubSyncConfigFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -89,6 +90,9 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun userSearchFragment() : UserSearchFragment
+
+    @ContributesAndroidInjector
+    abstract fun syncConfig() : SubSyncConfigFragment
 
     // endregion main ui
 
