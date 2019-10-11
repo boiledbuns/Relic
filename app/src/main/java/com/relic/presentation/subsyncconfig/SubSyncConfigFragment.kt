@@ -24,15 +24,24 @@ class SubSyncConfigFragment : RelicFragment() {
                 postSource = it
             }
         }
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.config_sub_sync, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeToolbar()
+
+        optionsTitle.text = getString(R.string.sync_sub_title, postSource.getSourceName())
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.config_sub_sync, container, false)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
     }
 
     private fun initializeToolbar() {

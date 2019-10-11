@@ -7,7 +7,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/relicBackgroundColor">
+    android:background="?attr/relicBackgroundColor"
+    android:clickable="true">
 
     <include layout="@layout/relic_toolbar"
         android:id="@+id/sync_config_toolbar"
@@ -33,8 +34,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:textStyle="bold"
-            android:textSize="@dimen/title_size_m"
-            tools:text="Repeats"/>
+            android:textSize="@dimen/title_size_m"/>
 
         <TextView
             android:id="@+id/syncRepeat"
@@ -68,20 +68,18 @@
             android:textSize="@dimen/title_size_m"
             android:layout_marginTop="@dimen/padding_l"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/syncRepeat"
-            tools:text="Sync settings for frontpage"/>
+            app:layout_constraintTop_toBottomOf="@id/syncRepeat"/>
 
         <TextView
             android:id="@+id/syncPages"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/sync_time"
+            android:text="@string/sync_posts"
             android:layout_marginTop="@dimen/padding_m"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/syncPagesEdit"
             app:layout_constraintTop_toBottomOf="@id/optionsTitle"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            tools:text="Number of pages to sync"/>
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
         <Spinner
             android:id="@+id/syncPagesEdit"
@@ -104,8 +102,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/syncCommentsEdit"
             app:layout_constraintTop_toBottomOf="@id/syncPages"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            tools:text="Sync comments"/>
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
         <CheckBox
             android:id="@+id/syncCommentsEdit"
@@ -121,13 +118,12 @@
             android:id="@+id/syncCommentPages"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/sync_time"
+            android:text="@string/sync_comments"
             android:layout_marginTop="@dimen/padding_m"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/syncCommentPagesEdit"
             app:layout_constraintTop_toBottomOf="@id/syncComments"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            tools:text="Number of comments to sync"/>
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
         <Spinner
             android:id="@+id/syncCommentPagesEdit"

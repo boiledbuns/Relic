@@ -139,8 +139,9 @@
 
 
     <string name="sync_time">repeats</string>
+    <string name="sync_posts">Number of pages to sync</string>
+    <string name="sync_comments">Number of comments to sync</string>
 
-    <string name="sync_sub_title">repeats</string>
-    <string name="sync_comments_title">repeats</string>
-
+    <string name="sync_sub_title">Sync settings for %s</string>
+    <string name="sync_comments_title">sync comments</string>
 </resources>
