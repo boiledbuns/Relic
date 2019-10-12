@@ -165,7 +165,7 @@ class DisplaySubFragment : RelicFragment() {
                 val subSyncConfigFrag = SubSyncConfigFragment.create(postSource)
                 // intentionally because replacing then popping off back stack loses scroll position
                 activity!!.supportFragmentManager.beginTransaction()
-                  .add(R.id.main_content_frame, subSyncConfigFrag)
+                  .replace(R.id.main_content_frame, subSyncConfigFrag)
                   .addToBackStack(TAG)
                   .commit()
                 fragmentOpened = true
