@@ -60,7 +60,7 @@
             tools:text="5:30 pm"/>
 
         <TextView
-            android:id="@+id/optionsTitle"
+            android:id="@+id/syncPostsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sync_sub_title"
@@ -68,7 +68,18 @@
             android:textSize="@dimen/title_size_m"
             android:layout_marginTop="@dimen/padding_l"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/syncRepeat"/>
+            app:layout_constraintEnd_toStartOf="@id/syncPostsToggle"
+            app:layout_constraintTop_toBottomOf="@id/syncRepeat"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <Switch
+            android:id="@+id/syncPostsToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_l"
+            app:layout_constraintTop_toBottomOf="@id/syncRepeat"
+            app:layout_constraintStart_toEndOf="@id/syncPostsTitle"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
             android:id="@+id/syncPages"
@@ -78,7 +89,7 @@
             android:layout_marginTop="@dimen/padding_m"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/syncPagesEdit"
-            app:layout_constraintTop_toBottomOf="@id/optionsTitle"
+            app:layout_constraintTop_toBottomOf="@id/syncPostsTitle"
             app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
         <Spinner
@@ -89,7 +100,7 @@
             android:layout_marginTop="@dimen/padding_m"
             app:layout_constraintStart_toEndOf="@id/syncPages"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/optionsTitle"/>
+            app:layout_constraintTop_toBottomOf="@id/syncPostsTitle"/>
 
         <TextView
             android:id="@+id/syncComments"
@@ -100,16 +111,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/syncCommentsEdit"
+            app:layout_constraintEnd_toStartOf="@id/syncCommentsToggle"
             app:layout_constraintTop_toBottomOf="@id/syncPages"
             app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
-        <CheckBox
-            android:id="@+id/syncCommentsEdit"
+        <Switch
+            android:id="@+id/syncCommentsToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_m"
-            android:layout_marginEnd="@dimen/padding_m"
             app:layout_constraintStart_toEndOf="@id/syncComments"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/syncPages"/>

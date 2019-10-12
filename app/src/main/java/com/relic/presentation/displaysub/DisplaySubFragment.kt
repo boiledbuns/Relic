@@ -339,7 +339,7 @@ class DisplaySubFragment : RelicFragment() {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
-                show(requireFragmentManager(), TAG)
+                show(requireActivity().supportFragmentManager, TAG)
             }
         }
     }

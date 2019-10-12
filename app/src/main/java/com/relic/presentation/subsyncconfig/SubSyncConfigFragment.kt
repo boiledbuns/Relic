@@ -17,6 +17,10 @@ class SubSyncConfigFragment : RelicFragment() {
 
     private lateinit var postSource: PostSource
 
+    private val subSyncPM by lazy {
+        SubSyncPM(requireActivity().application, postSource.getSourceName())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
@@ -36,7 +40,8 @@ class SubSyncConfigFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeToolbar()
 
-        optionsTitle.text = getString(R.string.sync_sub_title, postSource.getSourceName())
+        subSyncPM.bindPreferences()
+        syncPostsTitle.text = getString(R.string.sync_sub_title, postSource.getSourceName())
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -61,6 +66,20 @@ class SubSyncConfigFragment : RelicFragment() {
         }
     }
 
+    private fun SubSyncPM.bindPreferences() {
+        postSyncEnabled.let {
+            syncPostsToggle.isChecked = it
+            syncPagesEdit.isEnabled = it
+        }
+        
+        syncPagesEdit.apply {
+            setSelection(postSyncPages - 1)
+        }
+
+        commentSyncEnabled.let {
+            syncCommentsToggle.isChecked = it
+        }
+    }
 
     companion object {
         const val ARG_SUB_SOURCE = "arg_sub_source"
