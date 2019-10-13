@@ -13,14 +13,14 @@ import javax.inject.Inject
 /**
  * Workers can be identified through 2 ways
  * 1. For single subreddit sync - through their post source name
- * 2. For group subreddit sync - through their group names
+ * 2. For group subreddit sync - through their group names (TODO)
  */
 class ScheduleManagerImpl @Inject constructor(
   app : Application
 ) : ScheduleManager {
     private val workManager = WorkManager.getInstance(app)
 
-    override fun setupPostSync(postSource: PostSource) {
+    override fun setupPostSync(postSource: PostSource, syncPages : Int, time : Long) {
         val constraints = Constraints.Builder()
           .setRequiredNetworkType(NetworkType.CONNECTED)
           .build()
