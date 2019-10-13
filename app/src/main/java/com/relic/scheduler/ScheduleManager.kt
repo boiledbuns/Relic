@@ -1,19 +1,8 @@
 package com.relic.scheduler
 
-import android.content.Context
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import java.util.concurrent.TimeUnit
+import com.relic.data.PostSource
 
-class ScheduleManager(
-    appContext : Context
-) {
-
-    private val workManager = WorkManager.getInstance(appContext)
-
-    fun setupPostSync() {
-//        val postSyncReq = PeriodicWorkRequestBuilder<PostSyncWorker>(1, TimeUnit.DAYS)
-//            .build()
-//        workManager.enqueue(postSyncReq)
-    }
+interface ScheduleManager {
+    fun setupPostSync(postSource: PostSource)
+    fun cancelPostSync(postSource: PostSource)
 }

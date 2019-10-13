@@ -5,17 +5,25 @@ import android.text.InputType
 import android.view.View
 import androidx.preference.DropDownPreference
 import androidx.preference.EditTextPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.relic.data.PostSource
+import com.relic.presentation.base.RelicPreferenceFragment
+import com.relic.scheduler.ScheduleManager
+import javax.inject.Inject
 
 private const val PREFIX_POST_SYNC = "POST_SYNC_"
 private const val PREFIX_POST_SYNC_PAGES = "POST_SYNC_PAGES_"
 private const val PREFIX_COMMENT_SYNC = "COMMENT_SYNC_"
 
-class SubSyncConfigFragment : PreferenceFragmentCompat() {
+class SubSyncConfigFragment : RelicPreferenceFragment() {
 
+    @Inject
+    lateinit var scheduleManager : ScheduleManager
+
+    private lateinit var postSource: PostSource
     private lateinit var postSourceName: String
 
     private val keyPostSync by lazy { PREFIX_POST_SYNC + postSourceName }
@@ -30,6 +38,7 @@ class SubSyncConfigFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         arguments?.apply {
             getParcelable<PostSource>(ARG_POST_SOURCE)?.let {
+                postSource = it
                 postSourceName = it.getSourceName()
             }
         }
@@ -47,6 +56,10 @@ class SubSyncConfigFragment : PreferenceFragmentCompat() {
                 key = keyPostSync
                 title = "Enable post sync"
                 postSyncCategory.addPreference(this)
+
+                onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+                    handlePostSyncChange(preference, newValue as Boolean)
+                }
             }
 
             EditTextPreference(context).apply {
@@ -64,13 +77,24 @@ class SubSyncConfigFragment : PreferenceFragmentCompat() {
             screen.addPreference(commentSyncCategory)
 
             SwitchPreferenceCompat(context).apply {
-                key = "post_sync"
+                key = keyCommentSync
                 title = "Enable comment sync"
                 commentSyncCategory.addPreference(this)
             }
         }
 
         preferenceScreen = screen
+    }
+
+    private fun handlePostSyncChange(preference : Preference, enabled : Boolean) : Boolean {
+        if (enabled) {
+            scheduleManager.setupPostSync(postSource)
+        } else {
+            scheduleManager.cancelPostSync(postSource)
+        }
+
+        // always accept the update
+        return true
     }
 
     companion object {
