@@ -14,6 +14,8 @@ import androidx.preference.SwitchPreferenceCompat
 import com.relic.data.PostSource
 import com.relic.presentation.base.RelicPreferenceFragment
 import com.relic.scheduler.ScheduleManager
+import com.relic.scheduler.SyncRepeatDays
+import com.relic.scheduler.SyncRepeatOption
 import java.util.*
 import javax.inject.Inject
 
@@ -71,18 +73,19 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                 title = "Enable post sync"
                 postSyncCategory.addPreference(this)
 
-                onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
-                    handlePostSyncChange(newValue as Boolean)
+                onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
+                    handleSyncPreferenceChange()
                 }
             }
 
             Preference(context).apply {
                 key = keyPostSyncTime
-                title = "Time to sync: ${sp.getInt(keyPostSyncTime, 0)}"
+                title = "Time to sync: ${postSyncTime()/60}:${postSyncTime()%60} "
                 onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     val calendar: Calendar = Calendar.getInstance()
-                    val listener = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
-                        handlePostSyncTimeChanged(hourOfDay, minute)
+                    val listener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+                        sp.edit().putInt(keyPostSyncTime, hourOfDay*60 + minute).apply()
+                        handleSyncPreferenceChange()
                     }
 
                     // get previously set times if any, current time otherwise
@@ -98,7 +101,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
 
             DropDownPreference(context).apply {
                 key = keyPostSyncRepeat
-                title = "Repeats: ${sp.getString(keyPostSyncRepeat, "")}"
+                title = "Repeats:  ${postSyncRepeat()}"
                 entries = repeatOptions
                 entryValues = repeatOptions
                 postSyncCategory.addPreference(this)
@@ -106,7 +109,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
 
             DropDownPreference(context).apply {
                 key = keyPostSyncRepeatDays
-                title = "Repeats on: ${sp.getString(keyPostSyncRepeatDays, "")}"
+                title = "Repeats on: ${postSyncRepeatDays()}"
                 entries = repeatDays
                 entryValues = repeatDays
                 postSyncCategory.addPreference(this)
@@ -114,7 +117,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
 
             EditTextPreference(context).apply {
                 key = keyPostSyncPages
-                title = "Number of pages to sync: ${sp.getString(keyPostSyncPages, "0")!!.toInt()}"
+                title = "Number of pages to sync: ${postSyncRepeatPages()}"
 
                 setOnBindEditTextListener {
                     it.inputType = InputType.TYPE_CLASS_NUMBER
@@ -142,10 +145,17 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
         preferenceScreen = screen
     }
 
-    private fun handlePostSyncChange(enabled : Boolean) : Boolean {
+    private fun handleSyncPreferenceChange() : Boolean {
+        val enabled = isPostSyncEnabled()
         if (enabled) {
-            val pagesToSync = preferenceManager.sharedPreferences.getInt(keyPostSyncPages, 0)
-            scheduleManager.setupPostSync(postSource, pagesToSync, 0L)
+            scheduleManager.setupPostSync(
+              postSource = postSource,
+              pagesToSync = postSyncRepeatPages(),
+              timeToSync = postSyncTime(),
+              repeatType = postSyncRepeat(),
+              repeatDay = postSyncRepeatDays(),
+              commentSyncEnabled = isCommentSyncEnabled()
+            )
         } else {
             scheduleManager.cancelPostSync(postSource)
         }
@@ -154,20 +164,30 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
         return true
     }
 
-    private fun handlePostSyncTimeChanged(hourOfDay : Int, minute : Int) {
-        // convert to minutes
-        sp.edit().putInt(keyPostSyncTime, hourOfDay*60 + minute).apply()
-    }
-
     private val sp by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
 
     // region sub sync preferences manager
 
-    override fun isPostSyncEnabled() : Boolean=  sp.getBoolean(keyPostSync, false)
-    override fun postSyncTime(): String? =  sp.getString(keyPostSyncTime, null)
-    override fun postSyncRepeat(): String? = sp.getString(keyPostSyncRepeat, null)
-    override fun postSyncRepeatDays(): String? = sp.getString(keyPostSyncRepeatDays, null)
-    override fun postSyncRepeatPages(): Int = sp.getInt(keyPostSyncPages, 0)
+    override fun isPostSyncEnabled() : Boolean = sp.getBoolean(keyPostSync, false)
+    override fun postSyncTime(): Int = sp.getInt(keyPostSyncTime, 0)
+    override fun postSyncRepeat(): SyncRepeatOption {
+        return when (sp.getString(keyPostSyncRepeat, null) ) {
+            repeatOptions[1] -> SyncRepeatOption.WEEKLY
+            else -> SyncRepeatOption.DAILY
+        }
+    }
+    override fun postSyncRepeatDays(): SyncRepeatDays {
+        return when (sp.getString(keyPostSyncRepeatDays, null)) {
+            repeatDays[6] -> SyncRepeatDays.SUNDAY
+            repeatDays[5] -> SyncRepeatDays.SATURDAY
+            repeatDays[4] -> SyncRepeatDays.FRIDAY
+            repeatDays[3] -> SyncRepeatDays.THURSDAY
+            repeatDays[2] -> SyncRepeatDays.WEDNESDAY
+            repeatDays[1] -> SyncRepeatDays.TUESDAY
+            else -> SyncRepeatDays.MONDAY
+        }
+    }
+    override fun postSyncRepeatPages(): Int = sp.getString(keyPostSyncPages, "0")!!.toInt()
     override fun isCommentSyncEnabled(): Boolean = sp.getBoolean(keyCommentSync, false)
 
     // endregion sub sync preferences manager
