@@ -72,10 +72,6 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                 key = keyPostSync
                 title = "Enable post sync"
                 postSyncCategory.addPreference(this)
-
-                onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
-                    handleSyncPreferenceChange()
-                }
             }
 
             Preference(context).apply {
@@ -85,7 +81,6 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                     val calendar: Calendar = Calendar.getInstance()
                     val listener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
                         sp.edit().putInt(keyPostSyncTime, hourOfDay*60 + minute).apply()
-                        handleSyncPreferenceChange()
                     }
 
                     // get previously set times if any, current time otherwise
@@ -96,6 +91,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                     TimePickerDialog(context, listener, timeOfDay, minute, false).show()
                     true
                 }
+
                 postSyncCategory.addPreference(this)
             }
 
@@ -104,6 +100,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                 title = "Repeats:  ${postSyncRepeat()}"
                 entries = repeatOptions
                 entryValues = repeatOptions
+
                 postSyncCategory.addPreference(this)
             }
 
@@ -112,6 +109,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                 title = "Repeats on: ${postSyncRepeatDays()}"
                 entries = repeatDays
                 entryValues = repeatDays
+
                 postSyncCategory.addPreference(this)
             }
 
@@ -127,6 +125,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                     title = "Number of pages to sync: $newValue"
                     true
                 }
+
                 postSyncCategory.addPreference(this)
             }
         }
@@ -139,6 +138,18 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                 key = keyCommentSync
                 title = "Enable comment sync"
                 commentSyncCategory.addPreference(this)
+            }
+        }
+
+        PreferenceCategory(context).let { saveCategory ->
+            screen.addPreference(saveCategory)
+
+            Preference(context).apply {
+                title = "Save"
+                setOnPreferenceClickListener {
+                    handleSyncPreferenceChange()
+                }
+                saveCategory.addPreference(this)
             }
         }
 
