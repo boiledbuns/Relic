@@ -4,6 +4,7 @@ import android.app.TimePickerDialog
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.preference.DropDownPreference
 import androidx.preference.EditTextPreference
@@ -48,6 +49,12 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBackPressed()
+            }
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -141,18 +148,6 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
             }
         }
 
-        PreferenceCategory(context).let { saveCategory ->
-            screen.addPreference(saveCategory)
-
-            Preference(context).apply {
-                title = "Save"
-                setOnPreferenceClickListener {
-                    handleSyncPreferenceChange()
-                }
-                saveCategory.addPreference(this)
-            }
-        }
-
         preferenceScreen = screen
     }
 
@@ -171,8 +166,14 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
             scheduleManager.cancelPostSync(postSource)
         }
 
-        // always accept the update
-        return true
+        // defer back press handle until after we've completed setting up the schedule manager
+        return false
+    }
+
+    private fun onBackPressed() : Boolean {
+        // no need to check for divergence - just update the worker
+        handleSyncPreferenceChange()
+        return false
     }
 
     private val sp by lazy { PreferenceManager.getDefaultSharedPreferences(context) }

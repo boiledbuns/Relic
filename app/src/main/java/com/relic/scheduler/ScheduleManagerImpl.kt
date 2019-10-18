@@ -7,6 +7,8 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.relic.data.PostSource
+import com.relic.data.SortScope
+import com.relic.data.SortType
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -42,7 +44,13 @@ class ScheduleManagerImpl @Inject constructor(
 
         // time duration left between current # of seconds and # of seconds until schedule
         val durationUntilSync = calculateMinutesFromNextSync(timeToSync, repeatType, repeatDay)
-        val postSyncWorkerData = PostSyncWorker.createData(postSource.getSourceName(), pagesToSync, commentSyncEnabled)
+        val postSyncWorkerData = PostSyncWorker.createData(
+          postSource.getSourceName(),
+          SortType.DEFAULT,
+          SortScope.NONE,
+          pagesToSync,
+          commentSyncEnabled
+        )
         val postSyncReq = PeriodicWorkRequestBuilder<PostSyncWorker>(repeatInterval, TimeUnit.DAYS)
           .setInputData(postSyncWorkerData)
           .setConstraints(constraints)

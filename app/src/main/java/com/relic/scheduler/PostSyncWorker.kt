@@ -7,6 +7,7 @@ import androidx.work.Worker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.relic.data.CommentRepository
+import com.relic.data.PostRepoHelper
 import com.relic.data.PostRepository
 import com.relic.data.PostSource
 import com.relic.data.SortScope
@@ -24,6 +25,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 private const val KEY_POST_SOURCE = "KEY_POST_SOURCE"
+private const val KEY_SORT_TYPE = "KEY_SORT_TYPE"
+private const val KEY_SORT_SCOPE = "KEY_SORT_SCOPE"
 private const val KEY_POST_PAGES_TO_SYNC = "KEY_POST_SOURCE"
 private const val KEY_ENABLE_COMMENT_SYNC = "KEY_POST_SOURCE"
 
@@ -52,14 +55,18 @@ class PostSyncWorker(
         Timber.d("do work ")
         // todo add support for other post sources
         val postSource = PostSource.Subreddit(workerParams.inputData.getString(KEY_POST_SOURCE)!!)
+        val sortType = PostRepoHelper.toSortType(workerParams.inputData.getString(KEY_SORT_TYPE))
+        val sortScope = PostRepoHelper.toSortScope(workerParams.inputData.getString(KEY_SORT_SCOPE))
         val pagesToSync = workerParams.inputData.getInt(KEY_POST_PAGES_TO_SYNC, 0)
         val syncComments = workerParams.inputData.getBoolean(KEY_ENABLE_COMMENT_SYNC, false)
 
-        return runBlocking { syncPosts(postSource, pagesToSync, syncComments) }
+        return runBlocking { syncPosts(postSource, sortType, sortScope, pagesToSync, syncComments) }
     }
 
     private suspend fun syncPosts(
       postSource: PostSource,
+      sortType : SortType,
+      sortScope: SortScope,
       pagesToSync: Int,
       syncComments: Boolean
     ): Result {
@@ -75,7 +82,7 @@ class PostSyncWorker(
                         break
                     }
 
-                    val postsListing = postRepo.retrieveSortedPosts(postSource, SortType.DEFAULT, SortScope.NONE)
+                    val postsListing = postRepo.retrieveSortedPosts(postSource, sortType, sortScope)
                     postsListing.data.children?.let { posts ->
                         retrievedPosts.addAll(posts)
 
@@ -98,7 +105,6 @@ class PostSyncWorker(
         postRepo.insertPosts(postSource, retrievedPosts)
         commentRepo.insertComments(retrievedComments)
 
-
         return try {
             job.await()
             Result.success()
@@ -111,11 +117,15 @@ class PostSyncWorker(
     companion object {
         fun createData(
           postSource : String,
+          sortType: SortType,
+          sortScope: SortScope,
           pageSyncCount : Int,
           enableCommentSync : Boolean
         ) : Data {
             return Data.Builder()
               .putString(KEY_POST_SOURCE, postSource)
+              .putString(KEY_SORT_TYPE, sortType.toString())
+              .putString(KEY_SORT_SCOPE, sortScope.toString())
               .putInt(KEY_POST_PAGES_TO_SYNC, pageSyncCount)
               .putBoolean(KEY_ENABLE_COMMENT_SYNC, enableCommentSync)
               .build()

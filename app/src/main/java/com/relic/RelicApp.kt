@@ -9,6 +9,7 @@ import com.gfycat.core.GfyCoreInitializer
 import com.gfycat.core.GfycatApplicationInfo
 import com.relic.dagger.AppInjector
 import com.relic.scheduler.PostSyncWorker
+import com.relic.scheduler.RelicWorkerFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -21,7 +22,7 @@ class RelicApp : Application(), HasActivityInjector{
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
 
     @Inject
-    lateinit var postSyncWorkerFactory : PostSyncWorker.Factory
+    lateinit var relicWorkerFactory : RelicWorkerFactory
 
     override fun onCreate() {
         AppInjector.init(this)
@@ -43,7 +44,7 @@ class RelicApp : Application(), HasActivityInjector{
 
         // register our custom worker factory
         val config = Configuration.Builder()
-          .setWorkerFactory(postSyncWorkerFactory)
+          .setWorkerFactory(relicWorkerFactory)
           .build()
         WorkManager.initialize(this, config)
     }
