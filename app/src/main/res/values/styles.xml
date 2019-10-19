@@ -8,7 +8,7 @@
     <!-- REGION THEMES -->
     <style name="RelicThemePrimary" parent="RelicBaseTheme">
         <item name="colorPrimary">@color/backgroundSecondary</item>
-        <item name="colorAccent">@color/paleDarkGray</item>
+        <item name="colorAccent">@color/paleGray</item>
         <item name="relicBackgroundColor">@color/paleDarkGray</item>
         <item name="relicBackgroundColorB">@color/backgroundSecondaryB</item>
 
@@ -21,7 +21,7 @@
 
     <style name="RelicThemeLight" parent="RelicBaseTheme">
         <item name="colorPrimary">@color/white</item>
-        <item name="colorAccent">@color/paleGray</item>
+        <item name="colorAccent">@color/paleDarkGray</item>
         <item name="relicBackgroundColor">@color/paleGray</item>
         <item name="relicBackgroundColorB">@color/almostWhite</item>
 
