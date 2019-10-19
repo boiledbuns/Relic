@@ -32,7 +32,7 @@ Consult the [wiki](https://github.com/13ABEL/Relic/wiki) for more info about [co
 - [x] create new comments
 - [ ] handle unauthenticated users
 - [x] search for subs, posts, and users
-- [ ] background post retrieval while app is inactive
+- [x] background post retrieval while app is inactive
 
 ## additional features after v1
 
