@@ -2,10 +2,14 @@ package com.relic
 
 import android.app.Activity
 import android.app.Application
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.gfycat.core.GfyCoreInitializationBuilder
 import com.gfycat.core.GfyCoreInitializer
 import com.gfycat.core.GfycatApplicationInfo
 import com.relic.dagger.AppInjector
+import com.relic.scheduler.PostSyncWorker
+import com.relic.scheduler.RelicWorkerFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -16,6 +20,9 @@ class RelicApp : Application(), HasActivityInjector{
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+
+    @Inject
+    lateinit var relicWorkerFactory : RelicWorkerFactory
 
     override fun onCreate() {
         AppInjector.init(this)
@@ -34,6 +41,12 @@ class RelicApp : Application(), HasActivityInjector{
                 getString(R.string.gfycat_client_secret)
             ))
         )
+
+        // register our custom worker factory
+        val config = Configuration.Builder()
+          .setWorkerFactory(relicWorkerFactory)
+          .build()
+        WorkManager.initialize(this, config)
     }
 
     override fun activityInjector(): AndroidInjector<Activity> {

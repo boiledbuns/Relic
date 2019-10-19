@@ -31,4 +31,9 @@
           app:showAsAction="never"
           app:queryBackground="@android:color/transparent"/>
 
+    <item android:id="@+id/display_sub_sync_config"
+        android:title="@string/sync_config_menu"
+        app:showAsAction="never"
+        app:queryBackground="@android:color/transparent"/>
+
 </menu>

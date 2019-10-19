@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sync_config_root"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/relicBackgroundColor"
+    android:clickable="true">
+
+    <include layout="@layout/relic_toolbar"
+        android:id="@+id/sync_config_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_s"
+        android:elevation="8dp"
+        app:layout_collapseMode="pin"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/padding_m"
+        android:paddingEnd="@dimen/padding_m">
+
+        <TextView
+            android:id="@+id/repeatTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_time"
+            android:layout_marginTop="@dimen/padding_l"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            android:textSize="@dimen/title_size_m"/>
+
+        <TextView
+            android:id="@+id/syncRepeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_time"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/syncRepeatTime"
+            app:layout_constraintTop_toBottomOf="@id/repeatTitle"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            tools:text="Repeats daily/weekdays/weekends/custom"/>
+
+        <TextView
+            android:id="@+id/syncRepeatTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_time"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toEndOf="@id/syncRepeat"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/repeatTitle"
+            tools:text="5:30 pm"/>
+
+        <TextView
+            android:id="@+id/syncPostsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_sub_title"
+            android:textStyle="bold"
+            android:textSize="@dimen/title_size_m"
+            android:layout_marginTop="@dimen/padding_l"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/syncPostsToggle"
+            app:layout_constraintTop_toBottomOf="@id/syncRepeat"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <Switch
+            android:id="@+id/syncPostsToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_l"
+            app:layout_constraintTop_toBottomOf="@id/syncRepeat"
+            app:layout_constraintStart_toEndOf="@id/syncPostsTitle"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/syncPages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_posts"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/syncPagesEdit"
+            app:layout_constraintTop_toBottomOf="@id/syncPostsTitle"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <Spinner
+            android:id="@+id/syncPagesEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_time"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toEndOf="@id/syncPages"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/syncPostsTitle"/>
+
+        <TextView
+            android:id="@+id/syncComments"
+            android:text="@string/sync_comments_title"
+            android:textStyle="bold"
+            android:textSize="@dimen/title_size_m"
+            android:layout_marginTop="@dimen/padding_l"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/syncCommentsToggle"
+            app:layout_constraintTop_toBottomOf="@id/syncPages"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <Switch
+            android:id="@+id/syncCommentsToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toEndOf="@id/syncComments"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/syncPages"/>
+
+        <TextView
+            android:id="@+id/syncCommentPages"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_comments"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/syncCommentPagesEdit"
+            app:layout_constraintTop_toBottomOf="@id/syncComments"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <Spinner
+            android:id="@+id/syncCommentPagesEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sync_time"
+            android:layout_marginTop="@dimen/padding_m"
+            app:layout_constraintStart_toEndOf="@id/syncCommentPages"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/syncComments"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

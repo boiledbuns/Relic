@@ -33,6 +33,7 @@ import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.search.post.PostSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
+import com.relic.presentation.subsyncconfig.SubSyncConfigFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_sub.*
@@ -44,6 +45,8 @@ class DisplaySubFragment : RelicFragment() {
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
+
+    lateinit var postSource: PostSource
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(activity!!, object : ViewModelProvider.Factory{
@@ -72,6 +75,7 @@ class DisplaySubFragment : RelicFragment() {
 
         arguments?.apply {
             subName = getString(ARG_SUBREDDIT_NAME, "")
+            postSource = PostSource.Subreddit(subName)
         }
     }
 
@@ -155,6 +159,15 @@ class DisplaySubFragment : RelicFragment() {
                     .add(R.id.main_content_frame, createPostFrag)
                     .addToBackStack(TAG)
                     .commit()
+                fragmentOpened = true
+            }
+            R.id.display_sub_sync_config -> {
+                val subSyncConfigFrag = SubSyncConfigFragment.create(postSource)
+                // intentionally because replacing then popping off back stack loses scroll position
+                activity!!.supportFragmentManager.beginTransaction()
+                  .replace(R.id.main_content_frame, subSyncConfigFrag)
+                  .addToBackStack(TAG)
+                  .commit()
                 fragmentOpened = true
             }
             // when the sorting type is changed
@@ -326,7 +339,7 @@ class DisplaySubFragment : RelicFragment() {
                 arguments = Bundle().apply {
                     putString(SubInfoDialogContract.ARG_SUB_NAME, subName)
                 }
-                show(requireFragmentManager(), TAG)
+                show(requireActivity().supportFragmentManager, TAG)
             }
         }
     }
