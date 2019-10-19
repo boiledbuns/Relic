@@ -31,6 +31,8 @@ class ScheduleManagerImpl @Inject constructor(
       timeToSync: Int,
       repeatType: SyncRepeatOption,
       repeatDay: SyncRepeatDays,
+      sortType: SortType,
+      sortScope: SortScope,
       commentSyncEnabled: Boolean
     ) {
         val constraints = Constraints.Builder()
@@ -46,8 +48,8 @@ class ScheduleManagerImpl @Inject constructor(
         val durationUntilSync = calculateMinutesFromNextSync(timeToSync, repeatType, repeatDay)
         val postSyncWorkerData = PostSyncWorker.createData(
           postSource.getSourceName(),
-          SortType.DEFAULT,
-          SortScope.NONE,
+          sortType,
+          sortScope,
           pagesToSync,
           commentSyncEnabled
         )

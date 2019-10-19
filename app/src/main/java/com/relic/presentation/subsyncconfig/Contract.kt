@@ -1,5 +1,7 @@
 package com.relic.presentation.subsyncconfig
 
+import com.relic.data.SortScope
+import com.relic.data.SortType
 import com.relic.scheduler.SyncRepeatDays
 import com.relic.scheduler.SyncRepeatOption
 
@@ -12,6 +14,9 @@ interface SubSyncPreferenceManager {
     // if weekly, what day to sync
     fun postSyncRepeatDays() : SyncRepeatDays?
     fun postSyncRepeatPages() : Int
+
+    fun postSortType() : SortType
+    fun postSortScope() : SortScope
 
     fun isCommentSyncEnabled() : Boolean
 }

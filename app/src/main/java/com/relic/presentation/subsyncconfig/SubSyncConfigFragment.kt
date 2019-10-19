@@ -13,6 +13,8 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.relic.data.PostSource
+import com.relic.data.SortScope
+import com.relic.data.SortType
 import com.relic.presentation.base.RelicPreferenceFragment
 import com.relic.scheduler.ScheduleManager
 import com.relic.scheduler.SyncRepeatDays
@@ -26,6 +28,8 @@ private const val PREFIX_POST_SYNC_TIME = "POST_SYNC_TIME_"
 private const val PREFIX_POST_SYNC_REPEAT = "POST_SYNC_REPEAT_"
 private const val PREFIX_POST_SYNC_REPEAT_DAYS = "POST_SYNC_REPEAT_DAYS_"
 private const val PREFIX_POST_SYNC_PAGES = "POST_SYNC_PAGES_"
+private const val PREFIX_POST_SORT_TYPE = "POST_SORT_TYPE_"
+private const val PREFIX_POST_SORT_SCOPE = "POST_SORT_SCOPE_"
 private const val PREFIX_COMMENT_SYNC = "COMMENT_SYNC_"
 
 class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManager {
@@ -41,7 +45,12 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
     private val keyPostSyncRepeat by lazy { PREFIX_POST_SYNC_REPEAT + postSourceName }
     private val keyPostSyncRepeatDays by lazy { PREFIX_POST_SYNC_REPEAT_DAYS + postSourceName }
     private val keyPostSyncPages by lazy { PREFIX_POST_SYNC_PAGES + postSourceName }
+    private val keyPostSortType by lazy { PREFIX_POST_SORT_TYPE + postSourceName }
+    private val keyPostSortScope by lazy { PREFIX_POST_SORT_SCOPE + postSourceName }
     private val keyCommentSync by lazy { PREFIX_COMMENT_SYNC + postSourceName }
+
+    private val sortTypes = SortType.values().map { it.toString().toLowerCase() }.toTypedArray()
+    private val sortScopes = SortScope.values().map { it.toString().toLowerCase() }.toTypedArray()
 
     private val repeatOptions = arrayOf("daily", "weekly")
     private val repeatDays = arrayOf("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
@@ -52,7 +61,8 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
 
         requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                onBackPressed()
+                isEnabled = handleBackPress()
+                requireActivity().onBackPressed()
             }
         })
     }
@@ -104,20 +114,28 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
 
             DropDownPreference(context).apply {
                 key = keyPostSyncRepeat
-                title = "Repeats:  ${postSyncRepeat()}"
+                title = "Repeats: ${postSyncRepeat().toString().toLowerCase()}"
                 entries = repeatOptions
                 entryValues = repeatOptions
 
                 postSyncCategory.addPreference(this)
+                setOnPreferenceChangeListener { preference, newValue ->
+                    title = "Repeats: $newValue"
+                    true
+                }
             }
 
             DropDownPreference(context).apply {
                 key = keyPostSyncRepeatDays
-                title = "Repeats on: ${postSyncRepeatDays()}"
+                title = "Repeats on: ${postSyncRepeatDays().toString().toLowerCase()}"
                 entries = repeatDays
                 entryValues = repeatDays
 
                 postSyncCategory.addPreference(this)
+                setOnPreferenceChangeListener { preference, newValue ->
+                    title = "Repeats on: $newValue"
+                    true
+                }
             }
 
             EditTextPreference(context).apply {
@@ -134,6 +152,37 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
                 }
 
                 postSyncCategory.addPreference(this)
+            }
+        }
+
+        PreferenceCategory(context).let { postSortCategory ->
+            postSortCategory.title = "post sync sort preferences"
+            screen.addPreference(postSortCategory)
+
+            DropDownPreference(context).apply {
+                key = keyPostSortType
+                title = "Sort type: ${postSortType().toString().toLowerCase()}"
+                entries = sortTypes
+                entryValues = sortTypes
+
+                postSortCategory.addPreference(this)
+                setOnPreferenceChangeListener { _, newValue ->
+                    title = "Sort type: $newValue"
+                    true
+                }
+            }
+
+            DropDownPreference(context).apply {
+                key = keyPostSortScope
+                title = "Sort scope: ${postSortScope().toString().toLowerCase()}"
+                entries = sortScopes
+                entryValues = sortScopes
+
+                postSortCategory.addPreference(this)
+                setOnPreferenceChangeListener { _, newValue ->
+                    title = "Sort scope: $newValue"
+                    true
+                }
             }
         }
 
@@ -160,6 +209,8 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
               timeToSync = postSyncTime(),
               repeatType = postSyncRepeat(),
               repeatDay = postSyncRepeatDays(),
+              sortType = postSortType(),
+              sortScope = postSortScope(),
               commentSyncEnabled = isCommentSyncEnabled()
             )
         } else {
@@ -170,7 +221,7 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
         return false
     }
 
-    private fun onBackPressed() : Boolean {
+    private fun handleBackPress() : Boolean {
         // no need to check for divergence - just update the worker
         handleSyncPreferenceChange()
         return false
@@ -181,13 +232,16 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
     // region sub sync preferences manager
 
     override fun isPostSyncEnabled() : Boolean = sp.getBoolean(keyPostSync, false)
+
     override fun postSyncTime(): Int = sp.getInt(keyPostSyncTime, 0)
+
     override fun postSyncRepeat(): SyncRepeatOption {
         return when (sp.getString(keyPostSyncRepeat, null) ) {
             repeatOptions[1] -> SyncRepeatOption.WEEKLY
             else -> SyncRepeatOption.DAILY
         }
     }
+
     override fun postSyncRepeatDays(): SyncRepeatDays {
         return when (sp.getString(keyPostSyncRepeatDays, null)) {
             repeatDays[6] -> SyncRepeatDays.SUNDAY
@@ -199,7 +253,19 @@ class SubSyncConfigFragment : RelicPreferenceFragment(), SubSyncPreferenceManage
             else -> SyncRepeatDays.MONDAY
         }
     }
+
     override fun postSyncRepeatPages(): Int = sp.getString(keyPostSyncPages, "0")!!.toInt()
+
+    override fun postSortType(): SortType {
+        val sortTypeName = sp.getString(keyPostSortType, "")
+        return SortType.values().find { it.toString().toLowerCase() == sortTypeName } ?: SortType.DEFAULT
+    }
+
+    override fun postSortScope(): SortScope {
+        val sortScopeNames = sp.getString(keyPostSortScope, "")
+        return SortScope.values().find { it.toString().toLowerCase() == sortScopeNames } ?: SortScope.NONE
+    }
+
     override fun isCommentSyncEnabled(): Boolean = sp.getBoolean(keyCommentSync, false)
 
     // endregion sub sync preferences manager

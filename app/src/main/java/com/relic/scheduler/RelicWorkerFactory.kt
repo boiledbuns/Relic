@@ -17,7 +17,6 @@ class RelicWorkerFactory @Inject constructor(
     override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
         Timber.d(postRepository.toString())
 
-
         return when(workerClassName) {
             PostSyncWorker::class.java.name -> PostSyncWorker(appContext, workerParameters, postRepository, commentRepo)
             else -> null
