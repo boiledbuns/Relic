@@ -29,11 +29,11 @@ open class RelicFragment: Fragment(), RelicInjectable {
     }
 
     protected fun transitionToFragment(fragment : Fragment, replace : Boolean = false) {
-        activity!!.supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.main_content_frame, fragment)
-                .addToBackStack(TAG)
-                .commit()
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_content_frame, fragment)
+            .addToBackStack(TAG)
+            .commit()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,6 +1,7 @@
 package com.relic.presentation.main
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
@@ -22,9 +23,14 @@ import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
+import com.relic.presentation.displaypost.DisplayPostFragment
+import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragment
+import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
@@ -34,6 +40,7 @@ import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
@@ -41,6 +48,9 @@ class MainActivity : RelicActivity() {
 
     @Inject
     lateinit var factory : MainVM.Factory
+
+    @Inject
+    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager
@@ -73,12 +83,14 @@ class MainActivity : RelicActivity() {
         initializeDefaultView()
         initNavDrawer()
 
-        bindViewModel(this@MainActivity)
+        bindViewModel(this)
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         mainVM.userLiveData.observe (lifecycleOwner) { setUser(it) }
         mainVM.accountsLiveData.nonNull().observe (lifecycleOwner) { setAccounts(it) }
+
+        postInteractor.navigationLiveData.observe (lifecycleOwner){ handlePostInteractorNavigation(it!!) }
     }
 
     private fun initNavDrawer() {
@@ -127,7 +139,7 @@ class MainActivity : RelicActivity() {
             RequestCodes.CHANGED_ACCOUNT -> {
                 mainVM.onAccountSelected()
                 supportFragmentManager.fragments.forEach {
-
+                    // TODO maybe consider notifying each of changes
                 }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -155,7 +167,7 @@ class MainActivity : RelicActivity() {
     private fun initializeDefaultView() {
         // get the number of additional (non default) fragments in the stack
         val fragCount = supportFragmentManager.backStackEntryCount
-        Log.d(TAG, "Number of fragments $fragCount")
+        Timber.d("Number of fragments $fragCount")
 
         // add the default view only if there are no additional fragments on the stack
         if (fragCount < 1) {
@@ -257,6 +269,44 @@ class MainActivity : RelicActivity() {
     }
 
     // endregion navigation view handlers
+
+    // region post interactor
+
+    private fun handlePostInteractorNavigation(postNavigationData: NavigationData) {
+        when (postNavigationData) {
+            // navigates to display post
+            is NavigationData.ToPost -> {
+                val postFragment = DisplayPostFragment.create(
+                  postNavigationData.postId,
+                  postNavigationData.subredditName
+                )
+                // intentionally because replacing then popping off back stack loses scroll position
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, postFragment)
+                    .addToBackStack(TAG)
+                    .commit()
+            }
+            // navigates to display image on top of current fragment
+            is NavigationData.ToImage -> {
+                val imageFragment = DisplayImageFragment.create(
+                  postNavigationData.thumbnail
+                )
+                supportFragmentManager.beginTransaction()
+                  .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
+            }
+            // let browser handle navigation to url
+            is NavigationData.ToExternal -> {
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(postNavigationData.url))
+                startActivity(openInBrowser)
+            }
+            is NavigationData.ToUserPreview -> {
+                DisplayUserPreview.create(postNavigationData.username)
+                  .show(supportFragmentManager, TAG)
+            }
+        }
+    }
+
+    // endregion post interactor
 
     fun getNavDrawer(): DrawerLayout = navigationDrawer!!
 }

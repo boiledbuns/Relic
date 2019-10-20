@@ -19,7 +19,8 @@ import javax.inject.Singleton
         DeserializerModule::class,
         UtilModule::class,
         AuthModule::class,
-        ApiModule::class
+        ApiModule::class,
+        InteractorModule::class
     ]
 )
 interface AppComponent {

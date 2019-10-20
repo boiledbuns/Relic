@@ -1,5 +1,6 @@
 package com.relic.presentation.displaysub
 
+import androidx.lifecycle.LiveData
 import com.relic.data.PostSource
 import com.relic.data.SortScope
 import com.relic.data.SortType
@@ -18,6 +19,8 @@ interface DisplaySubContract {
     }
 
     interface PostAdapterDelegate {
+        val navigationLiveData : LiveData<NavigationData>
+
         fun visitPost(postFullname: String, subreddit : String)
         fun voteOnPost(postFullname: String, voteValue: Int)
         fun savePost(postFullname: String, save: Boolean)
@@ -39,7 +42,6 @@ sealed class NavigationData {
     data class ToPost (
         val postId : String,
         val subredditName : String,
-        val postSource: PostSource,
         val commentId : String? = null
     ) : NavigationData ()
 

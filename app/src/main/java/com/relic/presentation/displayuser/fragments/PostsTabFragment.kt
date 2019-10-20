@@ -22,7 +22,8 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_submissions.*
 import javax.inject.Inject
 
-class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate {
+class PostsTabFragment : RelicFragment() {
+
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
@@ -121,20 +122,6 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         }
 
     }
-
-    // region delegate functions
-
-    override fun visitPost(postFullname: String, subreddit: String) {}
-
-    override fun voteOnPost(postFullname: String, voteValue: Int) {}
-
-    override fun savePost(postFullname: String, save: Boolean) {}
-
-    override fun onLinkPressed(url: String) {}
-
-    override fun previewUser(username: String) {}
-
-    // endregion delegate functions
 
     companion object {
         private val ARG_USER_TAB = "arg_user_tab"

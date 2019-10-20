@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
-import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
 import com.relic.data.repository.NetworkException
 import com.relic.domain.models.CommentModel
@@ -33,8 +32,7 @@ class DisplayPostVM (
     private val postGateway: PostGateway,
     private val networkUtil : NetworkUtil,
     private val subName: String,
-    private val postFullname: String,
-    private val postSource : PostSource
+    private val postFullname: String
 ): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
 
     class Factory @Inject constructor(
@@ -46,10 +44,9 @@ class DisplayPostVM (
     ) {
         fun create(
             subredditName : String,
-            postFullname : String,
-            postSource: PostSource
+            postFullname : String
         ) : DisplayPostVM {
-            return DisplayPostVM(postRepo, commentRepo, listingRepo, postGateway, networkUtil, subredditName, postFullname, postSource)
+            return DisplayPostVM(postRepo, commentRepo, listingRepo, postGateway, networkUtil, subredditName, postFullname)
         }
     }
 

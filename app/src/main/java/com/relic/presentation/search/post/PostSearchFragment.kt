@@ -16,7 +16,7 @@ import com.relic.R
 import com.relic.data.PostSource
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.DisplaySubVM
+import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.PostSearchOptions
@@ -29,19 +29,18 @@ class PostSearchFragment : RelicFragment() {
     lateinit var factory : PostSearchResultsVM.Factory
 
     @Inject
+    lateinit var postAdapterDelegate: DisplaySubContract.PostAdapterDelegate
+
+    @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     private lateinit var pagerAdapter: PostsSearchPagerAdapter
-
-    val displaySubVM: DisplaySubVM by lazy {
-        ViewModelProviders.of(activity!!).get(DisplaySubVM::class.java)
-    }
 
     val searchResultsVM: PostSearchResultsVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(postSource, displaySubVM) as T
+                return factory.create(postSource) as T
             }
         }).get(PostSearchResultsVM::class.java)
     }

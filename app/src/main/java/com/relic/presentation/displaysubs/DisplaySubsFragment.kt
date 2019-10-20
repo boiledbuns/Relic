@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
 import com.relic.R
 import com.relic.databinding.DisplaySubsBinding
 import com.relic.domain.models.SubredditModel
@@ -62,7 +63,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         displaySubsBinding.apply {
 
             displaySubsRecyclerview.also {
-                it.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
+                it.layoutManager = GridLayoutManager(context, 3)
                 it.adapter = subAdapter
             }
         }
@@ -166,9 +167,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     internal inner class OnClickSubItem : DisplaySubsContract.SubItemOnClick {
         override fun onClick(subItem: SubredditModel) {
             val subFrag = DisplaySubFragment.create(subItem.subName)
-
-            // clear items before transition to ensure we don't hold too much in memory
-            subAdapter.clearList()
 
             // TODO : find a way to stop recreating the fragment everytime and keep the position in the list
             // this applies to sub view as well

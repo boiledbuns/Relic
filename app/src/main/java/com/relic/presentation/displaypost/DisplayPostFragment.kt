@@ -3,7 +3,12 @@ package com.relic.presentation.displaypost
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -16,7 +21,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.relic.R
-import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
@@ -45,14 +49,13 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return factory.create(subredditName, postFullName, postSource) as T
+                return factory.create(subredditName, postFullName) as T
             }
         }).get(DisplayPostVM::class.java)
     }
 
     private lateinit var postFullName: String
     private lateinit var subredditName: String
-    private lateinit var postSource: PostSource
     private var enableVisitSub = false
 
     private lateinit var pagerAdapter : DisplayPostPagerAdapter
@@ -68,7 +71,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         arguments?.apply {
             getString(ARG_POST_FULLNAME)?.let { postFullName = it }
             getString(ARG_SUB_NAME)?.let { subredditName = it }
-            getParcelable<PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
         }
 
@@ -241,13 +243,12 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
          * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
          * continuously chaining open subreddit actions
          */
-        fun create(postId : String, subreddit : String, postSource: PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
+        fun create(postId : String, subreddit : String, enableVisitSub : Boolean = false) : DisplayPostFragment {
             // create a new bundle for the post id
             val bundle = Bundle().apply {
                 putString(ARG_POST_FULLNAME, postId)
                 putString(ARG_SUB_NAME, subreddit)
                 putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
-                putParcelable(ARG_POST_SOURCE, postSource)
             }
 
             return DisplayPostFragment().apply {

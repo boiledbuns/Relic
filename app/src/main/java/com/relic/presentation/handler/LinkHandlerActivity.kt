@@ -44,7 +44,6 @@ class LinkHandlerActivity : RelicActivity() {
                         displayFragment(
                             DisplayPostFragment.create(
                                 postId = "t3_" + urlDetails[3],
-                                postSource = PostSource.Subreddit(urlDetails[1]),
                                 enableVisitSub = true,
                                 subreddit = urlDetails[1]
                             )

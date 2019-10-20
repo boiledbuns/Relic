@@ -20,20 +20,13 @@ import kotlin.coroutines.CoroutineContext
 
 class PostSearchResultsVM(
     private val postRepo: PostRepository,
-    private val postGateway: PostGateway,
-    private val postSource: PostSource,
-    displaySubVM : DisplaySubContract.PostAdapterDelegate
-) :
-    RelicViewModel(),
-    DisplaySearchContract.PostSearchVM,
-    DisplaySubContract.PostAdapterDelegate by displaySubVM
-{
+    private val postSource: PostSource
+) : RelicViewModel(), DisplaySearchContract.PostSearchVM {
     class Factory @Inject constructor(
-            private val postRepo: PostRepository,
-            private val postGateway: PostGateway
+        private val postRepo: PostRepository
     ) {
-        fun create(postSource: PostSource, displaySubVM : DisplaySubContract.PostAdapterDelegate) : PostSearchResultsVM {
-            return PostSearchResultsVM(postRepo, postGateway, postSource, displaySubVM)
+        fun create(postSource: PostSource) : PostSearchResultsVM {
+            return PostSearchResultsVM(postRepo, postSource)
         }
     }
 

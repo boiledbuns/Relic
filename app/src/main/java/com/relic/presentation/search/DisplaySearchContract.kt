@@ -11,7 +11,7 @@ import com.relic.presentation.main.RelicError
 
 interface DisplaySearchContract {
 
-    interface PostSearchVM : DisplaySubContract.PostAdapterDelegate {
+    interface PostSearchVM {
         val postSearchErrorLiveData : LiveData<RelicError?>
         val postResultsLiveData : LiveData<List<PostModel>>
         val offlinePostResultsLiveData : LiveData<List<PostModel>>

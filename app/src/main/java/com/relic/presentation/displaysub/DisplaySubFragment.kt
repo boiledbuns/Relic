@@ -1,21 +1,24 @@
 package com.relic.presentation.displaysub
 
+import android.os.Bundle
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.ItemTouchHelper
-import android.util.TypedValue
-import android.view.*
-import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.data.SortType
@@ -23,13 +26,10 @@ import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
-import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.main.RelicError
-import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.search.post.PostSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subinfodialog.SubInfoDialogContract
@@ -44,12 +44,13 @@ class DisplaySubFragment : RelicFragment() {
     lateinit var factory : DisplaySubVM.Factory
 
     @Inject
+    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
+
+    @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
-    lateinit var postSource: PostSource
-
     val displaySubVM: DisplaySubVM by lazy {
-        ViewModelProviders.of(activity!!, object : ViewModelProvider.Factory{
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(PostSource.Subreddit(subName)) as T
@@ -75,7 +76,6 @@ class DisplaySubFragment : RelicFragment() {
 
         arguments?.apply {
             subName = getString(ARG_SUBREDDIT_NAME, "")
-            postSource = PostSource.Subreddit(subName)
         }
     }
 
@@ -89,7 +89,7 @@ class DisplaySubFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
 
         subPostsRecyclerView.apply {
             adapter = postAdapter
@@ -146,7 +146,7 @@ class DisplaySubFragment : RelicFragment() {
         when (item.itemId) {
             R.id.display_sub_searchitem -> {
                 val searchFrag = PostSearchFragment.create(PostSource.Subreddit(subName))
-                activity!!.supportFragmentManager.beginTransaction()
+                requireActivity().supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, searchFrag)
                     .addToBackStack(TAG)
                     .commit()
@@ -155,16 +155,16 @@ class DisplaySubFragment : RelicFragment() {
             R.id.display_sub_create_post -> {
                 val createPostFrag = NewPostEditorFragment.create(subName)
                 // intentionally because replacing then popping off back stack loses scroll position
-                activity!!.supportFragmentManager.beginTransaction()
+                requireActivity().supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, createPostFrag)
                     .addToBackStack(TAG)
                     .commit()
                 fragmentOpened = true
             }
             R.id.display_sub_sync_config -> {
-                val subSyncConfigFrag = SubSyncConfigFragment.create(postSource)
+                val subSyncConfigFrag = SubSyncConfigFragment.create(PostSource.Subreddit(subName))
                 // intentionally because replacing then popping off back stack loses scroll position
-                activity!!.supportFragmentManager.beginTransaction()
+                requireActivity().supportFragmentManager.beginTransaction()
                   .replace(R.id.main_content_frame, subSyncConfigFrag)
                   .addToBackStack(TAG)
                   .commit()
@@ -201,7 +201,6 @@ class DisplaySubFragment : RelicFragment() {
     override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
         displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
         displaySubVM.subredditLiveData.nonNull().observe(lifecycleOwner) { updateSubInfo(it) }
-        displaySubVM.subNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
         displaySubVM.subInfoLiveData.nonNull().observe (lifecycleOwner) { setSubInfoData(it) }
         displaySubVM.errorLiveData.observe (lifecycleOwner) { handleError(it) }
 
@@ -241,41 +240,6 @@ class DisplaySubFragment : RelicFragment() {
 
         subscribeButtonView.setOnClickListener {
             displaySubVM.updateSubStatus(!subredditModel.isSubscribed)
-        }
-    }
-
-    // TODO consider extracting this code outside of both this and the displaysubfragment
-    private fun handleNavigation(subNavigationData: NavigationData) {
-        when (subNavigationData) {
-            // navigates to display post
-            is NavigationData.ToPost -> {
-                val postFragment = DisplayPostFragment.create(
-                    subNavigationData.postId,
-                    subNavigationData.subredditName,
-                    subNavigationData.postSource
-                )
-                // intentionally because replacing then popping off back stack loses scroll position
-                activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
-                fragmentOpened = true
-            }
-            // navigates to display image on top of current fragment
-            is NavigationData.ToImage -> {
-                val imageFragment = DisplayImageFragment.create(
-                    subNavigationData.thumbnail
-                )
-                activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
-            }
-            // let browser handle navigation to url
-            is NavigationData.ToExternal -> {
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
-                startActivity(openInBrowser)
-            }
-            is NavigationData.ToUserPreview -> {
-                DisplayUserPreview.create(subNavigationData.username)
-                    .show(requireFragmentManager(), TAG)
-            }
         }
     }
 
