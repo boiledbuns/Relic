@@ -1,7 +1,6 @@
 package com.relic.presentation.displaysub
 
 import androidx.lifecycle.LiveData
-import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
 import com.relic.presentation.helper.ImageHelper
 import com.shopify.livedataktx.SingleLiveData
@@ -25,12 +24,12 @@ class PostInteractor @Inject constructor(
   private val postGateway: PostGateway
 ) : DisplaySubContract.PostAdapterDelegate, CoroutineScope {
 
-    private val _navigationLiveData = SingleLiveData<NavigationData>()
-    override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
-
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
         Timber.e(e,  "caught exception")
     }
+
+    private val _navigationLiveData = SingleLiveData<NavigationData>()
+    override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
     override fun visitPost(postFullname : String, subreddit : String) {
         launch(Dispatchers.Main) { postGateway.visitPost(postFullname) }

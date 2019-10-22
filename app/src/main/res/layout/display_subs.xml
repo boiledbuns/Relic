@@ -1,84 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-        <import type="android.view.View"/>
+<!-- TODO push up to activity xml and move appbar layout through it as well -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    android:background="?attr/relicBackgroundColor"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <variable
-            name="searchIsVisible"
-            type="Boolean"/>
+    <!--<android.support.design.widget.AppBarLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
-        <variable
-            name="subscribedListIsVisible"
-            type="Boolean"/>
-    </data>
+        <!--&lt;!&ndash;<com.relic.presentation.customview.RelicToolbar&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:id="@+id/display_subs_toolbar"/>&ndash;&gt;-->
 
-    <!-- TODO push up to activity xml and move appbar layout through it as well -->
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <!--<include layout="@layout/relic_toolbar"-->
+                 <!--android:id="@+id/display_subs_toolbar"/>-->
+
+    <!--</android.support.design.widget.AppBarLayout>-->
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/display_subs_swiperefreshlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:background="?attr/relicBackgroundColor">
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <!--<android.support.design.widget.AppBarLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--&lt;!&ndash;<com.relic.presentation.customview.RelicToolbar&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-                <!--&lt;!&ndash;android:id="@+id/display_subs_toolbar"/>&ndash;&gt;-->
-
-            <!--<include layout="@layout/relic_toolbar"-->
-                     <!--android:id="@+id/display_subs_toolbar"/>-->
-
-        <!--</android.support.design.widget.AppBarLayout>-->
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/display_subs_swiperefreshlayout"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+            android:layout_height="match_parent">
 
-            <androidx.core.widget.NestedScrollView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <RelativeLayout
+                <com.relic.presentation.displaysubs.pinned.DisplayPinnedSubsView
+                    android:id="@+id/pinnedSubsView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"/>
 
-                    <com.relic.presentation.displaysubs.pinned.DisplayPinnedSubsView
-                        android:id="@+id/pinnedSubsView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                <!-- displays all subscribed subs-->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/display_subs_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/pinnedSubsView"
+                    android:clipToPadding="false"
+                    android:paddingEnd="@dimen/subitem_margin"
+                    android:paddingBottom="@dimen/subitem_margin"/>
 
-                    <!-- displays all subscribed subs-->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/display_subs_recyclerview"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/pinnedSubsView"
-                        android:clipToPadding="false"
-                        android:paddingEnd="@dimen/subitem_margin"
-                        android:paddingBottom="@dimen/subitem_margin"/>
-                    <!--android:layout_below="@+id/display_subs_toolbar"-->
+                <!-- Displays search results -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/search_subs_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
 
-                    <!-- Displays search results -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/search_subs_recyclerview"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"/>
+            </RelativeLayout>
 
-                </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
 
-            </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</layout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

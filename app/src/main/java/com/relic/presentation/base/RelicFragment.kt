@@ -8,7 +8,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
-import com.relic.R
 import com.relic.dagger.RelicInjectable
 import timber.log.Timber
 
@@ -26,14 +25,6 @@ open class RelicFragment: Fragment(), RelicInjectable {
 
     protected fun dismiss() {
         childFragmentManager.popBackStackImmediate()
-    }
-
-    protected fun transitionToFragment(fragment : Fragment, replace : Boolean = false) {
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_content_frame, fragment)
-            .addToBackStack(TAG)
-            .commit()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

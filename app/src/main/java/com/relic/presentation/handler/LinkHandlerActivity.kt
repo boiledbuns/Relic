@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.relic.R
-import com.relic.data.PostSource
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
@@ -12,7 +11,6 @@ import com.relic.presentation.displayuser.DisplayUserFragment
 import timber.log.Timber
 
 class LinkHandlerActivity : RelicActivity() {
-    internal val TAG = "LINK_HANDLER_ACTIVITY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -12,8 +12,6 @@ import kotlinx.coroutines.SupervisorJob
 
 
 class LoginActivity : RelicActivity(), CoroutineScope {
-    internal val TAG = "LOGIN_ACTIVITY"
-
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
     override fun onCreate(savedInstanceState: Bundle?) {

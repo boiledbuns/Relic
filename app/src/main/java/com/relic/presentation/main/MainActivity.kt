@@ -3,7 +3,6 @@ package com.relic.presentation.main
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -25,7 +24,9 @@ import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.displaysubs.DisplaySubsContract
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.home.HomeFragment
@@ -36,6 +37,7 @@ import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
+import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -44,13 +46,14 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
-    internal val TAG = "MAIN_ACTIVITY"
-
     @Inject
     lateinit var factory : MainVM.Factory
 
     @Inject
     lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
+
+    @Inject
+    lateinit var subredditInteractor : DisplaySubsContract.SubAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager
@@ -90,7 +93,8 @@ class MainActivity : RelicActivity() {
         mainVM.userLiveData.observe (lifecycleOwner) { setUser(it) }
         mainVM.accountsLiveData.nonNull().observe (lifecycleOwner) { setAccounts(it) }
 
-        postInteractor.navigationLiveData.observe (lifecycleOwner){ handlePostInteractorNavigation(it!!) }
+        postInteractor.navigationLiveData.observe (lifecycleOwner){ handleNavigation(it!!) }
+        subredditInteractor.navigationLiveData.observe (lifecycleOwner){ handleNavigation(it!!) }
     }
 
     private fun initNavDrawer() {
@@ -272,13 +276,13 @@ class MainActivity : RelicActivity() {
 
     // region post interactor
 
-    private fun handlePostInteractorNavigation(postNavigationData: NavigationData) {
-        when (postNavigationData) {
+    private fun handleNavigation(navData: NavigationData) {
+        when (navData) {
             // navigates to display post
             is NavigationData.ToPost -> {
                 val postFragment = DisplayPostFragment.create(
-                  postNavigationData.postId,
-                  postNavigationData.subredditName
+                  navData.postId,
+                  navData.subredditName
                 )
                 // intentionally because replacing then popping off back stack loses scroll position
                 supportFragmentManager.beginTransaction()
@@ -289,19 +293,27 @@ class MainActivity : RelicActivity() {
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
-                  postNavigationData.thumbnail
+                  navData.thumbnail
                 )
                 supportFragmentManager.beginTransaction()
                   .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
             }
             // let browser handle navigation to url
             is NavigationData.ToExternal -> {
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(postNavigationData.url))
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navData.url))
                 startActivity(openInBrowser)
             }
             is NavigationData.ToUserPreview -> {
-                DisplayUserPreview.create(postNavigationData.username)
+                DisplayUserPreview.create(navData.username)
                   .show(supportFragmentManager, TAG)
+            }
+            is NavigationData.ToPostSource -> {
+                val subFragment = DisplaySubFragment.create(navData.source.getSourceName())
+                transitionToFragment(subFragment)
+            }
+            is NavigationData.PreviewPostSource -> {
+                SubInfoBottomSheetDialog.create(navData.source.getSourceName())
+                    .show(supportFragmentManager, TAG)
             }
         }
     }
