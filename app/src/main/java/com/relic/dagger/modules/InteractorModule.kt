@@ -1,5 +1,7 @@
 package com.relic.dagger.modules
 
+import com.relic.presentation.displaypost.CommentInteractor
+import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.PostInteractor
 import com.relic.presentation.displaysubs.DisplaySubsContract
@@ -16,4 +18,7 @@ abstract class InteractorModule {
 
     @Binds
     abstract fun bindSubredditInteractor(subredditInteractor: SubredditInteractor) : DisplaySubsContract.SubAdapterDelegate
+
+    @Binds
+    abstract fun bindCommentInteractor(commentInteractor: CommentInteractor) : DisplayPostContract.CommentAdapterDelegate
 }

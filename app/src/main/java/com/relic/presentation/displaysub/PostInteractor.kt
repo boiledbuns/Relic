@@ -2,7 +2,9 @@ package com.relic.presentation.displaysub
 
 import androidx.lifecycle.LiveData
 import com.relic.data.gateway.PostGateway
-import com.relic.presentation.helper.ImageHelper
+import com.relic.domain.models.PostModel
+import com.relic.presentation.util.MediaHelper
+import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -36,16 +38,16 @@ class PostInteractor @Inject constructor(
         _navigationLiveData.postValue(NavigationData.ToPost(postFullname, subreddit))
     }
 
-    override fun onLinkPressed(url: String) {
-        val isImage = ImageHelper.isValidImage(url)
+    override fun onLinkPressed(postModel: PostModel) {
+        postModel.url?.let { url ->
+            val navData = when (val mediaType = MediaHelper.determineType(postModel)) {
+                is MediaType.Image, MediaType.Gfycat -> NavigationData.ToMedia(mediaType, url)
+                is MediaType.Link -> NavigationData.ToExternal(url)
+                else -> null
+            }
 
-        val subNavigation : NavigationData = if (isImage) {
-            NavigationData.ToImage(url)
-        } else {
-            NavigationData.ToExternal(url)
+            _navigationLiveData.postValue(navData)
         }
-
-        _navigationLiveData.postValue(subNavigation)
     }
 
     override fun previewUser(username: String) {
@@ -58,5 +60,9 @@ class PostInteractor @Inject constructor(
 
     override fun savePost(postFullname: String, save: Boolean) {
         launch(Dispatchers.Main) { postGateway.savePost(postFullname, save) }
+    }
+
+    override fun onNewReplyPressed(postFullname: String) {
+        _navigationLiveData.postValue(NavigationData.ToReply(postFullname))
     }
 }

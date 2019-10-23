@@ -20,7 +20,7 @@ class ListingItemAdapter(
     private val viewPrefsManager: PostViewPreferences,
     private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
 ) : RecyclerView.Adapter <RecyclerView.ViewHolder> (),
-    DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentAdapterDelegate {
+    DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentViewDelegate {
 
     private lateinit var markwon : Markwon
     private val VIEW_TYPE_POST = 0

@@ -12,7 +12,7 @@ class CommentItemVH (
 ): RecyclerView.ViewHolder(commentItem) {
     private var commentId = ""
 
-    fun initializeOnClicks(adapter : DisplayPostContract.CommentAdapterDelegate) {
+    fun initializeOnClicks(adapter : DisplayPostContract.CommentViewDelegate) {
         commentItem.apply {
             commentUpvoteView.setOnClickListener { adapter.voteOnComment(adapterPosition, UPVOTE_PRESSED) }
             commentDownvoteView.setOnClickListener { adapter.voteOnComment(adapterPosition, DOWNVOTE_PRESSED) }

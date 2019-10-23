@@ -8,7 +8,7 @@ class CommentMoreItemsVH (
     private val moreCommentsItem : RelicCommentMoreItemsView
 ) : RecyclerView.ViewHolder(moreCommentsItem) {
 
-    fun initializeOnClicks(delegate : DisplayPostContract.CommentAdapterDelegate) {
+    fun initializeOnClicks(delegate : DisplayPostContract.CommentViewDelegate) {
         moreCommentsItem.setOnClickListener {
             delegate.loadMoreComments(adapterPosition, false)
             // TODO display loading for comments

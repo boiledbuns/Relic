@@ -29,8 +29,10 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displaysubs.DisplaySubsContract
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
+import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
+import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
@@ -38,6 +40,7 @@ import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESU
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
+import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -315,10 +318,32 @@ class MainActivity : RelicActivity() {
                 SubInfoBottomSheetDialog.create(navData.source.getSourceName())
                     .show(supportFragmentManager, TAG)
             }
+
+            is NavigationData.ToMedia -> openMedia(navData)
+            is NavigationData.ToReply -> openPostReplyEditor(navData.parentFullname)
         }
     }
 
     // endregion post interactor
+
+    private fun openMedia(navMediaData : NavigationData.ToMedia) {
+        val displayFragment = when (navMediaData.mediaType)  {
+            MediaType.Gfycat -> DisplayGfycatFragment.create(navMediaData.mediaUrl)
+            else -> DisplayImageFragment.create(navMediaData.mediaUrl)
+        }
+        supportFragmentManager
+          .beginTransaction()
+          .add(R.id.main_content_frame, displayFragment)
+          .addToBackStack(TAG)
+          .commit()
+    }
+
+    private fun openPostReplyEditor(parentFullname: String) {
+        // this option is for replying to parent
+        // Should also allow user to do it inline, but that can be saved for a later task
+        val editorFragment = ReplyEditorFragment.create(parentFullname, true)
+        transitionToFragment(editorFragment)
+    }
 
     fun getNavDrawer(): DrawerLayout = navigationDrawer!!
 }

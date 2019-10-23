@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import com.relic.data.PostSource
 import com.relic.data.SortScope
 import com.relic.data.SortType
+import com.relic.domain.models.PostModel
 import com.relic.presentation.main.RelicError
+import com.relic.presentation.util.MediaType
 
 interface DisplaySubContract {
     interface ViewModel {
@@ -24,8 +26,10 @@ interface DisplaySubContract {
         fun visitPost(postFullname: String, subreddit : String)
         fun voteOnPost(postFullname: String, voteValue: Int)
         fun savePost(postFullname: String, save: Boolean)
-        fun onLinkPressed(url: String)
         fun previewUser(username : String)
+
+        fun onLinkPressed(postModel: PostModel)
+        fun onNewReplyPressed(postFullname: String)
     }
 
     interface PostItemAdapterDelegate {
@@ -38,6 +42,7 @@ interface DisplaySubContract {
     }
 }
 
+// TODO extract out of this interface
 sealed class NavigationData {
     data class ToPost (
         val postId : String,
@@ -69,6 +74,15 @@ sealed class NavigationData {
     data class ToUser (
             val username : String
     ) : NavigationData ()
+
+    data class ToMedia(
+      val mediaType: MediaType,
+      val mediaUrl: String
+    ) : NavigationData()
+
+    data class ToReply(
+      val parentFullname: String
+    ) : NavigationData()
 }
 
 data class DisplaySubInfoData (

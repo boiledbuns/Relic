@@ -8,6 +8,7 @@ import com.relic.domain.models.PostModel
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.FullPostView
+import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,8 +19,10 @@ private const val VIEW_TYPE_COMMENT = 1
 private const val VIEW_TYPE_LOAD_MORE = 2
 
 class CommentItemAdapter (
-    private val actionDelegate : DisplayPostContract.PostViewDelegate
-) : RelicAdapter<RecyclerView.ViewHolder>(), DisplayPostContract.CommentAdapterDelegate {
+    private val delegate : DisplayPostContract.ViewModel,
+    private val commentInteractor : DisplayPostContract.CommentAdapterDelegate,
+    private val postInteractor : DisplaySubContract.PostAdapterDelegate
+) : RelicAdapter<RecyclerView.ViewHolder>(), DisplayPostContract.CommentViewDelegate {
 
     private var post : PostModel? = null
     private var commentList : List<CommentModel> = ArrayList()
@@ -50,7 +53,7 @@ class CommentItemAdapter (
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_POST -> FullPostVH(FullPostView(parent.context)).apply {
-                initializeOnClicks(actionDelegate)
+                initializeOnClicks(commentInteractor)
             }
             VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context)).apply {
                 initializeOnClicks(this@CommentItemAdapter)
@@ -146,7 +149,7 @@ class CommentItemAdapter (
         val commentPosition = getCommentPosition(itemPosition)
         commentList[commentPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
-            val newStatus = actionDelegate.onCommentVoted(it as CommentModel, voteValue)
+            val newStatus = commentInteractor.onCommentVoted(it, voteValue)
 
             // optimistic, update copy cached in adapter and make request to api to update in server
             it.userUpvoted = newStatus
@@ -156,19 +159,19 @@ class CommentItemAdapter (
 
     override fun replyToComment(itemPosition : Int, text: String) {
         val commentPosition = getCommentPosition(itemPosition)
-        actionDelegate.onReplyPressed(commentList[commentPosition].fullName, text)
+        commentInteractor.onReplyPressed(commentList[commentPosition].fullName, text)
     }
 
     override fun visitComment(itemPosition: Int) {}
 
     override fun previewUser(itemPosition: Int) {
         val commentPosition = getCommentPosition(itemPosition)
-        actionDelegate.onUserPressed(commentList[commentPosition])
+        postInteractor.previewUser(commentList[commentPosition].author)
     }
 
     override fun loadMoreComments(itemPosition: Int, displayReplies : Boolean) {
         val commentPosition = getCommentPosition(itemPosition)
-        actionDelegate.onExpandReplies(commentList[commentPosition], displayReplies)
+        delegate.onExpandReplies(commentList[commentPosition], displayReplies)
     }
 
     // endregion OnClick handlers
