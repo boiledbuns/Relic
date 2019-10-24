@@ -13,11 +13,13 @@ import ru.noties.markwon.Markwon
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
     private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
-) : RelicAdapter <PostItemVH> (), DisplaySubContract.PostItemAdapterDelegate {
+) : RelicAdapter<PostItemVH> (), DisplaySubContract.PostViewDelegate {
 
     private var postList: List<PostModel> = ArrayList()
     private lateinit var markwon : Markwon
     private val postLayout = viewPrefsManager.getPostCardStyle()
+
+    fun getPosts() = postList
 
     override fun getItemCount() = postList.size
 

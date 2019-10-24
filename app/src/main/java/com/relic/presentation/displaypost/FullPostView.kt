@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
@@ -23,7 +24,7 @@ class FullPostView @JvmOverloads constructor(
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private val TAG = "FULL_POST_VIEW"
-    private lateinit var viewDelegate : DisplayPostContract.PostViewDelegate
+
     private var postDisplayType : MediaType? = null
     private val markwon = Markwon.create(context)
 
@@ -79,17 +80,12 @@ class FullPostView @JvmOverloads constructor(
         }
     }
 
-    fun setOnClicks(delegate : DisplayPostContract.PostViewDelegate) {
-        viewDelegate = delegate
-        initializeOnClicks(delegate)
-    }
-
-    private fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
-        postImageView.setOnClickListener { viewDelegate.onLinkPressed() }
-        postUpvoteView.setOnClickListener { viewDelegate.onPostVoted(1) }
-        postDownvoteView.setOnClickListener { viewDelegate.onPostVoted(-1) }
-        postReplyView.setOnClickListener { viewDelegate.onNewReplyPressed() }
-        postLinkCard.setOnClickListener { viewDelegate.onLinkPressed() }
+    fun setOnClicks(delegate: DisplaySubContract.PostViewDelegate) {
+        postImageView.setOnClickListener { delegate.onPostLinkPressed() }
+        postUpvoteView.setOnClickListener { delegate.onPostUpvotePressed() }
+        postDownvoteView.setOnClickListener { delegate.onPostUpvotePressed() }
+        postReplyView.setOnClickListener { delegate.onPostReply() }
+        postLinkCard.setOnClickListener { delegate.onPostLinkPressed() }
     }
 
     private fun loadLinks(postModel : PostModel) {

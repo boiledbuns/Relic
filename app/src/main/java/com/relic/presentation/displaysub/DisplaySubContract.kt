@@ -23,22 +23,24 @@ interface DisplaySubContract {
     interface PostAdapterDelegate {
         val navigationLiveData : LiveData<NavigationData>
 
-        fun visitPost(postFullname: String, subreddit : String)
-        fun voteOnPost(postFullname: String, voteValue: Int)
-        fun savePost(postFullname: String, save: Boolean)
-        fun previewUser(username : String)
+        fun visitPost(post: PostModel)
+        fun voteOnPost(post: PostModel, vote : Int)
+        fun savePost(post: PostModel)
+        fun previewUser(post: PostModel)
 
-        fun onLinkPressed(postModel: PostModel)
-        fun onNewReplyPressed(postFullname: String)
+        fun onLinkPressed(post: PostModel)
+        fun onNewReplyPressed(post: PostModel)
     }
 
-    interface PostItemAdapterDelegate {
-        fun onPostPressed(itemPosition : Int)
-        fun onPostSavePressed(itemPosition : Int)
-        fun onPostUpvotePressed(itemPosition : Int, notify : Boolean = true)
-        fun onPostDownvotePressed(itemPosition : Int, notify : Boolean = true)
-        fun onPostLinkPressed(itemPosition : Int)
-        fun onUserPressed(itemPosition : Int)
+    interface PostViewDelegate {
+        fun onPostPressed()
+        fun onPostSavePressed()
+        fun onPostUpvotePressed()
+        fun onPostDownvotePressed()
+
+        fun onPostReply()
+        fun onPostLinkPressed()
+        fun onUserPressed()
     }
 }
 

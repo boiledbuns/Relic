@@ -53,7 +53,7 @@ class CommentItemAdapter (
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_POST -> FullPostVH(FullPostView(parent.context)).apply {
-                initializeOnClicks(commentInteractor)
+                initializeOnClicks(postInteractor, commentInteractor)
             }
             VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context)).apply {
                 initializeOnClicks(this@CommentItemAdapter)

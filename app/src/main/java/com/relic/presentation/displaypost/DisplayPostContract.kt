@@ -34,11 +34,11 @@ interface DisplayPostContract {
 //    }
 
     interface CommentViewDelegate {
-        fun voteOnComment(itemPosition : Int, voteValue : Int)
-        fun replyToComment(itemPosition : Int, text: String)
-        fun visitComment(itemPosition : Int)
-        fun previewUser(itemPosition : Int)
-        fun loadMoreComments(itemPosition: Int, displayReplies : Boolean)
+        fun voteOnComment(voteValue : Int)
+        fun replyToComment(text: String)
+        fun visitComment()
+        fun previewUser()
+        fun loadMoreComments(displayReplies : Boolean)
     }
 }
 

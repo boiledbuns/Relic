@@ -12,7 +12,7 @@ class PostItemVH (
 
     var itemFullName = ""
 
-    fun initializeOnClicks(adapter : DisplaySubContract.PostItemAdapterDelegate) {
+    fun initializeOnClicks(adapter : DisplaySubContract.PostViewDelegate) {
         itemView.apply {
             setOnClickListener { adapter.onPostPressed(adapterPosition) }
             postItemSaveView.setOnClickListener { adapter.onPostSavePressed(adapterPosition) }
