@@ -20,6 +20,7 @@ interface DisplaySubContract {
         fun updateSubStatus(subscribe: Boolean)
     }
 
+    // delegate for handling domain layer interactions
     interface PostAdapterDelegate {
         val navigationLiveData : LiveData<NavigationData>
 
@@ -32,6 +33,7 @@ interface DisplaySubContract {
         fun onNewReplyPressed(post: PostModel)
     }
 
+    // delegate for handling view layer interactions
     interface PostViewDelegate {
         fun onPostPressed()
         fun onPostSavePressed()
@@ -42,6 +44,10 @@ interface DisplaySubContract {
         fun onPostLinkPressed()
         fun onUserPressed()
     }
+}
+
+interface ContentAdapter <T> {
+    fun retrieve(position : Int) : T
 }
 
 // TODO extract out of this interface

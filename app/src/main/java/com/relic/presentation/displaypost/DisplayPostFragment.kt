@@ -111,7 +111,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         inflater.inflate(R.menu.display_post_menu, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun  (item: MenuItem): Boolean {
         var override = true
 
         when (item.itemId) {

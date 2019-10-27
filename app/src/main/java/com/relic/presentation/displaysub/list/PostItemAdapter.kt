@@ -4,22 +4,25 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
+import com.relic.presentation.base.ComponentList
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
+import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
+import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
-    private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
-) : RelicAdapter<PostItemVH> (), DisplaySubContract.PostViewDelegate {
+    private val postInteractor : DisplaySubContract.PostAdapterDelegate
+) : RelicAdapter<PostItemVH>(), ComponentList<PostModel>, DisplaySubContract.PostViewDelegate {
 
     private var postList: List<PostModel> = ArrayList()
-    private lateinit var markwon : Markwon
+    private lateinit var markwon: Markwon
     private val postLayout = viewPrefsManager.getPostCardStyle()
 
-    fun getPosts() = postList
+    override fun getItem(position: Int) = postList.get(position)
 
     override fun getItemCount() = postList.size
 
@@ -29,7 +32,7 @@ class PostItemAdapter (
         markwon = Markwon.create(parent.context)
         val postItemView = RelicPostItemView(parent.context, postLayout = postLayout)
 
-        return PostItemVH(postItemView).apply {
+        return PostItemVH(postItemView, this, postInteractor).apply {
             initializeOnClicks(this@PostItemAdapter)
         }
     }
@@ -38,7 +41,9 @@ class PostItemAdapter (
         viewholder.bindPost(postList[position])
     }
 
-    fun clear() { setPostList(emptyList()) }
+    fun clear() {
+        setPostList(emptyList())
+    }
 
     fun setPostList(newPostList: List<PostModel>) {
         launch {
@@ -47,9 +52,8 @@ class PostItemAdapter (
         }
     }
 
-    // region onclick handlers
-
-    override fun onPostPressed (itemPosition : Int) {
+    // region post view delegate
+    override fun onPostPressed(itemPosition: Int) {
         postList[itemPosition].also {
             // update post to show that it has been visited
             postAdapterDelegate.visitPost(it.fullName, it.subreddit!!)
@@ -60,7 +64,7 @@ class PostItemAdapter (
     }
 
     // initialize onclick for the upvote button
-    override fun onPostUpvotePressed(itemPosition : Int, notify : Boolean) {
+    override fun onPostUpvotePressed(itemPosition: Int, notify: Boolean) {
         postList[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newStatus = if (it.userUpvoted <= 0) 1 else 0
@@ -74,7 +78,7 @@ class PostItemAdapter (
     }
 
     // initialize onclick for the downvote button
-    override fun onPostDownvotePressed(itemPosition : Int, notify : Boolean) {
+    override fun onPostDownvotePressed(itemPosition: Int, notify: Boolean) {
         postList[itemPosition].also {
             // determine the new vote value based on the current one and change the vote accordingly
             val newStatus = if (it.userUpvoted >= 0) -1 else 0
@@ -87,7 +91,7 @@ class PostItemAdapter (
         if (notify) notifyDataSetChanged()
     }
 
-    override fun onPostSavePressed (itemPosition : Int) {
+    override fun onPostSavePressed(itemPosition: Int) {
         postList[itemPosition].also {
             // calculate new save value based on the previous one and tell vm to update appropriately
             val newStatus = !it.saved
@@ -100,17 +104,9 @@ class PostItemAdapter (
         notifyDataSetChanged()
     }
 
-    override fun onPostLinkPressed (itemPosition : Int) {
-        postAdapterDelegate.onLinkPressed(postList[itemPosition].url!!)
-    }
+    // endregion post view delegate
 
-    override fun onUserPressed(itemPosition: Int) {
-        postAdapterDelegate.previewUser(postList[itemPosition].author)
-    }
-
-    // end region for onclick handlers
-
-    private suspend fun calculateDiff (newPostList: List<PostModel>) : DiffUtil.DiffResult {
+    private suspend fun calculateDiff(newPostList: List<PostModel>): DiffUtil.DiffResult {
         return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
                 return postList.size
@@ -125,8 +121,8 @@ class PostItemAdapter (
             }
 
             override fun areContentsTheSame(
-                oldItemPosition: Int,
-                newItemPosition: Int
+              oldItemPosition: Int,
+              newItemPosition: Int
             ): Boolean {
                 val oldPost = postList[oldItemPosition]
                 val newPost = newPostList[newItemPosition]
