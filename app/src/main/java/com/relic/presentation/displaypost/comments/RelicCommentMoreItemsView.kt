@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
+import com.relic.presentation.displaypost.DisplayPostContract
 import kotlinx.android.synthetic.main.relic_more_comments_item.view.*
 
 class RelicCommentMoreItemsView(
@@ -19,6 +20,13 @@ class RelicCommentMoreItemsView(
 
     fun displayLoadMore(replyCount : Int) {
         loadMoreItemText.text = resources.getString(R.string.load_comments, replyCount)
+    }
+
+    fun setViewDelegate(commentViewDelegate: DisplayPostContract.CommentViewDelegate) {
+        setOnClickListener {
+            commentViewDelegate.loadMoreComments(true)
+            // TODO display loading for comments
+        }
     }
 
     fun displayReplyDepth(depth : Int) {

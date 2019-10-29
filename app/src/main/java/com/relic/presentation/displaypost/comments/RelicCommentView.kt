@@ -9,6 +9,9 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
+import com.relic.presentation.displaypost.DisplayPostContract
+import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.helper.DateHelper
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
@@ -91,6 +94,14 @@ class RelicCommentView (
 
     fun setOnReplyAction(action : (text : String) -> Unit) {
         replyAction = action
+    }
+
+    fun setViewDelegate(commentViewDelegate: DisplayPostContract.CommentViewDelegate) {
+        commentUpvoteView.setOnClickListener { commentViewDelegate.voteOnComment(UPVOTE_PRESSED) }
+        commentDownvoteView.setOnClickListener { commentViewDelegate.voteOnComment(DOWNVOTE_PRESSED) }
+        commentAuthorView.setOnClickListener { commentViewDelegate.previewUser() }
+        setOnReplyAction { text -> commentViewDelegate.replyToComment(text) }
+        setOnClickListener { commentViewDelegate.visitComment() }
     }
 
     private fun openReplyEditor() {

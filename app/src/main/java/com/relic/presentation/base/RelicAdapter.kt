@@ -9,6 +9,6 @@ abstract class RelicAdapter<T : RecyclerView.ViewHolder> : RecyclerView.Adapter<
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 }
 
-interface ComponentList<T> {
+interface ComponentList<out T> {
     fun getItem(position : Int) : T
 }

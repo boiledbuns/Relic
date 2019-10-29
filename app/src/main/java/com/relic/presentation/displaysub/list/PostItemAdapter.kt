@@ -16,7 +16,7 @@ import ru.noties.markwon.Markwon
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
     private val postInteractor : DisplaySubContract.PostAdapterDelegate
-) : RelicAdapter<PostItemVH>(), ComponentList<PostModel>, DisplaySubContract.PostViewDelegate {
+) : RelicAdapter<PostItemVH>(), ComponentList<PostModel> {
 
     private var postList: List<PostModel> = ArrayList()
     private lateinit var markwon: Markwon
@@ -32,9 +32,7 @@ class PostItemAdapter (
         markwon = Markwon.create(parent.context)
         val postItemView = RelicPostItemView(parent.context, postLayout = postLayout)
 
-        return PostItemVH(postItemView, this, postInteractor).apply {
-            initializeOnClicks(this@PostItemAdapter)
-        }
+        return PostItemVH(postItemView, this, postInteractor)
     }
 
     override fun onBindViewHolder(viewholder: PostItemVH, position: Int) {
@@ -53,56 +51,56 @@ class PostItemAdapter (
     }
 
     // region post view delegate
-    override fun onPostPressed(itemPosition: Int) {
-        postList[itemPosition].also {
-            // update post to show that it has been visited
-            postAdapterDelegate.visitPost(it.fullName, it.subreddit!!)
-            // update the view and local model to reflect onclick
-            it.visited = true
-        }
-        notifyDataSetChanged()
-    }
-
-    // initialize onclick for the upvote button
-    override fun onPostUpvotePressed(itemPosition: Int, notify: Boolean) {
-        postList[itemPosition].also {
-            // determine the new vote value based on the current one and change the vote accordingly
-            val newStatus = if (it.userUpvoted <= 0) 1 else 0
-
-            // optimistic, update copy cached in adapter and make request to api to update in server
-            it.score = it.score + newStatus - it.userUpvoted
-            it.userUpvoted = newStatus
-            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
-        }
-        if (notify) notifyDataSetChanged()
-    }
-
-    // initialize onclick for the downvote button
-    override fun onPostDownvotePressed(itemPosition: Int, notify: Boolean) {
-        postList[itemPosition].also {
-            // determine the new vote value based on the current one and change the vote accordingly
-            val newStatus = if (it.userUpvoted >= 0) -1 else 0
-
-            // optimistic, update copy cached in adapter and make request to api to update in server
-            it.score = it.score + newStatus - it.userUpvoted
-            it.userUpvoted = newStatus
-            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
-        }
-        if (notify) notifyDataSetChanged()
-    }
-
-    override fun onPostSavePressed(itemPosition: Int) {
-        postList[itemPosition].also {
-            // calculate new save value based on the previous one and tell vm to update appropriately
-            val newStatus = !it.saved
-            postAdapterDelegate.savePost(it.fullName, newStatus)
-
-            // update the view and local model to reflect onclick
-            it.saved = newStatus
-        }
-
-        notifyDataSetChanged()
-    }
+//    override fun onPostPressed(itemPosition: Int) {
+//        postList[itemPosition].also {
+//            // update post to show that it has been visited
+//            postAdapterDelegate.visitPost(it.fullName, it.subreddit!!)
+//            // update the view and local model to reflect onclick
+//            it.visited = true
+//        }
+//        notifyDataSetChanged()
+//    }
+//
+//    // initialize onclick for the upvote button
+//    override fun onPostUpvotePressed(itemPosition: Int, notify: Boolean) {
+//        postList[itemPosition].also {
+//            // determine the new vote value based on the current one and change the vote accordingly
+//            val newStatus = if (it.userUpvoted <= 0) 1 else 0
+//
+//            // optimistic, update copy cached in adapter and make request to api to update in server
+//            it.score = it.score + newStatus - it.userUpvoted
+//            it.userUpvoted = newStatus
+//            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
+//        }
+//        if (notify) notifyDataSetChanged()
+//    }
+//
+//    // initialize onclick for the downvote button
+//    override fun onPostDownvotePressed(itemPosition: Int, notify: Boolean) {
+//        postList[itemPosition].also {
+//            // determine the new vote value based on the current one and change the vote accordingly
+//            val newStatus = if (it.userUpvoted >= 0) -1 else 0
+//
+//            // optimistic, update copy cached in adapter and make request to api to update in server
+//            it.score = it.score + newStatus - it.userUpvoted
+//            it.userUpvoted = newStatus
+//            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
+//        }
+//        if (notify) notifyDataSetChanged()
+//    }
+//
+//    override fun onPostSavePressed(itemPosition: Int) {
+//        postList[itemPosition].also {
+//            // calculate new save value based on the previous one and tell vm to update appropriately
+//            val newStatus = !it.saved
+//            postAdapterDelegate.savePost(it.fullName, newStatus)
+//
+//            // update the view and local model to reflect onclick
+//            it.saved = newStatus
+//        }
+//
+//        notifyDataSetChanged()
+//    }
 
     // endregion post view delegate
 

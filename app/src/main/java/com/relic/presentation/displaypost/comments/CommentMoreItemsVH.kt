@@ -5,21 +5,31 @@ import com.relic.domain.models.CommentModel
 import com.relic.presentation.displaypost.DisplayPostContract
 
 class CommentMoreItemsVH (
-    private val moreCommentsItem : RelicCommentMoreItemsView
-) : RecyclerView.ViewHolder(moreCommentsItem) {
+  private val moreCommentsItemView : RelicCommentMoreItemsView,
+  private val commentItemAdapter: CommentItemAdapter,
+  private val commentInteractor: DisplayPostContract.CommentAdapterDelegate
+) : RecyclerView.ViewHolder(moreCommentsItemView), DisplayPostContract.CommentViewDelegate {
 
-    fun initializeOnClicks(delegate : DisplayPostContract.CommentViewDelegate) {
-        moreCommentsItem.setOnClickListener {
-            delegate.loadMoreComments(adapterPosition, false)
-            // TODO display loading for comments
-        }
+    init {
+        moreCommentsItemView.setViewDelegate(this)
     }
 
-    fun bindLoadMore(commentModel : CommentModel){
+    fun bind(commentModel : CommentModel){
         commentModel.more?.let { more ->
-            if (more.isNotEmpty()) moreCommentsItem.displayLoadMore(more.size)
+            if (more.isNotEmpty()) moreCommentsItemView.displayLoadMore(more.size)
         }
-
-        moreCommentsItem.displayReplyDepth(commentModel.depth)
+        moreCommentsItemView.displayReplyDepth(commentModel.depth)
     }
+
+    // region comment view delegate
+
+    override fun voteOnComment(voteValue: Int) = commentInteractor.onCommentVoted(getComment(layoutPosition), voteValue)
+    override fun replyToComment(text: String) = commentInteractor.onReplyPressed(getComment(layoutPosition), text)
+    override fun previewUser() = commentInteractor.onPreviewUser(getComment(layoutPosition))
+    override fun loadMoreComments(displayReplies: Boolean) = commentInteractor.onExpandReplies(getComment(layoutPosition))
+    override fun visitComment() {}
+
+    // endregion comment view delegate
+
+    private fun getComment(commentLayoutPosition: Int) = commentItemAdapter.getComment(commentLayoutPosition)
 }

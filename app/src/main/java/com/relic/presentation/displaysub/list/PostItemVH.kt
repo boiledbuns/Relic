@@ -3,7 +3,6 @@ package com.relic.presentation.displaysub.list
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.PostModel
 import com.relic.presentation.base.ComponentList
-import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
@@ -16,18 +15,20 @@ class PostItemVH (
     private val postInteractor: DisplaySubContract.PostAdapterDelegate
 ) : RecyclerView.ViewHolder(postItemView), DisplaySubContract.PostViewDelegate {
 
-    private lateinit var itemFullName : String
-
-    fun initializeOnClicks(adapter : DisplaySubContract.PostViewDelegate) {
+    init {
         itemView.apply {
-            setOnClickListener { adapter.onPostPressed() }
-            postItemSaveView.setOnClickListener { adapter.onPostSavePressed() }
-            postItemUpvoteView.setOnClickListener { adapter.onPostUpvotePressed() }
-            postItemDownvoteView.setOnClickListener { adapter.onPostDownvotePressed() }
-            postItemThumbnailView.setOnClickListener { adapter.onPostLinkPressed() }
-            postItemCommentView.setOnClickListener { adapter.onPostReply() }
-            postItemAuthorView.setOnClickListener { adapter.onUserPressed() }
+            setOnClickListener { onPostPressed() }
+            postItemSaveView.setOnClickListener { onPostSavePressed() }
+            postItemUpvoteView.setOnClickListener { onPostUpvotePressed() }
+            postItemDownvoteView.setOnClickListener { onPostDownvotePressed() }
+            postItemThumbnailView.setOnClickListener { onPostLinkPressed() }
+            postItemCommentView.setOnClickListener { onPostReply() }
+            postItemAuthorView.setOnClickListener { onUserPressed() }
         }
+    }
+
+    fun bindPost(postModel : PostModel) {
+        postItemView.setPost(postModel)
     }
 
     // region post view delegate
@@ -49,9 +50,4 @@ class PostItemVH (
     // endregion post view delegate
 
     private fun getPost(position : Int) : PostModel = postList.getItem(position)
-
-    fun bindPost(postModel : PostModel) {
-        postItemView.setPost(postModel)
-        itemFullName = postModel.fullName
-    }
 }

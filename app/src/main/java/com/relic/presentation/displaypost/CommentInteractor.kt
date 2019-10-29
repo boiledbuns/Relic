@@ -20,29 +20,36 @@ class CommentInteractor @Inject constructor(
         Timber.e(e,  "caught exception")
     }
 
-    override fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int {
+    override fun onCommentVoted(comment: CommentModel, voteValue: Int) : Int {
         var newUserUpvoteValue = 0
         when (voteValue) {
             UPVOTE_PRESSED -> {
-                if (commentModel.userUpvoted != CommentModel.UPVOTE) newUserUpvoteValue = CommentModel.UPVOTE
+                if (comment.userUpvoted != CommentModel.UPVOTE) newUserUpvoteValue = CommentModel.UPVOTE
             }
             DOWNVOTE_PRESSED -> {
-                if (commentModel.userUpvoted != CommentModel.DOWNVOTE) newUserUpvoteValue = CommentModel.DOWNVOTE
+                if (comment.userUpvoted != CommentModel.DOWNVOTE) newUserUpvoteValue = CommentModel.DOWNVOTE
             }
         }
 
         // send request only if value changed
-        if (newUserUpvoteValue != commentModel.userUpvoted) {
-            launch(Dispatchers.Main) { postGateway.voteOnPost(commentModel.fullName, newUserUpvoteValue) }
+        if (newUserUpvoteValue != comment.userUpvoted) {
+            launch(Dispatchers.Main) { postGateway.voteOnPost(comment.fullName, newUserUpvoteValue) }
         }
 
         return newUserUpvoteValue
     }
 
-    override fun onReplyPressed(parent: String, text: String) {
+    override fun onReplyPressed(parent: CommentModel, text: String) {
         launch(Dispatchers.Main) {
-            commentRepo.postComment(parent, text)
+            commentRepo.postComment(parent.fullName, text)
         }
     }
 
+    override fun onPreviewUser(comment: CommentModel) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onExpandReplies(comment: CommentModel) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
