@@ -1,22 +1,20 @@
 package com.relic.presentation.displaypost.comments
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
-import com.relic.presentation.base.ComponentList
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.FullPostView
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
-import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 
 private const val VIEW_TYPE_POST = 0
 private const val VIEW_TYPE_COMMENT = 1
@@ -47,19 +45,16 @@ class CommentItemAdapter (
                 (viewHolder as CommentItemVH).bind(commentList[position - postSize()])
             }
             VIEW_TYPE_LOAD_MORE -> {
-                (viewHolder as CommentMoreItemsVH).bind(commentList[position - postSize()])
+                (viewHolder as CommentItemVH).bind(commentList[position - postSize()])
             }
         }
     }
 
-    fun getPost(position : Int) = post
-    fun getComment(commentLayoutPosition: Int) = commentList[getCommentPosition(commentLayoutPosition)]
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_POST -> FullPostVH(FullPostView(parent.context), this)
-            VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context), this)
-            else -> CommentMoreItemsVH(RelicCommentMoreItemsView(parent.context), this)
+            VIEW_TYPE_POST -> FullPostVH(FullPostView(parent.context))
+            VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context), viewType)
+            else -> CommentItemVH(RelicCommentMoreItemsView(parent.context), viewType)
         }
     }
 
@@ -130,6 +125,55 @@ class CommentItemAdapter (
 
             }
         })
+    }
+
+    private inner class FullPostVH(
+      private val fullPostView : FullPostView
+    ) : RecyclerView.ViewHolder(fullPostView), DisplaySubContract.PostViewDelegate {
+
+        init { fullPostView.setViewDelegate(this) }
+
+        fun bind(postModel: PostModel) {
+            fullPostView.setPost(postModel)
+        }
+
+        override fun onPostPressed() = postInteractor.visitPost(getPost())
+        override fun onPostSavePressed() = postInteractor.savePost(getPost(), !getPost().saved)
+        override fun onPostUpvotePressed() = postInteractor.voteOnPost(getPost(), UPVOTE_PRESSED)
+        override fun onPostDownvotePressed() = postInteractor.voteOnPost(getPost(), DOWNVOTE_PRESSED)
+        override fun onPostReply() = postInteractor.onNewReplyPressed(getPost())
+        override fun onPostLinkPressed() = postInteractor.onLinkPressed(getPost())
+        override fun onUserPressed() = postInteractor.previewUser(getPost())
+
+        fun getPost() = post!!
+    }
+
+    private inner class CommentItemVH(
+      private val view : View,
+      private val viewType : Int
+    ) : RecyclerView.ViewHolder(view), DisplayPostContract.CommentViewDelegate {
+
+        init {
+            when(viewType) {
+                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(this@CommentItemVH)
+                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(this@CommentItemVH)
+            }
+        }
+
+        fun bind(commentModel : CommentModel) {
+            when(viewType) {
+                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setComment(commentModel)
+                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setLoadMore(commentModel.replyCount)
+            }
+        }
+
+        override fun voteOnComment(voteValue: Int) = commentInteractor.onCommentVoted(getComment(layoutPosition), voteValue)
+        override fun replyToComment(text: String) = commentInteractor.onReplyPressed(getComment(layoutPosition), text)
+        override fun previewUser() = commentInteractor.onPreviewUser(getComment(layoutPosition))
+        override fun loadMoreComments(displayReplies: Boolean) = commentInteractor.onExpandReplies(getComment(layoutPosition))
+        override fun visitComment() {}
+
+        fun getComment(commentLayoutPosition: Int) = commentList[getCommentPosition(commentLayoutPosition)]
     }
 
     // region OnClick handlers

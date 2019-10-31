@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.preference.POST_LAYOUT_CARD
+import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
@@ -98,6 +99,16 @@ class RelicPostItemView @JvmOverloads constructor(
             postItemScore.text = postModel.score.toString()
             postItemCommentCountView.text = postModel.commentCount.toString()
         }
+    }
+
+    fun setViewDelegate(delegate : DisplaySubContract.PostViewDelegate) {
+        setOnClickListener { delegate.onPostPressed() }
+        postItemSaveView.setOnClickListener { delegate.onPostSavePressed() }
+        postItemUpvoteView.setOnClickListener { delegate.onPostUpvotePressed() }
+        postItemDownvoteView.setOnClickListener { delegate.onPostDownvotePressed() }
+        postItemThumbnailView.setOnClickListener { delegate.onPostLinkPressed() }
+        postItemCommentView.setOnClickListener { delegate.onPostReply() }
+        postItemAuthorView.setOnClickListener { delegate.onUserPressed() }
     }
 
     fun setVote(vote : Int) {

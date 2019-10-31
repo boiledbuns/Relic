@@ -26,7 +26,7 @@ interface DisplaySubContract {
 
         fun visitPost(post: PostModel)
         fun voteOnPost(post: PostModel, vote : Int)
-        fun savePost(post: PostModel)
+        fun savePost(post: PostModel, save :Boolean)
         fun previewUser(post: PostModel)
 
         fun onLinkPressed(post: PostModel)

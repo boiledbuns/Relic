@@ -46,7 +46,7 @@ class RelicCommentView (
         }
     }
 
-    fun setPost(commentModel : CommentModel) {
+    fun setComment(commentModel : CommentModel) {
         commentScoreView.text = resources.getString(R.string.comment_score, commentModel.score)
         commentFlairView.text = commentModel.authorFlairText
         commentAuthorView.text = commentModel.author

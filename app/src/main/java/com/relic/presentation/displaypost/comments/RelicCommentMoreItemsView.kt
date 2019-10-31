@@ -18,7 +18,7 @@ class RelicCommentMoreItemsView(
         LayoutInflater.from(context).inflate(R.layout.relic_more_comments_item, this)
     }
 
-    fun displayLoadMore(replyCount : Int) {
+    fun setLoadMore(replyCount : Int) {
         loadMoreItemText.text = resources.getString(R.string.load_comments, replyCount)
     }
 

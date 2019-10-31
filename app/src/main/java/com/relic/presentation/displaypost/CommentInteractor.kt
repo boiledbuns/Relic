@@ -20,7 +20,7 @@ class CommentInteractor @Inject constructor(
         Timber.e(e,  "caught exception")
     }
 
-    override fun onCommentVoted(comment: CommentModel, voteValue: Int) : Int {
+    override fun onCommentVoted(comment: CommentModel, voteValue: Int) {
         var newUserUpvoteValue = 0
         when (voteValue) {
             UPVOTE_PRESSED -> {
@@ -35,8 +35,6 @@ class CommentInteractor @Inject constructor(
         if (newUserUpvoteValue != comment.userUpvoted) {
             launch(Dispatchers.Main) { postGateway.voteOnPost(comment.fullName, newUserUpvoteValue) }
         }
-
-        return newUserUpvoteValue
     }
 
     override fun onReplyPressed(parent: CommentModel, text: String) {

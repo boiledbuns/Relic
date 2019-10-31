@@ -111,11 +111,11 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         inflater.inflate(R.menu.display_post_menu, menu)
     }
 
-    override fun  (item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
 
         when (item.itemId) {
-            R.id.post_menu_reply -> postInteractor.onNewReplyPressed(postFullName)
+            R.id.post_menu_reply -> displayPostVM.postLiveData.value?.let { postInteractor.onNewReplyPressed(it) }
             else -> override = super.onOptionsItemSelected(item)
         }
 

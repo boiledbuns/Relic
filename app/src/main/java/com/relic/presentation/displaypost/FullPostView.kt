@@ -80,7 +80,7 @@ class FullPostView @JvmOverloads constructor(
         }
     }
 
-    fun setOnClicks(delegate: DisplaySubContract.PostViewDelegate) {
+    fun setViewDelegate(delegate: DisplaySubContract.PostViewDelegate) {
         postImageView.setOnClickListener { delegate.onPostLinkPressed() }
         postUpvoteView.setOnClickListener { delegate.onPostUpvotePressed() }
         postDownvoteView.setOnClickListener { delegate.onPostUpvotePressed() }

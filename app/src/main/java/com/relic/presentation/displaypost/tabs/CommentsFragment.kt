@@ -9,14 +9,23 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaypost.CommentInteractor
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaypost.DisplayPostVM
 import com.relic.presentation.displaypost.comments.CommentItemAdapter
+import com.relic.presentation.displaysub.PostInteractor
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.tab_comments.*
+import javax.inject.Inject
 
 class CommentsFragment : RelicFragment() {
+
+    @Inject
+    lateinit var postInteractor: PostInteractor
+
+    @Inject
+    lateinit var commentInteractor: CommentInteractor
 
     private val commentsVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayPostVM::class.java)
@@ -33,7 +42,7 @@ class CommentsFragment : RelicFragment() {
 
         postCommentRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            commentAdapter = CommentItemAdapter(commentsVM)
+            commentAdapter = CommentItemAdapter(commentsVM, commentInteractor, postInteractor)
             adapter = commentAdapter
         }
 

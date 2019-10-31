@@ -7,13 +7,12 @@ import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
-import com.relic.presentation.base.ComponentList
 import com.relic.presentation.customview.RelicPostItemView
+import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaypost.comments.CommentItemVH
+import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaypost.comments.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.list.PostItemVH
 import ru.noties.markwon.Markwon
 
 private const val VIEW_TYPE_POST = 0
@@ -31,14 +30,6 @@ class ListingItemAdapter(
 
     private var listingItems : List<ListingItem> = ArrayList()
 
-    // not the ideal solution but necessary for moving forward
-    private val postComponentList = object : ComponentList<PostModel> {
-        override fun getItem(position: Int): PostModel = listingItems[position] as PostModel
-    }
-    private val commentComponentList = object : ComponentList<CommentModel> {
-        override fun getItem(position: Int): CommentModel = listingItems[position] as CommentModel
-    }
-
     override fun getItemCount(): Int = listingItems.size
 
     override fun getItemViewType(position: Int): Int {
@@ -50,25 +41,21 @@ class ListingItemAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_POST ->  {
-                val postItemView = RelicPostItemView(parent.context, postLayout = postLayout)
-                PostItemVH(postItemView, postComponentList, postInteractor)
-            }
+            VIEW_TYPE_POST ->  PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout))
             // TODO complete the custom comment VH and view for displaying within the tab
             else -> {
                 val commentView = RelicCommentView(parent.context).apply {
                     displayParent(true)
                 }
-                CommentItemVH(commentView, commentComponentList, commentInteractor)
+                CommentItemVH(commentView)
             }
         }
     }
 
     override fun onBindViewHolder(vh: RecyclerView.ViewHolder, position : Int) {
-        val item = listingItems[position]
-        when (item) {
-            is PostModel -> (vh as PostItemVH).bindPost(item)
-            is CommentModel -> (vh as CommentItemVH).bindComment(item)
+        when (val item = listingItems[position]) {
+            is PostModel -> (vh as PostItemVH).bind(item)
+            is CommentModel -> (vh as CommentItemVH).bind(item)
         }
     }
 
@@ -100,6 +87,46 @@ class ListingItemAdapter(
     fun clear() {
         listingItems = emptyList()
         notifyDataSetChanged()
+    }
+
+    private inner class CommentItemVH (
+      private val commentView : RelicCommentView
+    ): RecyclerView.ViewHolder(commentView), DisplayPostContract.CommentViewDelegate{
+
+        init { commentView.setViewDelegate(this) }
+
+        fun bind(commentModel : CommentModel) {
+            commentView.setComment(commentModel)
+        }
+
+        override fun voteOnComment(voteValue: Int) = commentInteractor.onCommentVoted(getComment(layoutPosition), voteValue)
+        override fun replyToComment(text: String) = commentInteractor.onReplyPressed(getComment(layoutPosition), text)
+        override fun previewUser() = commentInteractor.onPreviewUser(getComment(layoutPosition))
+        override fun loadMoreComments(displayReplies: Boolean) = commentInteractor.onExpandReplies(getComment(layoutPosition))
+        override fun visitComment() {}
+
+        private fun getComment(position: Int) = listingItems[position] as CommentModel
+    }
+
+    private inner class PostItemVH(
+      private val postItemView : RelicPostItemView
+    ) : RecyclerView.ViewHolder(postItemView), DisplaySubContract.PostViewDelegate {
+
+        init { postItemView.setViewDelegate(this) }
+
+        fun bind(postModel: PostModel) {
+            postItemView.setPost(postModel)
+        }
+
+        override fun onPostPressed() = postInteractor.visitPost(getPost(layoutPosition))
+        override fun onPostSavePressed() = postInteractor.savePost(getPost(layoutPosition), !getPost(layoutPosition).saved)
+        override fun onPostUpvotePressed() = postInteractor.voteOnPost(getPost(layoutPosition), UPVOTE_PRESSED)
+        override fun onPostDownvotePressed() = postInteractor.voteOnPost(getPost(layoutPosition), DOWNVOTE_PRESSED)
+        override fun onPostReply() = postInteractor.onNewReplyPressed(getPost(layoutPosition))
+        override fun onPostLinkPressed() = postInteractor.onLinkPressed(getPost(layoutPosition))
+        override fun onUserPressed() = postInteractor.previewUser(getPost(layoutPosition))
+
+        private fun getPost(position: Int) = listingItems[position] as PostModel
     }
 
 

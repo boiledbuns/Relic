@@ -13,6 +13,7 @@ import com.relic.R
 import com.relic.domain.models.ListingItem
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.ErrorData
@@ -26,6 +27,12 @@ class PostsTabFragment : RelicFragment() {
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
+
+    @Inject
+    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
+
+    @Inject
+    lateinit var commentInteractor : DisplayPostContract.CommentAdapterDelegate
 
     private val postsTabVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
@@ -51,7 +58,7 @@ class PostsTabFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userPostsAdapter = ListingItemAdapter(viewPrefsManager, postsTabVM)
+        userPostsAdapter = ListingItemAdapter(viewPrefsManager, postInteractor, commentInteractor)
         userTabRecyclerView.apply {
             adapter = userPostsAdapter
             layoutManager = LinearLayoutManager(context)

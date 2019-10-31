@@ -33,14 +33,14 @@ class PostInteractor @Inject constructor(
     private val _navigationLiveData = SingleLiveData<NavigationData>()
     override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
-    override fun visitPost(postFullname : String, subreddit : String) {
-        launch(Dispatchers.Main) { postGateway.visitPost(postFullname) }
-        _navigationLiveData.postValue(NavigationData.ToPost(postFullname, subreddit))
+    override fun visitPost(post: PostModel) {
+        launch(Dispatchers.Main) { postGateway.visitPost(post.fullName) }
+        _navigationLiveData.postValue(NavigationData.ToPost(post.fullName, post.subreddit!!))
     }
 
-    override fun onLinkPressed(postModel: PostModel) {
-        postModel.url?.let { url ->
-            val navData = when (val mediaType = MediaHelper.determineType(postModel)) {
+    override fun onLinkPressed(post: PostModel) {
+        post.url?.let { url ->
+            val navData = when (val mediaType = MediaHelper.determineType(post)) {
                 is MediaType.Image, MediaType.Gfycat -> NavigationData.ToMedia(mediaType, url)
                 is MediaType.Link -> NavigationData.ToExternal(url)
                 else -> null
@@ -50,19 +50,19 @@ class PostInteractor @Inject constructor(
         }
     }
 
-    override fun previewUser(username: String) {
-        _navigationLiveData.postValue(NavigationData.ToUserPreview(username))
+    override fun previewUser(post: PostModel) {
+        _navigationLiveData.postValue(NavigationData.ToUserPreview(post.author))
     }
 
-    override fun voteOnPost(postFullname: String, voteValue: Int) {
-        launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
+    override fun voteOnPost(post: PostModel, vote: Int) {
+        launch(Dispatchers.Main) { postGateway.voteOnPost(post.fullName, vote) }
     }
 
-    override fun savePost(postFullname: String, save: Boolean) {
-        launch(Dispatchers.Main) { postGateway.savePost(postFullname, save) }
+    override fun savePost(post: PostModel, save: Boolean) {
+        launch(Dispatchers.Main) { postGateway.savePost(post.fullName, save) }
     }
 
-    override fun onNewReplyPressed(postFullname: String) {
-        _navigationLiveData.postValue(NavigationData.ToReply(postFullname))
+    override fun onNewReplyPressed(post: PostModel) {
+        _navigationLiveData.postValue(NavigationData.ToReply(post.fullName))
     }
 }

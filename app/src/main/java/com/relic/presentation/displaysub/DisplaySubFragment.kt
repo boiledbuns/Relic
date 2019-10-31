@@ -209,15 +209,12 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    fun handleVHSwipeAction(vh : RecyclerView.ViewHolder, direction : Int) {
+    fun handleVHSwipeAction(vh :RecyclerView.ViewHolder, direction : Int) {
+        val postItemVH = vh as PostItemAdapter.PostItemVH
         // TODO don't handle manually -> need to check preferences
         when (direction) {
-            ItemTouchHelper.LEFT -> {
-                postAdapter.onPostDownvotePressed(vh.adapterPosition)
-            }
-            ItemTouchHelper.RIGHT -> {
-                postAdapter.onPostUpvotePressed(vh.adapterPosition)
-            }
+            ItemTouchHelper.LEFT -> postItemVH.onPostUpvotePressed()
+            ItemTouchHelper.RIGHT -> postItemVH.onPostDownvotePressed()
         }
     }
 
