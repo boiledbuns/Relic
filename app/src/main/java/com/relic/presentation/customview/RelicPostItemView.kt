@@ -111,7 +111,7 @@ class RelicPostItemView @JvmOverloads constructor(
         postItemAuthorView.setOnClickListener { delegate.onUserPressed() }
     }
 
-    fun setVote(vote : Int) {
+    private fun setVote(vote : Int) {
         when (vote) {
             1 -> {
                 postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)

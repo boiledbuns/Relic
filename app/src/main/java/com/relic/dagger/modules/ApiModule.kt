@@ -14,5 +14,8 @@ abstract class ApiModule {
     abstract fun bindPostApi(postGateway : PostGatewayImpl) : PostGateway
 
     @Binds
+    abstract fun bindCommentApi(commentGateway : CommentGatewayImpl) : CommentGateway
+
+    @Binds
     abstract fun bindUserApi(userGateway : UserGatewayImpl) : UserGateway
 }

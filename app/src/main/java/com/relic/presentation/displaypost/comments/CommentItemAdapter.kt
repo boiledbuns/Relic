@@ -121,8 +121,6 @@ class CommentItemAdapter (
                     }
                     else -> false
                 }
-
-
             }
         })
     }
@@ -155,8 +153,8 @@ class CommentItemAdapter (
 
         init {
             when(viewType) {
-                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(this@CommentItemVH)
-                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(this@CommentItemVH)
+                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(this)
+                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(this)
             }
         }
 

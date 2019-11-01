@@ -1,7 +1,7 @@
 package com.relic.presentation.displaypost
 
 import com.relic.data.CommentRepository
-import com.relic.data.gateway.PostGateway
+import com.relic.data.gateway.CommentGateway
 import com.relic.domain.models.CommentModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +12,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class CommentInteractor @Inject constructor(
-    private val postGateway: PostGateway,
+    private val commentGateway: CommentGateway,
     private val commentRepo: CommentRepository
 ) : DisplayPostContract.CommentAdapterDelegate, CoroutineScope {
 
@@ -33,14 +33,12 @@ class CommentInteractor @Inject constructor(
 
         // send request only if value changed
         if (newUserUpvoteValue != comment.userUpvoted) {
-            launch(Dispatchers.Main) { postGateway.voteOnPost(comment.fullName, newUserUpvoteValue) }
+            launch(Dispatchers.Main) { commentGateway.voteOnComment(comment.fullName, newUserUpvoteValue)}
         }
     }
 
     override fun onReplyPressed(parent: CommentModel, text: String) {
-        launch(Dispatchers.Main) {
-            commentRepo.postComment(parent.fullName, text)
-        }
+        launch(Dispatchers.Main) { commentRepo.postComment(parent.fullName, text)}
     }
 
     override fun onPreviewUser(comment: CommentModel) {
