@@ -11,6 +11,8 @@ import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.preference.POST_LAYOUT_CARD
+import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
+import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
@@ -30,6 +32,8 @@ class RelicPostItemView @JvmOverloads constructor(
     private val stickiedColor: Int
     private val backgroundColor: Int
     private val backgroundVisitedColor: Int
+
+    private lateinit var post : PostModel
 
     init {
         val typedVal = TypedValue()
@@ -56,16 +60,14 @@ class RelicPostItemView @JvmOverloads constructor(
     }
 
     fun setPost(postModel : PostModel) {
+        post = postModel
         postItemRootView?.apply {
-            val backgroundColor = if (postModel.visited) backgroundVisitedColor else backgroundColor
-            setBackgroundColor(backgroundColor)
+            updateVisited()
+            updateSaveView()
+            updateVoteView()
 
             val titleColor = if (postModel.stickied) stickiedColor else textColor
             titleView.setTextColor(titleColor)
-
-            // TODO convert all icons to use style colors
-            val saveColor = if (postModel.saved) R.color.upvote else R.color.paleGray
-            postItemSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
 
             if (!postModel.thumbnail.isNullOrBlank()) {
                 val thumbnail = postModel.thumbnail!!
@@ -94,25 +96,40 @@ class RelicPostItemView @JvmOverloads constructor(
                 postBodyView.visibility = View.GONE
             }
 
-            setVote(postModel.userUpvoted)
-
             postItemScore.text = postModel.score.toString()
             postItemCommentCountView.text = postModel.commentCount.toString()
         }
     }
 
     fun setViewDelegate(delegate : DisplaySubContract.PostViewDelegate) {
-        setOnClickListener { delegate.onPostPressed() }
-        postItemSaveView.setOnClickListener { delegate.onPostSavePressed() }
-        postItemUpvoteView.setOnClickListener { delegate.onPostUpvotePressed() }
-        postItemDownvoteView.setOnClickListener { delegate.onPostDownvotePressed() }
+        setOnClickListener {
+            delegate.onPostPressed()
+            updateVisited()
+        }
+        postItemSaveView.setOnClickListener {
+            delegate.onPostSavePressed();
+            post.saved = !post.saved
+            updateSaveView()
+        }
+        postItemUpvoteView.setOnClickListener {
+            delegate.onPostUpvotePressed()
+            post.userUpvoted = UPVOTE_PRESSED
+            updateVoteView()
+        }
+        postItemDownvoteView.setOnClickListener {
+            delegate.onPostDownvotePressed()
+            post.userUpvoted = DOWNVOTE_PRESSED
+            updateVoteView()
+        }
         postItemThumbnailView.setOnClickListener { delegate.onPostLinkPressed() }
         postItemCommentView.setOnClickListener { delegate.onPostReply() }
         postItemAuthorView.setOnClickListener { delegate.onUserPressed() }
     }
 
-    private fun setVote(vote : Int) {
-        when (vote) {
+    // region update view
+
+    private fun updateVoteView() {
+        when (post.userUpvoted) {
             1 -> {
                 postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)
                 postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
@@ -127,6 +144,19 @@ class RelicPostItemView @JvmOverloads constructor(
             }
         }
     }
+
+    private fun updateSaveView() {
+        // TODO convert all icons to use style colors
+        val saveColor = if (post.saved) R.color.upvote else R.color.paleGray
+        postItemSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
+    }
+
+    private fun updateVisited() {
+        val backgroundColor = if (post.visited) backgroundVisitedColor else backgroundColor
+        postItemRootView.setBackgroundColor(backgroundColor)
+    }
+
+    // endregion update view
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {

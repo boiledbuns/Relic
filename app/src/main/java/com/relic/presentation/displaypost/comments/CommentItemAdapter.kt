@@ -186,23 +186,6 @@ class CommentItemAdapter (
 //            notifyDataSetChanged()
 //        }
 //    }
-//
-//    override fun replyToComment(itemPosition : Int, text: String) {
-//        val commentPosition = getCommentPosition(itemPosition)
-//        commentInteractor.onReplyPressed(commentList[commentPosition].fullName, text)
-//    }
-//
-//    override fun visitComment(itemPosition: Int) {}
-//
-//    override fun previewUser(itemPosition: Int) {
-//        val commentPosition = getCommentPosition(itemPosition)
-//        postInteractor.previewUser(commentList[commentPosition].author)
-//    }
-//
-//    override fun loadMoreComments(itemPosition: Int, displayReplies : Boolean) {
-//        val commentPosition = getCommentPosition(itemPosition)
-//        delegate.onExpandReplies(commentList[commentPosition], displayReplies)
-//    }
 
     // endregion OnClick handlers
 }

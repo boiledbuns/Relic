@@ -25,6 +25,7 @@ class RelicCommentView (
     private var displayParent : Boolean = false
     private lateinit var replyAnchor : LinearLayout
     private var replyAction : (text : String) -> Unit = { }
+    private lateinit var comment : CommentModel
 
     init {
         LayoutInflater.from(context).inflate(R.layout.comment_item, this)
@@ -47,6 +48,10 @@ class RelicCommentView (
     }
 
     fun setComment(commentModel : CommentModel) {
+        comment = commentModel
+
+        updateVoteView()
+        
         commentScoreView.text = resources.getString(R.string.comment_score, commentModel.score)
         commentFlairView.text = commentModel.authorFlairText
         commentAuthorView.text = commentModel.author
@@ -60,21 +65,6 @@ class RelicCommentView (
             commentAuthorView.background?.setTint(resources.getColor(R.color.discussion_tag))
         } else {
             commentAuthorView.setBackgroundResource(0)
-        }
-
-        when (commentModel.userUpvoted) {
-            1 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
-            }
-            0 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
-            }
-            -1 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
-            }
         }
 
         if (commentModel.replyCount > 0) {
@@ -97,11 +87,37 @@ class RelicCommentView (
     }
 
     fun setViewDelegate(commentViewDelegate: DisplayPostContract.CommentViewDelegate) {
-        commentUpvoteView.setOnClickListener { commentViewDelegate.voteOnComment(UPVOTE_PRESSED) }
-        commentDownvoteView.setOnClickListener { commentViewDelegate.voteOnComment(DOWNVOTE_PRESSED) }
+        commentUpvoteView.setOnClickListener {
+            commentViewDelegate.voteOnComment(UPVOTE_PRESSED)
+            comment.userUpvoted = UPVOTE_PRESSED
+            updateVoteView()
+        }
+        commentDownvoteView.setOnClickListener {
+            commentViewDelegate.voteOnComment(DOWNVOTE_PRESSED)
+            comment.userUpvoted = DOWNVOTE_PRESSED
+            updateVoteView()
+        }
         commentAuthorView.setOnClickListener { commentViewDelegate.previewUser() }
         setOnReplyAction { text -> commentViewDelegate.replyToComment(text) }
         setOnClickListener { commentViewDelegate.visitComment() }
+    }
+
+    private fun updateVoteView() {
+        when (comment.userUpvoted) {
+            1 -> {
+                commentUpvoteView.setImageResource(R.drawable.ic_upvote_active)
+                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            0 -> {
+                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
+                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            -1 -> {
+                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
+                commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+            }
+        }
+
     }
 
     private fun openReplyEditor() {
