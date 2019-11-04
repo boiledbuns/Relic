@@ -51,7 +51,7 @@ class RelicCommentView (
         comment = commentModel
 
         updateVoteView()
-        
+
         commentScoreView.text = resources.getString(R.string.comment_score, commentModel.score)
         commentFlairView.text = commentModel.authorFlairText
         commentAuthorView.text = commentModel.author
@@ -102,6 +102,7 @@ class RelicCommentView (
         setOnClickListener { commentViewDelegate.visitComment() }
     }
 
+    // region update view
     private fun updateVoteView() {
         when (comment.userUpvoted) {
             1 -> {
@@ -119,6 +120,7 @@ class RelicCommentView (
         }
 
     }
+    // endregion update view
 
     private fun openReplyEditor() {
         val inlineReply = RelicInlineReplyView(context).apply {

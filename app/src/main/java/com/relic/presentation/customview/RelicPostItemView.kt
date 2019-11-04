@@ -107,7 +107,7 @@ class RelicPostItemView @JvmOverloads constructor(
             updateVisited()
         }
         postItemSaveView.setOnClickListener {
-            delegate.onPostSavePressed();
+            delegate.onPostSavePressed()
             post.saved = !post.saved
             updateSaveView()
         }
@@ -127,7 +127,6 @@ class RelicPostItemView @JvmOverloads constructor(
     }
 
     // region update view
-
     private fun updateVoteView() {
         when (post.userUpvoted) {
             1 -> {
@@ -155,7 +154,6 @@ class RelicPostItemView @JvmOverloads constructor(
         val backgroundColor = if (post.visited) backgroundVisitedColor else backgroundColor
         postItemRootView.setBackgroundColor(backgroundColor)
     }
-
     // endregion update view
 
     private fun setThumbnail(thumbnailUrl : String) {
