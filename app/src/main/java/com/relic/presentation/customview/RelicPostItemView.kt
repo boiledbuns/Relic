@@ -104,6 +104,7 @@ class RelicPostItemView @JvmOverloads constructor(
     fun setViewDelegate(delegate : DisplaySubContract.PostViewDelegate) {
         setOnClickListener {
             delegate.onPostPressed()
+            post.visited = true
             updateVisited()
         }
         postItemSaveView.setOnClickListener {
