@@ -24,6 +24,7 @@ import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
+import com.relic.presentation.displaysub.PostInteraction
 import com.relic.presentation.displaysub.PostInteractor
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -115,7 +116,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         var override = true
 
         when (item.itemId) {
-            R.id.post_menu_reply -> displayPostVM.postLiveData.value?.let { postInteractor.onNewReplyPressed(it) }
+            R.id.post_menu_reply -> displayPostVM.postLiveData.value?.let { postInteractor.handlePostInteraction(PostInteraction.NewReply(it)) }
             else -> override = super.onOptionsItemSelected(item)
         }
 

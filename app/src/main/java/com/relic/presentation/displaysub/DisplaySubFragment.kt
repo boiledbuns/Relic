@@ -213,8 +213,8 @@ class DisplaySubFragment : RelicFragment() {
         val postItemVH = vh as PostItemAdapter.PostItemVH
         // TODO don't handle manually -> need to check preferences
         when (direction) {
-            ItemTouchHelper.LEFT -> postItemVH.onPostUpvotePressed()
-            ItemTouchHelper.RIGHT -> postItemVH.onPostDownvotePressed()
+            ItemTouchHelper.LEFT -> postItemVH.delegate.onPostUpvotePressed()
+            ItemTouchHelper.RIGHT -> postItemVH.delegate.onPostDownvotePressed()
         }
     }
 

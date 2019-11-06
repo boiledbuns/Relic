@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
-import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostViewDelegate
 import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
@@ -16,7 +16,6 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
 import ru.noties.markwon.Markwon
-import java.lang.Exception
 
 class FullPostView @JvmOverloads constructor(
     context : Context,
@@ -69,7 +68,7 @@ class FullPostView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate: DisplaySubContract.PostViewDelegate) {
+    fun setViewDelegate(delegate: PostViewDelegate) {
         postSaveView.setOnClickListener {
             delegate.onPostSavePressed()
             post.saved = !post.saved

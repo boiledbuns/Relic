@@ -13,6 +13,8 @@ import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaypost.comments.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostInteraction
+import com.relic.presentation.displaysub.PostViewDelegate
 import ru.noties.markwon.Markwon
 
 private const val VIEW_TYPE_POST = 0
@@ -110,84 +112,18 @@ class ListingItemAdapter(
 
     private inner class PostItemVH(
       private val postItemView : RelicPostItemView
-    ) : RecyclerView.ViewHolder(postItemView), DisplaySubContract.PostViewDelegate {
+    ) : RecyclerView.ViewHolder(postItemView) {
 
-        init { postItemView.setViewDelegate(this) }
+        private val delegate = object : PostViewDelegate(postInteractor) {
+            override fun getPost() = listingItems[layoutPosition] as PostModel
+        }
+
+        init { postItemView.setViewDelegate(delegate) }
 
         fun bind(postModel: PostModel) {
             postItemView.setPost(postModel)
         }
-
-        override fun onPostPressed() = postInteractor.visitPost(getPost(layoutPosition))
-        override fun onPostSavePressed() = postInteractor.savePost(getPost(layoutPosition), !getPost(layoutPosition).saved)
-        override fun onPostUpvotePressed() = postInteractor.voteOnPost(getPost(layoutPosition), UPVOTE_PRESSED)
-        override fun onPostDownvotePressed() = postInteractor.voteOnPost(getPost(layoutPosition), DOWNVOTE_PRESSED)
-        override fun onPostReply() = postInteractor.onNewReplyPressed(getPost(layoutPosition))
-        override fun onPostLinkPressed() = postInteractor.onLinkPressed(getPost(layoutPosition))
-        override fun onUserPressed() = postInteractor.previewUser(getPost(layoutPosition))
-
-        private fun getPost(position: Int) = listingItems[position] as PostModel
     }
-
-
-    // start region for onclick handlers
-
-//    override fun onPostPressed (itemPosition : Int) {
-//        listingItems[itemPosition].also {
-//            // update post to show that it has been visited
-//            actionDelegate.visitListing(it)
-//
-//            // update the view and local model to reflect onclick
-//            it.visited = true
-//        }
-//        notifyItemChanged(itemPosition)
-//    }
-//
-//    override fun onPostUpvotePressed(itemPosition : Int, notify : Boolean) {
-//        listingItems[itemPosition].also {
-//            // determine the new vote value based on the current one and change the vote accordingly
-//            val newVote = if (it.userUpvoted <= 0) 1 else 0
-//            it.userUpvoted = newVote
-//            notifyItemChanged(itemPosition)
-//
-//            actionDelegate.voteOnListing(it, newVote)
-//        }
-//    }
-//
-//    override fun onPostDownvotePressed(itemPosition : Int, notify : Boolean) {
-//        listingItems[itemPosition].also {
-//            // determine the new vote value based on the current one and change the vote accordingly
-//            val newVote = if (it.userUpvoted >= 0) -1 else 0
-//
-//            // optimistic, update copy cached in adapter and make request to api to update in server
-//            it.userUpvoted = newVote
-//            notifyItemChanged(itemPosition)
-//
-//            actionDelegate.voteOnListing(it, newVote)
-//        }
-//    }
-//
-//    override fun onPostSavePressed (itemPosition : Int) {
-//        listingItems[itemPosition].also {
-//            // update the view and local model to reflect onclick
-//            it.saved = !it.saved
-//            notifyItemChanged(itemPosition)
-//
-//            actionDelegate.saveListing(it)
-//        }
-//    }
-//
-//    override fun onPostLinkPressed (itemPosition : Int) {
-//        actionDelegate.onThumbnailClicked(listingItems[itemPosition])
-//    }
-//
-//    override fun onUserPressed(itemPosition: Int) {
-//        actionDelegate.onUserClicked(listingItems[itemPosition])
-//    }
-//
-//    override fun loadMoreComments(itemPosition: Int, displayReplies: Boolean) { }
-
-    // end region for onclick handlers
 
     // TODO consider refactoring onclicks for both posts and comments to consolidate them into a single interface
 }

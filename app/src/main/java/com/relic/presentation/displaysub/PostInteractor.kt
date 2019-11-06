@@ -33,12 +33,25 @@ class PostInteractor @Inject constructor(
     private val _navigationLiveData = SingleLiveData<NavigationData>()
     override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
-    override fun visitPost(post: PostModel) {
+    override fun handlePostInteraction(interaction: PostInteraction) {
+        val post = interaction.post
+        when(interaction) {
+            is PostInteraction.Visit -> visitPost(post)
+            is PostInteraction.Vote -> voteOnPost(post, interaction.vote)
+            is PostInteraction.Save -> savePost(post)
+            is PostInteraction.PreviewUser -> previewUser(post)
+            is PostInteraction.VisitLink -> visitLink(post)
+            is PostInteraction.NewReply -> onNewReplyPressed(post)
+        }
+    }
+
+
+    private fun visitPost(post: PostModel) {
         launch(Dispatchers.Main) { postGateway.visitPost(post.fullName) }
         _navigationLiveData.postValue(NavigationData.ToPost(post.fullName, post.subreddit!!))
     }
 
-    override fun onLinkPressed(post: PostModel) {
+    private fun visitLink(post: PostModel) {
         post.url?.let { url ->
             val navData = when (val mediaType = MediaHelper.determineType(post)) {
                 is MediaType.Image, MediaType.Gfycat -> NavigationData.ToMedia(mediaType, url)
@@ -50,19 +63,19 @@ class PostInteractor @Inject constructor(
         }
     }
 
-    override fun previewUser(post: PostModel) {
+    private fun previewUser(post: PostModel) {
         _navigationLiveData.postValue(NavigationData.ToUserPreview(post.author))
     }
 
-    override fun voteOnPost(post: PostModel, vote: Int) {
+    private fun voteOnPost(post: PostModel, vote: Int) {
         launch(Dispatchers.Main) { postGateway.voteOnPost(post.fullName, vote) }
     }
 
-    override fun savePost(post: PostModel, save: Boolean) {
-        launch(Dispatchers.Main) { postGateway.savePost(post.fullName, save) }
+    private fun savePost(post: PostModel) {
+        launch(Dispatchers.Main) { postGateway.savePost(post.fullName, !post.saved) }
     }
 
-    override fun onNewReplyPressed(post: PostModel) {
+    private fun onNewReplyPressed(post: PostModel) {
         _navigationLiveData.postValue(NavigationData.ToReply(post.fullName))
     }
 }

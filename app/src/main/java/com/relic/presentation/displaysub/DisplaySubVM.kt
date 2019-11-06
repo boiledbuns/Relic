@@ -3,14 +3,17 @@ package com.relic.presentation.displaysub
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.relic.data.*
-import com.relic.data.gateway.PostGateway
+import com.relic.data.ListingRepository
+import com.relic.data.PostRepository
+import com.relic.data.PostSource
+import com.relic.data.SortScope
+import com.relic.data.SortType
+import com.relic.data.SubRepository
 import com.relic.data.repository.NetworkException
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.helper.ImageHelper
 import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.Dispatchers
@@ -23,20 +26,20 @@ open class DisplaySubVM (
     private val postSource: PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
-    private val postGateway: PostGateway,
+    private val postInteractor :  DisplaySubContract.PostAdapterDelegate,
     private val listingRepo : ListingRepository,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel {
+) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate by postInteractor {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,
-        private val postGateway: PostGateway,
+        private val postInteractor : DisplaySubContract.PostAdapterDelegate,
         private val listingRepo : ListingRepository,
         private val networkUtil : NetworkUtil
     ) {
         fun create (postSource : PostSource) : DisplaySubVM {
-            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, listingRepo, networkUtil)
+            return DisplaySubVM(postSource, subRepo, postRepo, postInteractor, listingRepo, networkUtil)
         }
     }
 
@@ -200,4 +203,21 @@ open class DisplaySubVM (
 
         Timber.e(e)
     }
+
+
+    override fun handlePostInteraction(interaction: PostInteraction) {
+        // specific interactions that require updating the view
+        postInteractor.handlePostInteraction(interaction)
+        findPost(interaction.post)?.apply {
+            when(interaction) {
+                is PostInteraction.Visit -> visited = true
+//                is PostInteraction.Vote -> userUpvoted = interaction.vote
+//                is PostInteraction.Save -> saved = interaction.save
+            }
+        }
+
+        _postListMediator.postValue(_postListMediator.value)
+    }
+
+    private fun findPost(post: PostModel) : PostModel? = _postListMediator.value?.first { it.fullName == post.fullName }
 }

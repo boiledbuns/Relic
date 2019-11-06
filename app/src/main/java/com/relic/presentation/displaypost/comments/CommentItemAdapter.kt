@@ -12,6 +12,8 @@ import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.FullPostView
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostInteraction
+import com.relic.presentation.displaysub.PostViewDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -127,23 +129,19 @@ class CommentItemAdapter (
 
     private inner class FullPostVH(
       private val fullPostView : FullPostView
-    ) : RecyclerView.ViewHolder(fullPostView), DisplaySubContract.PostViewDelegate {
+    ) : RecyclerView.ViewHolder(fullPostView){
 
-        init { fullPostView.setViewDelegate(this) }
+        private val delegate = object : PostViewDelegate(postInteractor) {
+            override fun getPost() = post!!
+        }
+
+        init {
+            fullPostView.setViewDelegate(delegate)
+        }
 
         fun bind(postModel: PostModel) {
             fullPostView.setPost(postModel)
         }
-
-        override fun onPostPressed() = postInteractor.visitPost(getPost())
-        override fun onPostSavePressed() = postInteractor.savePost(getPost(), !getPost().saved)
-        override fun onPostUpvotePressed() = postInteractor.voteOnPost(getPost(), UPVOTE_PRESSED)
-        override fun onPostDownvotePressed() = postInteractor.voteOnPost(getPost(), DOWNVOTE_PRESSED)
-        override fun onPostReply() = postInteractor.onNewReplyPressed(getPost())
-        override fun onPostLinkPressed() = postInteractor.onLinkPressed(getPost())
-        override fun onUserPressed() = postInteractor.previewUser(getPost())
-
-        fun getPost() = post!!
     }
 
     private inner class CommentItemVH(
@@ -173,19 +171,6 @@ class CommentItemAdapter (
 
         fun getComment(commentLayoutPosition: Int) = commentList[getCommentPosition(commentLayoutPosition)]
     }
-
-    // region OnClick handlers
-//    override fun voteOnComment(itemPosition : Int, voteValue : Int) {
-//        val commentPosition = getCommentPosition(itemPosition)
-//        commentList[commentPosition].also {
-//            // determine the new vote value based on the current one and change the vote accordingly
-//            val newStatus = commentInteractor.onCommentVoted(it, voteValue)
-//
-//            // optimistic, update copy cached in adapter and make request to api to update in server
-//            it.userUpvoted = newStatus
-//            notifyDataSetChanged()
-//        }
-//    }
 
     // endregion OnClick handlers
 }

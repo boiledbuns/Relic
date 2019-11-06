@@ -11,6 +11,8 @@ import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostInteraction
+import com.relic.presentation.displaysub.PostViewDelegate
 import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 
@@ -51,25 +53,15 @@ class PostItemAdapter (
 
     inner class PostItemVH (
       private val postItemView : RelicPostItemView
-    ) : RecyclerView.ViewHolder(postItemView), DisplaySubContract.PostViewDelegate {
+    ) : RecyclerView.ViewHolder(postItemView) {
 
-        init { postItemView.setViewDelegate(this) }
+        val delegate = object : PostViewDelegate(postInteractor) {
+            override fun getPost() = postList[layoutPosition]
+        }
+
+        init { postItemView.setViewDelegate(delegate) }
 
         fun bindPost(postModel : PostModel) = postItemView.setPost(postModel)
-
-        // region post view delegate
-
-        override fun onPostPressed() = postInteractor.visitPost(getPost())
-        override fun onPostSavePressed() = postInteractor.savePost(getPost(), getPost().saved)
-        override fun onPostUpvotePressed() = postInteractor.voteOnPost(getPost(), UPVOTE_PRESSED)
-        override fun onPostDownvotePressed() = postInteractor.voteOnPost(getPost(), DOWNVOTE_PRESSED)
-        override fun onPostReply() = postInteractor.onNewReplyPressed(getPost())
-        override fun onPostLinkPressed() = postInteractor.onLinkPressed(getPost())
-        override fun onUserPressed() = postInteractor.previewUser(getPost())
-
-        // endregion post view delegate
-
-        private fun getPost() : PostModel = postList[layoutPosition]
     }
 
     private suspend fun calculateDiff(newPostList: List<PostModel>): DiffUtil.DiffResult {

@@ -5,6 +5,8 @@ import com.relic.data.PostSource
 import com.relic.data.SortScope
 import com.relic.data.SortType
 import com.relic.domain.models.PostModel
+import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
+import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.util.MediaType
 
@@ -23,31 +25,35 @@ interface DisplaySubContract {
     // delegate for handling domain layer interactions
     interface PostAdapterDelegate {
         val navigationLiveData : LiveData<NavigationData>
-
-        fun visitPost(post: PostModel)
-        fun voteOnPost(post: PostModel, vote : Int)
-        fun savePost(post: PostModel, save :Boolean)
-        fun previewUser(post: PostModel)
-
-        fun onLinkPressed(post: PostModel)
-        fun onNewReplyPressed(post: PostModel)
+        fun handlePostInteraction(interaction: PostInteraction)
     }
 
-    // delegate for handling view layer interactions
-    interface PostViewDelegate {
-        fun onPostPressed()
-        fun onPostSavePressed()
-        fun onPostUpvotePressed()
-        fun onPostDownvotePressed()
 
-        fun onPostReply()
-        fun onPostLinkPressed()
-        fun onUserPressed()
-    }
 }
 
-interface ContentAdapter <T> {
-    fun retrieve(position : Int) : T
+abstract class PostViewDelegate(
+    private val postInteractor: DisplaySubContract.PostAdapterDelegate
+){
+    fun onPostPressed() = postInteractor.handlePostInteraction(PostInteraction.Visit(getPost()))
+    fun onPostSavePressed() = postInteractor.handlePostInteraction(PostInteraction.Save(getPost()))
+    fun onPostUpvotePressed() = postInteractor.handlePostInteraction(PostInteraction.Vote(getPost(), UPVOTE_PRESSED))
+    fun onPostDownvotePressed() = postInteractor.handlePostInteraction(PostInteraction.Vote(getPost(), DOWNVOTE_PRESSED))
+    fun onPostReply() = postInteractor.handlePostInteraction(PostInteraction.NewReply(getPost()))
+    fun onPostLinkPressed() = postInteractor.handlePostInteraction(PostInteraction.VisitLink(getPost()))
+    fun onUserPressed() = postInteractor.handlePostInteraction(PostInteraction.PreviewUser(getPost()))
+
+    abstract fun getPost() : PostModel
+}
+
+sealed class PostInteraction(
+    open val post : PostModel
+) {
+    data class Visit(override val post: PostModel) : PostInteraction(post)
+    data class Vote(override val post: PostModel, val vote : Int) : PostInteraction(post)
+    data class Save(override val post: PostModel) : PostInteraction(post)
+    data class PreviewUser(override val post: PostModel) : PostInteraction(post)
+    data class VisitLink(override val post: PostModel) : PostInteraction(post)
+    data class NewReply(override val post: PostModel) : PostInteraction(post)
 }
 
 // TODO extract out of this interface

@@ -13,7 +13,7 @@ import com.relic.domain.models.PostModel
 import com.relic.preference.POST_LAYOUT_CARD
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
-import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostViewDelegate
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
@@ -101,26 +101,26 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate : DisplaySubContract.PostViewDelegate) {
+    fun setViewDelegate(delegate : PostViewDelegate) {
         setOnClickListener {
             delegate.onPostPressed()
             post.visited = true
-            updateVisited()
+//            updateVisited()
         }
         postItemSaveView.setOnClickListener {
             delegate.onPostSavePressed()
             post.saved = !post.saved
-            updateSaveView()
+//            updateSaveView()
         }
         postItemUpvoteView.setOnClickListener {
             delegate.onPostUpvotePressed()
             post.userUpvoted = UPVOTE_PRESSED
-            updateVoteView()
+//            updateVoteView()
         }
         postItemDownvoteView.setOnClickListener {
             delegate.onPostDownvotePressed()
             post.userUpvoted = DOWNVOTE_PRESSED
-            updateVoteView()
+//            updateVoteView()
         }
         postItemThumbnailView.setOnClickListener { delegate.onPostLinkPressed() }
         postItemCommentView.setOnClickListener { delegate.onPostReply() }
