@@ -26,6 +26,8 @@ import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
+import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.relic.presentation.editor.NewPostEditorFragment
@@ -42,9 +44,6 @@ import javax.inject.Inject
 class DisplaySubFragment : RelicFragment() {
     @Inject
     lateinit var factory : DisplaySubVM.Factory
-
-    @Inject
-    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
@@ -89,7 +88,7 @@ class DisplaySubFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
+        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM)
 
         subPostsRecyclerView.apply {
             adapter = postAdapter
@@ -211,11 +210,14 @@ class DisplaySubFragment : RelicFragment() {
 
     fun handleVHSwipeAction(vh :RecyclerView.ViewHolder, direction : Int) {
         val postItemVH = vh as PostItemAdapter.PostItemVH
+        val postItem = postAdapter.getPostList()[postItemVH.layoutPosition]
         // TODO don't handle manually -> need to check preferences
-        when (direction) {
-            ItemTouchHelper.LEFT -> postItemVH.delegate.onPostUpvotePressed()
-            ItemTouchHelper.RIGHT -> postItemVH.delegate.onPostDownvotePressed()
+        val interaction = when (direction) {
+            ItemTouchHelper.LEFT -> PostInteraction.Upvote
+            else -> PostInteraction.Downvote
         }
+
+        displaySubVM.interact(postItem, interaction)
     }
 
     // region LiveData handlers

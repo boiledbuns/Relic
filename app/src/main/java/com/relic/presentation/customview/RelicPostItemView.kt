@@ -11,9 +11,11 @@ import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.preference.POST_LAYOUT_CARD
+import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
-import com.relic.presentation.displaysub.PostViewDelegate
+import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
@@ -21,10 +23,10 @@ import kotlinx.android.synthetic.main.post_tags.view.*
 import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
-        context: Context,
-        attrs : AttributeSet? = null,
-        defStyleAttr : Int = 0,
-        postLayout : Int
+    context: Context,
+    attrs : AttributeSet? = null,
+    defStyleAttr : Int = 0,
+    postLayout : Int
 ) : RelativeLayout(context, attrs, defStyleAttr) {
     // TODO need to think about increasing min api level from 21
     // TODO set color based on theme, still trying to figure out the best way to do this
@@ -101,30 +103,34 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate : PostViewDelegate) {
-        setOnClickListener {
-            delegate.onPostPressed()
-            post.visited = true
-//            updateVisited()
+    fun setViewDelegate(delegate : DisplaySubContract.PostAdapterDelegate, notifier : ItemNotifier) {
+        delegate.apply {
+            setOnClickListener {
+                interact(post, PostInteraction.Visit)
+                notifier.notifyItem()
+            }
+            postItemSaveView.setOnClickListener {
+                interact(post, PostInteraction.Save)
+                notifier.notifyItem()
+            }
+            postItemUpvoteView.setOnClickListener {
+                interact(post, PostInteraction.Upvote)
+                notifier.notifyItem()
+            }
+            postItemDownvoteView.setOnClickListener {
+                interact(post, PostInteraction.Downvote)
+                notifier.notifyItem()
+            }
+            postItemThumbnailView.setOnClickListener {
+                interact(post, PostInteraction.VisitLink)
+            }
+            postItemCommentView.setOnClickListener {
+                interact(post, PostInteraction.NewReply)
+            }
+            postItemAuthorView.setOnClickListener {
+                interact(post, PostInteraction.PreviewUser)
+            }
         }
-        postItemSaveView.setOnClickListener {
-            delegate.onPostSavePressed()
-            post.saved = !post.saved
-//            updateSaveView()
-        }
-        postItemUpvoteView.setOnClickListener {
-            delegate.onPostUpvotePressed()
-            post.userUpvoted = UPVOTE_PRESSED
-//            updateVoteView()
-        }
-        postItemDownvoteView.setOnClickListener {
-            delegate.onPostDownvotePressed()
-            post.userUpvoted = DOWNVOTE_PRESSED
-//            updateVoteView()
-        }
-        postItemThumbnailView.setOnClickListener { delegate.onPostLinkPressed() }
-        postItemCommentView.setOnClickListener { delegate.onPostReply() }
-        postItemAuthorView.setOnClickListener { delegate.onUserPressed() }
     }
 
     // region update view

@@ -25,35 +25,33 @@ interface DisplaySubContract {
     // delegate for handling domain layer interactions
     interface PostAdapterDelegate {
         val navigationLiveData : LiveData<NavigationData>
-        fun handlePostInteraction(interaction: PostInteraction)
+        fun interact(post : PostModel, interaction: PostInteraction)
     }
 
-
 }
+//
+//abstract class PostViewDelegate(
+//    private val postInteractor: DisplaySubContract.PostAdapterDelegate
+//){
+//    fun onPostPressed() = postInteractor.interact(PostInteraction.Visit(getPost()))
+//    fun onPostSavePressed() = postInteractor.interact(PostInteraction.Save(getPost()))
+//    fun onPostUpvotePressed() = postInteractor.interact(PostInteraction.Vote(getPost(), UPVOTE_PRESSED))
+//    fun onPostDownvotePressed() = postInteractor.interact(PostInteraction.Vote(getPost(), DOWNVOTE_PRESSED))
+//    fun onPostReply() = postInteractor.interact(PostInteraction.NewReply(getPost()))
+//    fun onPostLinkPressed() = postInteractor.interact(PostInteraction.VisitLink(getPost()))
+//    fun onUserPressed() = postInteractor.interact(PostInteraction.PreviewUser(getPost()))
+//
+//    abstract fun getPost() : PostModel
+//}
 
-abstract class PostViewDelegate(
-    private val postInteractor: DisplaySubContract.PostAdapterDelegate
-){
-    fun onPostPressed() = postInteractor.handlePostInteraction(PostInteraction.Visit(getPost()))
-    fun onPostSavePressed() = postInteractor.handlePostInteraction(PostInteraction.Save(getPost()))
-    fun onPostUpvotePressed() = postInteractor.handlePostInteraction(PostInteraction.Vote(getPost(), UPVOTE_PRESSED))
-    fun onPostDownvotePressed() = postInteractor.handlePostInteraction(PostInteraction.Vote(getPost(), DOWNVOTE_PRESSED))
-    fun onPostReply() = postInteractor.handlePostInteraction(PostInteraction.NewReply(getPost()))
-    fun onPostLinkPressed() = postInteractor.handlePostInteraction(PostInteraction.VisitLink(getPost()))
-    fun onUserPressed() = postInteractor.handlePostInteraction(PostInteraction.PreviewUser(getPost()))
-
-    abstract fun getPost() : PostModel
-}
-
-sealed class PostInteraction(
-    open val post : PostModel
-) {
-    data class Visit(override val post: PostModel) : PostInteraction(post)
-    data class Vote(override val post: PostModel, val vote : Int) : PostInteraction(post)
-    data class Save(override val post: PostModel) : PostInteraction(post)
-    data class PreviewUser(override val post: PostModel) : PostInteraction(post)
-    data class VisitLink(override val post: PostModel) : PostInteraction(post)
-    data class NewReply(override val post: PostModel) : PostInteraction(post)
+sealed class PostInteraction {
+    object Visit: PostInteraction()
+    object Upvote: PostInteraction()
+    object Downvote: PostInteraction()
+    object Save: PostInteraction()
+    object PreviewUser : PostInteraction()
+    object VisitLink : PostInteraction()
+    object NewReply : PostInteraction()
 }
 
 // TODO extract out of this interface

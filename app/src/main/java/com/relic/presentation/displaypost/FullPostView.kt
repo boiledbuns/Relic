@@ -8,7 +8,8 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
-import com.relic.presentation.displaysub.PostViewDelegate
+import com.relic.presentation.displaysub.DisplaySubContract
+import com.relic.presentation.displaysub.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
@@ -68,25 +69,13 @@ class FullPostView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate: PostViewDelegate) {
-        postSaveView.setOnClickListener {
-            delegate.onPostSavePressed()
-            post.saved = !post.saved
-            updateSaveView()
-        }
-        postUpvoteView.setOnClickListener {
-            delegate.onPostUpvotePressed()
-            post.userUpvoted = UPVOTE_PRESSED
-            updateVoteView()
-        }
-        postDownvoteView.setOnClickListener {
-            delegate.onPostDownvotePressed()
-            post.userUpvoted = DOWNVOTE_PRESSED
-            updateVoteView()
-        }
-        postImageView.setOnClickListener { delegate.onPostLinkPressed() }
-        postReplyView.setOnClickListener { delegate.onPostReply() }
-        postLinkCard.setOnClickListener { delegate.onPostLinkPressed() }
+    fun setViewDelegate(delegate: DisplaySubContract.PostAdapterDelegate) {
+        postSaveView.setOnClickListener { delegate.interact(post, PostInteraction.Save) }
+        postUpvoteView.setOnClickListener { delegate.interact(post, PostInteraction.Upvote) }
+        postDownvoteView.setOnClickListener { delegate.interact(post, PostInteraction.Downvote) }
+        postImageView.setOnClickListener { delegate.interact(post, PostInteraction.VisitLink) }
+        postReplyView.setOnClickListener { delegate.interact(post, PostInteraction.NewReply) }
+        postLinkCard.setOnClickListener { delegate.interact(post, PostInteraction.VisitLink) }
     }
 
     // region update view

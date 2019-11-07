@@ -116,7 +116,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         var override = true
 
         when (item.itemId) {
-            R.id.post_menu_reply -> displayPostVM.postLiveData.value?.let { postInteractor.handlePostInteraction(PostInteraction.NewReply(it)) }
+            R.id.post_menu_reply -> displayPostVM.postLiveData.value?.let { postInteractor.interact(it, PostInteraction.NewReply) }
             else -> override = super.onOptionsItemSelected(item)
         }
 

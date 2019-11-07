@@ -6,14 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
+import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.base.RelicAdapter
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.FullPostView
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.PostInteraction
-import com.relic.presentation.displaysub.PostViewDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -129,14 +126,10 @@ class CommentItemAdapter (
 
     private inner class FullPostVH(
       private val fullPostView : FullPostView
-    ) : RecyclerView.ViewHolder(fullPostView){
-
-        private val delegate = object : PostViewDelegate(postInteractor) {
-            override fun getPost() = post!!
-        }
+    ) : RecyclerView.ViewHolder(fullPostView) {
 
         init {
-            fullPostView.setViewDelegate(delegate)
+            fullPostView.setViewDelegate(postInteractor)
         }
 
         fun bind(postModel: PostModel) {

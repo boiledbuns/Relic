@@ -5,27 +5,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
-import com.relic.presentation.base.ComponentList
+import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.PostInteraction
-import com.relic.presentation.displaysub.PostViewDelegate
 import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
     private val postInteractor : DisplaySubContract.PostAdapterDelegate
-) : RelicAdapter<PostItemAdapter.PostItemVH>(), ComponentList<PostModel> {
+) : RelicAdapter<PostItemAdapter.PostItemVH>() {
 
     private var postList: List<PostModel> = ArrayList()
     private lateinit var markwon: Markwon
     private val postLayout = viewPrefsManager.getPostCardStyle()
-
-    override fun getItem(position: Int) = postList.get(position)
 
     override fun getItemCount() = postList.size
 
@@ -44,6 +38,7 @@ class PostItemAdapter (
         setPostList(emptyList())
     }
 
+    fun getPostList() : List<PostModel> = postList
     fun setPostList(newPostList: List<PostModel>) {
         launch {
             calculateDiff(newPostList).dispatchUpdatesTo(this@PostItemAdapter)
@@ -53,26 +48,21 @@ class PostItemAdapter (
 
     inner class PostItemVH (
       private val postItemView : RelicPostItemView
-    ) : RecyclerView.ViewHolder(postItemView) {
+    ) : RecyclerView.ViewHolder(postItemView), ItemNotifier {
 
-        val delegate = object : PostViewDelegate(postInteractor) {
-            override fun getPost() = postList[layoutPosition]
+        override fun notifyItem() {
+            notifyItemChanged(layoutPosition)
         }
 
-        init { postItemView.setViewDelegate(delegate) }
+        init { postItemView.setViewDelegate(postInteractor, this) }
 
         fun bindPost(postModel : PostModel) = postItemView.setPost(postModel)
     }
 
-    private suspend fun calculateDiff(newPostList: List<PostModel>): DiffUtil.DiffResult {
+    private fun calculateDiff(newPostList: List<PostModel>): DiffUtil.DiffResult {
         return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int {
-                return postList.size
-            }
-
-            override fun getNewListSize(): Int {
-                return newPostList.size
-            }
+            override fun getOldListSize() = postList.size
+            override fun getNewListSize() = newPostList.size
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return postList[oldItemPosition].fullName == newPostList[newItemPosition].fullName

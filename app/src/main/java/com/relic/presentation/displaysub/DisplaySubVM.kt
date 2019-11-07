@@ -203,21 +203,4 @@ open class DisplaySubVM (
 
         Timber.e(e)
     }
-
-
-    override fun handlePostInteraction(interaction: PostInteraction) {
-        // specific interactions that require updating the view
-        postInteractor.handlePostInteraction(interaction)
-        findPost(interaction.post)?.apply {
-            when(interaction) {
-                is PostInteraction.Visit -> visited = true
-//                is PostInteraction.Vote -> userUpvoted = interaction.vote
-//                is PostInteraction.Save -> saved = interaction.save
-            }
-        }
-
-        _postListMediator.postValue(_postListMediator.value)
-    }
-
-    private fun findPost(post: PostModel) : PostModel? = _postListMediator.value?.first { it.fullName == post.fullName }
 }

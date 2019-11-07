@@ -33,11 +33,11 @@ class PostInteractor @Inject constructor(
     private val _navigationLiveData = SingleLiveData<NavigationData>()
     override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
 
-    override fun handlePostInteraction(interaction: PostInteraction) {
-        val post = interaction.post
+    override fun interact(post: PostModel, interaction: PostInteraction) {
         when(interaction) {
             is PostInteraction.Visit -> visitPost(post)
-            is PostInteraction.Vote -> voteOnPost(post, interaction.vote)
+            is PostInteraction.Upvote -> voteOnPost(post, 1)
+            is PostInteraction.Downvote -> voteOnPost(post, -1)
             is PostInteraction.Save -> savePost(post)
             is PostInteraction.PreviewUser -> previewUser(post)
             is PostInteraction.VisitLink -> visitLink(post)
@@ -48,6 +48,7 @@ class PostInteractor @Inject constructor(
 
     private fun visitPost(post: PostModel) {
         launch(Dispatchers.Main) { postGateway.visitPost(post.fullName) }
+        post.visited = true
         _navigationLiveData.postValue(NavigationData.ToPost(post.fullName, post.subreddit!!))
     }
 
@@ -69,10 +70,16 @@ class PostInteractor @Inject constructor(
 
     private fun voteOnPost(post: PostModel, vote: Int) {
         launch(Dispatchers.Main) { postGateway.voteOnPost(post.fullName, vote) }
+        post.userUpvoted = when (post.userUpvoted) {
+            1 -> if (vote == 1) 0 else -1
+            -1 -> if (vote == -1) 0 else 1
+            else -> vote
+        }
     }
 
     private fun savePost(post: PostModel) {
         launch(Dispatchers.Main) { postGateway.savePost(post.fullName, !post.saved) }
+        post.saved = !post.saved
     }
 
     private fun onNewReplyPressed(post: PostModel) {

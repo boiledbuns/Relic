@@ -7,14 +7,11 @@ import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.preference.PostViewPreferences
+import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaypost.comments.RelicCommentView
 import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.PostInteraction
-import com.relic.presentation.displaysub.PostViewDelegate
 import ru.noties.markwon.Markwon
 
 private const val VIEW_TYPE_POST = 0
@@ -112,16 +109,16 @@ class ListingItemAdapter(
 
     private inner class PostItemVH(
       private val postItemView : RelicPostItemView
-    ) : RecyclerView.ViewHolder(postItemView) {
+    ) : RecyclerView.ViewHolder(postItemView), ItemNotifier {
 
-        private val delegate = object : PostViewDelegate(postInteractor) {
-            override fun getPost() = listingItems[layoutPosition] as PostModel
-        }
-
-        init { postItemView.setViewDelegate(delegate) }
+        init { postItemView.setViewDelegate(postInteractor, this) }
 
         fun bind(postModel: PostModel) {
             postItemView.setPost(postModel)
+        }
+
+        override fun notifyItem() {
+            notifyItemChanged(layoutPosition)
         }
     }
 
