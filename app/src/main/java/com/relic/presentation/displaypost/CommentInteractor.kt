@@ -20,32 +20,41 @@ class CommentInteractor @Inject constructor(
         Timber.e(e,  "caught exception")
     }
 
-    override fun onCommentVoted(comment: CommentModel, voteValue: Int) {
-        var newUserUpvoteValue = 0
-        when (voteValue) {
-            UPVOTE_PRESSED -> {
-                if (comment.userUpvoted != CommentModel.UPVOTE) newUserUpvoteValue = CommentModel.UPVOTE
-            }
-            DOWNVOTE_PRESSED -> {
-                if (comment.userUpvoted != CommentModel.DOWNVOTE) newUserUpvoteValue = CommentModel.DOWNVOTE
-            }
+    override fun interact(comment: CommentModel, interaction: CommentInteraction) {
+        when (interaction) {
+            CommentInteraction.Upvote -> onCommentVoted(comment, 1)
+            CommentInteraction.Downvote -> onCommentVoted(comment, -1)
+            is CommentInteraction.NewReply -> onReplyPressed(comment, interaction.text)
+            CommentInteraction.PreviewUser -> onPreviewUser(comment)
+            CommentInteraction.ExpandReplies -> onExpandReplies(comment)
+            CommentInteraction.Visit -> onVisit(comment)
+        }
+    }
+
+    private fun onCommentVoted(comment: CommentModel, vote: Int) {
+        comment.userUpvoted = when (comment.userUpvoted) {
+            1 -> if (vote == 1) 0 else -1
+            -1 -> if (vote == -1) 0 else 1
+            else -> vote
         }
 
         // send request only if value changed
-        if (newUserUpvoteValue != comment.userUpvoted) {
-            launch(Dispatchers.Main) { commentGateway.voteOnComment(comment.fullName, newUserUpvoteValue)}
-        }
+        launch(Dispatchers.Main) { commentGateway.voteOnComment(comment.fullName, comment.userUpvoted)}
     }
 
-    override fun onReplyPressed(parent: CommentModel, text: String) {
+    private fun onReplyPressed(parent: CommentModel, text: String) {
         launch(Dispatchers.Main) { commentRepo.postComment(parent.fullName, text)}
     }
 
-    override fun onPreviewUser(comment: CommentModel) {
+    private fun onPreviewUser(comment: CommentModel) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onExpandReplies(comment: CommentModel) {
+    private fun onExpandReplies(comment: CommentModel) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun onVisit(comment: CommentModel) {
+        comment.visited = true
     }
 }

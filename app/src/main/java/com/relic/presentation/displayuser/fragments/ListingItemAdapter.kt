@@ -90,21 +90,17 @@ class ListingItemAdapter(
 
     private inner class CommentItemVH (
       private val commentView : RelicCommentView
-    ): RecyclerView.ViewHolder(commentView), DisplayPostContract.CommentViewDelegate{
+    ): RecyclerView.ViewHolder(commentView), ItemNotifier{
 
-        init { commentView.setViewDelegate(this) }
+        init { commentView.setViewDelegate(commentInteractor, this) }
 
         fun bind(commentModel : CommentModel) {
             commentView.setComment(commentModel)
         }
 
-        override fun voteOnComment(voteValue: Int) = commentInteractor.onCommentVoted(getComment(layoutPosition), voteValue)
-        override fun replyToComment(text: String) = commentInteractor.onReplyPressed(getComment(layoutPosition), text)
-        override fun previewUser() = commentInteractor.onPreviewUser(getComment(layoutPosition))
-        override fun loadMoreComments(displayReplies: Boolean) = commentInteractor.onExpandReplies(getComment(layoutPosition))
-        override fun visitComment() {}
-
-        private fun getComment(position: Int) = listingItems[position] as CommentModel
+        override fun notifyItem() {
+            notifyItemChanged(layoutPosition)
+        }
     }
 
     private inner class PostItemVH(

@@ -140,29 +140,26 @@ class CommentItemAdapter (
     private inner class CommentItemVH(
       private val view : View,
       private val viewType : Int
-    ) : RecyclerView.ViewHolder(view), DisplayPostContract.CommentViewDelegate {
+    ) : RecyclerView.ViewHolder(view), ItemNotifier {
+
 
         init {
             when(viewType) {
-                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(this)
-                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(this)
+                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(commentInteractor, this)
+                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(commentInteractor, this)
             }
         }
 
         fun bind(commentModel : CommentModel) {
             when(viewType) {
                 VIEW_TYPE_COMMENT -> (view as RelicCommentView).setComment(commentModel)
-                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setLoadMore(commentModel.replyCount)
+                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setLoadMore(commentModel)
             }
         }
 
-        override fun voteOnComment(voteValue: Int) = commentInteractor.onCommentVoted(getComment(layoutPosition), voteValue)
-        override fun replyToComment(text: String) = commentInteractor.onReplyPressed(getComment(layoutPosition), text)
-        override fun previewUser() = commentInteractor.onPreviewUser(getComment(layoutPosition))
-        override fun loadMoreComments(displayReplies: Boolean) = commentInteractor.onExpandReplies(getComment(layoutPosition))
-        override fun visitComment() {}
-
-        fun getComment(commentLayoutPosition: Int) = commentList[getCommentPosition(commentLayoutPosition)]
+        override fun notifyItem() {
+            notifyItemChanged(getCommentPosition(layoutPosition))
+        }
     }
 
     // endregion OnClick handlers

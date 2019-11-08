@@ -9,6 +9,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.presentation.base.ItemNotifier
+import com.relic.presentation.displaypost.CommentInteraction
 import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.UPVOTE_PRESSED
@@ -86,20 +88,24 @@ class RelicCommentView (
         replyAction = action
     }
 
-    fun setViewDelegate(commentViewDelegate: DisplayPostContract.CommentViewDelegate) {
+    fun setViewDelegate(delegate: DisplayPostContract.CommentAdapterDelegate,  notifier : ItemNotifier) {
         commentUpvoteView.setOnClickListener {
-            commentViewDelegate.voteOnComment(UPVOTE_PRESSED)
-            comment.userUpvoted = UPVOTE_PRESSED
-            updateVoteView()
+            delegate.interact(comment, CommentInteraction.Upvote)
+            notifier.notifyItem()
         }
         commentDownvoteView.setOnClickListener {
-            commentViewDelegate.voteOnComment(DOWNVOTE_PRESSED)
-            comment.userUpvoted = DOWNVOTE_PRESSED
-            updateVoteView()
+            delegate.interact(comment, CommentInteraction.Downvote)
+            notifier.notifyItem()
         }
-        commentAuthorView.setOnClickListener { commentViewDelegate.previewUser() }
-        setOnReplyAction { text -> commentViewDelegate.replyToComment(text) }
-        setOnClickListener { commentViewDelegate.visitComment() }
+        commentAuthorView.setOnClickListener {
+            delegate.interact(comment, CommentInteraction.PreviewUser)
+        }
+        setOnReplyAction { text ->
+            delegate.interact(comment, CommentInteraction.NewReply(text))
+        }
+        setOnClickListener {
+            delegate.interact(comment, CommentInteraction.Visit)
+        }
     }
 
     // region update view

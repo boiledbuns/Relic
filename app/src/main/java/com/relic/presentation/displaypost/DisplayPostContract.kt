@@ -16,19 +16,17 @@ interface DisplayPostContract {
     }
 
     interface CommentAdapterDelegate {
-        fun onCommentVoted(comment: CommentModel, voteValue: Int)
-        fun onReplyPressed(parent : CommentModel, text : String)
-        fun onPreviewUser(comment: CommentModel)
-        fun onExpandReplies(comment: CommentModel)
+        fun interact(comment: CommentModel, interaction: CommentInteraction)
     }
+}
 
-    interface CommentViewDelegate {
-        fun voteOnComment(voteValue : Int)
-        fun replyToComment(text: String)
-        fun visitComment()
-        fun previewUser()
-        fun loadMoreComments(displayReplies : Boolean)
-    }
+sealed class CommentInteraction {
+    object Upvote: CommentInteraction()
+    object Downvote: CommentInteraction()
+    data class NewReply(val text: String): CommentInteraction()
+    object PreviewUser: CommentInteraction()
+    object ExpandReplies: CommentInteraction()
+    object Visit: CommentInteraction()
 }
 
 sealed class PostErrorData {
