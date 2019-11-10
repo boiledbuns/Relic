@@ -1,22 +1,28 @@
 package com.relic.presentation.displaypost.tabs
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProviders
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostVM
+import com.relic.interactor.PostInteractorImpl
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.tab_fullpost.*
+import javax.inject.Inject
 
 class FullPostFragment : RelicFragment() {
+
     private val fullPostVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayPostVM::class.java)
     }
+
+    @Inject
+    lateinit var postInteractor: PostInteractorImpl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.tab_fullpost, container, false)
@@ -42,6 +48,6 @@ class FullPostFragment : RelicFragment() {
             postTabSwipeRefresh.isRefreshing = false
         }
 
-        fullPostView.setOnClicks(fullPostVM)
+        fullPostView.setViewDelegate(postInteractor)
     }
 }

@@ -8,3 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 abstract class RelicAdapter<T : RecyclerView.ViewHolder> : RecyclerView.Adapter<T>(), CoroutineScope {
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 }
+
+interface ComponentList<out T> {
+    fun getItem(position : Int) : T
+}

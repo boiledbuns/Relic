@@ -3,14 +3,18 @@ package com.relic.presentation.displaysub
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.relic.data.*
-import com.relic.data.gateway.PostGateway
+import com.relic.data.ListingRepository
+import com.relic.data.PostRepository
+import com.relic.data.PostSource
+import com.relic.data.SortScope
+import com.relic.data.SortType
+import com.relic.data.SubRepository
 import com.relic.data.repository.NetworkException
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
+import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.helper.ImageHelper
 import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.Dispatchers
@@ -23,20 +27,20 @@ open class DisplaySubVM (
     private val postSource: PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
-    private val postGateway: PostGateway,
+    private val postInteractor : Contract.PostAdapterDelegate,
     private val listingRepo : ListingRepository,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate {
+) : RelicViewModel(), DisplaySubContract.ViewModel, Contract.PostAdapterDelegate by postInteractor {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,
-        private val postGateway: PostGateway,
+        private val postInteractor : Contract.PostAdapterDelegate,
         private val listingRepo : ListingRepository,
         private val networkUtil : NetworkUtil
     ) {
         fun create (postSource : PostSource) : DisplaySubVM {
-            return DisplaySubVM(postSource, subRepo, postRepo, postGateway, listingRepo, networkUtil)
+            return DisplaySubVM(postSource, subRepo, postRepo, postInteractor, listingRepo, networkUtil)
         }
     }
 
@@ -48,14 +52,12 @@ open class DisplaySubVM (
 
     private val _subredditMediator = MediatorLiveData<SubredditModel>()
     private val _postListMediator= MediatorLiveData<List<PostModel>> ()
-    private val _navigationLiveData = SingleLiveData<NavigationData>()
     private val _subInfoLiveData = MutableLiveData<DisplaySubInfoData>()
     private val _refreshLiveData = MutableLiveData<Boolean>()
     private val _errorLiveData = SingleLiveData<RelicError>()
 
     val subredditLiveData : LiveData<SubredditModel> = _subredditMediator
     val postListLiveData : LiveData<List<PostModel>> = _postListMediator
-    val subNavigationLiveData : LiveData<NavigationData> = _navigationLiveData
     val subInfoLiveData : LiveData<DisplaySubInfoData> = _subInfoLiveData
     val refreshLiveData : LiveData<Boolean> = _refreshLiveData
     val errorLiveData : LiveData<RelicError> = _errorLiveData
@@ -192,41 +194,6 @@ open class DisplaySubVM (
             }
         }
     }
-
-    // region view action delegate
-
-    override fun visitPost(postFullname : String, subreddit : String) {
-        launch(Dispatchers.Main) { postGateway.visitPost(postFullname) }
-        _navigationLiveData.value = NavigationData.ToPost(postFullname, subreddit, postSource)
-    }
-
-    override fun voteOnPost(postFullname: String, voteValue: Int) {
-        Timber.d("Voting on post ${postFullname} value = {voteValue}")
-        launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
-    }
-
-    override fun savePost(postFullname: String, save: Boolean) {
-        Timber.d("Saving on post ${postFullname} save = {save}")
-        launch(Dispatchers.Main) { postGateway.savePost(postFullname, save) }
-    }
-
-    override fun onLinkPressed(url: String) {
-        val isImage = ImageHelper.isValidImage(url)
-
-        val subNavigation : NavigationData = if (isImage) {
-            NavigationData.ToImage(url)
-        } else {
-            NavigationData.ToExternal(url)
-        }
-
-        _navigationLiveData.value = subNavigation
-    }
-
-    override fun previewUser(username: String) {
-        _navigationLiveData.value = NavigationData.ToUserPreview(username)
-    }
-
-    // endregion view action delegate
 
     override fun handleException(context: CoroutineContext, e : Throwable) {
         val subE = when (e) {

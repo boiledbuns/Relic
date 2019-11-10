@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="postSubNameView, postDateView"/>
+        app:constraint_referenced_ids="postSubNameView,postDateView"/>
 
 
     <TextView
@@ -84,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="postItemAuthorView, postItemAuthorFlairView"/>
+        app:constraint_referenced_ids="postItemAuthorView,postItemAuthorFlairView"/>
 
     <com.relic.presentation.displaypost.view.PostTagsView
         android:id="@+id/postItemTags"
@@ -142,7 +142,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="titleGroupBarrier, postBodyView"/>
+        app:constraint_referenced_ids="titleGroupBarrier,postBodyView"/>
 
     <!-- buttons and options row -->
     <ImageView

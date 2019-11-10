@@ -1,59 +1,65 @@
 package com.relic.presentation.displaysubs.subslist;
 
-import androidx.databinding.BindingAdapter;
-import androidx.databinding.DataBindingUtil;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.relic.R;
+import androidx.annotation.NonNull;
+import androidx.databinding.BindingAdapter;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.relic.domain.models.SubredditModel;
-import com.relic.databinding.SubItemBinding;
-import com.relic.presentation.displaysubs.DisplaySubsContract;
+import com.relic.interactor.Contract;
+import com.relic.interactor.SubInteraction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
-  private final String TAG = "SUB_ITEM_ADAPTER";
   private List<SubredditModel> subList = new ArrayList<>();
-  private DisplaySubsContract.SubItemOnClick onClick;
+  private Contract.SubAdapterDelegate subAdapterDelegate;
 
-  public SubItemAdapter(DisplaySubsContract.SubItemOnClick onClick) {
-    super();
-    this.onClick = onClick;
+  public SubItemAdapter(Contract.SubAdapterDelegate subAdapterDelegate) {
+    this.subAdapterDelegate = subAdapterDelegate;
   }
 
-  // TODO extract to external class once we decide design for sub items
   class SubItemVH extends RecyclerView.ViewHolder {
-    final SubItemBinding binding;
+    SubItemView subItemView;
 
-    SubItemVH(SubItemBinding subBinding) {
-      super(subBinding.getRoot());
-      this.binding = subBinding;
+    SubItemVH(SubItemView subItemView) {
+      super(subItemView);
+      this.subItemView = subItemView;
+
+      subItemView.setOnClickListener(v ->
+          subAdapterDelegate.interact(
+              subList.get(getAdapterPosition()),
+              SubInteraction.Visit.INSTANCE
+          )
+      );
+
+      subItemView.setOnLongClickListener(v -> {
+        subAdapterDelegate.interact(
+            subList.get(getAdapterPosition()),
+            SubInteraction.Preview.INSTANCE
+        );
+        return true;
+      });
     }
+
+    void bind(SubredditModel subModel) { subItemView.bind(subModel); }
   }
 
 
   @NonNull
   @Override
   public SubItemVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    // initialize the new viewholder with the binding to the sub item
-    SubItemBinding subBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-        R.layout.sub_item, parent, false);
-
-    subBinding.setSubOnClick(onClick);
-    return new SubItemVH(subBinding);
+    SubItemView subItemView = new SubItemView(parent.getContext());
+    return new SubItemVH(subItemView);
   }
 
   @Override
   public void onBindViewHolder(@NonNull SubItemVH holder, int position) {
-    // attachs the sub item to the viewholder post binding
-    holder.binding.setSubredditItem(subList.get(position));
-    holder.binding.executePendingBindings();
+    holder.bind(subList.get(position));
   }
 
   @Override

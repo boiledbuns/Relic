@@ -11,9 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.domain.models.ListingItem
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.ErrorData
 import com.relic.presentation.displayuser.UserTab
@@ -22,9 +22,16 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user_submissions.*
 import javax.inject.Inject
 
-class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate {
+class PostsTabFragment : RelicFragment() {
+
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
+
+    @Inject
+    lateinit var postInteractor : Contract.PostAdapterDelegate
+
+    @Inject
+    lateinit var commentInteractor : Contract.CommentAdapterDelegate
 
     private val postsTabVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
@@ -50,7 +57,7 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userPostsAdapter = ListingItemAdapter(viewPrefsManager, postsTabVM)
+        userPostsAdapter = ListingItemAdapter(viewPrefsManager, postInteractor, commentInteractor)
         userTabRecyclerView.apply {
             adapter = userPostsAdapter
             layoutManager = LinearLayoutManager(context)
@@ -121,20 +128,6 @@ class PostsTabFragment : RelicFragment(), DisplaySubContract.PostAdapterDelegate
         }
 
     }
-
-    // region delegate functions
-
-    override fun visitPost(postFullname: String, subreddit: String) {}
-
-    override fun voteOnPost(postFullname: String, voteValue: Int) {}
-
-    override fun savePost(postFullname: String, save: Boolean) {}
-
-    override fun onLinkPressed(url: String) {}
-
-    override fun previewUser(username: String) {}
-
-    // endregion delegate functions
 
     companion object {
         private val ARG_USER_TAB = "arg_user_tab"

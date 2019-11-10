@@ -176,13 +176,11 @@ class DisplayUserVM(
         val navData = when (listingItem) {
             is PostModel -> NavigationData.ToPost(
                     listingItem.fullName,
-                    listingItem.subreddit!!,
-                    postSource
+                    listingItem.subreddit!!
             )
             is CommentModel -> NavigationData.ToPost(
                     listingItem.linkFullname!!,
                     listingItem.subreddit!!,
-                    postSource,
                     listingItem.fullName
             )
             else -> null

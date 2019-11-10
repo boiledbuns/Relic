@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.NoResults
 import com.relic.presentation.displaysub.list.PostItemAdapter
@@ -19,8 +20,12 @@ import com.relic.presentation.main.RelicError
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.post_results.*
+import javax.inject.Inject
 
 class PostSearchResultsFragment : RelicFragment() {
+    @Inject
+    lateinit var postInteractor : Contract.PostAdapterDelegate
+
     private val searchResultsVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(PostSearchResultsVM::class.java)
     }
@@ -46,7 +51,7 @@ class PostSearchResultsFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postAdapter = PostItemAdapter(viewPrefsManager, searchResultsVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
 
         subSearchRV.apply {
             adapter = postAdapter

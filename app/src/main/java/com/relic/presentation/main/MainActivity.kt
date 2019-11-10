@@ -1,8 +1,8 @@
 package com.relic.presentation.main
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -20,27 +20,42 @@ import androidx.lifecycle.ViewModelProviders
 import com.relic.R
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
+import com.relic.presentation.displaypost.DisplayPostFragment
+import com.relic.presentation.displaysub.DisplaySubFragment
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragment
+import com.relic.presentation.displayuser.DisplayUserPreview
+import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
+import com.relic.presentation.media.DisplayGfycatFragment
+import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
+import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
+import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
-    internal val TAG = "MAIN_ACTIVITY"
-
     @Inject
     lateinit var factory : MainVM.Factory
+
+    @Inject
+    lateinit var postInteractor : Contract.PostAdapterDelegate
+
+    @Inject
+    lateinit var subredditInteractor : Contract.SubAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager
@@ -73,12 +88,15 @@ class MainActivity : RelicActivity() {
         initializeDefaultView()
         initNavDrawer()
 
-        bindViewModel(this@MainActivity)
+        bindViewModel(this)
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         mainVM.userLiveData.observe (lifecycleOwner) { setUser(it) }
         mainVM.accountsLiveData.nonNull().observe (lifecycleOwner) { setAccounts(it) }
+
+        postInteractor.navigationLiveData.observe (lifecycleOwner){ handleNavigation(it!!) }
+        subredditInteractor.navigationLiveData.observe (lifecycleOwner){ handleNavigation(it!!) }
     }
 
     private fun initNavDrawer() {
@@ -127,7 +145,7 @@ class MainActivity : RelicActivity() {
             RequestCodes.CHANGED_ACCOUNT -> {
                 mainVM.onAccountSelected()
                 supportFragmentManager.fragments.forEach {
-
+                    // TODO maybe consider notifying each of changes
                 }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -155,7 +173,7 @@ class MainActivity : RelicActivity() {
     private fun initializeDefaultView() {
         // get the number of additional (non default) fragments in the stack
         val fragCount = supportFragmentManager.backStackEntryCount
-        Log.d(TAG, "Number of fragments $fragCount")
+        Timber.d("Number of fragments $fragCount")
 
         // add the default view only if there are no additional fragments on the stack
         if (fragCount < 1) {
@@ -257,6 +275,74 @@ class MainActivity : RelicActivity() {
     }
 
     // endregion navigation view handlers
+
+    // region post interactor
+
+    private fun handleNavigation(navData: NavigationData) {
+        when (navData) {
+            // navigates to display post
+            is NavigationData.ToPost -> {
+                val postFragment = DisplayPostFragment.create(
+                  navData.postId,
+                  navData.subredditName
+                )
+                // intentionally because replacing then popping off back stack loses scroll position
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.main_content_frame, postFragment)
+                    .addToBackStack(TAG)
+                    .commit()
+            }
+            // navigates to display image on top of current fragment
+            is NavigationData.ToImage -> {
+                val imageFragment = DisplayImageFragment.create(
+                  navData.thumbnail
+                )
+                supportFragmentManager.beginTransaction()
+                  .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
+            }
+            // let browser handle navigation to url
+            is NavigationData.ToExternal -> {
+                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navData.url))
+                startActivity(openInBrowser)
+            }
+            is NavigationData.ToUserPreview -> {
+                DisplayUserPreview.create(navData.username)
+                  .show(supportFragmentManager, TAG)
+            }
+            is NavigationData.ToPostSource -> {
+                val subFragment = DisplaySubFragment.create(navData.source.getSourceName())
+                transitionToFragment(subFragment)
+            }
+            is NavigationData.PreviewPostSource -> {
+                SubInfoBottomSheetDialog.create(navData.source.getSourceName())
+                    .show(supportFragmentManager, TAG)
+            }
+
+            is NavigationData.ToMedia -> openMedia(navData)
+            is NavigationData.ToReply -> openPostReplyEditor(navData.parentFullname)
+        }
+    }
+
+    // endregion post interactor
+
+    private fun openMedia(navMediaData : NavigationData.ToMedia) {
+        val displayFragment = when (navMediaData.mediaType)  {
+            MediaType.Gfycat -> DisplayGfycatFragment.create(navMediaData.mediaUrl)
+            else -> DisplayImageFragment.create(navMediaData.mediaUrl)
+        }
+        supportFragmentManager
+          .beginTransaction()
+          .add(R.id.main_content_frame, displayFragment)
+          .addToBackStack(TAG)
+          .commit()
+    }
+
+    private fun openPostReplyEditor(parentFullname: String) {
+        // this option is for replying to parent
+        // Should also allow user to do it inline, but that can be saved for a later task
+        val editorFragment = ReplyEditorFragment.create(parentFullname, true)
+        transitionToFragment(editorFragment)
+    }
 
     fun getNavDrawer(): DrawerLayout = navigationDrawer!!
 }

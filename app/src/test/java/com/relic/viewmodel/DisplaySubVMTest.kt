@@ -1,19 +1,26 @@
 package com.relic.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.relic.api.response.Data
 import com.relic.api.response.Listing
-import com.relic.data.*
-import com.relic.data.gateway.PostGateway
+import com.relic.data.ListingRepository
+import com.relic.data.PostRepository
+import com.relic.data.PostSource
+import com.relic.data.SubRepository
+import com.relic.data.UserRepository
 import com.relic.data.gateway.SubGateway
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.displaysub.DisplaySubVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
@@ -22,7 +29,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-
 
 @ExperimentalCoroutinesApi
 class DisplaySubVMTest {
@@ -35,7 +41,7 @@ class DisplaySubVMTest {
     private lateinit var postRepo: PostRepository
     private lateinit var userRepo: UserRepository
     private lateinit var subGateway: SubGateway
-    private lateinit var postGateway: PostGateway
+    private lateinit var postInteractor: Contract.PostAdapterDelegate
     private lateinit var listingRepo: ListingRepository
 
     private val username = "testUsername"
@@ -48,7 +54,7 @@ class DisplaySubVMTest {
         postRepo = mock()
         userRepo = mock()
         subGateway = mock()
-        postGateway = mock()
+        postInteractor = mock()
         listingRepo = mock()
 
         whenever(subRepo.getSubGateway()).doReturn(subGateway)
@@ -69,7 +75,7 @@ class DisplaySubVMTest {
         whenever(postRepo.retrieveSortedPosts(any(), any(), any())).doReturn(mockListing())
 
         val source = PostSource.Subreddit("test_sub")
-        val vm = DisplaySubVM(source, subRepo, postRepo, postGateway, listingRepo, mockNetworkUtil)
+        val vm = DisplaySubVM(source, subRepo, postRepo, postInteractor, listingRepo, mockNetworkUtil)
 
         verify(postRepo, times(0)).getPosts(any())
         verify(postRepo, times(1)).retrieveSortedPosts(any(), any(), any())
@@ -83,7 +89,7 @@ class DisplaySubVMTest {
         whenever(postRepo.retrieveSortedPosts(any(), any(), any())).doReturn(mockListing())
 
         val source = PostSource.Subreddit("test_sub")
-        val vm = DisplaySubVM(source, subRepo, postRepo, postGateway, listingRepo, mockNetworkUtil)
+        val vm = DisplaySubVM(source, subRepo, postRepo, postInteractor, listingRepo, mockNetworkUtil)
 
         verify(postRepo, times(1)).getPosts(any())
         verify(postRepo, times(0)).retrieveSortedPosts(any(), any(), any())

@@ -1,30 +1,29 @@
 package com.relic.presentation.displayuser.fragments
 
+import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import android.view.ViewGroup
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.PostViewPreferences
+import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaypost.comments.CommentItemVH
 import com.relic.presentation.displaypost.comments.RelicCommentView
-import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.list.PostItemVH
-import com.relic.presentation.displayuser.DisplayUserContract
 import ru.noties.markwon.Markwon
+
+private const val VIEW_TYPE_POST = 0
+private const val VIEW_TYPE_COMMENT = 1
 
 class ListingItemAdapter(
     private val viewPrefsManager: PostViewPreferences,
-    private val actionDelegate : DisplayUserContract.ListingItemAdapterDelegate
-) : RecyclerView.Adapter <RecyclerView.ViewHolder> (),
-    DisplaySubContract.PostItemAdapterDelegate, DisplayPostContract.CommentAdapterDelegate {
+    private val postInteractor : Contract.PostAdapterDelegate,
+    private val commentInteractor: Contract.CommentAdapterDelegate
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var markwon : Markwon
-    private val VIEW_TYPE_POST = 0
-    private val VIEW_TYPE_COMMENT = 1
+
     private val postLayout = viewPrefsManager.getPostCardStyle()
 
     private var listingItems : List<ListingItem> = ArrayList()
@@ -40,25 +39,21 @@ class ListingItemAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_POST -> PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout)).apply {
-                initializeOnClicks(this@ListingItemAdapter)
-            }
+            VIEW_TYPE_POST ->  PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout))
             // TODO complete the custom comment VH and view for displaying within the tab
             else -> {
-                val commentView = RelicCommentView(parent.context)
-                commentView.displayParent(true)
-                CommentItemVH(commentView).apply {
-                    initializeOnClicks(this@ListingItemAdapter)
+                val commentView = RelicCommentView(parent.context).apply {
+                    displayParent(true)
                 }
+                CommentItemVH(commentView)
             }
         }
     }
 
     override fun onBindViewHolder(vh: RecyclerView.ViewHolder, position : Int) {
-        val item = listingItems[position]
-        when (item) {
-            is PostModel -> (vh as PostItemVH).bindPost(item)
-            is CommentModel -> (vh as CommentItemVH).bindComment(item)
+        when (val item = listingItems[position]) {
+            is PostModel -> (vh as PostItemVH).bind(item)
+            is CommentModel -> (vh as CommentItemVH).bind(item)
         }
     }
 
@@ -92,86 +87,35 @@ class ListingItemAdapter(
         notifyDataSetChanged()
     }
 
+    private inner class CommentItemVH (
+      private val commentView : RelicCommentView
+    ): RecyclerView.ViewHolder(commentView), ItemNotifier{
 
-    // start region for onclick handlers
+        init { commentView.setViewDelegate(commentInteractor, this) }
 
-    override fun onPostPressed (itemPosition : Int) {
-        listingItems[itemPosition].also {
-            // update post to show that it has been visited
-            actionDelegate.visitListing(it)
-
-            // update the view and local model to reflect onclick
-            it.visited = true
+        fun bind(commentModel : CommentModel) {
+            commentView.setComment(commentModel)
         }
-        notifyItemChanged(itemPosition)
-    }
 
-    override fun onPostUpvotePressed(itemPosition : Int, notify : Boolean) {
-        listingItems[itemPosition].also {
-            // determine the new vote value based on the current one and change the vote accordingly
-            val newVote = if (it.userUpvoted <= 0) 1 else 0
-            it.userUpvoted = newVote
-            notifyItemChanged(itemPosition)
-
-            actionDelegate.voteOnListing(it, newVote)
+        override fun notifyItem() {
+            notifyItemChanged(layoutPosition)
         }
     }
 
-    override fun onPostDownvotePressed(itemPosition : Int, notify : Boolean) {
-        listingItems[itemPosition].also {
-            // determine the new vote value based on the current one and change the vote accordingly
-            val newVote = if (it.userUpvoted >= 0) -1 else 0
+    private inner class PostItemVH(
+      private val postItemView : RelicPostItemView
+    ) : RecyclerView.ViewHolder(postItemView), ItemNotifier {
 
-            // optimistic, update copy cached in adapter and make request to api to update in server
-            it.userUpvoted = newVote
-            notifyItemChanged(itemPosition)
+        init { postItemView.setViewDelegate(postInteractor, this) }
 
-            actionDelegate.voteOnListing(it, newVote)
+        fun bind(postModel: PostModel) {
+            postItemView.setPost(postModel)
+        }
+
+        override fun notifyItem() {
+            notifyItemChanged(layoutPosition)
         }
     }
-
-    override fun onPostSavePressed (itemPosition : Int) {
-        listingItems[itemPosition].also {
-            // update the view and local model to reflect onclick
-            it.saved = !it.saved
-            notifyItemChanged(itemPosition)
-
-            actionDelegate.saveListing(it)
-        }
-    }
-
-    override fun onPostLinkPressed (itemPosition : Int) {
-        actionDelegate.onThumbnailClicked(listingItems[itemPosition])
-    }
-
-    override fun onUserPressed(itemPosition: Int) {
-        actionDelegate.onUserClicked(listingItems[itemPosition])
-    }
-
-    override fun loadMoreComments(itemPosition: Int, displayReplies: Boolean) { }
-
-    // end region for onclick handlers
 
     // TODO consider refactoring onclicks for both posts and comments to consolidate them into a single interface
-    // region comment adapter delegate
-
-    override fun voteOnComment(itemPosition: Int, voteValue: Int) {
-        if (voteValue == 1) {
-            onPostUpvotePressed(itemPosition)
-        } else if (voteValue == -1){
-            onPostDownvotePressed(itemPosition)
-        }
-    }
-
-    override fun replyToComment(itemPosition : Int, text: String) { }
-
-    override fun visitComment(itemPosition: Int) {
-         actionDelegate.visitListing(listingItems[itemPosition])
-    }
-
-    override fun previewUser(itemPosition: Int) {
-        actionDelegate.onUserClicked(listingItems[itemPosition])
-    }
-
-    // endregion comment adapter delegate
 }

@@ -17,14 +17,13 @@ class PostGatewayImpl @Inject constructor(
     private val requestManager: NetworkRequestManager,
     private val moshi : Moshi
 ) : PostGateway {
-    var TAG = "POST_GATEWAY"
 
     override suspend fun voteOnPost(fullname: String, voteStatus: Int) {
         // generate the voting endpoint
         val ending = RepoConstants.ENDPOINT + "api/vote?id=" + fullname + "&dir=$voteStatus"
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, ending)
-            Timber.d(TAG, "Success voting on post : $fullname to $voteStatus")
+            Timber.d("Success voting on post : $fullname to $voteStatus")
 
             // update the local model appropriately
             withContext(Dispatchers.IO) {
@@ -41,7 +40,7 @@ class PostGatewayImpl @Inject constructor(
         val ending = RepoConstants.ENDPOINT + "api/" + saveString + "?id=" + fullname
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, ending)
-            Timber.d(TAG, "Success post saved status for $fullname to $save")
+            Timber.d("Success post saved status for $fullname to $save")
 
             // update the local model appropriately
             withContext(Dispatchers.IO) {

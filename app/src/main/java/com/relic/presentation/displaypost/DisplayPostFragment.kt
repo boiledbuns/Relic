@@ -1,9 +1,12 @@
 package com.relic.presentation.displaypost
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -16,17 +19,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.relic.R
-import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
+import com.relic.interactor.CommentInteractorImpl
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.presentation.displayuser.DisplayUserPreview
-import com.relic.presentation.editor.ReplyEditorFragment
-import com.relic.presentation.media.DisplayGfycatFragment
-import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.util.MediaType
+import com.relic.interactor.PostInteraction
+import com.relic.interactor.PostInteractorImpl
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
@@ -39,20 +39,23 @@ import javax.inject.Inject
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
+    @Inject lateinit var postInteractor: PostInteractorImpl
+
+    @Inject lateinit var commentInteractor: CommentInteractorImpl
+
     @Inject lateinit var factory : DisplayPostVM.Factory
 
     private val displayPostVM : DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return factory.create(subredditName, postFullName, postSource) as T
+                return factory.create(subredditName, postFullName) as T
             }
         }).get(DisplayPostVM::class.java)
     }
 
     private lateinit var postFullName: String
     private lateinit var subredditName: String
-    private lateinit var postSource: PostSource
     private var enableVisitSub = false
 
     private lateinit var pagerAdapter : DisplayPostPagerAdapter
@@ -68,7 +71,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         arguments?.apply {
             getString(ARG_POST_FULLNAME)?.let { postFullName = it }
             getString(ARG_SUB_NAME)?.let { subredditName = it }
-            getParcelable<PostSource>(ARG_POST_SOURCE)?.let { postSource = it }
             enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
         }
 
@@ -115,7 +117,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         var override = true
 
         when (item.itemId) {
-            R.id.post_menu_reply -> openPostReplyEditor(postFullName)
+            R.id.post_menu_reply -> displayPostVM.postLiveData.value?.let { postInteractor.interact(it, PostInteraction.NewReply) }
             else -> override = super.onOptionsItemSelected(item)
         }
 
@@ -126,30 +128,12 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayPostVM.apply {
-            postNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             errorLiveData.observe(lifecycleOwner) { handleError(it) }
             postLiveData.nonNull().observe(lifecycleOwner) { handlePost(it) }
         }
     }
 
     // region live data handlers
-
-    private fun handleNavigation(navigationData : PostNavigationData) {
-        when (navigationData) {
-            is PostNavigationData.ToMedia -> openMedia(navigationData)
-            is PostNavigationData.ToReply -> openPostReplyEditor(navigationData.parentFullname)
-            is PostNavigationData.ToURL -> {
-                Intent(Intent.ACTION_VIEW).apply{
-                    data = Uri.parse(navigationData.url)
-                    startActivity(this)
-                }
-            }
-            is PostNavigationData.ToUserPreview -> {
-                DisplayUserPreview.create(navigationData.username)
-                    .show(requireFragmentManager(), TAG)
-            }
-        }
-    }
 
     private fun handleError(error : PostErrorData?) {
         if (previousError != error) {
@@ -203,28 +187,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
-    private fun openMedia(navMediaData : PostNavigationData.ToMedia) {
-        val displayFragment = when (navMediaData.mediaType)  {
-            MediaType.Gfycat -> DisplayGfycatFragment.create(navMediaData.mediaUrl)
-            else -> DisplayImageFragment.create(navMediaData.mediaUrl)
-        }
-        activity!!.supportFragmentManager
-                .beginTransaction()
-                .add(R.id.main_content_frame, displayFragment)
-                .addToBackStack(TAG)
-                .commit()
-    }
-
-    private fun openPostReplyEditor(parentFullname: String) {
-        // this option is for replying to parent
-        // Should also allow user to do it inline, but that can be saved for a later task
-        val editorFragment = ReplyEditorFragment.create(parentFullname, true)
-
-        // replace the current screen with the newly created fragment
-        activity!!.supportFragmentManager.beginTransaction()
-                .replace(R.id.main_content_frame, editorFragment).addToBackStack(TAG).commit()
-    }
-
     fun onPostDataLoaded() {
         Toast.makeText(context, "Comments loaded", Toast.LENGTH_SHORT).show()
     }
@@ -241,13 +203,12 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
          * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
          * continuously chaining open subreddit actions
          */
-        fun create(postId : String, subreddit : String, postSource: PostSource, enableVisitSub : Boolean = false) : DisplayPostFragment {
+        fun create(postId : String, subreddit : String, enableVisitSub : Boolean = false) : DisplayPostFragment {
             // create a new bundle for the post id
             val bundle = Bundle().apply {
                 putString(ARG_POST_FULLNAME, postId)
                 putString(ARG_SUB_NAME, subreddit)
                 putBoolean(ARG_ENABLE_VISIT_SUB, enableVisitSub)
-                putParcelable(ARG_POST_SOURCE, postSource)
             }
 
             return DisplayPostFragment().apply {

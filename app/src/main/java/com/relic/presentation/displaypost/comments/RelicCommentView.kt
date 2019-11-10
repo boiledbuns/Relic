@@ -9,6 +9,9 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.interactor.Contract
+import com.relic.presentation.base.ItemNotifier
+import com.relic.interactor.CommentInteraction
 import com.relic.presentation.helper.DateHelper
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
@@ -22,6 +25,7 @@ class RelicCommentView (
     private var displayParent : Boolean = false
     private lateinit var replyAnchor : LinearLayout
     private var replyAction : (text : String) -> Unit = { }
+    private lateinit var comment : CommentModel
 
     init {
         LayoutInflater.from(context).inflate(R.layout.comment_item, this)
@@ -43,7 +47,11 @@ class RelicCommentView (
         }
     }
 
-    fun setPost(commentModel : CommentModel) {
+    fun setComment(commentModel : CommentModel) {
+        comment = commentModel
+
+        updateVoteView()
+
         commentScoreView.text = resources.getString(R.string.comment_score, commentModel.score)
         commentFlairView.text = commentModel.authorFlairText
         commentAuthorView.text = commentModel.author
@@ -57,21 +65,6 @@ class RelicCommentView (
             commentAuthorView.background?.setTint(resources.getColor(R.color.discussion_tag))
         } else {
             commentAuthorView.setBackgroundResource(0)
-        }
-
-        when (commentModel.userUpvoted) {
-            1 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
-            }
-            0 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
-            }
-            -1 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
-            }
         }
 
         if (commentModel.replyCount > 0) {
@@ -92,6 +85,46 @@ class RelicCommentView (
     fun setOnReplyAction(action : (text : String) -> Unit) {
         replyAction = action
     }
+
+    fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier : ItemNotifier) {
+        commentUpvoteView.setOnClickListener {
+            delegate.interact(comment, CommentInteraction.Upvote)
+            notifier.notifyItem()
+        }
+        commentDownvoteView.setOnClickListener {
+            delegate.interact(comment, CommentInteraction.Downvote)
+            notifier.notifyItem()
+        }
+        commentAuthorView.setOnClickListener {
+            delegate.interact(comment, CommentInteraction.PreviewUser)
+        }
+        setOnReplyAction { text ->
+            delegate.interact(comment, CommentInteraction.NewReply(text))
+        }
+        setOnClickListener {
+            delegate.interact(comment, CommentInteraction.Visit)
+        }
+    }
+
+    // region update view
+    private fun updateVoteView() {
+        when (comment.userUpvoted) {
+            1 -> {
+                commentUpvoteView.setImageResource(R.drawable.ic_upvote_active)
+                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            0 -> {
+                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
+                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            -1 -> {
+                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
+                commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+            }
+        }
+
+    }
+    // endregion update view
 
     private fun openReplyEditor() {
         val inlineReply = RelicInlineReplyView(context).apply {

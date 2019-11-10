@@ -1,23 +1,18 @@
 package com.relic.presentation.displaypost
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.relic.data.CommentRepository
 import com.relic.data.ListingRepository
 import com.relic.data.PostRepository
-import com.relic.data.PostSource
 import com.relic.data.gateway.PostGateway
 import com.relic.data.repository.NetworkException
 import com.relic.domain.models.CommentModel
-import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
 import com.relic.network.NetworkUtil
 import com.relic.network.request.RelicRequestError
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.util.MediaHelper
-import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,9 +28,8 @@ class DisplayPostVM (
     private val postGateway: PostGateway,
     private val networkUtil : NetworkUtil,
     private val subName: String,
-    private val postFullname: String,
-    private val postSource : PostSource
-): RelicViewModel(), DisplayPostContract.ViewModel, DisplayPostContract.PostViewDelegate {
+    private val postFullname: String
+): RelicViewModel(), DisplayPostContract.ViewModel {
 
     class Factory @Inject constructor(
         private val postRepo: PostRepository,
@@ -46,21 +40,18 @@ class DisplayPostVM (
     ) {
         fun create(
             subredditName : String,
-            postFullname : String,
-            postSource: PostSource
+            postFullname : String
         ) : DisplayPostVM {
-            return DisplayPostVM(postRepo, commentRepo, listingRepo, postGateway, networkUtil, subredditName, postFullname, postSource)
+            return DisplayPostVM(postRepo, commentRepo, listingRepo, postGateway, networkUtil, subredditName, postFullname)
         }
     }
 
     private val _postLiveData = MediatorLiveData<PostModel> ()
     private val _commentListLiveData = MediatorLiveData<List<CommentModel>> ()
-    private val _navigationLiveData = SingleLiveData<PostNavigationData> ()
     private val _errorLiveData = MutableLiveData<PostErrorData> ()
 
     val postLiveData : LiveData<PostModel> =_postLiveData
     val commentListLiveData : LiveData<List<CommentModel>> = _commentListLiveData
-    val postNavigationLiveData : LiveData<PostNavigationData> = _navigationLiveData
     val errorLiveData : LiveData<PostErrorData> = _errorLiveData
 
     init {
@@ -160,61 +151,6 @@ class DisplayPostVM (
                     _commentListLiveData.postValue(newList)
                 }
             }
-        }
-    }
-
-    override fun onPostVoted(voteValue: Int) {
-        Log.d(TAG, "Voted on post " + postFullname + "value = " + voteValue)
-        launch(Dispatchers.Main) { postGateway.voteOnPost(postFullname, voteValue) }
-    }
-
-    override fun onCommentVoted(commentModel: CommentModel, voteValue: Int) : Int{
-        var newUserUpvoteValue = 0
-        when (voteValue) {
-            UPVOTE_PRESSED -> {
-                if (commentModel.userUpvoted != CommentModel.UPVOTE) newUserUpvoteValue = CommentModel.UPVOTE
-            }
-            DOWNVOTE_PRESSED -> {
-                if (commentModel.userUpvoted != CommentModel.DOWNVOTE) newUserUpvoteValue = CommentModel.DOWNVOTE
-            }
-        }
-
-        // send request only if value changed
-        if (newUserUpvoteValue != commentModel.userUpvoted) {
-            launch(Dispatchers.Main) { postGateway.voteOnPost(commentModel.fullName, voteValue) }
-        }
-        return newUserUpvoteValue
-    }
-
-    override fun onLinkPressed() {
-        postLiveData.value?.let {
-            val mediaType = MediaHelper.determineType(it)
-            _navigationLiveData.value = when (mediaType) {
-                is MediaType.Image, MediaType.Gfycat -> PostNavigationData.ToMedia(mediaType, _postLiveData.value!!.url!!)
-                is MediaType.Link -> PostNavigationData.ToURL(_postLiveData.value!!.url!!)
-                else -> null
-            }
-            _navigationLiveData.value = null
-        }
-
-    }
-
-    override fun onReplyPressed(parent: String, text: String) {
-        launch(Dispatchers.Main) {
-            commentRepo.postComment(parent, text)
-        }
-    }
-
-    override fun onNewReplyPressed() {
-        _navigationLiveData.value = PostNavigationData.ToReply(postFullname)
-        _navigationLiveData.value = null
-    }
-
-    override fun onUserPressed(listing: ListingItem) {
-        if (networkUtil.checkConnection()) {
-            _navigationLiveData.value = PostNavigationData.ToUserPreview(listing.author)
-        } else {
-            _errorLiveData.postValue(PostErrorData.NetworkUnavailable)
         }
     }
 

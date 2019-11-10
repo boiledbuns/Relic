@@ -1,12 +1,15 @@
 package com.relic.presentation.displaypost
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
+import com.relic.interactor.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
@@ -14,7 +17,6 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.full_post.view.*
 import ru.noties.markwon.Markwon
-import java.lang.Exception
 
 class FullPostView @JvmOverloads constructor(
     context : Context,
@@ -22,16 +24,19 @@ class FullPostView @JvmOverloads constructor(
     defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private val TAG = "FULL_POST_VIEW"
-    private lateinit var viewDelegate : DisplayPostContract.PostViewDelegate
     private var postDisplayType : MediaType? = null
     private val markwon = Markwon.create(context)
+    private lateinit var post : PostModel
 
     init {
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
     }
 
     fun setPost(postModel : PostModel) {
+        post = postModel
+        updateVoteView()
+        updateSaveView()
+
         postDisplayType = MediaHelper.determineType(postModel)
 
         postModel.apply {
@@ -45,21 +50,6 @@ class FullPostView @JvmOverloads constructor(
                 val selfText = selftext!!
                 markwon.setMarkdown(postSelfText, selfText)
                 postSelfText.visibility = View.VISIBLE
-            }
-
-            when (userUpvoted) {
-                1 -> {
-                    postUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                    postDownvoteView.setImageResource(R.drawable.ic_downvote)
-                }
-                0 -> {
-                    postUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    postDownvoteView.setImageResource(R.drawable.ic_downvote)
-                }
-                -1 -> {
-                    postUpvoteView.setImageResource(R.drawable.ic_upvote)
-                    postDownvoteView.setImageResource(R.drawable.ic_downvote_active)
-                }
             }
 
             postVoteCountView.text = score.toString()
@@ -79,18 +69,39 @@ class FullPostView @JvmOverloads constructor(
         }
     }
 
-    fun setOnClicks(delegate : DisplayPostContract.PostViewDelegate) {
-        viewDelegate = delegate
-        initializeOnClicks(delegate)
+    fun setViewDelegate(delegate: Contract.PostAdapterDelegate) {
+        postSaveView.setOnClickListener { delegate.interact(post, PostInteraction.Save) }
+        postUpvoteView.setOnClickListener { delegate.interact(post, PostInteraction.Upvote) }
+        postDownvoteView.setOnClickListener { delegate.interact(post, PostInteraction.Downvote) }
+        postImageView.setOnClickListener { delegate.interact(post, PostInteraction.VisitLink) }
+        postReplyView.setOnClickListener { delegate.interact(post, PostInteraction.NewReply) }
+        postLinkCard.setOnClickListener { delegate.interact(post, PostInteraction.VisitLink) }
     }
 
-    private fun initializeOnClicks(viewDelegate : DisplayPostContract.PostViewDelegate) {
-        postImageView.setOnClickListener { viewDelegate.onLinkPressed() }
-        postUpvoteView.setOnClickListener { viewDelegate.onPostVoted(1) }
-        postDownvoteView.setOnClickListener { viewDelegate.onPostVoted(-1) }
-        postReplyView.setOnClickListener { viewDelegate.onNewReplyPressed() }
-        postLinkCard.setOnClickListener { viewDelegate.onLinkPressed() }
+    // region update view
+    private fun updateVoteView() {
+        when (post.userUpvoted) {
+            1 -> {
+                postUpvoteView.setImageResource(R.drawable.ic_upvote_active)
+                postDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            0 -> {
+                postUpvoteView.setImageResource(R.drawable.ic_upvote)
+                postDownvoteView.setImageResource(R.drawable.ic_downvote)
+            }
+            -1 -> {
+                postUpvoteView.setImageResource(R.drawable.ic_upvote)
+                postDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+            }
+        }
     }
+
+    private fun updateSaveView() {
+        // TODO convert all icons to use style colors
+        val saveColor = if (post.saved) R.color.upvote else R.color.paleGray
+        postSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
+    }
+    // endregion update view
 
     private fun loadLinks(postModel : PostModel) {
         when (postDisplayType) {

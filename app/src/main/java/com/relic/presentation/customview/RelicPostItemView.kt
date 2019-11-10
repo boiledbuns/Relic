@@ -10,7 +10,10 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.POST_LAYOUT_CARD
+import com.relic.presentation.base.ItemNotifier
+import com.relic.interactor.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
@@ -18,10 +21,10 @@ import kotlinx.android.synthetic.main.post_tags.view.*
 import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
-        context: Context,
-        attrs : AttributeSet? = null,
-        defStyleAttr : Int = 0,
-        postLayout : Int
+    context: Context,
+    attrs : AttributeSet? = null,
+    defStyleAttr : Int = 0,
+    postLayout : Int
 ) : RelativeLayout(context, attrs, defStyleAttr) {
     // TODO need to think about increasing min api level from 21
     // TODO set color based on theme, still trying to figure out the best way to do this
@@ -29,6 +32,8 @@ class RelicPostItemView @JvmOverloads constructor(
     private val stickiedColor: Int
     private val backgroundColor: Int
     private val backgroundVisitedColor: Int
+
+    private lateinit var post : PostModel
 
     init {
         val typedVal = TypedValue()
@@ -55,16 +60,14 @@ class RelicPostItemView @JvmOverloads constructor(
     }
 
     fun setPost(postModel : PostModel) {
+        post = postModel
         postItemRootView?.apply {
-            val backgroundColor = if (postModel.visited) backgroundVisitedColor else backgroundColor
-            setBackgroundColor(backgroundColor)
+            updateVisited()
+            updateSaveView()
+            updateVoteView()
 
             val titleColor = if (postModel.stickied) stickiedColor else textColor
             titleView.setTextColor(titleColor)
-
-            // TODO convert all icons to use style colors
-            val saveColor = if (postModel.saved) R.color.upvote else R.color.paleGray
-            postItemSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
 
             if (!postModel.thumbnail.isNullOrBlank()) {
                 val thumbnail = postModel.thumbnail!!
@@ -93,15 +96,44 @@ class RelicPostItemView @JvmOverloads constructor(
                 postBodyView.visibility = View.GONE
             }
 
-            setVote(postModel.userUpvoted)
-
             postItemScore.text = postModel.score.toString()
             postItemCommentCountView.text = postModel.commentCount.toString()
         }
     }
 
-    fun setVote(vote : Int) {
-        when (vote) {
+    fun setViewDelegate(delegate : Contract.PostAdapterDelegate, notifier : ItemNotifier) {
+        delegate.apply {
+            setOnClickListener {
+                interact(post, PostInteraction.Visit)
+                notifier.notifyItem()
+            }
+            postItemSaveView.setOnClickListener {
+                interact(post, PostInteraction.Save)
+                notifier.notifyItem()
+            }
+            postItemUpvoteView.setOnClickListener {
+                interact(post, PostInteraction.Upvote)
+                notifier.notifyItem()
+            }
+            postItemDownvoteView.setOnClickListener {
+                interact(post, PostInteraction.Downvote)
+                notifier.notifyItem()
+            }
+            postItemThumbnailView.setOnClickListener {
+                interact(post, PostInteraction.VisitLink)
+            }
+            postItemCommentView.setOnClickListener {
+                interact(post, PostInteraction.NewReply)
+            }
+            postItemAuthorView.setOnClickListener {
+                interact(post, PostInteraction.PreviewUser)
+            }
+        }
+    }
+
+    // region update view
+    private fun updateVoteView() {
+        when (post.userUpvoted) {
             1 -> {
                 postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)
                 postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
@@ -116,6 +148,18 @@ class RelicPostItemView @JvmOverloads constructor(
             }
         }
     }
+
+    private fun updateSaveView() {
+        // TODO convert all icons to use style colors
+        val saveColor = if (post.saved) R.color.upvote else R.color.paleGray
+        postItemSaveView.setColorFilter(resources.getColor(saveColor), PorterDuff.Mode.SRC_IN)
+    }
+
+    private fun updateVisited() {
+        val backgroundColor = if (post.visited) backgroundVisitedColor else backgroundColor
+        postItemRootView.setBackgroundColor(backgroundColor)
+    }
+    // endregion update view
 
     private fun setThumbnail(thumbnailUrl : String) {
         try {

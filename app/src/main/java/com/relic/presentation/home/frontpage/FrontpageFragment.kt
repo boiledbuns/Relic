@@ -1,24 +1,20 @@
 package com.relic.presentation.home.frontpage
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.displaypost.DisplayPostFragment
-import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -33,6 +29,9 @@ import javax.inject.Inject
 class FrontpageFragment : RelicFragment() {
     @Inject
     lateinit var factory : FrontpageVM.Factory
+
+    @Inject
+    lateinit var postInteractor : Contract.PostAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
@@ -60,7 +59,7 @@ class FrontpageFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, frontpageVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -102,7 +101,6 @@ class FrontpageFragment : RelicFragment() {
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // observe the live data list of posts for this subreddit
         frontpageVM.postListLiveData.nonNull().observe(lifecycleOwner) { handlePostsLoaded(it) }
-        frontpageVM.subNavigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
     }
 
     // region live data handlers
@@ -115,35 +113,6 @@ class FrontpageFragment : RelicFragment() {
         // turn off loading animation and unlock scrolling to allow more posts to be loaded
         frontpageSwipeRefreshLayout.isRefreshing = false
         scrollLocked = false
-    }
-
-    private fun handleNavigation(subNavigationData: NavigationData) {
-        when (subNavigationData) {
-            // navigates to display post
-            is NavigationData.ToPost -> {
-                val postFragment = DisplayPostFragment.create(
-                    postId = subNavigationData.postId,
-                    subreddit = subNavigationData.subredditName,
-                    postSource = subNavigationData.postSource,
-                    enableVisitSub = true
-                )
-                activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
-            }
-            // navigates to display image on top of current fragment
-            is NavigationData.ToImage -> {
-                val imageFragment = DisplayImageFragment.create(
-                    subNavigationData.thumbnail
-                )
-                activity!!.supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
-            }
-            // let browser handle navigation to url
-            is NavigationData.ToExternal -> {
-                val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(subNavigationData.url))
-                startActivity(openInBrowser)
-            }
-        }
     }
 
     // endregion live data handlers

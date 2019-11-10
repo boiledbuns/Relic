@@ -2,21 +2,23 @@ package com.relic.presentation.displaysub.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.PostViewPreferences
+import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
-    private val postAdapterDelegate : DisplaySubContract.PostAdapterDelegate
-) : RelicAdapter <PostItemVH> (), DisplaySubContract.PostItemAdapterDelegate {
+    private val postInteractor : Contract.PostAdapterDelegate
+) : RelicAdapter<PostItemAdapter.PostItemVH>() {
 
     private var postList: List<PostModel> = ArrayList()
-    private lateinit var markwon : Markwon
+    private lateinit var markwon: Markwon
     private val postLayout = viewPrefsManager.getPostCardStyle()
 
     override fun getItemCount() = postList.size
@@ -25,19 +27,18 @@ class PostItemAdapter (
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): PostItemVH {
         markwon = Markwon.create(parent.context)
-        val postItemView = RelicPostItemView(parent.context, postLayout = postLayout)
-
-        return PostItemVH(postItemView).apply {
-            initializeOnClicks(this@PostItemAdapter)
-        }
+        return PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout))
     }
 
     override fun onBindViewHolder(viewholder: PostItemVH, position: Int) {
         viewholder.bindPost(postList[position])
     }
 
-    fun clear() { setPostList(emptyList()) }
+    fun clear() {
+        setPostList(emptyList())
+    }
 
+    fun getPostList() : List<PostModel> = postList
     fun setPostList(newPostList: List<PostModel>) {
         launch {
             calculateDiff(newPostList).dispatchUpdatesTo(this@PostItemAdapter)
@@ -45,86 +46,31 @@ class PostItemAdapter (
         }
     }
 
-    // region onclick handlers
+    inner class PostItemVH (
+      private val postItemView : RelicPostItemView
+    ) : RecyclerView.ViewHolder(postItemView), ItemNotifier {
 
-    override fun onPostPressed (itemPosition : Int) {
-        postList[itemPosition].also {
-            // update post to show that it has been visited
-            postAdapterDelegate.visitPost(it.fullName, it.subreddit!!)
-            // update the view and local model to reflect onclick
-            it.visited = true
-        }
-        notifyDataSetChanged()
-    }
-
-    // initialize onclick for the upvote button
-    override fun onPostUpvotePressed(itemPosition : Int, notify : Boolean) {
-        postList[itemPosition].also {
-            // determine the new vote value based on the current one and change the vote accordingly
-            val newStatus = if (it.userUpvoted <= 0) 1 else 0
-
-            // optimistic, update copy cached in adapter and make request to api to update in server
-            it.score = it.score + newStatus - it.userUpvoted
-            it.userUpvoted = newStatus
-            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
-        }
-        if (notify) notifyDataSetChanged()
-    }
-
-    // initialize onclick for the downvote button
-    override fun onPostDownvotePressed(itemPosition : Int, notify : Boolean) {
-        postList[itemPosition].also {
-            // determine the new vote value based on the current one and change the vote accordingly
-            val newStatus = if (it.userUpvoted >= 0) -1 else 0
-
-            // optimistic, update copy cached in adapter and make request to api to update in server
-            it.score = it.score + newStatus - it.userUpvoted
-            it.userUpvoted = newStatus
-            postAdapterDelegate.voteOnPost(it.fullName, newStatus)
-        }
-        if (notify) notifyDataSetChanged()
-    }
-
-    override fun onPostSavePressed (itemPosition : Int) {
-        postList[itemPosition].also {
-            // calculate new save value based on the previous one and tell vm to update appropriately
-            val newStatus = !it.saved
-            postAdapterDelegate.savePost(it.fullName, newStatus)
-
-            // update the view and local model to reflect onclick
-            it.saved = newStatus
+        override fun notifyItem() {
+            notifyItemChanged(layoutPosition)
         }
 
-        notifyDataSetChanged()
+        init { postItemView.setViewDelegate(postInteractor, this) }
+
+        fun bindPost(postModel : PostModel) = postItemView.setPost(postModel)
     }
 
-    override fun onPostLinkPressed (itemPosition : Int) {
-        postAdapterDelegate.onLinkPressed(postList[itemPosition].url!!)
-    }
-
-    override fun onUserPressed(itemPosition: Int) {
-        postAdapterDelegate.previewUser(postList[itemPosition].author)
-    }
-
-    // end region for onclick handlers
-
-    private suspend fun calculateDiff (newPostList: List<PostModel>) : DiffUtil.DiffResult {
+    private fun calculateDiff(newPostList: List<PostModel>): DiffUtil.DiffResult {
         return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int {
-                return postList.size
-            }
-
-            override fun getNewListSize(): Int {
-                return newPostList.size
-            }
+            override fun getOldListSize() = postList.size
+            override fun getNewListSize() = newPostList.size
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return postList[oldItemPosition].fullName == newPostList[newItemPosition].fullName
             }
 
             override fun areContentsTheSame(
-                oldItemPosition: Int,
-                newItemPosition: Int
+              oldItemPosition: Int,
+              newItemPosition: Int
             ): Boolean {
                 val oldPost = postList[oldItemPosition]
                 val newPost = newPostList[newItemPosition]

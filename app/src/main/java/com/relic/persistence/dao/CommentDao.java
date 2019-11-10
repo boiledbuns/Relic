@@ -27,4 +27,7 @@ public abstract class CommentDao {
 
     @Query("DELETE from CommentModel WHERE id = :commentFullName")
     public abstract void deleteComment(String commentFullName);
+
+    @Query("UPDATE CommentModel SET score = score + :vote - userUpvoted, userUpvoted = :vote  where fullName = :commentFullname")
+    public abstract void updateVote(String commentFullname, int vote);
 }
