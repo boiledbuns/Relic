@@ -29,10 +29,18 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
       super(subItemView);
       this.subItemView = subItemView;
 
-      subItemView.setOnClickListener(v -> subAdapterDelegate.onClick(subList.get(getAdapterPosition())));
+      subItemView.setOnClickListener(v ->
+          subAdapterDelegate.interact(
+              subList.get(getAdapterPosition()),
+              DisplaySubsContract.SubInteraction.Visit.INSTANCE
+          )
+      );
 
       subItemView.setOnLongClickListener(v -> {
-        subAdapterDelegate.onLongClick(subList.get(getAdapterPosition()));
+        subAdapterDelegate.interact(
+            subList.get(getAdapterPosition()),
+            DisplaySubsContract.SubInteraction.Preview.INSTANCE
+        );
         return true;
       });
     }

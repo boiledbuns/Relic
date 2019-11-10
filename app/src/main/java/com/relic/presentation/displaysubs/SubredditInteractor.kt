@@ -19,6 +19,13 @@ import javax.inject.Singleton
 class SubredditInteractor @Inject constructor(
     private val subGateway: SubGateway
 ): DisplaySubsContract.SubAdapterDelegate, CoroutineScope {
+    override fun interact(subreddit: SubredditModel, subInteraction: DisplaySubsContract.SubInteraction) {
+        when (subInteraction) {
+            DisplaySubsContract.SubInteraction.Visit -> visit(subreddit)
+            DisplaySubsContract.SubInteraction.Preview -> preview(subreddit)
+            DisplaySubsContract.SubInteraction.Subscribe -> subscribe(subreddit)
+        }
+    }
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
         Timber.e(e,  "caught exception")
@@ -27,17 +34,17 @@ class SubredditInteractor @Inject constructor(
     private val _navigationLiveData = SingleLiveData<NavigationData>()
     override val navigationLiveData: LiveData<NavigationData> = _navigationLiveData
 
-    override fun onClick(subItem: SubredditModel) {
+    fun visit(subItem: SubredditModel) {
         val navData = NavigationData.ToPostSource(PostSource.Subreddit(subItem.subName))
         _navigationLiveData.postValue(navData)
     }
 
-    override fun onLongClick(subItem: SubredditModel) {
+    fun preview(subItem: SubredditModel) {
         val navData = NavigationData.PreviewPostSource(PostSource.Subreddit(subItem.subName))
         _navigationLiveData.postValue(navData)
     }
 
-    override fun onSubscribe(subscribe : Boolean, subreddit: String) {
-        launch { subGateway.subscribe(true, subreddit) }
+    fun subscribe(subreddit: SubredditModel) {
+        launch { subGateway.subscribe(!subreddit.isSubscribed, subreddit.subName) }
     }
 }

@@ -1,7 +1,6 @@
 package com.relic.presentation.displaysubs
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.displaysub.NavigationData
 
@@ -16,10 +15,14 @@ interface DisplaySubsContract {
     }
 
     interface SubAdapterDelegate {
-        fun onClick(subItem: SubredditModel)
-        fun onLongClick(subItem: SubredditModel)
-        fun onSubscribe(subscribe : Boolean, subreddit: String)
+        fun interact(subreddit: SubredditModel, subInteraction: SubInteraction)
 
         val navigationLiveData: LiveData<NavigationData>
+    }
+
+    sealed class SubInteraction {
+        object Visit : SubInteraction()
+        object Preview : SubInteraction()
+        object Subscribe : SubInteraction()
     }
 }
