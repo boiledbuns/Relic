@@ -1,12 +1,8 @@
 package com.relic.presentation.displaysub
 
-import androidx.lifecycle.LiveData
 import com.relic.data.PostSource
 import com.relic.data.SortScope
 import com.relic.data.SortType
-import com.relic.domain.models.PostModel
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.util.MediaType
 
@@ -22,36 +18,6 @@ interface DisplaySubContract {
         fun updateSubStatus(subscribe: Boolean)
     }
 
-    // delegate for handling domain layer interactions
-    interface PostAdapterDelegate {
-        val navigationLiveData : LiveData<NavigationData>
-        fun interact(post : PostModel, interaction: PostInteraction)
-    }
-
-}
-//
-//abstract class PostViewDelegate(
-//    private val postInteractor: DisplaySubContract.PostAdapterDelegate
-//){
-//    fun onPostPressed() = postInteractor.interact(PostInteraction.Visit(getPost()))
-//    fun onPostSavePressed() = postInteractor.interact(PostInteraction.Save(getPost()))
-//    fun onPostUpvotePressed() = postInteractor.interact(PostInteraction.Vote(getPost(), UPVOTE_PRESSED))
-//    fun onPostDownvotePressed() = postInteractor.interact(PostInteraction.Vote(getPost(), DOWNVOTE_PRESSED))
-//    fun onPostReply() = postInteractor.interact(PostInteraction.NewReply(getPost()))
-//    fun onPostLinkPressed() = postInteractor.interact(PostInteraction.VisitLink(getPost()))
-//    fun onUserPressed() = postInteractor.interact(PostInteraction.PreviewUser(getPost()))
-//
-//    abstract fun getPost() : PostModel
-//}
-
-sealed class PostInteraction {
-    object Visit: PostInteraction()
-    object Upvote: PostInteraction()
-    object Downvote: PostInteraction()
-    object Save: PostInteraction()
-    object PreviewUser : PostInteraction()
-    object VisitLink : PostInteraction()
-    object NewReply : PostInteraction()
 }
 
 // TODO extract out of this interface

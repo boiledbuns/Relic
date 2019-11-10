@@ -6,12 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.ListingItem
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.comments.RelicCommentView
-import com.relic.presentation.displaysub.DisplaySubContract
 import ru.noties.markwon.Markwon
 
 private const val VIEW_TYPE_POST = 0
@@ -19,8 +18,8 @@ private const val VIEW_TYPE_COMMENT = 1
 
 class ListingItemAdapter(
     private val viewPrefsManager: PostViewPreferences,
-    private val postInteractor : DisplaySubContract.PostAdapterDelegate,
-    private val commentInteractor: DisplayPostContract.CommentAdapterDelegate
+    private val postInteractor : Contract.PostAdapterDelegate,
+    private val commentInteractor: Contract.CommentAdapterDelegate
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var markwon : Markwon

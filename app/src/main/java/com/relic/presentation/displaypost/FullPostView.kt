@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
-import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.PostInteraction
+import com.relic.interactor.Contract
+import com.relic.interactor.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
@@ -69,7 +69,7 @@ class FullPostView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate: DisplaySubContract.PostAdapterDelegate) {
+    fun setViewDelegate(delegate: Contract.PostAdapterDelegate) {
         postSaveView.setOnClickListener { delegate.interact(post, PostInteraction.Save) }
         postUpvoteView.setOnClickListener { delegate.interact(post, PostInteraction.Upvote) }
         postDownvoteView.setOnClickListener { delegate.interact(post, PostInteraction.Downvote) }

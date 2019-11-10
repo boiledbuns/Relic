@@ -10,12 +10,10 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.POST_LAYOUT_CARD
 import com.relic.presentation.base.ItemNotifier
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
-import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.PostInteraction
+import com.relic.interactor.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
@@ -103,7 +101,7 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate : DisplaySubContract.PostAdapterDelegate, notifier : ItemNotifier) {
+    fun setViewDelegate(delegate : Contract.PostAdapterDelegate, notifier : ItemNotifier) {
         delegate.apply {
             setOnClickListener {
                 interact(post, PostInteraction.Visit)

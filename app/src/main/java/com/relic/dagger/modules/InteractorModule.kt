@@ -1,11 +1,9 @@
 package com.relic.dagger.modules
 
-import com.relic.presentation.displaypost.CommentInteractor
-import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaysub.DisplaySubContract
-import com.relic.presentation.displaysub.PostInteractor
-import com.relic.presentation.displaysubs.DisplaySubsContract
-import com.relic.presentation.displaysubs.SubredditInteractor
+import com.relic.interactor.CommentInteractorImpl
+import com.relic.interactor.Contract
+import com.relic.interactor.PostInteractorImpl
+import com.relic.interactor.SubredditInteractorImpl
 import dagger.Binds
 import dagger.Module
 
@@ -14,11 +12,11 @@ import dagger.Module
 abstract class InteractorModule {
 
     @Binds
-    abstract fun bindPostInteractor(postInteractor: PostInteractor) : DisplaySubContract.PostAdapterDelegate
+    abstract fun bindPostInteractor(postInteractor: PostInteractorImpl) : Contract.PostAdapterDelegate
 
     @Binds
-    abstract fun bindSubredditInteractor(subredditInteractor: SubredditInteractor) : DisplaySubsContract.SubAdapterDelegate
+    abstract fun bindSubredditInteractor(subredditInteractor: SubredditInteractorImpl) : Contract.SubAdapterDelegate
 
     @Binds
-    abstract fun bindCommentInteractor(commentInteractor: CommentInteractor) : DisplayPostContract.CommentAdapterDelegate
+    abstract fun bindCommentInteractor(commentInteractor: CommentInteractorImpl) : Contract.CommentAdapterDelegate
 }

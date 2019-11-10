@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostVM
-import com.relic.presentation.displaysub.PostInteractor
+import com.relic.interactor.PostInteractorImpl
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.tab_fullpost.*
@@ -22,7 +22,7 @@ class FullPostFragment : RelicFragment() {
     }
 
     @Inject
-    lateinit var postInteractor: PostInteractor
+    lateinit var postInteractor: PostInteractorImpl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.tab_fullpost, container, false)

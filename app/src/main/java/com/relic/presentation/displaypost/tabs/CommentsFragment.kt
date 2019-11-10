@@ -9,11 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.CommentInteractor
+import com.relic.interactor.CommentInteractorImpl
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaypost.DisplayPostVM
 import com.relic.presentation.displaypost.comments.CommentItemAdapter
-import com.relic.presentation.displaysub.PostInteractor
+import com.relic.interactor.PostInteractorImpl
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.tab_comments.*
@@ -22,10 +22,10 @@ import javax.inject.Inject
 class CommentsFragment : RelicFragment() {
 
     @Inject
-    lateinit var postInteractor: PostInteractor
+    lateinit var postInteractor: PostInteractorImpl
 
     @Inject
-    lateinit var commentInteractor: CommentInteractor
+    lateinit var commentInteractor: CommentInteractorImpl
 
     private val commentsVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayPostVM::class.java)

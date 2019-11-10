@@ -11,10 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.relic.R
 import com.relic.domain.models.ListingItem
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.ErrorData
 import com.relic.presentation.displayuser.UserTab
@@ -29,10 +28,10 @@ class PostsTabFragment : RelicFragment() {
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     @Inject
-    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
+    lateinit var postInteractor : Contract.PostAdapterDelegate
 
     @Inject
-    lateinit var commentInteractor : DisplayPostContract.CommentAdapterDelegate
+    lateinit var commentInteractor : Contract.CommentAdapterDelegate
 
     private val postsTabVM by lazy {
         ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)

@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -31,7 +31,7 @@ class FrontpageFragment : RelicFragment() {
     lateinit var factory : FrontpageVM.Factory
 
     @Inject
-    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
+    lateinit var postInteractor : Contract.PostAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager

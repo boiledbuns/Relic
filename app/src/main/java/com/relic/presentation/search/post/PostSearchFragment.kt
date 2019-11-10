@@ -14,9 +14,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.data.PostSource
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
 import com.relic.presentation.search.PostSearchOptions
@@ -29,7 +29,7 @@ class PostSearchFragment : RelicFragment() {
     lateinit var factory : PostSearchResultsVM.Factory
 
     @Inject
-    lateinit var postAdapterDelegate: DisplaySubContract.PostAdapterDelegate
+    lateinit var postAdapterDelegate: Contract.PostAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager

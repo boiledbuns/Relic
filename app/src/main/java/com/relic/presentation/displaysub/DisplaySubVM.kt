@@ -12,6 +12,7 @@ import com.relic.data.SubRepository
 import com.relic.data.repository.NetworkException
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
+import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.main.RelicError
@@ -26,15 +27,15 @@ open class DisplaySubVM (
     private val postSource: PostSource,
     private val subRepo: SubRepository,
     private val postRepo: PostRepository,
-    private val postInteractor :  DisplaySubContract.PostAdapterDelegate,
+    private val postInteractor : Contract.PostAdapterDelegate,
     private val listingRepo : ListingRepository,
     private val networkUtil : NetworkUtil
-) : RelicViewModel(), DisplaySubContract.ViewModel, DisplaySubContract.PostAdapterDelegate by postInteractor {
+) : RelicViewModel(), DisplaySubContract.ViewModel, Contract.PostAdapterDelegate by postInteractor {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository,
         private val postRepo : PostRepository,
-        private val postInteractor : DisplaySubContract.PostAdapterDelegate,
+        private val postInteractor : Contract.PostAdapterDelegate,
         private val listingRepo : ListingRepository,
         private val networkUtil : NetworkUtil
     ) {

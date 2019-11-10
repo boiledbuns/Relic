@@ -20,12 +20,13 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.domain.models.PostModel
+import com.relic.interactor.CommentInteractorImpl
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.presentation.displaysub.PostInteraction
-import com.relic.presentation.displaysub.PostInteractor
+import com.relic.interactor.PostInteraction
+import com.relic.interactor.PostInteractorImpl
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
@@ -38,9 +39,9 @@ import javax.inject.Inject
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
-    @Inject lateinit var postInteractor: PostInteractor
+    @Inject lateinit var postInteractor: PostInteractorImpl
 
-    @Inject lateinit var commentInteractor: CommentInteractor
+    @Inject lateinit var commentInteractor: CommentInteractorImpl
 
     @Inject lateinit var factory : DisplayPostVM.Factory
 

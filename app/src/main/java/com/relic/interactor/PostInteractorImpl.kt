@@ -1,8 +1,9 @@
-package com.relic.presentation.displaysub
+package com.relic.interactor
 
 import androidx.lifecycle.LiveData
 import com.relic.data.gateway.PostGateway
 import com.relic.domain.models.PostModel
+import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.shopify.livedataktx.SingleLiveData
@@ -22,9 +23,9 @@ import javax.inject.Singleton
  * also exposes livedata that emits navigation events from post related actions
  */
 @Singleton
-class PostInteractor @Inject constructor(
+class PostInteractorImpl @Inject constructor(
   private val postGateway: PostGateway
-) : DisplaySubContract.PostAdapterDelegate, CoroutineScope {
+) : Contract.PostAdapterDelegate, CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
         Timber.e(e,  "caught exception")

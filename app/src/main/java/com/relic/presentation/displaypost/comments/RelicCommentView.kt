@@ -9,11 +9,9 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.interactor.Contract
 import com.relic.presentation.base.ItemNotifier
-import com.relic.presentation.displaypost.CommentInteraction
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
-import com.relic.presentation.displaypost.DisplayPostContract
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
+import com.relic.interactor.CommentInteraction
 import com.relic.presentation.helper.DateHelper
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
@@ -88,7 +86,7 @@ class RelicCommentView (
         replyAction = action
     }
 
-    fun setViewDelegate(delegate: DisplayPostContract.CommentAdapterDelegate,  notifier : ItemNotifier) {
+    fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier : ItemNotifier) {
         commentUpvoteView.setOnClickListener {
             delegate.interact(comment, CommentInteraction.Upvote)
             notifier.notifyItem()

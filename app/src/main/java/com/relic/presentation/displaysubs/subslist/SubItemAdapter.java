@@ -9,16 +9,17 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.relic.domain.models.SubredditModel;
-import com.relic.presentation.displaysubs.DisplaySubsContract;
+import com.relic.interactor.Contract;
+import com.relic.interactor.SubInteraction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemVH> {
   private List<SubredditModel> subList = new ArrayList<>();
-  private DisplaySubsContract.SubAdapterDelegate subAdapterDelegate;
+  private Contract.SubAdapterDelegate subAdapterDelegate;
 
-  public SubItemAdapter(DisplaySubsContract.SubAdapterDelegate subAdapterDelegate) {
+  public SubItemAdapter(Contract.SubAdapterDelegate subAdapterDelegate) {
     this.subAdapterDelegate = subAdapterDelegate;
   }
 
@@ -32,14 +33,14 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
       subItemView.setOnClickListener(v ->
           subAdapterDelegate.interact(
               subList.get(getAdapterPosition()),
-              DisplaySubsContract.SubInteraction.Visit.INSTANCE
+              SubInteraction.Visit.INSTANCE
           )
       );
 
       subItemView.setOnLongClickListener(v -> {
         subAdapterDelegate.interact(
             subList.get(getAdapterPosition()),
-            DisplaySubsContract.SubInteraction.Preview.INSTANCE
+            SubInteraction.Preview.INSTANCE
         );
         return true;
       });

@@ -1,4 +1,4 @@
-package com.relic.presentation.displaypost
+package com.relic.interactor
 
 import com.relic.data.CommentRepository
 import com.relic.data.gateway.CommentGateway
@@ -13,10 +13,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CommentInteractor @Inject constructor(
+class CommentInteractorImpl @Inject constructor(
     private val commentGateway: CommentGateway,
     private val commentRepo: CommentRepository
-) : DisplayPostContract.CommentAdapterDelegate, CoroutineScope {
+) : Contract.CommentAdapterDelegate, CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
         Timber.e(e,  "caught exception")

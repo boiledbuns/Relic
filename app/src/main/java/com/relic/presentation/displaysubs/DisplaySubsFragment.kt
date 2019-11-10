@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.relic.R
+import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
@@ -30,7 +31,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     lateinit var factory : DisplaySubsVM.Factory
 
     @Inject
-    lateinit var subredditInteractor: DisplaySubsContract.SubAdapterDelegate
+    lateinit var subredditInteractor: Contract.SubAdapterDelegate
 
     private val viewModel : DisplaySubsVM by lazy {
         ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {

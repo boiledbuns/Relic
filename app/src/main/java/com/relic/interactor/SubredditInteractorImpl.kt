@@ -1,4 +1,4 @@
-package com.relic.presentation.displaysubs
+package com.relic.interactor
 
 import androidx.lifecycle.LiveData
 import com.relic.data.PostSource
@@ -16,14 +16,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SubredditInteractor @Inject constructor(
+class SubredditInteractorImpl @Inject constructor(
     private val subGateway: SubGateway
-): DisplaySubsContract.SubAdapterDelegate, CoroutineScope {
-    override fun interact(subreddit: SubredditModel, subInteraction: DisplaySubsContract.SubInteraction) {
+): Contract.SubAdapterDelegate, CoroutineScope {
+    override fun interact(subreddit: SubredditModel, subInteraction: SubInteraction) {
         when (subInteraction) {
-            DisplaySubsContract.SubInteraction.Visit -> visit(subreddit)
-            DisplaySubsContract.SubInteraction.Preview -> preview(subreddit)
-            DisplaySubsContract.SubInteraction.Subscribe -> subscribe(subreddit)
+            SubInteraction.Visit -> visit(subreddit)
+            SubInteraction.Preview -> preview(subreddit)
+            SubInteraction.Subscribe -> subscribe(subreddit)
         }
     }
 

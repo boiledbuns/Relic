@@ -20,13 +20,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.relic.R
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
+import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragment
-import com.relic.presentation.displaysub.DisplaySubContract
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.NavigationData
-import com.relic.presentation.displaysubs.DisplaySubsContract
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
@@ -53,10 +52,10 @@ class MainActivity : RelicActivity() {
     lateinit var factory : MainVM.Factory
 
     @Inject
-    lateinit var postInteractor : DisplaySubContract.PostAdapterDelegate
+    lateinit var postInteractor : Contract.PostAdapterDelegate
 
     @Inject
-    lateinit var subredditInteractor : DisplaySubsContract.SubAdapterDelegate
+    lateinit var subredditInteractor : Contract.SubAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager

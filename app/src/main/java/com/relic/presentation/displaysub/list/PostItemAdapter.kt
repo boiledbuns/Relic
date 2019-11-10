@@ -4,17 +4,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.launch
 import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
-    private val postInteractor : DisplaySubContract.PostAdapterDelegate
+    private val postInteractor : Contract.PostAdapterDelegate
 ) : RelicAdapter<PostItemAdapter.PostItemVH>() {
 
     private var postList: List<PostModel> = ArrayList()

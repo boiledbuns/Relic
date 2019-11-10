@@ -24,10 +24,9 @@ import com.relic.data.PostSource
 import com.relic.data.SortType
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
+import com.relic.interactor.PostInteraction
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.DOWNVOTE_PRESSED
-import com.relic.presentation.displaypost.UPVOTE_PRESSED
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.relic.presentation.editor.NewPostEditorFragment

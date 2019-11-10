@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
+import com.relic.interactor.Contract
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.displaypost.DisplayPostContract
 import com.relic.presentation.displaypost.FullPostView
-import com.relic.presentation.displaysub.DisplaySubContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,8 +21,8 @@ private const val VIEW_TYPE_LOAD_MORE = 2
 
 class CommentItemAdapter (
     private val delegate : DisplayPostContract.ViewModel,
-    private val commentInteractor : DisplayPostContract.CommentAdapterDelegate,
-    private val postInteractor : DisplaySubContract.PostAdapterDelegate
+    private val commentInteractor : Contract.CommentAdapterDelegate,
+    private val postInteractor : Contract.PostAdapterDelegate
 ) : RelicAdapter<RecyclerView.ViewHolder>() {
 
     var post : PostModel? = null

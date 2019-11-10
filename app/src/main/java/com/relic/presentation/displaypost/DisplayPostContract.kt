@@ -15,18 +15,6 @@ interface DisplayPostContract {
         fun onExpandReplies(comment : CommentModel, expanded : Boolean)
     }
 
-    interface CommentAdapterDelegate {
-        fun interact(comment: CommentModel, interaction: CommentInteraction)
-    }
-}
-
-sealed class CommentInteraction {
-    object Upvote: CommentInteraction()
-    object Downvote: CommentInteraction()
-    data class NewReply(val text: String): CommentInteraction()
-    object PreviewUser: CommentInteraction()
-    object ExpandReplies: CommentInteraction()
-    object Visit: CommentInteraction()
 }
 
 sealed class PostErrorData {
