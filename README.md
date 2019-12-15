@@ -19,6 +19,17 @@ I have a lot of ideas that I want to implement, but my primary focus for now is 
 
 Consult the [wiki](https://github.com/13ABEL/Relic/wiki) for more info about [contributing](https://github.com/13ABEL/Relic/wiki/Contribution-Quickstart)
 
+## Screenshots
+Here are some screenshots showing off what relic looks like in different situations. Although These definitely don't show off everything relic has to offer, they should give you an idea of what the app looks like
+
+|||||
+|---|---|---|---|
+| **overview of a current user** | **overview of subreddits** | **subreddit with primarily text-base content** | **subreddit with primarily image-base content** |
+| ![](https://i.imgur.com/XVvXmOk.png) | ![](https://i.imgur.com/iOeXGXC.png) | ![](https://i.imgur.com/5glGf8F.png) | ![](https://i.imgur.com/BshKB1a.png)|
+| **expanded full text post** | **comment section of post** | **user preview panel** | **prototype image viewer** |
+| ![](https://i.imgur.com/foRqxeu.png) | ![](https://i.imgur.com/E2nLVbK.png) | ![](https://i.imgur.com/b6Yy670.png)| ![](https://i.imgur.com/6Rsokz6.png) |
+
+
 ## roadmap to v1 milestone
 
 - [x] display individual subreddits
