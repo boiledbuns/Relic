@@ -5,7 +5,8 @@ The project is currently a WIP. Updates and progress can be found [here](./docs/
 
 ## Why Relic? (WIP)
 
-Relic is an open source Reddit client developed from the ground up with offline use in mind.
+Relic is an open source Reddit client developed from the ground up with offline use in mind. **Screenshots are below** if you just want to jump to those :)
+
 
 ## About
 
@@ -20,7 +21,7 @@ I have a lot of ideas that I want to implement, but my primary focus for now is 
 Consult the [wiki](https://github.com/13ABEL/Relic/wiki) for more info about [contributing](https://github.com/13ABEL/Relic/wiki/Contribution-Quickstart)
 
 ## Screenshots
-Here are some screenshots showing off what relic looks like in different situations. Although These definitely don't show off everything relic has to offer, they should give you an idea of what the app looks like
+Here are some screenshots showing off what relic looks like in different situations. Although These definitely don't show off everything relic has to offer, they should give you an idea of what the app looks like.
 
 |||||
 |---|---|---|---|
