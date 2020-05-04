@@ -8,6 +8,12 @@
 
     <string name="app_author">u/boiledbuns</string>
 
+    <!-- bottom navigation -->
+    <string name="nav_profile">profile</string>
+    <string name="nav_search">search</string>
+    <string name="nav_home">home</string>
+    <string name="nav_settings">settings</string>
+
     <!-- search strings-->
     <string name="searchmenu_title">Search</string>
     <string name="sync_config_menu">sync settings</string>
