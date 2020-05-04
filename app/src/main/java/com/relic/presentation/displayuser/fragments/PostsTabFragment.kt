@@ -34,7 +34,7 @@ class PostsTabFragment : RelicFragment() {
     lateinit var commentInteractor : Contract.CommentAdapterDelegate
 
     private val postsTabVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
+        ViewModelProviders.of(requireActivity()).get(DisplayUserVM::class.java)
     }
 
     private lateinit var selectedUserTab : UserTab

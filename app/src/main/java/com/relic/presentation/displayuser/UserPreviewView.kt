@@ -16,9 +16,6 @@ class UserPreviewView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
-
-    private val TAG = "USER_PREVIEW_VIEW"
-
     init {
         LayoutInflater.from(context).inflate(R.layout.user_preview_view, this, true)
     }

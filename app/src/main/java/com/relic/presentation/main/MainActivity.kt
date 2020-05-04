@@ -13,10 +13,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.relic.R
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
@@ -26,6 +29,7 @@ import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
@@ -74,6 +78,12 @@ class MainActivity : RelicActivity() {
     private var itemSelectedDelegate : ((item: MenuItem?) -> Boolean)? = null
     private lateinit var navHeader : View
 
+    private val subsFragment by lazy { DisplaySubsFragment() }
+    private val homeFragment by lazy { HomeFragment() }
+    private val accountFragment by lazy { DisplayUserFragment.create(null) }
+    private val searchFragment by lazy { DisplayUserFragment.create(null) }
+    private val settingsFragment by lazy { DisplayUserFragment.create(null) }
+
     // region lifecycle hooks
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,15 +98,38 @@ class MainActivity : RelicActivity() {
         initializeDefaultView()
         initNavDrawer()
 
+        setupBottonNav()
         bindViewModel(this)
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         mainVM.userLiveData.observe (lifecycleOwner) { setUser(it) }
-        mainVM.accountsLiveData.nonNull().observe (lifecycleOwner) { setAccounts(it) }
+        mainVM.accountsLiveData.observe (lifecycleOwner) { accounts -> accounts?.let { setAccounts(it) } }
 
         postInteractor.navigationLiveData.observe (lifecycleOwner){ handleNavigation(it!!) }
         subredditInteractor.navigationLiveData.observe (lifecycleOwner){ handleNavigation(it!!) }
+    }
+
+    private fun setupBottonNav() {
+        bottom_navigation.setOnNavigationItemSelectedListener { menuItem ->
+            val fragment = when(menuItem.itemId) {
+                R.id.nav_subreddits -> subsFragment
+                R.id.nav_home -> homeFragment
+                R.id.nav_account -> accountFragment
+                R.id.nav_search -> searchFragment
+                R.id.nav_settings -> settingsFragment
+                else -> null
+            }
+
+            fragment?.let {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.main_content_frame, it)
+                    .commit()
+            }
+
+            true
+        }
     }
 
     private fun initNavDrawer() {

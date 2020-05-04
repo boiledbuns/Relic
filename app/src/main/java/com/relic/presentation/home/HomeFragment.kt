@@ -29,7 +29,6 @@ class HomeFragment : RelicFragment() {
         super.onCreate(savedInstanceState)
 
         pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
-            tabFragments.add(DisplaySubsFragment())
             tabFragments.add(FrontpageFragment())
         }
     }
@@ -78,7 +77,7 @@ class HomeFragment : RelicFragment() {
     }
 
     private inner class HomePagerAdapter(fm: FragmentManager) :FragmentPagerAdapter(fm, BEHAVIOR_SET_USER_VISIBLE_HINT) {
-        val tabFragmentTitles = listOf("HOME", "FRONTPAGE")
+        val tabFragmentTitles = listOf("FRONTPAGE")
         val tabFragments = ArrayList<Fragment>()
 
         override fun getPageTitle(position: Int): CharSequence? {

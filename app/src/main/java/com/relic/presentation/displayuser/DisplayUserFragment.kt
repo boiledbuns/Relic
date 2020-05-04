@@ -22,8 +22,6 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.util.RelicEvent
-import com.shopify.livedataktx.nonNull
-import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_user.*
 import java.util.*
 import javax.inject.Inject
@@ -34,7 +32,7 @@ class DisplayUserFragment : RelicFragment() {
     lateinit var factory : DisplayUserVM.Factory
 
     private val displayUserVM : DisplayUserVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(username) as T
@@ -42,14 +40,14 @@ class DisplayUserFragment : RelicFragment() {
         }).get(DisplayUserVM::class.java)
     }
 
-    private lateinit var username : String
+    private var username : String? = null
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.getString(ARG_USERNAME)?.let { username = it }
+        username = arguments?.getString(ARG_USERNAME)
         setHasOptionsMenu(true)
     }
 
@@ -61,13 +59,9 @@ class DisplayUserFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
-            contentFragments.add(PostsTabFragment.create(UserTab.Submitted))
-            contentFragments.add(PostsTabFragment.create(UserTab.Comments))
-            contentFragments.add(PostsTabFragment.create(UserTab.Saved))
-            contentFragments.add(PostsTabFragment.create(UserTab.Upvoted))
-            contentFragments.add(PostsTabFragment.create(UserTab.Downvoted))
-            contentFragments.add(PostsTabFragment.create(UserTab.Gilded))
-            contentFragments.add(PostsTabFragment.create(UserTab.Hidden))
+            for (tabType in tabTypes) {
+                contentFragments.add(PostsTabFragment.create(tabType))
+            }
         }
 
         initializeToolbar(userToolbar as Toolbar)
@@ -129,7 +123,6 @@ class DisplayUserFragment : RelicFragment() {
         val pActivity = (activity as AppCompatActivity)
 
         toolbar.apply {
-            title = getString(R.string.user_prefix_label, username)
             pActivity.setSupportActionBar(this)
         }
 
@@ -142,8 +135,15 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        displayUserVM.userLiveData.nonNull().observe(lifecycleOwner) { userUserPreview.setUser(it) }
-        displayUserVM.navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
+        displayUserVM.userLiveData.observe(lifecycleOwner, androidx.lifecycle.Observer { user ->
+            user?.let {
+                (userToolbar as Toolbar).title = getString(R.string.user_prefix_label, it.name)
+                userUserPreview.setUser(it)
+            }
+        })
+        displayUserVM.navigationLiveData.observe(lifecycleOwner, androidx.lifecycle.Observer {
+            handleNavigation(it)
+        })
     }
 
     private fun handleNavigation(navEvent : RelicEvent<NavigationData>) {
@@ -183,7 +183,7 @@ class DisplayUserFragment : RelicFragment() {
     companion object {
         val ARG_USERNAME = "arg_username"
 
-        fun create(username : String) : DisplayUserFragment {
+        fun create(username : String?) : DisplayUserFragment {
             val bundle = Bundle().apply {
                 putString(ARG_USERNAME, username)
             }

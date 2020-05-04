@@ -9,6 +9,7 @@
     <string name="app_author">u/boiledbuns</string>
 
     <!-- bottom navigation -->
+    <string name="nav_subreddits">subreddits</string>
     <string name="nav_profile">profile</string>
     <string name="nav_search">search</string>
     <string name="nav_home">home</string>

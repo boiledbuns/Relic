@@ -20,30 +20,33 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class DisplayUserVM(
-    private val postRepo: PostRepository,
-    private val userRepo: UserRepository,
-    private val postGateway: PostGateway,
-    private val username : String
+        private val postRepo: PostRepository,
+        private val userRepo: UserRepository,
+        private val postGateway: PostGateway,
+        private val username: String?
 ) : RelicViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
 
     class Factory @Inject constructor(
-        private val postRepo: PostRepository,
-        private val userRepo: UserRepository,
-        private val postGateway: PostGateway
+            private val postRepo: PostRepository,
+            private val userRepo: UserRepository,
+            private val postGateway: PostGateway
     ) {
-        fun create(username : String) : DisplayUserVM {
+        /*
+           specify null username to get the current user
+         */
+        fun create(username: String?): DisplayUserVM {
             return DisplayUserVM(postRepo, userRepo, postGateway, username)
         }
     }
 
     private var _userLiveData = MutableLiveData<UserModel>()
-    var userLiveData : LiveData<UserModel> = _userLiveData
+    var userLiveData: LiveData<UserModel> = _userLiveData
 
     private var _navigationLiveData = MutableLiveData<RelicEvent<NavigationData>>()
-    var navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
+    var navigationLiveData: LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     private var _errorLiveData = MutableLiveData<ErrorData>()
-    val errorLiveData : LiveData<ErrorData> = _errorLiveData
+    val errorLiveData: LiveData<ErrorData> = _errorLiveData
 
     // dictionary mapping a tab to its associated livedata
     // items should only be added if the tab is being accessed for the first time
@@ -53,27 +56,37 @@ class DisplayUserVM(
     private var currentSortingScope = mutableMapOf<UserTab, SortScope>()
     private var currentAfterValues = mutableMapOf<UserTab, String?>()
 
-    private lateinit var currentTab : UserTab
+    private lateinit var currentTab: UserTab
 
     init {
+        for (tabType in tabTypes) {
+            postsLiveData[tabType] = MediatorLiveData()
+        }
+
         launch(Dispatchers.Main) {
-            _userLiveData.postValue(userRepo.retrieveUser(username))
+            val user = username?.let { userRepo.retrieveUser(username) }
+                    ?: userRepo.getCurrentUser()
+            _userLiveData.postValue(user)
+
+            // initialize livedata for tab data
+            for (tabType in tabTypes) {
+                launch {
+                    requestPosts(tab = tabType, refresh = true)
+                }
+            }
         }
     }
 
-    fun getTabPostsLiveData(tab : UserTab) : LiveData<List<ListingItem>> {
-        if (postsLiveData[tab] == null) {
-            // create a new livedata if it doesn't already exist
-            postsLiveData[tab] = MediatorLiveData()
-            requestPosts(tab = tab, refresh = true)
-        }
+    fun getTabPostsLiveData(tab: UserTab): LiveData<List<ListingItem>> {
         return postsLiveData[tab]!!
     }
 
-    fun requestPosts(tab : UserTab, refresh : Boolean) {
+    fun requestPosts(tab: UserTab, refresh: Boolean) {
+        val user = _userLiveData.value ?: return
+
         // subscribe to the appropriate livedata based on tab selected
         val userRetrievalOption = toRetrievalOption(tab)
-        val postSource = PostSource.User(username, userRetrievalOption)
+        val postSource = PostSource.User(user.name, userRetrievalOption)
 
         launch(Dispatchers.Main) {
             val listing = if (refresh) {
@@ -97,7 +110,7 @@ class DisplayUserVM(
         }
     }
 
-    private fun handleListingRetrieval(tab: UserTab, listing : Listing<out ListingItem>) {
+    private fun handleListingRetrieval(tab: UserTab, listing: Listing<out ListingItem>) {
         listing.data.children?.let { items ->
 //            Log.d(TAG, "listing after ${listing.data.after}")
 //            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
@@ -113,7 +126,7 @@ class DisplayUserVM(
         }
     }
 
-    fun setCurrentTab(tab : UserTab) {
+    fun setCurrentTab(tab: UserTab) {
         currentTab = tab
     }
 
@@ -139,7 +152,7 @@ class DisplayUserVM(
 
     // region helper functions
 
-    private fun toRetrievalOption(tab : UserTab): RetrievalOption {
+    private fun toRetrievalOption(tab: UserTab): RetrievalOption {
         return when (tab) {
             is UserTab.Submitted -> RetrievalOption.Submitted
             is UserTab.Comments -> RetrievalOption.Comments
@@ -151,7 +164,7 @@ class DisplayUserVM(
         }
     }
 
-    private fun extractTabPosition(listingItem: ListingItem, tab: UserTab) : Int {
+    private fun extractTabPosition(listingItem: ListingItem, tab: UserTab): Int {
         return when (tab) {
             UserTab.Submitted -> listingItem.userSubmittedPosition
             UserTab.Comments -> listingItem.userCommentsPosition
@@ -167,11 +180,11 @@ class DisplayUserVM(
 
     // region post adapter delegate
 
-    override fun visitListing(listingItem : ListingItem) {
+    override fun visitListing(listingItem: ListingItem) {
         launch(Dispatchers.Main) { postGateway.visitPost(listingItem.fullName) }
 
         // retrieval option doesn't matter in this case
-        val postSource = PostSource.User(username, RetrievalOption.Submitted)
+//        val postSource = PostSource.User(username, RetrievalOption.Submitted)
 
         val navData = when (listingItem) {
             is PostModel -> NavigationData.ToPost(
@@ -191,19 +204,19 @@ class DisplayUserVM(
         }
     }
 
-    override fun voteOnListing(listingItem : ListingItem, newVote : Int) {
+    override fun voteOnListing(listingItem: ListingItem, newVote: Int) {
         launch(Dispatchers.Main) { postGateway.voteOnPost(listingItem.fullName, newVote) }
     }
 
-    override fun saveListing(listingItem : ListingItem) {
+    override fun saveListing(listingItem: ListingItem) {
         launch(Dispatchers.Main) { postGateway.savePost(listingItem.fullName, !listingItem.saved) }
     }
 
-    override fun onThumbnailClicked(listingItem : ListingItem) {
-        if (listingItem is PostModel){
+    override fun onThumbnailClicked(listingItem: ListingItem) {
+        if (listingItem is PostModel) {
             val isImage = ImageHelper.isValidImage(listingItem.url!!)
 
-            val subNavigation : NavigationData = if (isImage) {
+            val subNavigation: NavigationData = if (isImage) {
                 NavigationData.ToImage(listingItem.url!!)
             } else {
                 NavigationData.ToExternal(listingItem.url!!)
