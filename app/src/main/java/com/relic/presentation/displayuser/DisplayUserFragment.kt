@@ -31,13 +31,25 @@ class DisplayUserFragment : RelicFragment() {
     @Inject
     lateinit var factory : DisplayUserVM.Factory
 
-    private val displayUserVM : DisplayUserVM by lazy {
-        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(username) as T
-            }
-        }).get(DisplayUserVM::class.java)
+    val displayUserVM : DisplayUserVM by lazy {
+        val provider = if (username == null) {
+            // if displaying own user -> retrieve vm from activity context
+            ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                    return factory.create(username) as T
+                }
+            })
+        } else {
+            // if displayed other users -> retrieve vm from fragment context
+            ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                    return factory.create(username) as T
+                }
+            })
+        }
+        provider.get(DisplayUserVM::class.java)
     }
 
     private var username : String? = null
