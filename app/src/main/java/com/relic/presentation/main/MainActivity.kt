@@ -95,8 +95,8 @@ class MainActivity : RelicActivity() {
         // since i't not super important, just use this workaround for now
         navHeader = navigationView.getHeaderView(0)
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
-        initializeDefaultView()
-        initNavDrawer()
+//        initializeDefaultView()
+//        initNavDrawer()
 
         setupBottonNav()
         bindViewModel(this)
@@ -111,24 +111,27 @@ class MainActivity : RelicActivity() {
     }
 
     private fun setupBottonNav() {
-        bottom_navigation.setOnNavigationItemSelectedListener { menuItem ->
-            val fragment = when(menuItem.itemId) {
-                R.id.nav_subreddits -> subsFragment
-                R.id.nav_home -> homeFragment
-                R.id.nav_account -> accountFragment
-                R.id.nav_search -> searchFragment
-                R.id.nav_settings -> settingsFragment
-                else -> null
+        bottom_navigation.apply {
+            setOnNavigationItemSelectedListener { menuItem ->
+                val fragment = when(menuItem.itemId) {
+                    R.id.nav_subreddits -> subsFragment
+                    R.id.nav_home -> homeFragment
+                    R.id.nav_account -> accountFragment
+                    R.id.nav_search -> searchFragment
+                    R.id.nav_settings -> settingsFragment
+                    else -> null
+                }
+
+                fragment?.let {
+                    supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.main_content_frame, it)
+                            .commit()
+                }
+                true
             }
 
-            fragment?.let {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.main_content_frame, it)
-                    .commit()
-            }
-
-            true
+            selectedItemId = R.id.nav_home
         }
     }
 

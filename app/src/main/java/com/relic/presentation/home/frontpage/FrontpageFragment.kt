@@ -37,7 +37,7 @@ class FrontpageFragment : RelicFragment() {
     lateinit var viewPrefsManager : ViewPreferencesManager
 
     private val frontpageVM: FrontpageVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
+        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create() as T
             }

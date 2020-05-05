@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- need constraint layout to keep the square shape -->
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:background="?attr/colorPrimary"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_marginStart="@dimen/subitem_margin"
-    android:layout_marginTop="@dimen/subitem_margin"
+    android:layout_marginStart="@dimen/padding_m"
+    android:paddingVertical="@dimen/padding_s"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
-        android:layout_height="0dp"
-        android:layout_width="match_parent"
-        app:layout_constraintDimensionRatio="W, 1:1"
-        app:layout_constraintTop_toTopOf="parent"
-        android:paddingTop="@dimen/subitem_padding_top"
-        android:paddingStart="@dimen/subitem_padding_hor"
-        android:paddingEnd="@dimen/subitem_padding_hor">
+    <ImageView
+        android:id="@+id/sub_icon"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/sub_name"
+        android:layout_marginRight="@dimen/padding_l"
+        android:layout_marginTop="4dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"/>
 
-        <TextView
-            android:id="@+id/subreddit"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:letterSpacing="@dimen/title_spacing"
-            android:textStyle="normal"/>
+    <TextView
+        android:id="@+id/sub_name"
+        app:layout_constraintStart_toEndOf="@id/sub_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/title_text_m"
+        android:textStyle="normal"
+        tools:text="test subreddit"/>
 
-        <ImageView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:contentDescription="@string/tag_banner"/>
-    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

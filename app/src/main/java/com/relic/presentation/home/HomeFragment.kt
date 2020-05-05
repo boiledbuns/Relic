@@ -6,22 +6,18 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysubs.DisplaySubsFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
-import com.relic.presentation.main.MainActivity
 import kotlinx.android.synthetic.main.home.view.*
 
 class HomeFragment : RelicFragment() {
 
-    private lateinit var pagerAdapter : HomePagerAdapter
-    private lateinit var toggle : ActionBarDrawerToggle
+    private lateinit var pagerAdapter: HomePagerAdapter
+    private lateinit var toggle: ActionBarDrawerToggle
 
     // region lifecycle hooks
 
@@ -41,14 +37,6 @@ class HomeFragment : RelicFragment() {
         return inflater.inflate(R.layout.home, container, false).apply {
             homeViewPager.adapter = pagerAdapter
             homeTabLayout.setupWithViewPager(homeViewPager)
-
-            (homeToolbarView as Toolbar).let { toolbar ->
-                (activity as MainActivity).setSupportActionBar(toolbar)
-                initializeToolbar()
-                toolbar.setNavigationOnClickListener {
-                    (activity as MainActivity).getNavDrawer().openDrawer(GravityCompat.START)
-                }
-            }
         }
     }
 
@@ -62,21 +50,7 @@ class HomeFragment : RelicFragment() {
 
     // endregion lifecycle hooks
 
-    private fun initializeToolbar() {
-        val pActivity = (activity as MainActivity)
-
-        toggle = ActionBarDrawerToggle(activity, pActivity.getNavDrawer(), R.string.app_name, R.string.app_name)
-        pActivity.getNavDrawer().addDrawerListener(toggle)
-
-        pActivity.supportActionBar?.apply {
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-        }
-
-        toggle.syncState()
-    }
-
-    private inner class HomePagerAdapter(fm: FragmentManager) :FragmentPagerAdapter(fm, BEHAVIOR_SET_USER_VISIBLE_HINT) {
+    private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         val tabFragmentTitles = listOf("FRONTPAGE")
         val tabFragments = ArrayList<Fragment>()
 
