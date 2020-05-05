@@ -50,18 +50,19 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_subs, container, false).apply {
-            subAdapter = SubItemAdapter(subredditInteractor)
-
-            display_subs_recyclerview.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = subAdapter
-            }
-        }
+        return inflater.inflate(R.layout.display_subs, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        subAdapter = SubItemAdapter(subredditInteractor)
+
+        display_subs_recyclerview.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = subAdapter
+        }
+
         // attach the actions associated with loading the posts
         attachScrollListeners()
     }

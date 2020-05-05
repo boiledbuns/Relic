@@ -18,9 +18,11 @@ import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
+import com.relic.presentation.search.SearchFragment
 import com.relic.presentation.search.post.PostSearchResultsFragment
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
+import com.relic.presentation.settings.SettingsFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subsyncconfig.SubSyncConfigFragment
 import dagger.Module
@@ -93,6 +95,12 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun syncConfig() : SubSyncConfigFragment
+
+    @ContributesAndroidInjector
+    abstract fun settingsFragment() : SettingsFragment
+
+    @ContributesAndroidInjector
+    abstract fun searchFragment() : SearchFragment
 
     // endregion main ui
 

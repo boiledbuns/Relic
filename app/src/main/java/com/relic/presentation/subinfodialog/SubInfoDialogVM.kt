@@ -6,6 +6,7 @@ import com.relic.data.SubRepository
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
 import kotlinx.coroutines.*
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -46,6 +47,6 @@ class SubInfoDialogVM (
     }
 
     override fun handleException(context: CoroutineContext, e: Throwable) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Timber.e(e)
     }
 }
