@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="You're currently not signed in!" />
+        android:text="@string/login_info" />
 
     <Button
         android:id="@+id/login_button"
@@ -19,6 +19,6 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/login_info"
         android:layout_marginTop="@dimen/padding_l"
-        android:text="login" />
+        android:text="@string/login" />
 
 </RelativeLayout>

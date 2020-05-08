@@ -151,4 +151,7 @@
 
     <string name="sync_sub_title">Sync posts for %s</string>
     <string name="sync_comments_title">sync comments</string>
+    <string name="icon_content_description">icon</string>
+    <string name="login">login</string>
+    <string name="login_info">You\'re currently not signed in!</string>
 </resources>
