@@ -1,24 +1,19 @@
 package com.relic.presentation.displaysubs
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
 import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
-import com.relic.presentation.displaysubs.subslist.SubItemAdapter
+import com.relic.presentation.displaysubs.list.SubItemAdapter
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subs.*
@@ -28,12 +23,12 @@ import javax.inject.Inject
 
 class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     @Inject
-    lateinit var factory : DisplaySubsVM.Factory
+    lateinit var factory: DisplaySubsVM.Factory
 
     @Inject
     lateinit var subredditInteractor: Contract.SubAdapterDelegate
 
-    private val viewModel : DisplaySubsVM by lazy {
+    private val viewModel: DisplaySubsVM by lazy {
         ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create() as T
@@ -55,18 +50,19 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.display_subs, container, false).apply {
-            subAdapter = SubItemAdapter(subredditInteractor)
-
-            display_subs_recyclerview.apply {
-                layoutManager = GridLayoutManager(context, 3)
-                adapter = subAdapter
-            }
-        }
+        return inflater.inflate(R.layout.display_subs, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        subAdapter = SubItemAdapter(subredditInteractor)
+
+        display_subs_recyclerview.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = subAdapter
+        }
+
         // attach the actions associated with loading the posts
         attachScrollListeners()
     }

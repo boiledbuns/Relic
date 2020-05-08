@@ -13,14 +13,17 @@ import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
+import com.relic.presentation.login.LoginFragment
 import com.relic.presentation.login.SignInFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
 import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
+import com.relic.presentation.search.SearchFragment
 import com.relic.presentation.search.post.PostSearchResultsFragment
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
+import com.relic.presentation.settings.SettingsFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.subsyncconfig.SubSyncConfigFragment
 import dagger.Module
@@ -94,10 +97,19 @@ abstract class FragBuildersModule {
     @ContributesAndroidInjector
     abstract fun syncConfig() : SubSyncConfigFragment
 
+    @ContributesAndroidInjector
+    abstract fun settingsFragment() : SettingsFragment
+
+    @ContributesAndroidInjector
+    abstract fun searchFragment() : SearchFragment
+
     // endregion main ui
 
     @ContributesAndroidInjector
-    abstract fun contributeLogin() : SignInFragment
+    abstract fun contributeLogin() : LoginFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeSignIn() : SignInFragment
 
     @ContributesAndroidInjector
     abstract fun contributePreferences() : PreferencesFragment
@@ -107,4 +119,5 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributePostLayout() : PostLayoutFragment
+
 }

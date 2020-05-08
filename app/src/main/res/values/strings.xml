@@ -8,6 +8,13 @@
 
     <string name="app_author">u/boiledbuns</string>
 
+    <!-- bottom navigation -->
+    <string name="nav_subreddits">subs</string>
+    <string name="nav_profile">profile</string>
+    <string name="nav_search">search</string>
+    <string name="nav_home">home</string>
+    <string name="nav_settings">settings</string>
+
     <!-- search strings-->
     <string name="searchmenu_title">Search</string>
     <string name="sync_config_menu">sync settings</string>
@@ -144,4 +151,7 @@
 
     <string name="sync_sub_title">Sync posts for %s</string>
     <string name="sync_comments_title">sync comments</string>
+    <string name="icon_content_description">icon</string>
+    <string name="login">login</string>
+    <string name="login_info">You\'re currently not signed in!</string>
 </resources>

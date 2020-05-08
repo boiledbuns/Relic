@@ -14,6 +14,7 @@ import com.relic.domain.models.ListingItem
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserVM
 import com.relic.presentation.displayuser.ErrorData
 import com.relic.presentation.displayuser.UserTab
@@ -34,7 +35,7 @@ class PostsTabFragment : RelicFragment() {
     lateinit var commentInteractor : Contract.CommentAdapterDelegate
 
     private val postsTabVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(DisplayUserVM::class.java)
+        (requireParentFragment() as DisplayUserFragment).displayUserVM
     }
 
     private lateinit var selectedUserTab : UserTab

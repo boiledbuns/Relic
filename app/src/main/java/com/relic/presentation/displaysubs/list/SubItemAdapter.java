@@ -1,4 +1,4 @@
-package com.relic.presentation.displaysubs.subslist;
+package com.relic.presentation.displaysubs.list;
 
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -99,20 +99,6 @@ public class SubItemAdapter extends RecyclerView.Adapter<SubItemAdapter.SubItemV
         return true;
       }
     });
-  }
-
-  @BindingAdapter({"bind:bannerUrl"})
-  public static void loadImage(ImageView imgView, String bannerUrl) {
-    // does not load image Wif the banner img string is empty
-//    if (bannerUrl.length() > 0) {
-//      try {
-//        Log.d("SUB_ITEM_ADAPTER", "URL = " + bannerUrl);
-//        Picasso.get().load(bannerUrl).into(imgView);
-//      }
-//      catch (Error e) {
-//        Log.d("SUB_ITEM_ADAPTER", "Issue loading image " + e.toString());
-//      }
-//    }
   }
 
   public void clearList() {
