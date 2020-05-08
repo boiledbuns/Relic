@@ -6,13 +6,9 @@ import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -31,7 +27,6 @@ import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
-import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.login.LoginFragment
 import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayImageFragment
@@ -211,6 +206,7 @@ class MainActivity : RelicActivity() {
             TextView(this).apply {
                 text = account.name
                 layoutParams = params
+                // TODO switch to different way of viewing accounts
 //                navHeader.findViewById<LinearLayout>(R.id.navHeaderAccounts).addView(this)
 //
 //                setOnClickListener {
@@ -253,7 +249,6 @@ class MainActivity : RelicActivity() {
             R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 
-//        navigationDrawer.closeDrawers()
         return true
     }
 
@@ -327,7 +322,6 @@ class MainActivity : RelicActivity() {
         transitionToFragment(editorFragment)
     }
 
-//    fun getNavDrawer(): DrawerLayout = navigationDrawer!!
 }
 
 
