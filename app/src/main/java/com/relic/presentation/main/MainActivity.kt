@@ -32,6 +32,7 @@ import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
+import com.relic.presentation.login.LoginFragment
 import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferenceLink
@@ -96,7 +97,7 @@ class MainActivity : RelicActivity() {
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         mainVM.userLiveData.observe(lifecycleOwner) { setUser(it) }
-        mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { setAccounts(it) } }
+        mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
 
         postInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
         subredditInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
@@ -106,9 +107,11 @@ class MainActivity : RelicActivity() {
         bottom_navigation.apply {
             setOnNavigationItemSelectedListener { menuItem ->
                 val fragment = when (menuItem.itemId) {
+                    R.id.nav_account -> {
+                        mainVM.userLiveData.value?.let { accountFragment } ?: LoginFragment()
+                    }
                     R.id.nav_subreddits -> subsFragment
                     R.id.nav_home -> homeFragment
-                    R.id.nav_account -> accountFragment
                     R.id.nav_search -> searchFragment
                     R.id.nav_settings -> settingsFragment
                     else -> null
@@ -130,42 +133,6 @@ class MainActivity : RelicActivity() {
         bottom_navigation.itemTextAppearanceActive
     }
 
-//    private fun initNavDrawer() {
-//        navigationView.setNavigationItemSelectedListener { handleNavMenuOnclick(it) }
-//
-//        // init onclick for user in nav header
-//        navHeader.findViewById<TextView>(R.id.navHeaderUsername).apply {
-//            setOnClickListener {
-//                mainVM.userLiveData.value?.let {
-//                    val displayUserFrag = DisplayUserFragment.create(text.toString())
-//
-//                    supportFragmentManager
-//                        .beginTransaction()
-//                        .replace(R.id.main_content_frame, displayUserFrag)
-//                        .addToBackStack(TAG)
-//                        .commit()
-//                } ?: run {
-//                    LoginActivity.startForResult(this@MainActivity)
-//                }
-//
-//                navigationDrawer.closeDrawers()
-//            }
-//        }
-//
-//        // init onclick for "preferences" selector in nav header
-//        navHeader.findViewById<ImageView>(R.id.navUserDropdownIc).setOnClickListener {
-//            val dropdown = findViewById<LinearLayout>(R.id.navHeaderDropdown)
-//            dropdown.visibility = when (dropdown.visibility) {
-//                View.VISIBLE -> View.GONE
-//                else -> View.VISIBLE
-//            }
-//            // init onclick for "preferences" selector in nav header
-//            navHeader.findViewById<TextView>(R.id.navHeaderAddAccount).setOnClickListener {
-//                LoginActivity.startForResult(this@MainActivity)
-//            }
-//        }
-//    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RequestCodes.CHANGED_PREFERENCES -> {
@@ -175,9 +142,6 @@ class MainActivity : RelicActivity() {
             }
             RequestCodes.CHANGED_ACCOUNT -> {
                 mainVM.onAccountSelected()
-                supportFragmentManager.fragments.forEach {
-                    // TODO maybe consider notifying each of changes
-                }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
@@ -227,23 +191,12 @@ class MainActivity : RelicActivity() {
     // region livedata handlers
 
     private fun setUser(userModel: UserModel?) {
-//        navHeader.apply {
-//            if (userModel != null) {
-//                findViewById<TextView>(R.id.navHeaderUsername).text = userModel.name
-//                findViewById<TextView>(R.id.linkKarma).text = resources.getString(R.string.placeholder_link_karma, userModel.linkKarma)
-//                findViewById<TextView>(R.id.commentKarma).text = resources.getString(R.string.placeholder_comment_karma, userModel.linkKarma)
-//                findViewById<ImageView>(R.id.navUserDropdownIc).visibility = View.VISIBLE
-//            } else {
-//                findViewById<ImageView>(R.id.navUserDropdownIc).visibility = View.GONE
-//            }
-//        }
+        // once the user has signed in, replace the sign in page with the account page
+        // trigger the selection
+        bottom_navigation.selectedItemId = R.id.nav_home
     }
 
-    private fun setAccounts(accounts: List<AccountModel>) {
-//        navHeader.apply {
-//            findViewById<LinearLayout>(R.id.navHeaderAccounts).removeAllViews()
-//        }
-
+    private fun handleAccounts(accounts: List<AccountModel>) {
         val params = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
