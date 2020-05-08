@@ -53,7 +53,7 @@ class UserVMTest {
 
     @Test
     fun `user retrieved on init`() = runBlockingTest {
-        val mockUser = mock<UserModel>()
+        val mockUser = mockUser()
         whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
 
         val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
@@ -67,6 +67,9 @@ class UserVMTest {
 
     @Test
     fun `livedata updated when posts retrieved` () = runBlockingTest {
+        val mockUser = mockUser()
+        whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
+
         val mockListingItems = listOf<ListingItem>(mock())
         val listing = mockListing(mockListingItems)
         whenever(postRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
@@ -83,6 +86,9 @@ class UserVMTest {
 
     @Test
     fun `error livedata updated when no posts retrieved` () = runBlockingTest {
+        val mockUser = mockUser()
+        whenever(userRepo.retrieveUser(username)).doReturn(mockUser)
+
         val listing = mockListing()
         val localPostRepo = postRepo
         whenever(localPostRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
@@ -111,5 +117,11 @@ class UserVMTest {
         }
 
         return Listing(kind = "", data = data)
+    }
+
+    private fun mockUser() : UserModel {
+        return UserModel().apply {
+            name = username
+        }
     }
 }

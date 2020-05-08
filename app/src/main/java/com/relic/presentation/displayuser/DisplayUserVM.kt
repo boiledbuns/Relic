@@ -15,21 +15,23 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.helper.ImageHelper
 import com.relic.presentation.util.RelicEvent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+/// the user is guaranteed to be non-null for this viewmodel
 class DisplayUserVM(
-        private val postRepo: PostRepository,
-        private val userRepo: UserRepository,
-        private val postGateway: PostGateway,
-        private val username: String?
+    private val postRepo: PostRepository,
+    private val userRepo: UserRepository,
+    private val postGateway: PostGateway,
+    private val username : String?
 ) : RelicViewModel(), DisplayUserContract.ListingItemAdapterDelegate {
 
     class Factory @Inject constructor(
-            private val postRepo: PostRepository,
-            private val userRepo: UserRepository,
-            private val postGateway: PostGateway
+        private val postRepo: PostRepository,
+        private val userRepo: UserRepository,
+        private val postGateway: PostGateway
     ) {
         /*
            specify null username to get the current user
@@ -57,56 +59,55 @@ class DisplayUserVM(
     private var currentAfterValues = mutableMapOf<UserTab, String?>()
 
     private lateinit var currentTab: UserTab
+    private val retrieveUserJob : Job
 
     init {
         for (tabType in tabTypes) {
             postsLiveData[tabType] = MediatorLiveData()
         }
 
-        launch(Dispatchers.Main) {
+        retrieveUserJob = launch(Dispatchers.Main) {
             val user = username?.let { userRepo.retrieveUser(username) }
                     ?: userRepo.getCurrentUser()
-            _userLiveData.postValue(user)
-
-            // initialize livedata for tab data
-            for (tabType in tabTypes) {
-                launch {
-                    requestPosts(tab = tabType, refresh = true)
-                }
-            }
+            // use set value here to dispatch the results immediately
+            _userLiveData.value = user
         }
     }
 
     fun getTabPostsLiveData(tab: UserTab): LiveData<List<ListingItem>> {
-        return postsLiveData[tab]!!
+        return postsLiveData[tab]!!.apply {
+            if (value == null) {
+                requestPosts(tab = tab, refresh = true)
+            }
+        }
     }
 
     fun requestPosts(tab: UserTab, refresh: Boolean) {
-        val user = _userLiveData.value ?: return
+        retrieveUserJob.invokeOnCompletion {
+            // subscribe to the appropriate livedata based on tab selected
+            val userRetrievalOption = toRetrievalOption(tab)
+            val postSource = PostSource.User(_userLiveData.value!!.name, userRetrievalOption)
 
-        // subscribe to the appropriate livedata based on tab selected
-        val userRetrievalOption = toRetrievalOption(tab)
-        val postSource = PostSource.User(user.name, userRetrievalOption)
+            launch(Dispatchers.Main) {
+                val listing = if (refresh) {
+                    val type = currentSortingType[tab] ?: SortType.DEFAULT
+                    val scope = currentSortingScope[tab] ?: SortScope.NONE
 
-        launch(Dispatchers.Main) {
-            val listing = if (refresh) {
-                val type = currentSortingType[tab] ?: SortType.DEFAULT
-                val scope = currentSortingScope[tab] ?: SortScope.NONE
+                    postRepo.retrieveUserListing(postSource, type, scope)
+                } else {
+                    val listingAfter = currentAfterValues[tab]
+                    // only retrieve more posts if after is not null
+                    if (listingAfter != null) {
+                        postRepo.retrieveNextListing(source = postSource, after = listingAfter)
+                    } else null
+                }
 
-                postRepo.retrieveUserListing(postSource, type, scope)
-            } else {
-                val listingAfter = currentAfterValues[tab]
-                // only retrieve more posts if after is not null
-                if (listingAfter != null) {
-                    postRepo.retrieveNextListing(source = postSource, after = listingAfter)
-                } else null
+                if (listing != null) {
+                    handleListingRetrieval(tab, listing)
+                }
+
+                // TODO based on user preferences -> save data offline
             }
-
-            if (listing != null) {
-                handleListingRetrieval(tab, listing)
-            }
-
-            // TODO based on user preferences -> save data offline
         }
     }
 
