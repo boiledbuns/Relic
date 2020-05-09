@@ -3,7 +3,7 @@
     <dimen name="empty">0dp</dimen>
 
     <!-- relic_toolbar -->
-    <dimen name="toolbar_height">52dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
     <dimen name="toolbar_paddingtop">4dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="toolbar_chipheight">40dp</dimen>
@@ -118,5 +118,8 @@
 
 
     <dimen name="card_radius">4dp</dimen>
+
+    <!-- subreddits -->
+    <dimen name="source_icon_size">42dp</dimen>
 
 </resources>

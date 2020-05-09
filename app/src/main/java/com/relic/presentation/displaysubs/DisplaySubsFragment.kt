@@ -14,10 +14,11 @@ import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysubs.list.SubItemAdapter
+import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subs.*
-import kotlinx.android.synthetic.main.display_subs.view.*
+import kotlinx.android.synthetic.main.primary_sources_view.view.*
 import java.util.*
 import javax.inject.Inject
 
@@ -61,6 +62,20 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         display_subs_recyclerview.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = subAdapter
+        }
+
+        default_sources.source_frontpage.setOnClickListener {
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.display_subs_root, FrontpageFragment())
+                .addToBackStack(TAG)
+                .commit()
+        }
+        default_sources.source_all.setOnClickListener {
+            // TODO when we add the "all" page
+        }
+        default_sources.source_popular.setOnClickListener {
+            // TODO when we add the "popular" page\
         }
 
         // attach the actions associated with loading the posts

@@ -16,7 +16,7 @@ class DisplayPostLinkView @JvmOverloads constructor(
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.display_pinned_subs, this, true)
+        LayoutInflater.from(context).inflate(R.layout.display_fav_subs, this, true)
     }
 
     fun loadLinkPreview(thumbnailUrl : String) {
