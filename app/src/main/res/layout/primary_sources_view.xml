@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/padding_l"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/source_frontpage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/source_all"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/source_icon_size"
+            android:layout_marginBottom="@dimen/padding_m"
+            android:src="@drawable/ic_home"
+            android:tint="?attr/relicTitleColor" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/source_frontpage"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/source_all"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/source_popular"
+        app:layout_constraintStart_toEndOf="@id/source_frontpage">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/source_icon_size"
+            android:layout_marginBottom="@dimen/padding_m"
+            android:src="@drawable/ic_all"
+            android:tint="?attr/relicTitleColor" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/source_all"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/source_popular"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/source_all">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/source_icon_size"
+            android:layout_marginBottom="@dimen/padding_m"
+            android:src="@drawable/ic_rising"
+            android:tint="?attr/relicTitleColor" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/source_popular"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

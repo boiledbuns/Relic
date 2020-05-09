@@ -7,17 +7,19 @@
     android:paddingBottom="@dimen/padding_xs">
 
     <TextView
-        android:id="@+id/pinnedSubsCountTextView"
+        android:id="@+id/favSubsCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/padding_m"/>
+        android:textSize="@dimen/title_text_l"
+        android:padding="@dimen/padding_m"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pinnedSubsRecyclerView"
+        android:id="@+id/favSubsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/pinnedSubsCountTextView"
+        android:layout_below="@id/favSubsCountTextView"
         android:padding="@dimen/padding_xs"
-        android:clipToPadding="false"/>
+        android:clipToPadding="false"
+        android:orientation="horizontal"/>
 
 </RelativeLayout>

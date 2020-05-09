@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/display_subs_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 
 <!-- TODO push up to activity xml and move appbar layout through it as well -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
     android:background="?attr/relicBackgroundColor"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:fitsSystemWindows="true">
 
-    <!--<android.support.design.widget.AppBarLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <!--&lt;!&ndash;<com.relic.presentation.customview.RelicToolbar&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:id="@+id/display_subs_toolbar"/>&ndash;&gt;-->
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            app:title="Subreddits" />
 
-        <!--<include layout="@layout/relic_toolbar"-->
-                 <!--android:id="@+id/display_subs_toolbar"/>-->
-
-    <!--</android.support.design.widget.AppBarLayout>-->
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/display_subs_swiperefreshlayout"
@@ -37,27 +38,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.relic.presentation.displaysubs.pinned.DisplayPinnedSubsView
+                <include
+                    android:id="@+id/default_sources"
+                    layout="@layout/primary_sources_view" />
+
+                <com.relic.presentation.displaysubs.pinned.DisplayFavSubsView
                     android:id="@+id/pinnedSubsView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/default_sources" />
+
+                <TextView
+                    android:id="@+id/all_subs_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/pinnedSubsView"
+                    android:paddingStart="@dimen/padding_m"
+                    android:paddingEnd="@dimen/padding_m"
+                    android:paddingBottom="@dimen/padding_m"
+                    android:text="@string/all_subscriptions"
+                    android:textSize="@dimen/title_text_l" />
 
                 <!-- displays all subscribed subs-->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/display_subs_recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_below="@id/pinnedSubsView"
+                    android:layout_below="@id/all_subs_title"
                     android:clipToPadding="false"
                     android:paddingEnd="@dimen/subitem_margin"
-                    android:paddingBottom="@dimen/subitem_margin"/>
+                    android:paddingBottom="@dimen/subitem_margin" />
 
                 <!-- Displays search results -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/search_subs_recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
@@ -66,3 +83,5 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</FrameLayout>
