@@ -9,11 +9,11 @@
     <string name="app_author">u/boiledbuns</string>
 
     <!-- bottom navigation -->
-    <string name="nav_subreddits">subs</string>
-    <string name="nav_profile">profile</string>
-    <string name="nav_search">search</string>
-    <string name="nav_home">home</string>
-    <string name="nav_settings">settings</string>
+    <string name="nav_subreddits">Subs</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_settings">Settings</string>
 
     <!-- search strings-->
     <string name="searchmenu_title">Search</string>

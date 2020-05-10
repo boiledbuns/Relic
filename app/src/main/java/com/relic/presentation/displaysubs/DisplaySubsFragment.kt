@@ -29,6 +29,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     @Inject
     lateinit var subredditInteractor: Contract.SubAdapterDelegate
 
+    @Suppress("UNCHECKED_CAST")
     private val viewModel: DisplaySubsVM by lazy {
         ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -63,11 +64,10 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             layoutManager = LinearLayoutManager(context)
             adapter = subAdapter
         }
-
         default_sources.source_frontpage.setOnClickListener {
-            requireActivity().supportFragmentManager
+            supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.display_subs_root, FrontpageFragment())
+                .replace(R.id.main_content_frame, FrontpageFragment())
                 .addToBackStack(TAG)
                 .commit()
         }
