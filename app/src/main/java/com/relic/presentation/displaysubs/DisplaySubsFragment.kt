@@ -3,16 +3,19 @@ package com.relic.presentation.displaysubs
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
 import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
+import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysubs.list.SubItemAdapter
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.shopify.livedataktx.nonNull
@@ -22,7 +25,10 @@ import kotlinx.android.synthetic.main.primary_sources_view.view.*
 import java.util.*
 import javax.inject.Inject
 
+const val KEY_STACK_SIZE = "KEY_STACK_SIZE"
+
 class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
+
     @Inject
     lateinit var factory: DisplaySubsVM.Factory
 
@@ -48,6 +54,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setHasOptionsMenu(true)
     }
 
@@ -65,11 +72,8 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             adapter = subAdapter
         }
         default_sources.source_frontpage.setOnClickListener {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.main_content_frame, FrontpageFragment())
-                .addToBackStack(TAG)
-                .commit()
+            val action = DisplaySubsFragmentDirections.actionDisplaySubsFragmentToFrontpage()
+            findNavController().navigate(action)
         }
         default_sources.source_all.setOnClickListener {
             // TODO when we add the "all" page

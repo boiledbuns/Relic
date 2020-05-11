@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/subreddit"
+    app:startDestination="@id/displaySubFragment2">
+
+    <fragment
+        android:id="@+id/displaySubFragment2"
+        android:name="com.relic.presentation.displaysub.DisplaySubFragment"
+        android:label="DisplaySubFragment" >
+        <argument
+            android:name="ARG_SUBREDDIT_NAME"
+            app:argType="string" />
+    </fragment>
+</navigation>

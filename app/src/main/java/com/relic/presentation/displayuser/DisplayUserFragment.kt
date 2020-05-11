@@ -206,7 +206,7 @@ class DisplayUserFragment : RelicFragment() {
         }
     }
 
-    private inner class UserContentPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_SET_USER_VISIBLE_HINT) {
+    private inner class UserContentPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         val contentFragmentTitles = listOf(
             UserTab.Submitted,
             UserTab.Comments,

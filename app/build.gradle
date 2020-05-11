@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
 apply plugin: "kotlin-android-extensions"
+apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
     compileSdkVersion 28
@@ -91,7 +92,7 @@ dependencies {
     def work_ver = "2.2.0"
     def pref_ver = "1.1.0"
 
-    // ViewModel and LiveData
+    // android libs
     implementation "androidx.appcompat:appcompat:$android_appcompat_ver"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
 
@@ -104,6 +105,10 @@ dependencies {
 
     implementation "androidx.work:work-runtime-ktx:$work_ver"
     implementation "androidx.preference:preference:$pref_ver"
+
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.2'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
+
     // endregion android libs
 
     // region external utility (3rd party) libs
