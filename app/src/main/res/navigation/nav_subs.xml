@@ -12,7 +12,7 @@
             android:id="@+id/action_displaySubsFragment_to_subreddit"
             app:destination="@id/subreddit">
             <argument
-                android:name="subredditName"
+                android:name="subName"
                 app:argType="string" />
         </action>
         <action

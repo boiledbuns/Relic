@@ -3,7 +3,6 @@ package com.relic.presentation.displaysubs
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +14,6 @@ import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
-import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysubs.list.SubItemAdapter
 import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.shopify.livedataktx.nonNull
@@ -25,10 +23,7 @@ import kotlinx.android.synthetic.main.primary_sources_view.view.*
 import java.util.*
 import javax.inject.Inject
 
-const val KEY_STACK_SIZE = "KEY_STACK_SIZE"
-
 class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
-
     @Inject
     lateinit var factory: DisplaySubsVM.Factory
 
@@ -54,7 +49,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setHasOptionsMenu(true)
     }
 
@@ -65,15 +59,19 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subAdapter = SubItemAdapter(subredditInteractor)
-
+        subAdapter = SubItemAdapter(subredditInteractor) { subName ->
+            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToSubreddit(subName).apply {
+                findNavController().navigate(this)
+            }
+        }
         display_subs_recyclerview.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = subAdapter
         }
         default_sources.source_frontpage.setOnClickListener {
-            val action = DisplaySubsFragmentDirections.actionDisplaySubsFragmentToFrontpage()
-            findNavController().navigate(action)
+            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToFrontpage().apply {
+                findNavController().navigate(this)
+            }
         }
         default_sources.source_all.setOnClickListener {
             // TODO when we add the "all" page

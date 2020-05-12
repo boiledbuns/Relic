@@ -36,15 +36,19 @@ class MainVM(
     val userLiveData : LiveData<UserModel> = _userLiveData
 
     init {
-        launch(Dispatchers.Main) {
-            auth.refreshToken(AuthenticationCallback {
-                Log.d(TAG, "Token refreshed")
-                retrieveUser()
-            })
-        }
-
         _accountsLiveData.addSource(userRepo.getAccounts()) { accounts ->
             _accountsLiveData.postValue(accounts)
+        }
+
+        if (auth.isAuthenticated()) {
+            launch(Dispatchers.Main) {
+                auth.refreshToken(AuthenticationCallback {
+                    Log.d(TAG, "Token refreshed")
+                    retrieveUser()
+                })
+            }
+        } else {
+            _userLiveData.postValue(null)
         }
     }
 

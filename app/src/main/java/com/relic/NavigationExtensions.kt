@@ -26,6 +26,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.relic.R
 
 /**
  * Manages the various graphs needed for a [BottomNavigationView].
@@ -44,7 +45,7 @@ fun BottomNavigationView.setupWithNavController(
     // Result. Mutable live data with the selected controlled
     val selectedNavController = MutableLiveData<NavController>()
 
-    var firstFragmentGraphId = 0
+    var firstFragmentGraphId = 2
 
     // First create a NavHostFragment for each NavGraph ID
     navGraphIds.forEachIndexed { index, navGraphId ->
@@ -61,10 +62,9 @@ fun BottomNavigationView.setupWithNavController(
         // Obtain its id
         val graphId = navHostFragment.navController.graph.id
 
-        if (index == 0) {
+        if (index == 2) {
             firstFragmentGraphId = graphId
         }
-
         // Save to the map
         graphIdToTagMap[graphId] = fragmentTag
 
@@ -94,8 +94,15 @@ fun BottomNavigationView.setupWithNavController(
                 // Pop everything above the first fragment (the "fixed start destination")
                 fragmentManager.popBackStack(firstFragmentTag,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
-                    as NavHostFragment
+
+                // temp fix, will cleanup later
+                val selectedFragment = if (item.itemId == R.id.nav_account && navGraphIds[0] == R.navigation.login) {
+                    fragmentManager.findFragmentByTag(getFragmentTag(0))
+                        as NavHostFragment
+                } else {
+                    fragmentManager.findFragmentByTag(newlySelectedItemTag)
+                        as NavHostFragment
+                }
 
                 // Exclude the first fragment tag because it's always in the back stack.
                 if (firstFragmentTag != newlySelectedItemTag) {

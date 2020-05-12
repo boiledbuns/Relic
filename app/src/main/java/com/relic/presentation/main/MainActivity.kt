@@ -9,42 +9,32 @@ import android.view.MotionEvent
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.NavController
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.relic.R
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
-import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.NavigationData
-import com.relic.presentation.displaysubs.DisplaySubsFragment
-import com.relic.presentation.displayuser.DisplayUserFragment
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
-import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.presentation.search.SearchFragment
 import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
-import com.relic.presentation.settings.SettingsFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
 import navigation.setupWithNavController
-import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
@@ -73,8 +63,6 @@ class MainActivity : RelicActivity() {
 
     private var itemSelectedDelegate: ((item: MenuItem?) -> Boolean)? = null
 
-    private val fragmentStateAdapter = RelicFragmentStateAdapter(this)
-
     // region lifecycle hooks
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,108 +71,32 @@ class MainActivity : RelicActivity() {
         setContentView(R.layout.activity_main)
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
-        setupBottomNav()
         bindViewModel(this)
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.observe(lifecycleOwner) { setUser(it) }
+        mainVM.userLiveData.observe(lifecycleOwner) { handleUser(it) }
         mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
 
         postInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
         subredditInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
     }
 
-    private fun setupBottomNav() {
-//        bottom_navigation.setOnNavigationItemSelectedListener { menuItem ->
-//            // check if the current back stack is not null
-////            for (entry in supportFragmentManager.fragments) {
-////                val currentItem = bottom_navigation.selectedItemId
-////                backstack[currentItem]?.add(entry)
-////            }
-//            val currentItem = bottom_navigation.selectedItemId
-////            backstack[currentItem] = supportFragmentManager.fragments.forEach()
-//
-////            val itemId = menuItem.itemId
-////            val fragment = when (itemId) {
-////                R.id.nav_account -> {
-////                    mainVM.userLiveData.value?.let { accountFragment } ?: LoginFragment()
-////                }
-////                R.id.nav_subreddits -> subsFragment
-////                R.id.nav_home -> homeFragment
-////                R.id.nav_search -> searchFragment
-////                R.id.nav_settings -> settingsFragment
-////                else -> null
-////            }
-////            fragment?.let {
-////                transitionToFragment(it)
-////            }
-////            val currentFragment = when (bottom_navigation.selectedItemId) {
-////                R.id.nav_account -> {
-////                    mainVM.userLiveData.value?.let { fragmentStateAdapter.createFragment(0) } ?: LoginFragment()
-////                }
-////                R.id.nav_subreddits -> fragmentStateAdapter.createFragment(1)
-////                R.id.nav_home -> fragmentStateAdapter.createFragment(2)
-////                R.id.nav_search -> fragmentStateAdapter.createFragment(3)
-////                R.id.nav_settings -> fragmentStateAdapter.createFragment(4)
-////                else -> null
-////            }
-////            val fragment = when (menuItem.itemId) {
-////                R.id.nav_account -> {
-////                    mainVM.userLiveData.value?.let { fragmentStateAdapter.createFragment(0) } ?: LoginFragment()
-////                }
-////                R.id.nav_subreddits -> fragmentStateAdapter.createFragment(1)
-////                R.id.nav_home -> fragmentStateAdapter.createFragment(2)
-////                R.id.nav_search -> fragmentStateAdapter.createFragment(3)
-////                R.id.nav_settings -> fragmentStateAdapter.createFragment(4)
-////                else -> null
-////            }
-////            fragment?.let { newFragment ->
-////                supportFragmentManager.beginTransaction()
-////                    .apply {
-////                        // detach other fragments
-////                        supportFragmentManager.popBackStack(0, POP_BACK_STACK_INCLUSIVE)
-////                        for (existingFragment in fragmentStateAdapter.navigationFragments) {
-//////                            supportFragmentManager.findFragmentByTag(menuItem.itemId.toString())
-////                            detach(existingFragment)
-////                        }
-////                    }
-////                    .apply {
-////                        val existingFragment = supportFragmentManager.findFragmentByTag(menuItem.itemId.toString())
-////                        if (existingFragment == null) {
-////                            add(R.id.main_content_frame, newFragment, menuItem.itemId.toString())
-////                        } else {
-////                            attach(newFragment)
-////                        }
-////                    }
-////                    .commit()
-////
-////            }`
-//            val navGraphIds = listOf(R.navigation.nav_home, R.navigation.nav_account, R.navigation.nav_subs, R.navigation.nav_search, R.navigation.nav_settings)
-//
-//            // use the solution from the google navigation components repo for now since there isn't
-//            // a clear solution for managing multiple backstacks currently
-//            currentNavController = bottom_navigation.setupWithNavController(
-//                navGraphIds = navGraphIds,
-//                fragmentManager = supportFragmentManager,
-//                containerId = R.id.main_content_frame,
-//                intent = intent
-//            )
-//            true
-//        }
-
-        val navGraphIds = listOf(R.navigation.nav_home, R.navigation.nav_account, R.navigation.nav_subs, R.navigation.nav_search, R.navigation.nav_settings)
-
+    private fun setupBottomNav(userModel: UserModel?) {
         // use the solution from the google navigation components repo for now since there isn't
         // a clear solution for managing multiple backstacks currently
+        val navGraphIds = if (userModel == null) {
+            listOf(R.navigation.login, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
+        } else {
+            listOf(R.navigation.nav_account, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
+        }
         currentNavController = bottom_navigation.setupWithNavController(
             navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = R.id.main_content_frame,
             intent = intent
         )
-        // default page
-        bottom_navigation.selectedItemId = R.id.nav_home
+
     }
 
     private var currentNavController: LiveData<NavController>? = null
@@ -221,20 +133,6 @@ class MainActivity : RelicActivity() {
 
     // endregion lifecycle hooks
 
-    private fun initializeDefaultView() {
-        // get the number of additional (non default) fragments in the stack
-        val fragCount = supportFragmentManager.backStackEntryCount
-        Timber.d("Number of fragments $fragCount")
-
-        // add the default view only if there are no additional fragments on the stack
-        if (fragCount < 1) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.main_content_frame, HomeFragment())
-                .commit()
-        }
-    }
-
     private fun setTheme() {
         val themeId = viewPrefsManager.getAppTheme()
         setTheme(themeId)
@@ -247,10 +145,10 @@ class MainActivity : RelicActivity() {
 
     // region livedata handlers
 
-    private fun setUser(userModel: UserModel?) {
+    private fun handleUser(userModel: UserModel?) {
         // once the user has signed in, replace the sign in page with the account page
         // trigger the selection
-        bottom_navigation.selectedItemId = R.id.nav_home
+        setupBottomNav(userModel)
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -318,6 +216,7 @@ class MainActivity : RelicActivity() {
                     navData.postId,
                     navData.subredditName
                 )
+
                 // intentionally because replacing then popping off back stack loses scroll position
                 supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, postFragment)
@@ -374,22 +273,6 @@ class MainActivity : RelicActivity() {
         // Should also allow user to do it inline, but that can be saved for a later task
         val editorFragment = ReplyEditorFragment.create(parentFullname, true)
         transitionToFragment(editorFragment)
-    }
-
-    class RelicFragmentStateAdapter(activity: RelicActivity) : FragmentStateAdapter(activity) {
-        private val accountFragment by lazy { DisplayUserFragment.create(null) }
-        private val subsFragment by lazy { DisplaySubsFragment() }
-        private val homeFragment by lazy { HomeFragment() }
-        private val searchFragment by lazy { SearchFragment() }
-        private val settingsFragment by lazy { SettingsFragment() }
-
-        val navigationFragments = listOf(accountFragment, subsFragment, homeFragment, searchFragment, settingsFragment)
-
-        override fun getItemCount() = 5
-
-        override fun createFragment(position: Int): RelicFragment {
-            return navigationFragments[position]
-        }
     }
 
 }
