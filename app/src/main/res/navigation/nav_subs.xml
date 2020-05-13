@@ -19,6 +19,6 @@
             android:id="@+id/action_displaySubsFragment_to_frontpage"
             app:destination="@id/frontpage" />
     </fragment>
-    <include app:graph="@navigation/subreddit" />
     <include app:graph="@navigation/frontpage" />
+    <include app:graph="@navigation/subreddit" />
 </navigation>

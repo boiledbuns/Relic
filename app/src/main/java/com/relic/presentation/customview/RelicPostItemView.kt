@@ -101,10 +101,11 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate : Contract.PostAdapterDelegate, notifier : ItemNotifier) {
+    fun setViewDelegate(delegate : Contract.PostAdapterDelegate, notifier : ItemNotifier, navigationDelegate: ((post: PostModel) -> Unit)? = null) {
         delegate.apply {
             setOnClickListener {
                 interact(post, PostInteraction.Visit)
+                navigationDelegate?.invoke(post)
                 notifier.notifyItem()
             }
             postItemSaveView.setOnClickListener {

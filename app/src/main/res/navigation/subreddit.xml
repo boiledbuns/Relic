@@ -1,14 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/subreddit"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/subreddit"
     app:startDestination="@id/displaySubFragment">
 
     <fragment
         android:id="@+id/displaySubFragment"
         android:name="com.relic.presentation.displaysub.DisplaySubFragment"
-        android:label="DisplaySubFragment" >
+        android:label="DisplaySubFragment">
+        <action
+            android:id="@+id/action_displaySubFragment_to_post"
+            app:destination="@id/nestedDisplayPostFragment">
+            <argument
+                android:name="postFullName"
+                app:argType="string" />
+            <argument
+                android:name="subredditName"
+                app:argType="string" />
+            <argument
+                android:name="enableVisitSub"
+                android:defaultValue="false"
+                app:argType="boolean" />
+        </action>
+
         <argument
             android:name="subName"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nestedDisplayPostFragment"
+        android:name="com.relic.presentation.displaypost.DisplayPostFragment"
+        android:label="DisplayPostFragment">
+        <argument
+            android:name="postFullName"
+            app:argType="string"/>
+
+        <argument
+            android:name="subredditName"
+            app:argType="string"/>
+
+        <argument
+            android:name="enableVisitSub"
+            app:argType="boolean"
+            android:defaultValue="false"/>
+
+        <action
+            android:id="@+id/action_to_subreddit"
+            app:destination="@id/displaySubFragment">
+            <argument
+                android:name="subName"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+
 </navigation>

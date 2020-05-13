@@ -20,6 +20,7 @@ import android.content.Intent
 import android.util.SparseArray
 import androidx.core.util.forEach
 import androidx.core.util.set
+import androidx.core.view.get
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -37,15 +38,18 @@ fun BottomNavigationView.setupWithNavController(
     navGraphIds: List<Int>,
     fragmentManager: FragmentManager,
     containerId: Int,
-    intent: Intent
+    intent: Intent,
+    initialPosition: Int
 ): LiveData<NavController> {
+    // get the id of the default item from the menu
+    selectedItemId = this.menu[initialPosition].itemId
 
     // Map of tags
     val graphIdToTagMap = SparseArray<String>()
     // Result. Mutable live data with the selected controlled
     val selectedNavController = MutableLiveData<NavController>()
 
-    var firstFragmentGraphId = 2
+    var firstFragmentGraphId = 0
 
     // First create a NavHostFragment for each NavGraph ID
     navGraphIds.forEachIndexed { index, navGraphId ->
@@ -62,17 +66,17 @@ fun BottomNavigationView.setupWithNavController(
         // Obtain its id
         val graphId = navHostFragment.navController.graph.id
 
-        if (index == 2) {
+        if (index == initialPosition) {
             firstFragmentGraphId = graphId
         }
         // Save to the map
         graphIdToTagMap[graphId] = fragmentTag
 
         // Attach or detach nav host fragment depending on whether it's the selected item.
-        if (this.selectedItemId == graphId) {
+        if (selectedItemId == graphId) {
             // Update livedata with the selected graph
             selectedNavController.value = navHostFragment.navController
-            attachNavHostFragment(fragmentManager, navHostFragment, index == 0)
+            attachNavHostFragment(fragmentManager, navHostFragment, index == initialPosition)
         } else {
             detachNavHostFragment(fragmentManager, navHostFragment)
         }
@@ -96,7 +100,7 @@ fun BottomNavigationView.setupWithNavController(
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
                 // temp fix, will cleanup later
-                val selectedFragment = if (item.itemId == R.id.nav_account && navGraphIds[0] == R.navigation.login) {
+                val selectedFragment = if (item.itemId == R.id.nav_account && navGraphIds[0] == R.navigation.nav_login) {
                     fragmentManager.findFragmentByTag(getFragmentTag(0))
                         as NavHostFragment
                 } else {

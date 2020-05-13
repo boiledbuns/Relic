@@ -51,7 +51,7 @@ class PostSearchResultsFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
+        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor) {}
 
         subSearchRV.apply {
             adapter = postAdapter

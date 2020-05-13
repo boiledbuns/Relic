@@ -6,5 +6,34 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.relic.presentation.home.HomeFragment"
-        android:label="HomeFragment" />
+        android:label="HomeFragment" >
+
+        <!-- actions need to be duplicated bc of existing viewpager issues that cause the children
+        of a viewpager using navigation components to crash upon navigation unless the actions is
+        also available in the parent fragment -->
+        <action
+            android:id="@+id/action_to_post"
+            app:destination="@id/post">
+            <argument
+                android:name="postFullName"
+                app:argType="string" />
+            <argument
+                android:name="subredditName"
+                app:argType="string" />
+            <argument
+                android:name="enableVisitSub"
+                android:defaultValue="false"
+                app:argType="boolean" />
+        </action>
+        <action
+            android:id="@+id/action_to_subreddit"
+            app:destination="@id/subreddit">
+            <argument
+                android:name="subName"
+                app:argType="string" />
+        </action>
+    </fragment>
+    <include app:graph="@navigation/subreddit"/>
+    <include app:graph="@navigation/post" />
+
 </navigation>

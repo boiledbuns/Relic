@@ -17,8 +17,6 @@ import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
-import com.relic.presentation.displaypost.DisplayPostFragment
-import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
@@ -86,7 +84,7 @@ class MainActivity : RelicActivity() {
         // use the solution from the google navigation components repo for now since there isn't
         // a clear solution for managing multiple backstacks currently
         val navGraphIds = if (userModel == null) {
-            listOf(R.navigation.login, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
+            listOf(R.navigation.nav_login, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
         } else {
             listOf(R.navigation.nav_account, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
         }
@@ -94,7 +92,8 @@ class MainActivity : RelicActivity() {
             navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = R.id.main_content_frame,
-            intent = intent
+            intent = intent,
+            initialPosition = 2
         )
 
     }
@@ -210,19 +209,6 @@ class MainActivity : RelicActivity() {
 
     private fun handleNavigation(navData: NavigationData) {
         when (navData) {
-            // navigates to display post
-            is NavigationData.ToPost -> {
-                val postFragment = DisplayPostFragment.create(
-                    navData.postId,
-                    navData.subredditName
-                )
-
-                // intentionally because replacing then popping off back stack loses scroll position
-                supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, postFragment)
-                    .addToBackStack(TAG)
-                    .commit()
-            }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
@@ -239,10 +225,6 @@ class MainActivity : RelicActivity() {
             is NavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(navData.username)
                     .show(supportFragmentManager, TAG)
-            }
-            is NavigationData.ToPostSource -> {
-                val subFragment = DisplaySubFragment.create(navData.source.getSourceName())
-                transitionToFragment(subFragment)
             }
             is NavigationData.PreviewPostSource -> {
                 SubInfoBottomSheetDialog.create(navData.source.getSourceName())

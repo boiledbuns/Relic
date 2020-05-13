@@ -17,6 +17,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.domain.models.PostModel
@@ -27,6 +29,8 @@ import com.relic.presentation.displaypost.tabs.FullPostFragment
 import com.relic.presentation.displaysub.DisplaySubFragment
 import com.relic.interactor.PostInteraction
 import com.relic.interactor.PostInteractorImpl
+import com.relic.presentation.displaysub.DisplaySubFragmentDirections
+import com.relic.presentation.home.HomeFragmentDirections
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
@@ -54,9 +58,11 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }).get(DisplayPostVM::class.java)
     }
 
-    private lateinit var postFullName: String
-    private lateinit var subredditName: String
-    private var enableVisitSub = false
+    private val args: DisplayPostFragmentArgs by navArgs()
+
+    private val postFullName by lazy { args.postFullName }
+    private val subredditName by lazy { args.subredditName }
+    private val enableVisitSub by lazy { args.enableVisitSub }
 
     private lateinit var pagerAdapter : DisplayPostPagerAdapter
     private lateinit var tabTitleView : View
@@ -67,12 +73,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
-        arguments?.apply {
-            getString(ARG_POST_FULLNAME)?.let { postFullName = it }
-            getString(ARG_SUB_NAME)?.let { subredditName = it }
-            enableVisitSub = getBoolean(ARG_ENABLE_VISIT_SUB)
-        }
 
         pagerAdapter = DisplayPostPagerAdapter(childFragmentManager).apply {
             tabFragments.add(FullPostFragment())
@@ -180,9 +180,14 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         (displayPostToolbar as Toolbar).apply {
             setNavigationOnClickListener { activity?.onBackPressed() }
             if (enableVisitSub) setOnClickListener {
-                val subFragment = DisplaySubFragment.create(subredditName)
-                activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_content_frame, subFragment).addToBackStack(TAG).commit()
+                // TODO
+//                HomeFragmentDirections.actionToSubreddit(subredditName).apply {
+//                    findNavController().navigate(this)
+//                }
+                DisplayPostFragmentDirections.actionToSubreddit(subredditName).apply {
+                    findNavController().navigate(this)
+                }
+
             }
         }
     }

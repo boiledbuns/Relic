@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
@@ -16,6 +17,8 @@ import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.home.HomeFragment
+import com.relic.presentation.home.HomeFragmentDirections
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
@@ -59,7 +62,17 @@ class FrontpageFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
+        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor) { post ->
+            if (parentFragment != null) {
+                HomeFragmentDirections.actionToPost(post.fullName, post.subreddit!!, true).apply {
+                    findNavController().navigate(this)
+                }
+            } else {
+                FrontpageFragmentDirections.actionToPost(post.fullName, post.subreddit!!, true).apply {
+                    findNavController().navigate(this)
+                }
+            }
+        }
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)

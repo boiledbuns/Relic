@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/frontpage"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/frontpage"
     app:startDestination="@id/frontpageFragment">
 
     <fragment
         android:id="@+id/frontpageFragment"
         android:name="com.relic.presentation.home.frontpage.FrontpageFragment"
-        android:label="FrontpageFragment" />
+        android:label="FrontpageFragment">
+        <action
+            android:id="@+id/action_to_post"
+            app:destination="@id/post">
+            <argument
+                android:name="postFullName"
+                app:argType="string" />
+            <argument
+                android:name="subredditName"
+                app:argType="string" />
+            <argument
+                android:name="enableVisitSub"
+                android:defaultValue="false"
+                app:argType="boolean" />
+        </action>
+    </fragment>
 </navigation>

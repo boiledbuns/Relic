@@ -2,12 +2,7 @@ package com.relic.presentation.displaysub
 
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -15,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,7 +44,7 @@ class DisplaySubFragment : RelicFragment() {
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
-    val args: DisplaySubFragmentArgs by navArgs()
+    private val args: DisplaySubFragmentArgs by navArgs()
 
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
@@ -86,7 +82,11 @@ class DisplaySubFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM) { post ->
+            DisplaySubFragmentDirections.actionDisplaySubFragmentToPost(post.fullName, post.subreddit!!, true).apply {
+                findNavController().navigate(this)
+            }
+        }
 
         subPostsRecyclerView.apply {
             adapter = postAdapter
