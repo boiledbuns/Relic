@@ -64,11 +64,11 @@ class FrontpageFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
         postAdapter = PostItemAdapter(viewPrefsManager, postInteractor) { post ->
             if (parentFragment != null) {
-                HomeFragmentDirections.actionToPost(post.fullName, post.subreddit!!, true).apply {
+                HomeFragmentDirections.actionHomeFragmentToDisplayPostFragment(post.fullName, post.subreddit!!, true).apply {
                     findNavController().navigate(this)
                 }
             } else {
-                FrontpageFragmentDirections.actionToPost(post.fullName, post.subreddit!!, true).apply {
+                FrontpageFragmentDirections.actionFrontpageFragmentToDisplayPostFragment(post.fullName, post.subreddit!!, true).apply {
                     findNavController().navigate(this)
                 }
             }

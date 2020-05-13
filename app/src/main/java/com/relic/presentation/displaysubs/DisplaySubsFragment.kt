@@ -60,7 +60,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         super.onViewCreated(view, savedInstanceState)
 
         subAdapter = SubItemAdapter(subredditInteractor) { subName ->
-            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToSubreddit(subName).apply {
+            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToDisplaySubFragment(subName).apply {
                 findNavController().navigate(this)
             }
         }
@@ -69,7 +69,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             adapter = subAdapter
         }
         default_sources.source_frontpage.setOnClickListener {
-            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToFrontpage().apply {
+            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToFrontpageFragment().apply {
                 findNavController().navigate(this)
             }
         }

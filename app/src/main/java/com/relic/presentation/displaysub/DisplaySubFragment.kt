@@ -83,7 +83,7 @@ class DisplaySubFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM) { post ->
-            DisplaySubFragmentDirections.actionDisplaySubFragmentToPost(post.fullName, post.subreddit!!, true).apply {
+            DisplaySubFragmentDirections.actionDisplaySubFragmentToDisplayPostFragment(post.fullName, post.subreddit!!, true).apply {
                 findNavController().navigate(this)
             }
         }

@@ -83,17 +83,12 @@ class MainActivity : RelicActivity() {
     private fun setupBottomNav(userModel: UserModel?) {
         // use the solution from the google navigation components repo for now since there isn't
         // a clear solution for managing multiple backstacks currently
-        val navGraphIds = if (userModel == null) {
-            listOf(R.navigation.nav_login, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
-        } else {
-            listOf(R.navigation.nav_account, R.navigation.nav_subs, R.navigation.nav_home, R.navigation.nav_search, R.navigation.nav_settings)
-        }
         currentNavController = bottom_navigation.setupWithNavController(
-            navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = R.id.main_content_frame,
             intent = intent,
-            initialPosition = 2
+            initialPosition = 2,
+            showLogin = userModel == null
         )
 
     }

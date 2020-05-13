@@ -184,7 +184,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 //                HomeFragmentDirections.actionToSubreddit(subredditName).apply {
 //                    findNavController().navigate(this)
 //                }
-                DisplayPostFragmentDirections.actionToSubreddit(subredditName).apply {
+                DisplayPostFragmentDirections.actionDisplayPostFragmentToDisplaySubFragment(subredditName).apply {
                     findNavController().navigate(this)
                 }
 
