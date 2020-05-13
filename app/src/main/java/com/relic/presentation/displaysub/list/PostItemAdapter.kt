@@ -14,8 +14,7 @@ import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,
-    private val postInteractor : Contract.PostAdapterDelegate,
-    private val navigationDelegate: (post: PostModel) -> Unit
+    private val postInteractor : Contract.PostAdapterDelegate
 ) : RelicAdapter<PostItemAdapter.PostItemVH>() {
 
     private var postList: List<PostModel> = ArrayList()
@@ -55,7 +54,7 @@ class PostItemAdapter (
             notifyItemChanged(layoutPosition)
         }
 
-        init { postItemView.setViewDelegate(postInteractor, this, navigationDelegate) }
+        init { postItemView.setViewDelegate(postInteractor, this) }
 
         fun bindPost(postModel : PostModel) = postItemView.setPost(postModel)
     }
@@ -81,3 +80,4 @@ class PostItemAdapter (
         })
     }
 }
+

@@ -6,26 +6,7 @@
     <fragment
         android:id="@+id/placeholderFragment"
         android:name="com.relic.presentation.main.PlaceholderFragment"
-        android:label="PlaceholderFragment" >
-        <action
-            android:id="@+id/action_placeholderFragment_to_displayUserFragment"
-            app:destination="@id/displayUserFragment" />
-        <action
-            android:id="@+id/action_placeholderFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_placeholderFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-        <action
-            android:id="@+id/action_placeholderFragment_to_displaySubsFragment"
-            app:destination="@id/displaySubsFragment" />
-        <action
-            android:id="@+id/action_placeholderFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_placeholderFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+        android:label="PlaceholderFragment" />
     <fragment
         android:id="@+id/displayUserFragment"
         android:name="com.relic.presentation.displayuser.DisplayUserFragment"
@@ -41,22 +22,11 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.relic.presentation.home.HomeFragment"
-        android:label="HomeFragment" >
-        <action
-            android:id="@+id/action_homeFragment_to_displayPostFragment"
-            app:destination="@id/displayPostFragment" />
-    </fragment>
+        android:label="HomeFragment" />
     <fragment
         android:id="@+id/displaySubsFragment"
         android:name="com.relic.presentation.displaysubs.DisplaySubsFragment"
-        android:label="DisplaySubsFragment" >
-        <action
-            android:id="@+id/action_displaySubsFragment_to_frontpageFragment"
-            app:destination="@id/frontpageFragment" />
-        <action
-            android:id="@+id/action_displaySubsFragment_to_displaySubFragment"
-            app:destination="@id/displaySubFragment"/>
-    </fragment>
+        android:label="DisplaySubsFragment" />
     <fragment
         android:id="@+id/displayPostFragment"
         android:name="com.relic.presentation.displaypost.DisplayPostFragment"
@@ -71,18 +41,11 @@
             android:name="enableVisitSub"
             android:defaultValue="false"
             app:argType="boolean" />
-        <action
-            android:id="@+id/action_displayPostFragment_to_displaySubFragment"
-            app:destination="@id/displaySubFragment" />
     </fragment>
     <fragment
         android:id="@+id/frontpageFragment"
         android:name="com.relic.presentation.home.frontpage.FrontpageFragment"
-        android:label="FrontpageFragment" >
-        <action
-            android:id="@+id/action_frontpageFragment_to_displayPostFragment"
-            app:destination="@id/displayPostFragment" />
-    </fragment>
+        android:label="FrontpageFragment" />
     <fragment
         android:id="@+id/displaySubFragment"
         android:name="com.relic.presentation.displaysub.DisplaySubFragment"
@@ -90,9 +53,6 @@
         <argument
             android:name="subName"
             app:argType="string" />
-        <action
-            android:id="@+id/action_displaySubFragment_to_displayPostFragment"
-            app:destination="@id/displayPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"

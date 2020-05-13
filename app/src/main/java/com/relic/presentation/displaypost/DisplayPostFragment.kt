@@ -1,12 +1,7 @@
 package com.relic.presentation.displaypost
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -23,14 +18,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.interactor.CommentInteractorImpl
+import com.relic.interactor.PostInteraction
+import com.relic.interactor.PostInteractorImpl
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.tabs.CommentsFragment
 import com.relic.presentation.displaypost.tabs.FullPostFragment
-import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.interactor.PostInteraction
-import com.relic.interactor.PostInteractorImpl
-import com.relic.presentation.displaysub.DisplaySubFragmentDirections
-import com.relic.presentation.home.HomeFragmentDirections
+import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_post.*
@@ -180,14 +173,8 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         (displayPostToolbar as Toolbar).apply {
             setNavigationOnClickListener { activity?.onBackPressed() }
             if (enableVisitSub) setOnClickListener {
-                // TODO
-//                HomeFragmentDirections.actionToSubreddit(subredditName).apply {
-//                    findNavController().navigate(this)
-//                }
-                DisplayPostFragmentDirections.actionDisplayPostFragmentToDisplaySubFragment(subredditName).apply {
-                    findNavController().navigate(this)
-                }
-
+                val args = DisplaySubFragmentArgs(subredditName).toBundle()
+                findNavController().navigate(R.id.displaySubFragment, args)
             }
         }
     }

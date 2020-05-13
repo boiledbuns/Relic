@@ -232,6 +232,15 @@
                             <option name="y" value="105" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_displayPostFragment_to_displaySubFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -303,6 +312,15 @@
                             <option name="y" value="-488" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_frontpageFragment_to_displayPostFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -339,43 +357,43 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="placeholderFragmnet">
+                  <entry key="placeholderFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-617" />
-                            <option name="y" value="-18" />
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_placeholderFragmnet_to_displaySubsFragment">
+                            <entry key="action_placeholderFragment_to_displaySubsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_placeholderFragmnet_to_displayUserFragment2">
+                            <entry key="action_placeholderFragment_to_displayUserFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_placeholderFragmnet_to_homeFragment">
+                            <entry key="action_placeholderFragment_to_homeFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_placeholderFragmnet_to_loginFragment">
+                            <entry key="action_placeholderFragment_to_loginFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_placeholderFragmnet_to_searchFragment">
+                            <entry key="action_placeholderFragment_to_searchFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_placeholderFragmnet_to_settingsFragment">
+                            <entry key="action_placeholderFragment_to_settingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>

@@ -30,7 +30,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.relic.R
-import com.relic.presentation.main.PlaceholderFragmentDirections
 
 /**
  * Manages the various graphs needed for a [BottomNavigationView].

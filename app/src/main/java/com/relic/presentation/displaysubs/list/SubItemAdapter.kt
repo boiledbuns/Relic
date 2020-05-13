@@ -13,8 +13,7 @@ import com.relic.presentation.displaysubs.list.SubItemAdapter.SubItemVH
 import java.util.*
 
 class SubItemAdapter(
-    private val subAdapterDelegate: SubAdapterDelegate,
-    private val navDelegate: (String) -> Unit
+    private val subAdapterDelegate: SubAdapterDelegate
 ) : RecyclerView.Adapter<SubItemVH>() {
     private var subList: MutableList<SubredditModel> = ArrayList()
 
@@ -24,7 +23,7 @@ class SubItemAdapter(
         }
 
         init {
-            subItemView.setOnClickListener { v: View? -> navDelegate(subList[adapterPosition].subName) }
+            subItemView.setOnClickListener { v: View? -> subAdapterDelegate.interact(subList[adapterPosition], SubInteraction.Visit) }
             subItemView.setOnLongClickListener { v: View? ->
                 subAdapterDelegate.interact(
                     subList[adapterPosition],

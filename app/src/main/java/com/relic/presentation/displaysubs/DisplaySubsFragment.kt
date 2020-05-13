@@ -15,7 +15,6 @@ import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysubs.list.SubItemAdapter
-import com.relic.presentation.home.frontpage.FrontpageFragment
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subs.*
@@ -59,19 +58,14 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subAdapter = SubItemAdapter(subredditInteractor) { subName ->
-            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToDisplaySubFragment(subName).apply {
-                findNavController().navigate(this)
-            }
-        }
+        subAdapter = SubItemAdapter(subredditInteractor)
+
         display_subs_recyclerview.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = subAdapter
         }
         default_sources.source_frontpage.setOnClickListener {
-            DisplaySubsFragmentDirections.actionDisplaySubsFragmentToFrontpageFragment().apply {
-                findNavController().navigate(this)
-            }
+            findNavController().navigate(R.id.frontpageFragment)
         }
         default_sources.source_all.setOnClickListener {
             // TODO when we add the "all" page

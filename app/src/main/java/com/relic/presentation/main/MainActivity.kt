@@ -11,12 +11,15 @@ import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.relic.R
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
+import com.relic.presentation.displaypost.DisplayPostFragmentArgs
+import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
@@ -60,6 +63,7 @@ class MainActivity : RelicActivity() {
     private lateinit var relicGD: GestureDetectorCompat
 
     private var itemSelectedDelegate: ((item: MenuItem?) -> Boolean)? = null
+    private var currentNavController: LiveData<NavController>? = null
 
     // region lifecycle hooks
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,11 +94,7 @@ class MainActivity : RelicActivity() {
             initialPosition = 2,
             showLogin = userModel == null
         )
-
     }
-
-    private var currentNavController: LiveData<NavController>? = null
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
@@ -204,6 +204,11 @@ class MainActivity : RelicActivity() {
 
     private fun handleNavigation(navData: NavigationData) {
         when (navData) {
+            // navigates to display post
+            is NavigationData.ToPost -> {
+                val args = DisplayPostFragmentArgs(postFullName = navData.postId, subredditName = navData.subredditName).toBundle()
+                currentNavController?.value?.navigate(R.id.displayPostFragment, args)
+            }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
                 val imageFragment = DisplayImageFragment.create(
@@ -220,6 +225,10 @@ class MainActivity : RelicActivity() {
             is NavigationData.ToUserPreview -> {
                 DisplayUserPreview.create(navData.username)
                     .show(supportFragmentManager, TAG)
+            }
+            is NavigationData.ToPostSource -> {
+                val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
+                currentNavController?.value?.navigate(R.id.displaySubFragment, args)
             }
             is NavigationData.PreviewPostSource -> {
                 SubInfoBottomSheetDialog.create(navData.source.getSourceName())
