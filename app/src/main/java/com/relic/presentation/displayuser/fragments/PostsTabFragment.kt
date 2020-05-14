@@ -46,7 +46,7 @@ class PostsTabFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
+        requireArguments().getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
         }
     }

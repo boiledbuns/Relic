@@ -1,20 +1,21 @@
 package com.relic.presentation.displayuser
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import android.view.*
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import com.relic.R
 import com.relic.data.SortScope
 import com.relic.data.SortType
+import com.relic.interactor.Contract
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
@@ -30,6 +31,12 @@ class DisplayUserFragment : RelicFragment() {
 
     @Inject
     lateinit var factory : DisplayUserVM.Factory
+
+    @Inject
+    lateinit var postInteractor: Contract.PostAdapterDelegate
+
+    @Inject
+    lateinit var commentInteractor: Contract.CommentAdapterDelegate
 
     val displayUserVM : DisplayUserVM by lazy {
         val provider = if (username == null) {
@@ -153,42 +160,41 @@ class DisplayUserFragment : RelicFragment() {
                 userUserPreview.setUser(it)
             }
         })
-        displayUserVM.navigationLiveData.observe(lifecycleOwner, androidx.lifecycle.Observer {
-            handleNavigation(it)
-        })
+//        displayUserVM.navigationLiveData.observe(lifecycleOwner, androidx.lifecycle.Observer {
+////            handleNavigation(it)
+//        })
     }
 
-    private fun handleNavigation(navEvent : RelicEvent<NavigationData>) {
-        if (!navEvent.consumed) {
-            val navigation = navEvent.consume()
-
-            when (navigation) {
-                is NavigationData.ToPost -> {
-                    val postFragment = DisplayPostFragment.create(
-                        navigation.postId,
-                        navigation.subredditName,
-                        enableVisitSub = true
-                    )
-                    // intentionally because replacing then popping off back stack loses scroll position
-                    activity!!.supportFragmentManager.beginTransaction()
-                        .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
-                }
-                // navigates to display image on top of current fragment
-                is NavigationData.ToImage -> {
-                    val imageFragment = DisplayImageFragment.create(
-                        navigation.thumbnail
-                    )
-                    activity!!.supportFragmentManager.beginTransaction()
-                        .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
-                }
-                // let browser handle navigation to url
-                is NavigationData.ToExternal -> {
-                    val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
-                    startActivity(openInBrowser)
-                }
-            }
-        }
-    }
+//    // TODO route through main activity
+//    private fun handleNavigation(navEvent : RelicEvent<NavigationData>) {
+//        if (!navEvent.consumed) {
+//            val navigation = navEvent.consume()
+//
+//            when (navigation) {
+//                is NavigationData.ToPost -> {
+//                    val postFragment = DisplayPostFragment.create(
+//                        navigation.postId,
+//                        navigation.subredditName,
+//                        enableVisitSub = true
+//                    )
+//                    // intentionally because replacing then popping off back stack loses scroll position
+//                    requireActivity().supportFragmentManager.beginTransaction()
+//                        .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
+//                }
+//                // navigates to display image on top of current fragment
+//                is NavigationData.ToImage -> {
+//                    val imageFragment = DisplayImageFragment.create(
+//                        navigation.thumbnail
+//                    )
+//                }
+//                // let browser handle navigation to url
+//                is NavigationData.ToExternal -> {
+//                    val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
+//                    startActivity(openInBrowser)
+//                }
+//            }
+//        }
+//    }
 
     // endregion livedata handlers
 

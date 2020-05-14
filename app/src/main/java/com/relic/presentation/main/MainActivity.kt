@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
@@ -25,7 +24,9 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.media.DisplayGfycatFragment
+import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragment
+import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
@@ -75,26 +76,28 @@ class MainActivity : RelicActivity() {
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
         bindViewModel(this)
+
+        // set up navigation if none to restore
+        if (savedInstanceState == null) {
+            setupBottomNav(mainVM.userLiveData.value)
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        // wait for bottom navigation bar to restore its state (selected item)
+        // before setting up it up again
+        setupBottomNav(mainVM.userLiveData.value)
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         mainVM.userLiveData.observe(lifecycleOwner) { handleUser(it) }
         mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
 
+        // todo converge into a single source
         postInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
         subredditInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
-    }
-
-    private fun setupBottomNav(userModel: UserModel?) {
-        // use the solution from the google navigation components repo for now since there isn't
-        // a clear solution for managing multiple backstacks currently
-        currentNavController = bottom_navigation.setupWithNavController(
-            fragmentManager = supportFragmentManager,
-            containerId = R.id.main_content_frame,
-            intent = intent,
-            initialPosition = 2,
-            showLogin = userModel == null
-        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -128,6 +131,18 @@ class MainActivity : RelicActivity() {
 
     // endregion lifecycle hooks
 
+    private fun setupBottomNav(userModel: UserModel?) {
+        // use the solution from the google navigation components repo for now since there isn't
+        // a clear solution for managing multiple backstacks currently
+        currentNavController = bottom_navigation.setupWithNavController(
+            fragmentManager = supportFragmentManager,
+            containerId = R.id.main_content_frame,
+            intent = intent,
+            initialPosition = 2,
+            showLogin = userModel == null
+        )
+    }
+
     private fun setTheme() {
         val themeId = viewPrefsManager.getAppTheme()
         setTheme(themeId)
@@ -143,7 +158,7 @@ class MainActivity : RelicActivity() {
     private fun handleUser(userModel: UserModel?) {
         // once the user has signed in, replace the sign in page with the account page
         // trigger the selection
-        setupBottomNav(userModel)
+//        setupBottomNav(userModel)
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -212,11 +227,8 @@ class MainActivity : RelicActivity() {
             }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
-                val imageFragment = DisplayImageFragment.create(
-                    navData.thumbnail
-                )
-                supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, imageFragment).addToBackStack(TAG).commit()
+                val args = DisplayImageFragmentArgs(url = navData.thumbnail).toBundle()
+                currentNavController?.value?.navigate(R.id.displayImageFragment, args)
             }
             // let browser handle navigation to url
             is NavigationData.ToExternal -> {
@@ -252,15 +264,13 @@ class MainActivity : RelicActivity() {
     // endregion post interactor
 
     private fun openMedia(navMediaData: NavigationData.ToMedia) {
-        val displayFragment = when (navMediaData.mediaType) {
-            MediaType.Gfycat -> DisplayGfycatFragment.create(navMediaData.mediaUrl)
-            else -> DisplayImageFragment.create(navMediaData.mediaUrl)
+        when (navMediaData.mediaType) {
+            MediaType.Gfycat -> {
+                val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
+                currentNavController?.value?.navigate(R.id.displayImageFragment, args)
+            }
         }
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.main_content_frame, displayFragment)
-            .addToBackStack(TAG)
-            .commit()
+        // TODO handle additional cases and add support for custom plugins
     }
 
     private fun openPostReplyEditor(parentFullname: String) {

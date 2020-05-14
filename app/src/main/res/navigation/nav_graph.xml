@@ -58,4 +58,20 @@
         android:id="@+id/loginFragment"
         android:name="com.relic.presentation.login.LoginFragment"
         android:label="LoginFragment" />
+    <dialog
+        android:id="@+id/displayImageFragment"
+        android:name="com.relic.presentation.media.DisplayImageFragment"
+        android:label="DisplayImageFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/displayGfycatFragment"
+        android:name="com.relic.presentation.media.DisplayGfycatFragment"
+        android:label="DisplayGfycatFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
 </navigation>
