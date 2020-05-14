@@ -45,7 +45,7 @@ class DisplayUserPreview : RelicBottomSheetDialog() {
                 dismiss()
 
                 val fullUserFrag = DisplayUserFragment.create(username)
-                activity!!.supportFragmentManager.beginTransaction()
+                requireActivity().supportFragmentManager.beginTransaction()
                     .add(R.id.main_content_frame, fullUserFrag).addToBackStack(TAG).commit()
             }
         }

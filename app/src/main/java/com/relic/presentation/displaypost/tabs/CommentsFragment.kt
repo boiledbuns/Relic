@@ -28,7 +28,7 @@ class CommentsFragment : RelicFragment() {
     lateinit var commentInteractor: CommentInteractorImpl
 
     private val commentsVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(DisplayPostVM::class.java)
+        ViewModelProviders.of(requireParentFragment()).get(DisplayPostVM::class.java)
     }
 
     private lateinit var commentAdapter: CommentItemAdapter

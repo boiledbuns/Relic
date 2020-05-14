@@ -18,7 +18,7 @@ import javax.inject.Inject
 class FullPostFragment : RelicFragment() {
 
     private val fullPostVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(DisplayPostVM::class.java)
+        ViewModelProviders.of(requireParentFragment()).get(DisplayPostVM::class.java)
     }
 
     @Inject
