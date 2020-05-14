@@ -121,7 +121,7 @@ class PostsTabFragment : RelicFragment() {
         when(errorData) {
             is ErrorData.NoMorePosts -> {
                 if (selectedUserTab == errorData.tab) {
-                    Snackbar.make(view!!, "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(requireView(), "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
                     tabProgress.visibility = View.GONE
                     userTabSwipeRefreshLayout.isRefreshing = false
                 }

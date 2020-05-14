@@ -107,7 +107,7 @@ class ThemeFragment : RelicFragment() {
             currentTheme = selectedTheme
             viewPrefsManager.setAppTheme(currentTheme)
 
-            fragmentManager!!.beginTransaction()
+            requireFragmentManager().beginTransaction()
                     .detach(this)
                     .attach(this)
                     .commit()
