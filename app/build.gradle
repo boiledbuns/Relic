@@ -158,13 +158,14 @@ dependencies {
     // endregion external utility (3rd party) libs
 
     // region android view libs
+    def recyclerview_ver = "1.2.0-alpha03"
 
     annotationProcessor "androidx.databinding:databinding-compiler:1.0.0"
 
     implementation "com.google.android.material:material:1.0.0"
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation "androidx.recyclerview:recyclerview:1.0.0"
+    implementation "androidx.recyclerview:recyclerview:$recyclerview_ver"
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
     // endregion android view libs

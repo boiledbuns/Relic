@@ -13,6 +13,7 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.relic.R
+import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
@@ -227,8 +228,16 @@ class MainActivity : RelicActivity() {
                     .show(supportFragmentManager, TAG)
             }
             is NavigationData.ToPostSource -> {
-                val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
-                currentNavController?.value?.navigate(R.id.displaySubFragment, args)
+                when(navData.source) {
+                    is PostSource.Subreddit -> {
+                        val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
+                        currentNavController?.value?.navigate(R.id.displaySubFragment, args)
+                    }
+                    is PostSource.Frontpage -> {
+                        currentNavController?.value?.navigate(R.id.frontpageFragment)
+                    }
+                }
+
             }
             is NavigationData.PreviewPostSource -> {
                 SubInfoBottomSheetDialog.create(navData.source.getSourceName())

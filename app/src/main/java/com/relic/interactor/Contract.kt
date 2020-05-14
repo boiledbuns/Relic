@@ -1,6 +1,7 @@
 package com.relic.interactor
 
 import androidx.lifecycle.LiveData
+import com.relic.data.PostSource
 import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
@@ -19,7 +20,7 @@ interface Contract {
 
     interface SubAdapterDelegate {
         val navigationLiveData: LiveData<NavigationData>
-        fun interact(subreddit: SubredditModel, subInteraction: SubInteraction)
+        fun interact(postSource: PostSource, subInteraction: SubInteraction)
     }
 }
 
@@ -45,5 +46,7 @@ sealed class PostInteraction {
 sealed class SubInteraction {
     object Visit : SubInteraction()
     object Preview : SubInteraction()
-    object Subscribe : SubInteraction()
+    data class Subscribe(
+        val subredditModel: SubredditModel
+    ) : SubInteraction()
 }

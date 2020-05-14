@@ -33,8 +33,9 @@ class DisplaySubsVM (
         }
     }
 
-    private val _subscribedSubsList = MediatorLiveData <List<SubredditModel>> ()
-    val subscribedSubsList : LiveData<List<SubredditModel>> =  _subscribedSubsList
+    val subscribedSubsList : LiveData<List<SubredditModel>>
+        get() = subRepository.getSubscribedSubs()
+//    val subscribedSubsList by lazy { subRepository.getSubscribedSubs() }
 
     private val _searchResults = MediatorLiveData <List<String>> ()
     val searchResults: LiveData<List<String>> = _searchResults
@@ -45,10 +46,6 @@ class DisplaySubsVM (
     private var searchExact : Boolean = false
 
     init {
-        _subscribedSubsList.addSource(subRepository.getSubscribedSubs()) { subscribedSubs ->
-            _subscribedSubsList.postValue(subscribedSubs)
-        }
-
         refreshSubs()
     }
 

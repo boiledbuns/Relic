@@ -23,7 +23,6 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
     <ProgressBar
         android:id="@+id/frontpageProgress"
         android:layout_width="match_parent"
