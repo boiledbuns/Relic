@@ -57,9 +57,9 @@ class PostInteractorImpl @Inject constructor(
         post.url?.let { url ->
             val navData = when (val mediaType = MediaHelper.determineType(post)) {
                 is MediaType.Image -> NavigationData.ToImage(url)
-                is MediaType.Gfycat -> NavigationData.ToMedia(mediaType, url)
-                is MediaType.Link -> NavigationData.ToExternal(url)
-                else -> null
+                MediaType.Link -> NavigationData.ToExternal(url)
+                null -> null
+                else -> NavigationData.ToMedia(mediaType, url)
             }
 
             navData?.let { _navigationLiveData.postValue(it) }

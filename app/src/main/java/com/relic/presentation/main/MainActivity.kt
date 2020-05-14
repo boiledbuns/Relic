@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
@@ -23,9 +24,7 @@ import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
-import com.relic.presentation.media.DisplayGfycatFragment
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
-import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
@@ -268,6 +267,9 @@ class MainActivity : RelicActivity() {
             MediaType.Gfycat -> {
                 val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
                 currentNavController?.value?.navigate(R.id.displayImageFragment, args)
+            }
+            else -> {
+                Toast.makeText(baseContext, "Media type $navMediaData doesn't have a handler yet", Toast.LENGTH_SHORT).show()
             }
         }
         // TODO handle additional cases and add support for custom plugins
