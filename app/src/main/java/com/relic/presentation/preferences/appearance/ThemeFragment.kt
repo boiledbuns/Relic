@@ -51,7 +51,7 @@ class ThemeFragment : RelicFragment() {
         }
 
         val themeDropdownAdapter = ArrayAdapter.createFromResource(
-            context!!,
+            requireContext(),
             R.array.theme_names,
             android.R.layout.simple_spinner_item
         ).apply {

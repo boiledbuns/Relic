@@ -34,13 +34,13 @@ class PostLayoutFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postLayoutToolbarView.setNavigationOnClickListener { activity!!.onBackPressed() }
+        postLayoutToolbarView.setNavigationOnClickListener { requireActivity().onBackPressed() }
 
         currentLayout = viewPrefsManager.getPostCardStyle()
 
         // initialize the adapter for the spinner displaying post layout options
         val layoutSpinnerAdapter = ArrayAdapter.createFromResource(
-                context!!,
+                requireContext(),
                 R.array.post_layout_options,
                 android.R.layout.simple_spinner_item
         ).apply {
@@ -74,7 +74,7 @@ class PostLayoutFragment : RelicFragment() {
     }
 
     private fun resetPostPreviewView() {
-        val postItemView = RelicPostItemView(context!!, postLayout = viewPrefsManager.getPostCardStyle())
+        val postItemView = RelicPostItemView(requireContext(), postLayout = viewPrefsManager.getPostCardStyle())
 
         postItemView.setPost(previewPost)
 

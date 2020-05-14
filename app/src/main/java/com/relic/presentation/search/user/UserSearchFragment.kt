@@ -115,7 +115,7 @@ class UserSearchFragment : RelicFragment() {
         when (navData) {
             is NavigationData.ToUser -> {
                 val userFrag = DisplayUserFragment.create(navData.username)
-                activity!!.supportFragmentManager.beginTransaction()
+                requireActivity().supportFragmentManager.beginTransaction()
                         .add(R.id.main_content_frame, userFrag)
                         .addToBackStack(TAG).commit()
             }

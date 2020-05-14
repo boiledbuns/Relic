@@ -121,7 +121,7 @@ class SubSearchFragment : RelicFragment() {
             is NavigationData.ToPostSource -> {
                 if (navigationData.source is PostSource.Subreddit) {
                     val subFrag = DisplaySubFragment.create(navigationData.source.subredditName)
-                    activity!!.supportFragmentManager
+                    requireActivity().supportFragmentManager
                             .beginTransaction()
                             .add(R.id.main_content_frame, subFrag)
                             .addToBackStack(TAG)
@@ -131,7 +131,7 @@ class SubSearchFragment : RelicFragment() {
             is NavigationData.PreviewPostSource -> {
                 if (navigationData.source is PostSource.Subreddit) {
                    SubInfoBottomSheetDialog.create(navigationData.source.subredditName)
-                           .show(activity!!.supportFragmentManager, TAG)
+                           .show(requireActivity().supportFragmentManager, TAG)
                 }
             }
         }
