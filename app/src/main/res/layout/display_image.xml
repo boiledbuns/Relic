@@ -6,14 +6,7 @@
     android:theme="@style/AlertDialog.AppCompat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent">
-
-    <RelativeLayout
-        android:id="@+id/fullImageBackground"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/darken_background"
-        android:alpha="0.5"/>
+    android:background="@color/transparent60">
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/fullImage"

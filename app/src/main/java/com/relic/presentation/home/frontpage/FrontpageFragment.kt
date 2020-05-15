@@ -59,7 +59,9 @@ class FrontpageFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor)
+        postAdapter = PostItemAdapter(viewPrefsManager, postInteractor).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)

@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.home.frontpage.FrontpageFragment
-import kotlinx.android.synthetic.main.home.view.*
+import kotlinx.android.synthetic.main.home.*
 
 class HomeFragment : RelicFragment() {
 
@@ -21,23 +21,24 @@ class HomeFragment : RelicFragment() {
 
     // region lifecycle hooks
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
-            tabFragments.add(FrontpageFragment())
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.home, container, false).apply {
-            homeViewPager.adapter = pagerAdapter
-            homeTabLayout.setupWithViewPager(homeViewPager)
+        return inflater.inflate(R.layout.home, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
+            tabFragments.add(FrontpageFragment())
         }
+
+        homeViewPager.adapter = pagerAdapter
+        homeViewPager.offscreenPageLimit = 1
+        homeTabLayout.setupWithViewPager(homeViewPager)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

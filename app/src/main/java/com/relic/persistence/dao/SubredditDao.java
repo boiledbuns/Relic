@@ -15,7 +15,7 @@ public abstract class SubredditDao {
   @Query("SELECT * FROM SubredditModel")
   public abstract List<SubredditModel> getAll();
 
-  @Query("SELECT * FROM SubredditModel ORDER BY subName DESC")
+  @Query("SELECT * FROM SubredditModel ORDER BY subName COLLATE NOCASE")
   public abstract LiveData<List<SubredditModel>> getAllSubscribed();
 
   @Query("SELECT * FROM SubredditModel " +

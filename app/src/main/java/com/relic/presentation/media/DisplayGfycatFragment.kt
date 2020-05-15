@@ -1,30 +1,27 @@
 package com.relic.presentation.media
 
-import androidx.lifecycle.MutableLiveData
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.MutableLiveData
+import androidx.navigation.fragment.navArgs
 import com.gfycat.core.GfyCore
 import com.gfycat.core.gfycatapi.pojo.Gfycat
 import com.relic.R
-import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_gif.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class DisplayGfycatFragment : RelicFragment() {
+class DisplayGfycatFragment : DialogFragment() {
 
-    private var gfyUrl: String? = null
-    private val gfycatLiveData : MutableLiveData<Gfycat> = MutableLiveData()
+    private val args: DisplayGfycatFragmentArgs by navArgs()
+    private val url by lazy { args.url }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // retrieve the image url from the bundled args
-        gfyUrl = arguments!!.getString(GFY_KEY)
-    }
+    private val gfycatLiveData: MutableLiveData<Gfycat> = MutableLiveData()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,7 +32,7 @@ class DisplayGfycatFragment : RelicFragment() {
 
         // retrieve the reference to the binding
         return inflater.inflate(R.layout.display_gif, container, false).apply {
-            setOnClickListener { activity!!.onBackPressed() }
+            setOnClickListener { requireActivity().onBackPressed() }
         }
     }
 
@@ -49,44 +46,28 @@ class DisplayGfycatFragment : RelicFragment() {
         loadGfyCat()
     }
 
+    override fun getTheme(): Int = R.style.FullScreenDialogTheme
+
     override fun onDestroyView() {
         displayGfycat.release()
         super.onDestroyView()
     }
 
     private fun loadGfyCat() {
-        gfyUrl?.let {
-            // parse the gfyid from the url
-            val urlTokens = it.split("/")
-            val gfyId = urlTokens.last()
-            Log.d(TAG, "gfy id $gfyId")
+        // parse the gfyid from the url
+        val urlTokens = url.split("/")
+        val gfyId = urlTokens.last()
+        Timber.d("gfy id $gfyId")
 
-            GlobalScope.launch {
-                GfyCore.getFeedManager().getGfycat(gfyId).subscribe { gfycat, error ->
-                    if (error != null) {
-                        Log.d(TAG, "Error retrieving gfycat ${error}")
-                    } else {
-                        gfycatLiveData.postValue(gfycat)
-                    }
+        GlobalScope.launch {
+            GfyCore.getFeedManager().getGfycat(gfyId).subscribe { gfycat, error ->
+                if (error != null) {
+                    Timber.d("Error retrieving gfycat $error")
+                } else {
+                    gfycatLiveData.postValue(gfycat)
                 }
             }
-
         }
-
         // TODO release the resources for player when done
     }
-
-    companion object {
-        private val GFY_KEY = "gfy_url"
-
-        fun create(gfyUrl : String) : DisplayGfycatFragment {
-            val bundle = Bundle()
-            bundle.putString(GFY_KEY, gfyUrl)
-
-            return DisplayGfycatFragment().apply {
-                arguments = bundle
-            }
-        }
-    }
-
 }

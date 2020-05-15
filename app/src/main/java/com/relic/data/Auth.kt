@@ -7,6 +7,7 @@ interface Auth {
     suspend fun retrieveAccessToken(redirectUrl: String, callback: AuthenticationCallback)
     suspend fun refreshToken(callback: AuthenticationCallback)
 
+    fun isAuthenticated() : Boolean
     fun getCurrentAccountName() : LiveData<String?>
     val url : String
 

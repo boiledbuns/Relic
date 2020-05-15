@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
 import com.relic.dagger.RelicInjectable
@@ -14,6 +15,13 @@ import timber.log.Timber
 open class RelicFragment: Fragment(), RelicInjectable {
     protected val TAG : String = javaClass.toString().split(".").last().toUpperCase()
     protected var snackbar : Snackbar? = null
+
+    // avoid naming conflict with default activity getter
+    protected val relicActivity: RelicActivity
+        get() = requireActivity() as RelicActivity
+    protected val supportFragmentManager : FragmentManager
+        get() = requireActivity().supportFragmentManager
+
 
     private val connectivityManager: ConnectivityManager by lazy {
         requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

@@ -45,6 +45,11 @@ class AuthImpl @Inject constructor(
 
     private var lastRefresh: Date? = null
 
+    override fun isAuthenticated(): Boolean {
+        return appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).contains(KEY_CURR_ACCOUNT)
+    }
+
+
     private val spAccountLiveData = MutableLiveData<String?>()
     private val listener : SharedPreferences.OnSharedPreferenceChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener { sp, key ->
@@ -63,9 +68,8 @@ class AuthImpl @Inject constructor(
 
     init {
         // checks if the user is currently signed in by checking shared preferences
-        val isAuthenticated = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).contains(KEY_CURR_ACCOUNT)
 
-        if (isAuthenticated) {
+        if (isAuthenticated()) {
             // refresh the auth token
             // move the date change to the refresh method
             Log.d(TAG, "Current date/time: " + Calendar.getInstance().time)

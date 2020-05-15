@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/padding_xs"
+    android:paddingBottom="@dimen/padding_xs">
+
+    <include
+        android:id="@+id/default_sources"
+        layout="@layout/primary_sources_view" />
+
+    <TextView
+        android:id="@+id/pinnedSubsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/default_sources"
+        android:text="@string/pinned_subs"
+        android:textSize="@dimen/title_text_l"
+        android:padding="@dimen/padding_m"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pinnedSubsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/pinnedSubsCountTextView"
+        android:padding="@dimen/padding_xs"
+        android:clipToPadding="false"
+        android:orientation="horizontal"/>
+
+    <TextView
+        android:id="@+id/all_subs_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/pinnedSubsRecyclerView"
+        android:paddingStart="@dimen/padding_m"
+        android:paddingEnd="@dimen/padding_m"
+        android:paddingBottom="@dimen/padding_m"
+        android:text="@string/all_subscriptions"
+        android:textSize="@dimen/title_text_l"/>
+</RelativeLayout>

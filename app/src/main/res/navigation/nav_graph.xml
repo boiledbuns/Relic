@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nag_graph"
+    app:startDestination="@id/placeholderFragment">
+
+    <fragment
+        android:id="@+id/placeholderFragment"
+        android:name="com.relic.presentation.main.PlaceholderFragment"
+        android:label="PlaceholderFragment" />
+    <fragment
+        android:id="@+id/displayUserFragment"
+        android:name="com.relic.presentation.displayuser.DisplayUserFragment"
+        android:label="DisplayUserFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.relic.presentation.settings.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.relic.presentation.search.SearchFragment"
+        android:label="SearchFragment" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.relic.presentation.home.HomeFragment"
+        android:label="HomeFragment" />
+    <fragment
+        android:id="@+id/displaySubsFragment"
+        android:name="com.relic.presentation.displaysubs.DisplaySubsFragment"
+        android:label="DisplaySubsFragment" />
+    <fragment
+        android:id="@+id/displayPostFragment"
+        android:name="com.relic.presentation.displaypost.DisplayPostFragment"
+        android:label="DisplayPostFragment">
+        <argument
+            android:name="postFullName"
+            app:argType="string" />
+        <argument
+            android:name="subredditName"
+            app:argType="string" />
+        <argument
+            android:name="enableVisitSub"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/frontpageFragment"
+        android:name="com.relic.presentation.home.frontpage.FrontpageFragment"
+        android:label="FrontpageFragment" />
+    <fragment
+        android:id="@+id/displaySubFragment"
+        android:name="com.relic.presentation.displaysub.DisplaySubFragment"
+        android:label="DisplaySubFragment" >
+        <argument
+            android:name="subName"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.relic.presentation.login.LoginFragment"
+        android:label="LoginFragment" />
+    <dialog
+        android:id="@+id/displayImageFragment"
+        android:name="com.relic.presentation.media.DisplayImageFragment"
+        android:label="DisplayImageFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/displayGfycatFragment"
+        android:name="com.relic.presentation.media.DisplayGfycatFragment"
+        android:label="DisplayGfycatFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
+</navigation>

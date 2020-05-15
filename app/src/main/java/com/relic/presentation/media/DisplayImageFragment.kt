@@ -5,22 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.navArgs
 import com.relic.R
-import com.relic.presentation.base.RelicFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.display_image.*
 
-class DisplayImageFragment : RelicFragment() {
+class DisplayImageFragment : DialogFragment() {
 
-    private var imageUrl: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // retrieve the image url from the bundled args
-        imageUrl = arguments!!.getString(IMAGE_KEY)
-    }
+    private val args: DisplayImageFragmentArgs by navArgs()
+    private val imageUrl by lazy { args.url }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,9 +26,11 @@ class DisplayImageFragment : RelicFragment() {
 
         // retrieve the reference to the binding
         return inflater.inflate(R.layout.display_image, container, false).apply {
-            setOnClickListener { activity!!.onBackPressed() }
+            setOnClickListener { requireActivity().onBackPressed() }
         }
     }
+
+    override fun getTheme(): Int = R.style.FullScreenDialogTheme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,18 +55,4 @@ class DisplayImageFragment : RelicFragment() {
 
         Picasso.get().load(imageUrl).fit().centerInside().into(fullImage, callback)
     }
-
-    companion object {
-        private val IMAGE_KEY = "image_url"
-
-        fun create(thumbnailUrl : String) : DisplayImageFragment {
-            val bundle = Bundle()
-            bundle.putString(IMAGE_KEY, thumbnailUrl)
-
-            return DisplayImageFragment().apply {
-                arguments = bundle
-            }
-        }
-    }
-
 }

@@ -2,12 +2,7 @@ package com.relic.presentation.displaysub
 
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -15,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,6 +43,8 @@ class DisplaySubFragment : RelicFragment() {
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
+    private val args: DisplaySubFragmentArgs by navArgs()
+
     val displaySubVM: DisplaySubVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             @Suppress("UNCHECKED_CAST")
@@ -56,7 +54,7 @@ class DisplaySubFragment : RelicFragment() {
         }).get(DisplaySubVM::class.java)
     }
 
-    private lateinit var subName: String
+    private val subName: String by lazy { args.subName }
 
     private lateinit var postAdapter: PostItemAdapter
     private lateinit var subItemTouchHelper : ItemTouchHelper
@@ -71,10 +69,6 @@ class DisplaySubFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
-        arguments?.apply {
-            subName = getString(ARG_SUBREDDIT_NAME, "")
-        }
     }
 
     override fun onCreateView(
@@ -97,7 +91,7 @@ class DisplaySubFragment : RelicFragment() {
         initializeToolbar()
         initializeOnClicks()
         attachScrollListeners()
-        touchHelperCallback = PostItemsTouchHelper(this, context!!)
+        touchHelperCallback = PostItemsTouchHelper(this, requireContext())
         subItemTouchHelper = ItemTouchHelper(touchHelperCallback)
         subItemTouchHelper.attachToRecyclerView(subPostsRecyclerView)
         displaySubFAB.hide()

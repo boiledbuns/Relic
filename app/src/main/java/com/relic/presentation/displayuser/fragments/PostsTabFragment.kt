@@ -46,7 +46,7 @@ class PostsTabFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments!!.getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
+        requireArguments().getParcelable<UserTab>(ARG_USER_TAB)?.let { userTab ->
             selectedUserTab = userTab
         }
     }
@@ -121,7 +121,7 @@ class PostsTabFragment : RelicFragment() {
         when(errorData) {
             is ErrorData.NoMorePosts -> {
                 if (selectedUserTab == errorData.tab) {
-                    Snackbar.make(view!!, "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(requireView(), "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
                     tabProgress.visibility = View.GONE
                     userTabSwipeRefreshLayout.isRefreshing = false
                 }

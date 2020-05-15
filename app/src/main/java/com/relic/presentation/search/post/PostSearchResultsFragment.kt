@@ -27,7 +27,7 @@ class PostSearchResultsFragment : RelicFragment() {
     lateinit var postInteractor : Contract.PostAdapterDelegate
 
     private val searchResultsVM by lazy {
-        ViewModelProviders.of(parentFragment!!).get(PostSearchResultsVM::class.java)
+        ViewModelProviders.of(requireParentFragment()).get(PostSearchResultsVM::class.java)
     }
 
     private val viewPrefsManager by lazy {

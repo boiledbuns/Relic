@@ -5,7 +5,7 @@
         android:title="@string/nav_profile"
         android:icon="@drawable/ic_account"/>
 
-    <item android:id="@+id/nav_subreddits"
+    <item android:id="@+id/nav_subs"
         android:title="@string/nav_subreddits"
         android:icon="@drawable/ic_subs"/>
 

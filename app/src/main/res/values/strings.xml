@@ -9,11 +9,11 @@
     <string name="app_author">u/boiledbuns</string>
 
     <!-- bottom navigation -->
-    <string name="nav_subreddits">subs</string>
-    <string name="nav_profile">profile</string>
-    <string name="nav_search">search</string>
-    <string name="nav_home">home</string>
-    <string name="nav_settings">settings</string>
+    <string name="nav_subreddits">Subs</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_settings">Settings</string>
 
     <!-- search strings-->
     <string name="searchmenu_title">Search</string>
@@ -154,8 +154,11 @@
     <string name="icon_content_description">icon</string>
     <string name="login">login</string>
     <string name="login_info">You\'re currently not signed in!</string>
-    <string name="all_subscriptions">All Subscriptions</string>
     <string name="source_frontpage">Frontpage</string>
     <string name="source_all">All</string>
     <string name="source_popular">Popular</string>
+
+    <string name="all_subscriptions">All Subscriptions</string>
+    <string name="pinned_subs">Pinned Subreddits</string>
+
 </resources>
