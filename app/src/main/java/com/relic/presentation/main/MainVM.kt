@@ -12,6 +12,7 @@ import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -43,7 +44,7 @@ class MainVM(
         if (auth.isAuthenticated()) {
             launch(Dispatchers.Main) {
                 auth.refreshToken(AuthenticationCallback {
-                    Log.d(TAG, "Token refreshed")
+                    Timber.d("Token refreshed")
                     retrieveUser()
                 })
             }
@@ -73,7 +74,7 @@ class MainVM(
         launch(Dispatchers.Main) {
             // need to retrieve current user (to get the username) before retrieving the account
             userRepo.getCurrentUser()?.let { user ->
-                Log.d(TAG, "user $user")
+                Timber.d( "user $user")
                 _userLiveData.postValue(user)
 
                 userRepo.retrieveAccount(user.name)

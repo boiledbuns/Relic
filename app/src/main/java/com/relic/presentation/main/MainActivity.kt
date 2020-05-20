@@ -1,5 +1,6 @@
 package com.relic.presentation.main
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.MotionEvent
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
@@ -24,6 +26,7 @@ import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragment
+import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
@@ -74,11 +77,14 @@ class MainActivity : RelicActivity() {
         setContentView(R.layout.activity_main)
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
-        bindViewModel(this)
-
         // set up navigation if none to restore
         if (savedInstanceState == null) {
             setupBottomNav(mainVM.userLiveData.value)
+        }
+
+        bindViewModel(this)
+        if (mainVM.userLiveData.value == null) {
+            displayLoginDialog()
         }
     }
 
@@ -91,7 +97,6 @@ class MainActivity : RelicActivity() {
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.observe(lifecycleOwner) { handleUser(it) }
         mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
 
         // todo converge into a single source
@@ -107,7 +112,11 @@ class MainActivity : RelicActivity() {
                 }
             }
             RequestCodes.CHANGED_ACCOUNT -> {
-                mainVM.onAccountSelected()
+                if (resultCode == Activity.RESULT_OK) {
+                    mainVM.onAccountSelected()
+                } else {
+                    displayLoginDialog()
+                }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
@@ -154,10 +163,16 @@ class MainActivity : RelicActivity() {
 
     // region livedata handlers
 
-    private fun handleUser(userModel: UserModel?) {
-        // once the user has signed in, replace the sign in page with the account page
-        // trigger the selection
-//        setupBottomNav(userModel)
+    private fun displayLoginDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Log in!")
+            .setMessage("Relic is still under development and only supports logged in users for now :)")
+            .setCancelable(false)
+            .setPositiveButton("Login") { _, _ ->
+                LoginActivity.startForResult(this@MainActivity)
+            }
+            .create()
+            .show()
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -239,7 +254,7 @@ class MainActivity : RelicActivity() {
                     .show(supportFragmentManager, TAG)
             }
             is NavigationData.ToPostSource -> {
-                when(navData.source) {
+                when (navData.source) {
                     is PostSource.Subreddit -> {
                         val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
                         currentNavController?.value?.navigate(R.id.displaySubFragment, args)
