@@ -10,7 +10,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
@@ -21,7 +20,6 @@ import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysubs.list.SubItemAdapter
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subs.*
-import kotlinx.android.synthetic.main.primary_sources_view.view.*
 import java.util.*
 import javax.inject.Inject
 
@@ -34,7 +32,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     @Suppress("UNCHECKED_CAST")
     private val viewModel: DisplaySubsVM by lazy {
-        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create() as T
             }

@@ -37,9 +37,10 @@ import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
+import com.relic.resetBottomNavigation
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
-import navigation.setupWithNavController
+import com.relic.setupWithNavController
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
@@ -77,26 +78,24 @@ class MainActivity : RelicActivity() {
         setContentView(R.layout.activity_main)
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
-        // set up navigation if none to restore
         if (savedInstanceState == null) {
-            setupBottomNav(mainVM.userLiveData.value)
+            // set up navigation if none to restore
+            setupBottomNav()
+        } else {
+            // wait for bottom navigation bar to restore its state (selected item)
+            // before setting up it up again
+            // TODO handle selected items
+            setupBottomNav()
         }
 
         bindViewModel(this)
-        if (mainVM.userLiveData.value == null) {
+        if (!mainVM.isAuthenticated()) {
             displayLoginDialog()
         }
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        // wait for bottom navigation bar to restore its state (selected item)
-        // before setting up it up again
-        setupBottomNav(mainVM.userLiveData.value)
-    }
-
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
+        mainVM.userLiveData.observe(lifecycleOwner) { user -> user?.let { handleUser(it) } }
         mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
 
         // todo converge into a single source
@@ -139,15 +138,22 @@ class MainActivity : RelicActivity() {
 
     // endregion lifecycle hooks
 
-    private fun setupBottomNav(userModel: UserModel?) {
+    private fun setupBottomNav() {
+        val menuToDestinationMap =  mapOf(
+            Pair(R.id.nav_account, R.id.displayUserFragment),
+            Pair(R.id.nav_subs, R.id.displaySubsFragment),
+            Pair(R.id.nav_home, R.id.homeFragment),
+            Pair(R.id.nav_search, R.id.searchFragment),
+            Pair(R.id.nav_settings, R.id.settingsFragment)
+        )
+
         // use the solution from the google navigation components repo for now since there isn't
         // a clear solution for managing multiple backstacks currently
         currentNavController = bottom_navigation.setupWithNavController(
             fragmentManager = supportFragmentManager,
             containerId = R.id.main_content_frame,
-            intent = intent,
             initialPosition = 2,
-            showLogin = userModel == null
+            menuItemToDestinationMap = menuToDestinationMap
         )
     }
 
@@ -165,7 +171,7 @@ class MainActivity : RelicActivity() {
 
     private fun displayLoginDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Log in!")
+            .setTitle("Welcome to Relic")
             .setMessage("Relic is still under development and only supports logged in users for now :)")
             .setCancelable(false)
             .setPositiveButton("Login") { _, _ ->
@@ -173,6 +179,11 @@ class MainActivity : RelicActivity() {
             }
             .create()
             .show()
+    }
+
+    private fun handleUser(user: UserModel) {
+        bottom_navigation.resetBottomNavigation()
+        setupBottomNav()
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -230,8 +241,6 @@ class MainActivity : RelicActivity() {
 
     // endregion navigation view handlers
 
-    // region post interactor
-
     private fun handleNavigation(navData: NavigationData) {
         when (navData) {
             // navigates to display post
@@ -274,8 +283,6 @@ class MainActivity : RelicActivity() {
             is NavigationData.ToReply -> openPostReplyEditor(navData.parentFullname)
         }
     }
-
-    // endregion post interactor
 
     private fun openMedia(navMediaData: NavigationData.ToMedia) {
         when (navMediaData.mediaType) {

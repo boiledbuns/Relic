@@ -1,6 +1,5 @@
 package com.relic.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.relic.data.Auth
@@ -69,6 +68,8 @@ class MainVM(
             }
         }
     }
+
+    override fun isAuthenticated(): Boolean = auth.isAuthenticated()
 
     private fun retrieveUser() {
         launch(Dispatchers.Main) {

@@ -1,7 +1,5 @@
 package com.relic.presentation.displayuser
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -17,12 +15,8 @@ import com.relic.data.SortScope
 import com.relic.data.SortType
 import com.relic.interactor.Contract
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaypost.DisplayPostFragment
 import com.relic.presentation.displaysub.DisplaySubMenuHelper
-import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.fragments.PostsTabFragment
-import com.relic.presentation.media.DisplayImageFragment
-import com.relic.presentation.util.RelicEvent
 import kotlinx.android.synthetic.main.display_user.*
 import java.util.*
 import javax.inject.Inject
@@ -30,7 +24,7 @@ import javax.inject.Inject
 class DisplayUserFragment : RelicFragment() {
 
     @Inject
-    lateinit var factory : DisplayUserVM.Factory
+    lateinit var factory: DisplayUserVM.Factory
 
     @Inject
     lateinit var postInteractor: Contract.PostAdapterDelegate
@@ -38,28 +32,17 @@ class DisplayUserFragment : RelicFragment() {
     @Inject
     lateinit var commentInteractor: Contract.CommentAdapterDelegate
 
-    val displayUserVM : DisplayUserVM by lazy {
-        val provider = if (username == null) {
-            // if displaying own user -> retrieve vm from activity context
-            ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                    return factory.create(username) as T
-                }
-            })
-        } else {
-            // if displayed other users -> retrieve vm from fragment context
-            ViewModelProviders.of(this, object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                    return factory.create(username) as T
-                }
-            })
-        }
-        provider.get(DisplayUserVM::class.java)
+    val displayUserVM: DisplayUserVM by lazy {
+        // if displayed other users -> retrieve vm from fragment context
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return factory.create(username) as T
+            }
+        }).get(DisplayUserVM::class.java)
     }
 
-    private var username : String? = null
+    private var username: String? = null
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
 
@@ -108,8 +91,8 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
-        var sortType : SortType?
-        var sortScope : SortScope?
+        var sortType: SortType?
+        var sortScope: SortScope?
 
         when (item.itemId) {
             // when the sorting type is changed
@@ -138,7 +121,7 @@ class DisplayUserFragment : RelicFragment() {
 
     // region livedata handlers
 
-    private fun initializeToolbar(toolbar : Toolbar) {
+    private fun initializeToolbar(toolbar: Toolbar) {
         val pActivity = (activity as AppCompatActivity)
 
         toolbar.apply {
@@ -201,7 +184,7 @@ class DisplayUserFragment : RelicFragment() {
     companion object {
         val ARG_USERNAME = "arg_username"
 
-        fun create(username : String?) : DisplayUserFragment {
+        fun create(username: String?): DisplayUserFragment {
             val bundle = Bundle().apply {
                 putString(ARG_USERNAME, username)
             }
@@ -212,7 +195,7 @@ class DisplayUserFragment : RelicFragment() {
         }
     }
 
-    private inner class UserContentPagerAdapter(fm : FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    private inner class UserContentPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         val contentFragmentTitles = listOf(
             UserTab.Submitted,
             UserTab.Comments,
@@ -223,9 +206,9 @@ class DisplayUserFragment : RelicFragment() {
             UserTab.Hidden
         )
 
-        val contentFragments : ArrayList<PostsTabFragment> = ArrayList()
+        val contentFragments: ArrayList<PostsTabFragment> = ArrayList()
 
-        override fun getItem(p0: Int) : PostsTabFragment {
+        override fun getItem(p0: Int): PostsTabFragment {
             // tells vm which tab is currently being displayed, used for additional options
             displayUserVM.setCurrentTab(contentFragmentTitles[p0])
 

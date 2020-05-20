@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package navigation
+package com.relic
 
 import android.content.Intent
 import android.util.SparseArray
@@ -29,7 +29,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.relic.R
+
+// mapping between items and tag of fragments currently being managed
+val itemIdToTagMap = SparseArray<String>()
 
 /**
  * Manages the various graphs needed for a [BottomNavigationView].
@@ -39,16 +41,13 @@ import com.relic.R
 fun BottomNavigationView.setupWithNavController(
     fragmentManager: FragmentManager,
     containerId: Int,
-    intent: Intent,
     initialPosition: Int,
-    showLogin: Boolean
+    menuItemToDestinationMap: Map<Int, Int>
 ): LiveData<NavController> {
     // get the id of the default item from the menu
     val firstItemId = this.menu[initialPosition].itemId
     selectedItemId = firstItemId
 
-    // Map of tags
-    val itemIdToTagMap = SparseArray<String>()
     // Result. Mutable live data with the selected controlled
     val selectedNavController = MutableLiveData<NavController>()
 
@@ -66,14 +65,7 @@ fun BottomNavigationView.setupWithNavController(
         ).let { navHostFragment ->
             // replace the placeholder fragment with the actual fragment associated with the menu item
             // and remove it from the back stack
-            when(item.itemId) {
-                R.id.nav_account -> R.id.displayUserFragment
-                R.id.nav_subs -> R.id.displaySubsFragment
-                R.id.nav_home -> R.id.homeFragment
-                R.id.nav_search -> R.id.searchFragment
-                R.id.nav_settings -> R.id.settingsFragment
-                else -> null
-            }?.let { destinationId ->
+            menuItemToDestinationMap[itemId]?.let { destinationId ->
                 navHostFragment.findNavController().apply {
                     popBackStack()
                     navigate(destinationId)
@@ -111,13 +103,8 @@ fun BottomNavigationView.setupWithNavController(
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
                 // temp fix, will cleanup later
-                val selectedFragment = if (showLogin && item.itemId == R.id.nav_account) {
-                    fragmentManager.findFragmentByTag(getFragmentTag(0))
-                        as NavHostFragment
-                } else {
-                    fragmentManager.findFragmentByTag(newlySelectedItemTag)
-                        as NavHostFragment
-                }
+                val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
+                    as NavHostFragment
 
                 // Exclude the first fragment tag because it's always in the back stack.
                 if (firstFragmentTag != newlySelectedItemTag) {
@@ -169,6 +156,12 @@ fun BottomNavigationView.setupWithNavController(
         }
     }
     return selectedNavController
+}
+
+fun BottomNavigationView.resetBottomNavigation() {
+    setOnNavigationItemSelectedListener(null)
+    setOnNavigationItemReselectedListener(null)
+    itemIdToTagMap.clear()
 }
 
 private fun BottomNavigationView.setupDeepLinks(
