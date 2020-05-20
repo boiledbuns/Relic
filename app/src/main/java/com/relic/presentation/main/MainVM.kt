@@ -16,24 +16,24 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class MainVM(
-    private val auth : Auth,
-    private val userRepo : UserRepository
+    private val auth: Auth,
+    private val userRepo: UserRepository
 ) : RelicViewModel(), MainContract.VM, CoroutineScope {
 
     class Factory @Inject constructor(
-        private val auth : Auth,
-        private val userRepo : UserRepository
+        private val auth: Auth,
+        private val userRepo: UserRepository
     ) {
-        fun create () : MainVM {
+        fun create(): MainVM {
             return MainVM(auth, userRepo)
         }
     }
 
     private val _accountsLiveData = MediatorLiveData<List<AccountModel>>()
-    private val _userLiveData = MediatorLiveData<UserModel>()
+    private val _userChangedLiveData = MediatorLiveData<UserModel>()
 
-    val accountsLiveData : LiveData<List<AccountModel>> = _accountsLiveData
-    val userLiveData : LiveData<UserModel> = _userLiveData
+    val accountsLiveData: LiveData<List<AccountModel>> = _accountsLiveData
+    val userChangedEventLiveData: LiveData<UserModel> = _userChangedLiveData
 
     init {
         _accountsLiveData.addSource(userRepo.getAccounts()) { accounts ->
@@ -47,12 +47,10 @@ class MainVM(
                     retrieveUser()
                 })
             }
-        } else {
-            _userLiveData.postValue(null)
         }
     }
 
-    override fun onAccountSelected(name : String?) {
+    override fun onAccountSelected(name: String?) {
         launch(Dispatchers.Main) {
             if (name != null) {
                 // account switch, we're in charge of refreshing info about the account
@@ -64,7 +62,7 @@ class MainVM(
                 })
             } else {
                 // username should already have been set, we just need to update livedata appropriately
-                _userLiveData.postValue(userRepo.getCurrentUser())
+                _userChangedLiveData.postValue(userRepo.getCurrentUser())
             }
         }
     }
@@ -75,9 +73,7 @@ class MainVM(
         launch(Dispatchers.Main) {
             // need to retrieve current user (to get the username) before retrieving the account
             userRepo.getCurrentUser()?.let { user ->
-                Timber.d( "user $user")
-                _userLiveData.postValue(user)
-
+                Timber.d("user $user")
                 userRepo.retrieveAccount(user.name)
             }
         }

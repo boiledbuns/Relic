@@ -38,9 +38,9 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
 import com.relic.resetBottomNavigation
+import com.relic.setupWithNavController
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
-import com.relic.setupWithNavController
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
@@ -95,7 +95,7 @@ class MainActivity : RelicActivity() {
     }
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.observe(lifecycleOwner) { user -> user?.let { handleUser(it) } }
+        mainVM.userChangedEventLiveData.observe(lifecycleOwner) { user -> user?.let { handleUserChangedEvent(it) } }
         mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
 
         // todo converge into a single source
@@ -139,7 +139,7 @@ class MainActivity : RelicActivity() {
     // endregion lifecycle hooks
 
     private fun setupBottomNav() {
-        val menuToDestinationMap =  mapOf(
+        val menuToDestinationMap = mapOf(
             Pair(R.id.nav_account, R.id.displayUserFragment),
             Pair(R.id.nav_subs, R.id.displaySubsFragment),
             Pair(R.id.nav_home, R.id.homeFragment),
@@ -181,7 +181,7 @@ class MainActivity : RelicActivity() {
             .show()
     }
 
-    private fun handleUser(user: UserModel) {
+    private fun handleUserChangedEvent(newUser: UserModel) {
         bottom_navigation.resetBottomNavigation()
         setupBottomNav()
     }

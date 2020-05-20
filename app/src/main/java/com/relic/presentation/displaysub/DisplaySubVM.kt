@@ -77,7 +77,9 @@ open class DisplaySubVM (
         // from the network or just display what we have locally
         if (networkUtil.checkConnection()) {
             retrieveMorePosts(true)
-            retrieveSubreddit()
+            if (postSource is PostSource.Subreddit) {
+                retrieveSubreddit()
+            }
         } else {
             // observe the list of posts stored locally
             _postListMediator.addSource(postRepo.getPosts(postSource)) { postModels ->
