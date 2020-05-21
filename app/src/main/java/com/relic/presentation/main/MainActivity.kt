@@ -1,6 +1,7 @@
 package com.relic.presentation.main
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -64,6 +65,7 @@ class MainActivity : RelicActivity() {
 
     private var itemSelectedDelegate: ((item: MenuItem?) -> Boolean)? = null
     private var currentNavController: LiveData<NavController>? = null
+    private var currentInitDialog: Dialog? = null
 
     // region lifecycle hooks
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +95,7 @@ class MainActivity : RelicActivity() {
         accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
         userChangedEventLiveData.observeConsumable(lifecycleOwner) { handleUserChangedEvent(it) }
         navigationEventLiveData.observeConsumable(lifecycleOwner) { handleNavigationEvent(it) }
+        initializationMessageLiveData.observe(lifecycleOwner) { handleInitMessage(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -213,6 +216,21 @@ class MainActivity : RelicActivity() {
         }
     }
 
+    private fun handleInitMessage(message: String?) {
+        if (message == null) {
+            // dismiss current dialog
+            currentInitDialog?.dismiss()
+            currentInitDialog = null
+        } else {
+            currentInitDialog = AlertDialog.Builder(this)
+                .setTitle("Welcome to Relic!")
+                .setMessage(message)
+                .setCancelable(false)
+                .create().apply {
+                    show()
+                }
+        }
+    }
     // endregion livedata handlers
 
     // region navigation view handlers

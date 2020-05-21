@@ -1,6 +1,6 @@
 package com.relic.presentation.displaysubs
 
- import android.os.Bundle
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -16,14 +16,13 @@ import com.relic.R
 import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysubs.list.SubItemAdapter
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subs.*
 import java.util.*
 import javax.inject.Inject
 
-class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
+class DisplaySubsFragment : RelicFragment() {
     @Inject
     lateinit var factory: DisplaySubsVM.Factory
 
@@ -78,11 +77,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             }
         }
 
-        // observe whether all subscribed subreddits have been loaded
-//        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) {
-//            if (it) handleOnAllSubsLoaded()
-//        }
-
         viewModel.pinnedSubs.observe(lifecycleOwner) { pinnedSubs ->
             pinnedSubs?.let {
                 subAdapter.setPinnedSubs(it)
@@ -90,13 +84,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         }
     }
 
-    override fun handleOnAllSubsLoaded() {
-        display_subs_swiperefreshlayout.isRefreshing = false
-        display_subs_recyclerview.scrollToPosition(0)
-    }
-
     // endregion view model binding and handlers
-
 
     private fun attachScrollListeners() {
         display_subs_swiperefreshlayout.setOnRefreshListener {

@@ -68,7 +68,7 @@ class DisplayUserVM(
 
         retrieveUserJob = launch(Dispatchers.Main) {
             val user = username?.let { userRepo.retrieveUser(username) }
-                ?: userRepo.getCurrentUser()
+                ?: userRepo.retrieveCurrentUser()
             // use set value here to dispatch the results immediately
             _userLiveData.value = user
         }

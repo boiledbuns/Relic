@@ -79,7 +79,7 @@ class AuthImpl @Inject constructor(
 
     /**
      * Callback used to parse the url after the user has authenticated through the reddit auth page.
-     * Retrieves the code value and uses it to obtain the real auth token
+     * Retrieves the code value and uses it to obtain the access and refresh token
      * @param redirectUrl url with params to parse
      */
     override suspend fun retrieveAccessToken(redirectUrl: String, callback: AuthenticationCallback) {
@@ -140,11 +140,9 @@ class AuthImpl @Inject constructor(
                     )
 
                     userRepo.setCurrentAccount(username)
+                    callback.onAuthenticated()
                 }
             } // TODO fail if username is null
-
-            callback.onAuthenticated()
-
         } catch (e: Exception) {
             throw DomainTransfer.handleException("retrieve token", e) ?: e
         }

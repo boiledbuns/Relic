@@ -35,7 +35,6 @@ class DisplaySubsVM (
 
     val subscribedSubsList : LiveData<List<SubredditModel>>
         get() = subRepository.getSubscribedSubs()
-//    val subscribedSubsList by lazy { subRepository.getSubscribedSubs() }
 
     private val _searchResults = MediatorLiveData <List<String>> ()
     val searchResults: LiveData<List<String>> = _searchResults
@@ -44,10 +43,6 @@ class DisplaySubsVM (
 
     private var searchDisplayNSFW : Boolean = false
     private var searchExact : Boolean = false
-
-    init {
-        refreshSubs()
-    }
 
     override fun refreshSubs() {
         launch (Dispatchers.Main) {

@@ -175,11 +175,13 @@ dependencies {
     def photoview_release_ver = "2.0.0"
     def markwon_ver = "3.0.1"
     def gfycat_ver = "0.7.3"
+    def circleimageview_ver = "3.1.0"
 
     implementation "com.squareup.picasso:picasso:$picasso_ver"
     implementation "com.github.chrisbanes:PhotoView:$photoview_release_ver"
     implementation "ru.noties.markwon:core:$markwon_ver"
     implementation "com.gfycat.android:gfycat-webp-player:$gfycat_ver"
+    implementation "de.hdodenhof:circleimageview:$circleimageview_ver"
 
     // endregion 3rd partly view libs
 }
