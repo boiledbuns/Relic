@@ -14,7 +14,9 @@
         android:label="DisplayUserFragment">
         <argument
             android:name="username"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
