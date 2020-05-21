@@ -1,5 +1,7 @@
 package com.relic.presentation.main
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,6 +11,7 @@ import android.view.MotionEvent
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
@@ -16,14 +19,15 @@ import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
-import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragmentArgs
 import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.displayuser.DisplayUserFragmentArgs
 import com.relic.presentation.displayuser.DisplayUserPreview
-import com.relic.presentation.editor.ReplyEditorFragment
+import com.relic.presentation.editor.ReplyEditorFragmentArgs
+import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
@@ -34,20 +38,16 @@ import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
+import com.relic.presentation.util.observeConsumable
+import com.relic.resetBottomNavigation
+import com.relic.setupWithNavController
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
-import navigation.setupWithNavController
 import javax.inject.Inject
 
 class MainActivity : RelicActivity() {
     @Inject
     lateinit var factory: MainVM.Factory
-
-    @Inject
-    lateinit var postInteractor: Contract.PostAdapterDelegate
-
-    @Inject
-    lateinit var subredditInteractor: Contract.SubAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager
@@ -65,6 +65,7 @@ class MainActivity : RelicActivity() {
 
     private var itemSelectedDelegate: ((item: MenuItem?) -> Boolean)? = null
     private var currentNavController: LiveData<NavController>? = null
+    private var currentInitDialog: Dialog? = null
 
     // region lifecycle hooks
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,29 +75,27 @@ class MainActivity : RelicActivity() {
         setContentView(R.layout.activity_main)
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
-        bindViewModel(this)
-
-        // set up navigation if none to restore
         if (savedInstanceState == null) {
-            setupBottomNav(mainVM.userLiveData.value)
+            // set up navigation if none to restore
+            setupBottomNav()
+        } else {
+            // wait for bottom navigation bar to restore its state (selected item)
+            // before setting up it up again
+            // TODO handle selected items
+            setupBottomNav()
+        }
+
+        bindViewModel(this)
+        if (!mainVM.isAuthenticated()) {
+            displayLoginDialog()
         }
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        // wait for bottom navigation bar to restore its state (selected item)
-        // before setting up it up again
-        setupBottomNav(mainVM.userLiveData.value)
-    }
-
-    private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userLiveData.observe(lifecycleOwner) { handleUser(it) }
-        mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
-
-        // todo converge into a single source
-        postInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
-        subredditInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
+    private fun bindViewModel(lifecycleOwner: LifecycleOwner) = mainVM.apply {
+        accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
+        userChangedEventLiveData.observeConsumable(lifecycleOwner) { handleUserChangedEvent(it) }
+        navigationEventLiveData.observeConsumable(lifecycleOwner) { handleNavigationEvent(it) }
+        initializationMessageLiveData.observe(lifecycleOwner) { handleInitMessage(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -107,7 +106,11 @@ class MainActivity : RelicActivity() {
                 }
             }
             RequestCodes.CHANGED_ACCOUNT -> {
-                mainVM.onAccountSelected()
+                // inform vm the account has changed if the login was successful
+                when (resultCode) {
+                    Activity.RESULT_OK -> mainVM.onAccountSelected()
+                    else -> displayLoginDialog()
+                }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
@@ -130,15 +133,22 @@ class MainActivity : RelicActivity() {
 
     // endregion lifecycle hooks
 
-    private fun setupBottomNav(userModel: UserModel?) {
+    private fun setupBottomNav() {
+        val menuToDestinationMap = mapOf(
+            Pair(R.id.nav_account, R.id.displayUserFragment),
+            Pair(R.id.nav_subs, R.id.displaySubsFragment),
+            Pair(R.id.nav_home, R.id.homeFragment),
+            Pair(R.id.nav_search, R.id.searchFragment),
+            Pair(R.id.nav_settings, R.id.settingsFragment)
+        )
+
         // use the solution from the google navigation components repo for now since there isn't
         // a clear solution for managing multiple backstacks currently
         currentNavController = bottom_navigation.setupWithNavController(
             fragmentManager = supportFragmentManager,
             containerId = R.id.main_content_frame,
-            intent = intent,
             initialPosition = 2,
-            showLogin = userModel == null
+            menuItemToDestinationMap = menuToDestinationMap
         )
     }
 
@@ -152,12 +162,23 @@ class MainActivity : RelicActivity() {
         recreate()
     }
 
+    private fun displayLoginDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Welcome to Relic")
+            .setMessage("Relic is still under development and only supports logged in users for now :)")
+            .setCancelable(false)
+            .setPositiveButton("Login") { _, _ ->
+                LoginActivity.startForResult(this@MainActivity)
+            }
+            .create()
+            .show()
+    }
+
     // region livedata handlers
 
-    private fun handleUser(userModel: UserModel?) {
-        // once the user has signed in, replace the sign in page with the account page
-        // trigger the selection
-//        setupBottomNav(userModel)
+    private fun handleUserChangedEvent(newUser: UserModel) {
+        bottom_navigation.resetBottomNavigation()
+        setupBottomNav()
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -195,6 +216,21 @@ class MainActivity : RelicActivity() {
         }
     }
 
+    private fun handleInitMessage(message: String?) {
+        if (message == null) {
+            // dismiss current dialog
+            currentInitDialog?.dismiss()
+            currentInitDialog = null
+        } else {
+            currentInitDialog = AlertDialog.Builder(this)
+                .setTitle("Welcome to Relic!")
+                .setMessage(message)
+                .setCancelable(false)
+                .create().apply {
+                    show()
+                }
+        }
+    }
     // endregion livedata handlers
 
     // region navigation view handlers
@@ -215,14 +251,16 @@ class MainActivity : RelicActivity() {
 
     // endregion navigation view handlers
 
-    // region post interactor
-
-    private fun handleNavigation(navData: NavigationData) {
+    private fun handleNavigationEvent(navData: NavigationData) {
         when (navData) {
             // navigates to display post
             is NavigationData.ToPost -> {
                 val args = DisplayPostFragmentArgs(postFullName = navData.postId, subredditName = navData.subredditName).toBundle()
                 currentNavController?.value?.navigate(R.id.displayPostFragment, args)
+            }
+            is NavigationData.ToUser -> {
+                val args = DisplayUserFragmentArgs(navData.username).toBundle()
+                currentNavController?.value?.navigate(R.id.displayUserFragment, args)
             }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
@@ -239,7 +277,7 @@ class MainActivity : RelicActivity() {
                     .show(supportFragmentManager, TAG)
             }
             is NavigationData.ToPostSource -> {
-                when(navData.source) {
+                when (navData.source) {
                     is PostSource.Subreddit -> {
                         val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
                         currentNavController?.value?.navigate(R.id.displaySubFragment, args)
@@ -260,8 +298,6 @@ class MainActivity : RelicActivity() {
         }
     }
 
-    // endregion post interactor
-
     private fun openMedia(navMediaData: NavigationData.ToMedia) {
         when (navMediaData.mediaType) {
             MediaType.Gfycat -> {
@@ -276,10 +312,8 @@ class MainActivity : RelicActivity() {
     }
 
     private fun openPostReplyEditor(parentFullname: String) {
-        // this option is for replying to parent
-        // Should also allow user to do it inline, but that can be saved for a later task
-        val editorFragment = ReplyEditorFragment.create(parentFullname, true)
-        transitionToFragment(editorFragment)
+        val args = ReplyEditorFragmentArgs(parentFullname, true).toBundle()
+        currentNavController?.value?.navigate(R.id.replyEditorFragment, args)
     }
 
 }

@@ -10,22 +10,19 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
 import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.callbacks.AllSubsLoadedCallback
 import com.relic.presentation.displaysubs.list.SubItemAdapter
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.display_subs.*
-import kotlinx.android.synthetic.main.primary_sources_view.view.*
 import java.util.*
 import javax.inject.Inject
 
-class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
+class DisplaySubsFragment : RelicFragment() {
     @Inject
     lateinit var factory: DisplaySubsVM.Factory
 
@@ -34,7 +31,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
 
     @Suppress("UNCHECKED_CAST")
     private val viewModel: DisplaySubsVM by lazy {
-        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create() as T
             }
@@ -80,11 +77,6 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
             }
         }
 
-        // observe whether all subscribed subreddits have been loaded
-//        viewModel.allSubscribedSubsLoaded.nonNull().observe(this) {
-//            if (it) handleOnAllSubsLoaded()
-//        }
-
         viewModel.pinnedSubs.observe(lifecycleOwner) { pinnedSubs ->
             pinnedSubs?.let {
                 subAdapter.setPinnedSubs(it)
@@ -92,13 +84,7 @@ class DisplaySubsFragment : RelicFragment(), AllSubsLoadedCallback {
         }
     }
 
-    override fun handleOnAllSubsLoaded() {
-        display_subs_swiperefreshlayout.isRefreshing = false
-        display_subs_recyclerview.scrollToPosition(0)
-    }
-
     // endregion view model binding and handlers
-
 
     private fun attachScrollListeners() {
         display_subs_swiperefreshlayout.setOnRefreshListener {

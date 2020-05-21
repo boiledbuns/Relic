@@ -38,15 +38,15 @@ import javax.inject.Inject
 
 class DisplaySubFragment : RelicFragment() {
     @Inject
-    lateinit var factory : DisplaySubVM.Factory
+    lateinit var factory: DisplaySubVM.Factory
 
     @Inject
-    lateinit var viewPrefsManager : ViewPreferencesManager
+    lateinit var viewPrefsManager: ViewPreferencesManager
 
     private val args: DisplaySubFragmentArgs by navArgs()
 
     val displaySubVM: DisplaySubVM by lazy {
-        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return factory.create(PostSource.Subreddit(subName)) as T
@@ -57,8 +57,8 @@ class DisplaySubFragment : RelicFragment() {
     private val subName: String by lazy { args.subName }
 
     private lateinit var postAdapter: PostItemAdapter
-    private lateinit var subItemTouchHelper : ItemTouchHelper
-    private lateinit var touchHelperCallback : ItemTouchHelper.Callback
+    private lateinit var subItemTouchHelper: ItemTouchHelper
+    private lateinit var touchHelperCallback: ItemTouchHelper.Callback
 
     private var fragmentOpened: Boolean = false
     private var scrollLocked: Boolean = false
@@ -81,7 +81,9 @@ class DisplaySubFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         subPostsRecyclerView.apply {
             adapter = postAdapter
@@ -157,9 +159,9 @@ class DisplaySubFragment : RelicFragment() {
                 val subSyncConfigFrag = SubSyncConfigFragment.create(PostSource.Subreddit(subName))
                 // intentionally because replacing then popping off back stack loses scroll position
                 requireActivity().supportFragmentManager.beginTransaction()
-                  .replace(R.id.main_content_frame, subSyncConfigFrag)
-                  .addToBackStack(TAG)
-                  .commit()
+                    .replace(R.id.main_content_frame, subSyncConfigFrag)
+                    .addToBackStack(TAG)
+                    .commit()
                 fragmentOpened = true
             }
             // when the sorting type is changed
@@ -190,18 +192,18 @@ class DisplaySubFragment : RelicFragment() {
         return override
     }
 
-    override fun bindViewModel(lifecycleOwner : LifecycleOwner) {
-        displaySubVM.postListLiveData.nonNull().observe (lifecycleOwner) { updateLoadedPosts(it) }
+    override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
+        displaySubVM.postListLiveData.nonNull().observe(lifecycleOwner) { updateLoadedPosts(it) }
         displaySubVM.subredditLiveData.nonNull().observe(lifecycleOwner) { updateSubInfo(it) }
-        displaySubVM.subInfoLiveData.nonNull().observe (lifecycleOwner) { setSubInfoData(it) }
-        displaySubVM.errorLiveData.observe (lifecycleOwner) { handleError(it) }
+        displaySubVM.subInfoLiveData.nonNull().observe(lifecycleOwner) { setSubInfoData(it) }
+        displaySubVM.errorLiveData.observe(lifecycleOwner) { handleError(it) }
 
-        displaySubVM.refreshLiveData.nonNull().observe (lifecycleOwner) {
+        displaySubVM.refreshLiveData.nonNull().observe(lifecycleOwner) {
             subSwipeRefreshLayout.isRefreshing = it
         }
     }
 
-    fun handleVHSwipeAction(vh :RecyclerView.ViewHolder, direction : Int) {
+    fun handleVHSwipeAction(vh: RecyclerView.ViewHolder, direction: Int) {
         val postItemVH = vh as PostItemAdapter.PostItemVH
         val postItem = postAdapter.getPostList()[postItemVH.layoutPosition]
         // TODO don't handle manually -> need to check preferences
@@ -215,7 +217,7 @@ class DisplaySubFragment : RelicFragment() {
 
     // region LiveData handlers
 
-    private fun updateLoadedPosts(postModels : List<PostModel>) {
+    private fun updateLoadedPosts(postModels: List<PostModel>) {
         postAdapter.setPostList(postModels)
         // updates post list size info
 //        sub(postModels.size)
@@ -225,7 +227,7 @@ class DisplaySubFragment : RelicFragment() {
         displaySubProgress.visibility = View.GONE
     }
 
-    private fun updateSubInfo(subredditModel : SubredditModel) {
+    private fun updateSubInfo(subredditModel: SubredditModel) {
         subscribeButtonView.apply {
             text = if (subredditModel.isSubscribed) "subbed" else "subscribe"
         }
@@ -235,7 +237,7 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : RelicError?) {
+    private fun handleError(error: RelicError?) {
         error?.let {
             // cancellation should also stop all progress indicators
             subSwipeRefreshLayout.isRefreshing = false
@@ -271,7 +273,7 @@ class DisplaySubFragment : RelicFragment() {
         } ?: snackbar?.dismiss()
     }
 
-    private fun setSubInfoData(sortingInfo : DisplaySubInfoData) {
+    private fun setSubInfoData(sortingInfo: DisplaySubInfoData) {
         val method = DisplaySubMenuHelper.convertSortingTypeToText(sortingInfo.sortingMethod)
         val scope = DisplaySubMenuHelper.convertSortingScopeToText(sortingInfo.sortingScope)
 
@@ -378,7 +380,7 @@ class DisplaySubFragment : RelicFragment() {
     companion object {
         private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
 
-        fun create(subredditName : String) : DisplaySubFragment {
+        fun create(subredditName: String): DisplaySubFragment {
             return DisplaySubFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_SUBREDDIT_NAME, subredditName)

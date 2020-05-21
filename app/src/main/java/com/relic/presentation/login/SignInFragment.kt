@@ -76,16 +76,9 @@ class SignInFragment: RelicFragment(), CoroutineScope {
         }
 
         override fun onAuthenticated() {
-            launch(Dispatchers.Main) {
-                userRepo.retrieveUsername()?.let { name ->
-                    userRepo.getCurrentUser()
-                    userRepo.setCurrentAccount(name)
-                }
-
-                activity?.apply {
-                    setResult(Activity.RESULT_OK, Intent())
-                    onBackPressed()
-                }
+            activity?.apply {
+                setResult(Activity.RESULT_OK, Intent())
+                finish()
             }
         }
     }

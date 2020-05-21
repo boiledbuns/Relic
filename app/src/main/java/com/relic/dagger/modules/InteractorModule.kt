@@ -1,9 +1,6 @@
 package com.relic.dagger.modules
 
-import com.relic.interactor.CommentInteractorImpl
-import com.relic.interactor.Contract
-import com.relic.interactor.PostInteractorImpl
-import com.relic.interactor.SubredditInteractorImpl
+import com.relic.interactor.*
 import dagger.Binds
 import dagger.Module
 
@@ -19,4 +16,7 @@ abstract class InteractorModule {
 
     @Binds
     abstract fun bindCommentInteractor(commentInteractor: CommentInteractorImpl) : Contract.CommentAdapterDelegate
+
+    @Binds
+    abstract fun bindUserInteractor(userInteractorImpl: UserInteractorImpl) : Contract.UserAdapterDelegate
 }

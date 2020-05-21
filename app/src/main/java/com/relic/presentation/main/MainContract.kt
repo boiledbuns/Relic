@@ -10,6 +10,8 @@ interface MainContract {
          * name of the selected account needs to be presented to allow the vm to retrieve its details
          */
         fun onAccountSelected(name : String? = null)
+
+        fun isAuthenticated() : Boolean
     }
 }
 

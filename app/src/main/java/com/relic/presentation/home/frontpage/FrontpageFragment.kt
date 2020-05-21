@@ -11,12 +11,14 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
+import com.relic.data.Auth
+import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
+import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.displaysub.list.PostItemAdapter
-import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
 import timber.log.Timber
@@ -28,7 +30,7 @@ import javax.inject.Inject
  */
 class FrontpageFragment : RelicFragment() {
     @Inject
-    lateinit var factory : FrontpageVM.Factory
+    lateinit var factory : DisplaySubVM.Factory
 
     @Inject
     lateinit var postInteractor : Contract.PostAdapterDelegate
@@ -36,12 +38,15 @@ class FrontpageFragment : RelicFragment() {
     @Inject
     lateinit var viewPrefsManager : ViewPreferencesManager
 
-    private val frontpageVM: FrontpageVM by lazy {
-        ViewModelProviders.of(requireActivity(), object : ViewModelProvider.Factory{
+    @Inject
+    lateinit var auth: Auth
+
+    private val frontpageVM by lazy {
+        ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create() as T
+                return factory.create(PostSource.Frontpage) as T
             }
-        }).get(FrontpageVM::class.java)
+        }).get(DisplaySubVM::class.java)
     }
 
     private lateinit var postAdapter: PostItemAdapter
@@ -72,9 +77,7 @@ class FrontpageFragment : RelicFragment() {
     }
 
     private fun attachViewListeners() {
-        val swipeRefreshLayout = frontpageSwipeRefreshLayout
-
-        swipeRefreshLayout.apply {
+        frontpageSwipeRefreshLayout.apply {
             setOnRefreshListener {
                 // empties current items to show that it's being refreshed
                 frontpageRecyclerView.layoutManager!!.scrollToPosition(0)
@@ -102,19 +105,28 @@ class FrontpageFragment : RelicFragment() {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // observe the live data list of posts for this subreddit
-        frontpageVM.postListLiveData.nonNull().observe(lifecycleOwner) { handlePostsLoaded(it) }
+        frontpageVM.postListLiveData.observe(lifecycleOwner) { handlePosts(it) }
+        frontpageVM.refreshLiveData.observe (lifecycleOwner) { handleRefresh(it) }
     }
 
     // region live data handlers
 
-    private fun handlePostsLoaded(postModels : List<PostModel>) {
-        Timber.d("size of frontpage %s", postModels.size)
-        postAdapter.setPostList(postModels)
-        frontpageProgress.visibility = View.GONE
+    private fun handlePosts(posts : List<PostModel>?) {
+        posts?.let {
+            Timber.d("size of frontpage %s", posts.size)
+            postAdapter.setPostList(posts)
 
-        // turn off loading animation and unlock scrolling to allow more posts to be loaded
-        frontpageSwipeRefreshLayout.isRefreshing = false
-        scrollLocked = false
+            // unlock scrolling to allow more posts to be loaded
+            frontpageProgress.visibility = View.GONE
+            scrollLocked = false
+        }
+    }
+
+    private fun handleRefresh(refreshing : Boolean?) {
+        // niche case to hide loading on first open of app when user is not logged in
+        if (auth.isAuthenticated()) {
+            refreshing?.let { frontpageSwipeRefreshLayout.isRefreshing = it }
+        }
     }
 
     // endregion live data handlers

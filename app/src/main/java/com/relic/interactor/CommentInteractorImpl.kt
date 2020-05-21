@@ -1,8 +1,12 @@
 package com.relic.interactor
 
+import androidx.lifecycle.LiveData
 import com.relic.data.CommentRepository
 import com.relic.data.gateway.CommentGateway
 import com.relic.domain.models.CommentModel
+import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.util.RelicEvent
+import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +25,9 @@ class CommentInteractorImpl @Inject constructor(
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
         Timber.e(e,  "caught exception")
     }
+
+    private val _navigationLiveData = SingleLiveData<RelicEvent<NavigationData>>()
+    override val navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     override fun interact(comment: CommentModel, interaction: CommentInteraction) {
         when (interaction) {
@@ -49,7 +56,7 @@ class CommentInteractorImpl @Inject constructor(
     }
 
     private fun onPreviewUser(comment: CommentModel) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        _navigationLiveData.postValue(RelicEvent(NavigationData.ToUserPreview(comment.author)))
     }
 
     private fun onExpandReplies(comment: CommentModel) {

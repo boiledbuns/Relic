@@ -22,51 +22,51 @@ interface DisplaySubContract {
 
 // TODO extract out of this interface
 sealed class NavigationData {
-    data class ToPost (
-        val postId : String,
-        val subredditName : String,
-        val commentId : String? = null
-    ) : NavigationData ()
+    data class ToPost(
+        val postId: String,
+        val subredditName: String,
+        val commentId: String? = null
+    ) : NavigationData()
 
-    data class ToPostSource (
-        val source : PostSource
-    ) : NavigationData ()
+    data class ToPostSource(
+        val source: PostSource
+    ) : NavigationData()
 
-    data class PreviewPostSource (
-            val source : PostSource
-    ) : NavigationData ()
+    data class PreviewPostSource(
+        val source: PostSource
+    ) : NavigationData()
 
     // specifically for posts
-    data class ToImage (
-        val thumbnail : String
-    ) : NavigationData ()
+    data class ToImage(
+        val thumbnail: String
+    ) : NavigationData()
 
-    data class ToExternal (
-        val url : String
-    ) : NavigationData ()
+    data class ToExternal(
+        val url: String
+    ) : NavigationData()
 
-    data class ToUserPreview (
-        val username : String
-    ) : NavigationData ()
+    data class ToUserPreview(
+        val username: String
+    ) : NavigationData()
 
-    data class ToUser (
-            val username : String
-    ) : NavigationData ()
+    data class ToUser(
+        val username: String
+    ) : NavigationData()
 
     data class ToMedia(
-      val mediaType: MediaType,
-      val mediaUrl: String
+        val mediaType: MediaType,
+        val mediaUrl: String
     ) : NavigationData()
 
     data class ToReply(
-      val parentFullname: String
+        val parentFullname: String
     ) : NavigationData()
 }
 
-data class DisplaySubInfoData (
-    var sortingMethod : SortType,
-    var sortingScope : SortScope
+data class DisplaySubInfoData(
+    var sortingMethod: SortType,
+    var sortingScope: SortScope
 )
 
 
-object NoResults: RelicError()
+object NoResults : RelicError()

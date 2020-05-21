@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.navArgs
 import com.relic.R
 import com.relic.presentation.base.RelicFragment
 import com.shopify.livedataktx.nonNull
@@ -23,21 +24,12 @@ class ReplyEditorFragment : RelicFragment() {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 // construct & inject editor ViewModel
-                return factory.create(parent, parentIsPost) as T
+                return factory.create(args.parentFullname, args.isPost) as T
             }
         }).get(ReplyEditorVM::class.java)
     }
 
-    lateinit var parent : String
-    var parentIsPost : Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.apply {
-            getString(PARENT_ARG)?.let { parent = it } ?: dismiss()
-            parentIsPost = getBoolean(IS_POST_ARG)
-        } ?: dismiss()
-    }
+    private val args : ReplyEditorFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.editor_reply, container, false)
