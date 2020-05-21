@@ -81,7 +81,9 @@ class DisplaySubFragment : RelicFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM)
+        postAdapter = PostItemAdapter(viewPrefsManager, displaySubVM).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         subPostsRecyclerView.apply {
             adapter = postAdapter

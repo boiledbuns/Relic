@@ -6,6 +6,7 @@ import com.relic.domain.models.CommentModel
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubredditModel
 import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.util.RelicEvent
 
 // delegates for handling domain layer interactions
 interface Contract {
@@ -14,12 +15,12 @@ interface Contract {
     }
 
     interface PostAdapterDelegate {
-        val navigationLiveData : LiveData<NavigationData>
+        val navigationLiveData : LiveData<RelicEvent<NavigationData>>
         fun interact(post : PostModel, interaction: PostInteraction)
     }
 
     interface SubAdapterDelegate {
-        val navigationLiveData: LiveData<NavigationData>
+        val navigationLiveData: LiveData<RelicEvent<NavigationData>>
         fun interact(postSource: PostSource, subInteraction: SubInteraction)
     }
 }

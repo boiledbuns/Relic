@@ -6,6 +6,7 @@ import com.relic.domain.models.PostModel
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
+import com.relic.presentation.util.RelicEvent
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -31,8 +32,8 @@ class PostInteractorImpl @Inject constructor(
         Timber.e(e,  "caught exception")
     }
 
-    private val _navigationLiveData = SingleLiveData<NavigationData>()
-    override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
+    private val _navigationLiveData = SingleLiveData<RelicEvent<NavigationData>>()
+    override val navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     override fun interact(post: PostModel, interaction: PostInteraction) {
         when(interaction) {
@@ -50,7 +51,7 @@ class PostInteractorImpl @Inject constructor(
     private fun visitPost(post: PostModel) {
         launch(Dispatchers.Main) { postGateway.visitPost(post.fullName) }
         post.visited = true
-        _navigationLiveData.postValue(NavigationData.ToPost(post.fullName, post.subreddit!!))
+        _navigationLiveData.postValue(RelicEvent(NavigationData.ToPost(post.fullName, post.subreddit!!)))
     }
 
     private fun visitLink(post: PostModel) {
@@ -62,12 +63,12 @@ class PostInteractorImpl @Inject constructor(
                 else -> NavigationData.ToMedia(mediaType, url)
             }
 
-            navData?.let { _navigationLiveData.postValue(it) }
+            navData?.let { _navigationLiveData.postValue(RelicEvent(it)) }
         }
     }
 
     private fun previewUser(post: PostModel) {
-        _navigationLiveData.postValue(NavigationData.ToUserPreview(post.author))
+        _navigationLiveData.postValue(RelicEvent(NavigationData.ToUserPreview(post.author)))
     }
 
     private fun voteOnPost(post: PostModel, vote: Int) {
@@ -85,6 +86,6 @@ class PostInteractorImpl @Inject constructor(
     }
 
     private fun onNewReplyPressed(post: PostModel) {
-        _navigationLiveData.postValue(NavigationData.ToReply(post.fullName))
+        _navigationLiveData.postValue(RelicEvent(NavigationData.ToReply(post.fullName)))
     }
 }

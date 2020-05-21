@@ -37,6 +37,7 @@ import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
+import com.relic.presentation.util.observeConsumable
 import com.relic.resetBottomNavigation
 import com.relic.setupWithNavController
 import com.shopify.livedataktx.observe
@@ -47,11 +48,7 @@ class MainActivity : RelicActivity() {
     @Inject
     lateinit var factory: MainVM.Factory
 
-    @Inject
-    lateinit var postInteractor: Contract.PostAdapterDelegate
 
-    @Inject
-    lateinit var subredditInteractor: Contract.SubAdapterDelegate
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager
@@ -94,13 +91,10 @@ class MainActivity : RelicActivity() {
         }
     }
 
-    private fun bindViewModel(lifecycleOwner: LifecycleOwner) {
-        mainVM.userChangedEventLiveData.observe(lifecycleOwner) { user -> user?.let { handleUserChangedEvent(it) } }
-        mainVM.accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
-
-        // todo converge into a single source
-        postInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
-        subredditInteractor.navigationLiveData.observe(lifecycleOwner) { handleNavigation(it!!) }
+    private fun bindViewModel(lifecycleOwner: LifecycleOwner) = mainVM.apply {
+        accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
+        userChangedEventLiveData.observeConsumable(lifecycleOwner) { handleUserChangedEvent(it) }
+        navigationLiveData.observeConsumable(lifecycleOwner) { handleNavigationEvent(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -111,10 +105,10 @@ class MainActivity : RelicActivity() {
                 }
             }
             RequestCodes.CHANGED_ACCOUNT -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    mainVM.onAccountSelected()
-                } else {
-                    displayLoginDialog()
+                // inform vm the account has changed if the login was successful
+                when (resultCode) {
+                    Activity.RESULT_OK -> mainVM.onAccountSelected()
+                    else -> displayLoginDialog()
                 }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -241,7 +235,7 @@ class MainActivity : RelicActivity() {
 
     // endregion navigation view handlers
 
-    private fun handleNavigation(navData: NavigationData) {
+    private fun handleNavigationEvent(navData: NavigationData) {
         when (navData) {
             // navigates to display post
             is NavigationData.ToPost -> {
