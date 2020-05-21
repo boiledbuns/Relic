@@ -87,7 +87,7 @@ dependencies {
 
     // region android libs
     def android_appcompat_ver = "1.1.0"
-    def lifecycle_ver = "2.0.0"
+    def lifecycle_ver = "2.2.0"
     def room_ver = "2.1.0"
     def work_ver = "2.2.0"
     def pref_ver = "1.1.0"

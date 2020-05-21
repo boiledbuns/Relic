@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.navArgs
 import com.relic.R
 import com.relic.data.SortScope
 import com.relic.data.SortType
@@ -37,19 +38,18 @@ class DisplayUserFragment : RelicFragment() {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(username) as T
+                return factory.create(args.username) as T
             }
         }).get(DisplayUserVM::class.java)
     }
 
-    private var username: String? = null
+    private val args: DisplayUserFragmentArgs by navArgs()
+
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        username = arguments?.getString(ARG_USERNAME)
         setHasOptionsMenu(true)
     }
 
@@ -143,41 +143,7 @@ class DisplayUserFragment : RelicFragment() {
                 userUserPreview.setUser(it)
             }
         })
-//        displayUserVM.navigationLiveData.observe(lifecycleOwner, androidx.lifecycle.Observer {
-////            handleNavigation(it)
-//        })
     }
-
-//    // TODO route through main activity
-//    private fun handleNavigation(navEvent : RelicEvent<NavigationData>) {
-//        if (!navEvent.consumed) {
-//            val navigation = navEvent.consume()
-//
-//            when (navigation) {
-//                is NavigationData.ToPost -> {
-//                    val postFragment = DisplayPostFragment.create(
-//                        navigation.postId,
-//                        navigation.subredditName,
-//                        enableVisitSub = true
-//                    )
-//                    // intentionally because replacing then popping off back stack loses scroll position
-//                    requireActivity().supportFragmentManager.beginTransaction()
-//                        .add(R.id.main_content_frame, postFragment).addToBackStack(TAG).commit()
-//                }
-//                // navigates to display image on top of current fragment
-//                is NavigationData.ToImage -> {
-//                    val imageFragment = DisplayImageFragment.create(
-//                        navigation.thumbnail
-//                    )
-//                }
-//                // let browser handle navigation to url
-//                is NavigationData.ToExternal -> {
-//                    val openInBrowser = Intent(Intent.ACTION_VIEW, Uri.parse(navigation.url))
-//                    startActivity(openInBrowser)
-//                }
-//            }
-//        }
-//    }
 
     // endregion livedata handlers
 

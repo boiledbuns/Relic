@@ -21,28 +21,32 @@ import kotlin.coroutines.CoroutineContext
 class MainVM(
     private val auth: Auth,
     private val userRepo: UserRepository,
+    private val commentInteractor: Contract.CommentAdapterDelegate,
     private val postInteractor: Contract.PostAdapterDelegate,
-    private val subredditInteractor: Contract.SubAdapterDelegate
+    private val subredditInteractor: Contract.SubAdapterDelegate,
+    private val userInteractor: Contract.UserAdapterDelegate
 ) : RelicViewModel(), MainContract.VM, CoroutineScope {
 
     class Factory @Inject constructor(
         private val auth: Auth,
         private val userRepo: UserRepository,
+        private val commentInteractor: Contract.CommentAdapterDelegate,
         private val postInteractor: Contract.PostAdapterDelegate,
-        private val subredditInteractor: Contract.SubAdapterDelegate
+        private val subredditInteractor: Contract.SubAdapterDelegate,
+        private val userInteractor: Contract.UserAdapterDelegate
     ) {
         fun create(): MainVM {
-            return MainVM(auth, userRepo, postInteractor, subredditInteractor)
+            return MainVM(auth, userRepo, commentInteractor, postInteractor, subredditInteractor, userInteractor)
         }
     }
 
     private val _accountsLiveData = MediatorLiveData<List<AccountModel>>()
-    private val _userChangedLiveData = MediatorLiveData<RelicEvent<UserModel>>()
+    private val _userChangedEventLiveData = MediatorLiveData<RelicEvent<UserModel>>()
     private val _navigationLiveData = MediatorLiveData<RelicEvent<NavigationData>>()
 
     val accountsLiveData: LiveData<List<AccountModel>> = _accountsLiveData
-    val userChangedEventLiveData: LiveData<RelicEvent<UserModel>> = _userChangedLiveData
-    val navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
+    val userChangedEventLiveData: LiveData<RelicEvent<UserModel>> = _userChangedEventLiveData
+    val navigationEventLiveData: LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     init {
         _accountsLiveData.addSource(userRepo.getAccounts()) { accounts ->
@@ -51,6 +55,8 @@ class MainVM(
         _navigationLiveData.apply {
             addSource(postInteractor.navigationLiveData) { postValue(it) }
             addSource(subredditInteractor.navigationLiveData) { postValue(it) }
+            addSource(commentInteractor.navigationLiveData) { postValue(it) }
+            addSource(userInteractor.navigationLiveData) { postValue(it) }
         }
 
         if (auth.isAuthenticated()) {
@@ -75,7 +81,7 @@ class MainVM(
                 })
             } else {
                 // username should already have been set, we just need to update livedata appropriately
-                _userChangedLiveData.postValue(RelicEvent(userRepo.getCurrentUser()!!))
+                _userChangedEventLiveData.postValue(RelicEvent(userRepo.getCurrentUser()!!))
             }
         }
     }

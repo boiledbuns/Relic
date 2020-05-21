@@ -18,14 +18,14 @@ import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
-import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
 import com.relic.presentation.displaypost.DisplayPostFragmentArgs
 import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
+import com.relic.presentation.displayuser.DisplayUserFragmentArgs
 import com.relic.presentation.displayuser.DisplayUserPreview
-import com.relic.presentation.editor.ReplyEditorFragment
+import com.relic.presentation.editor.ReplyEditorFragmentArgs
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
@@ -47,8 +47,6 @@ import javax.inject.Inject
 class MainActivity : RelicActivity() {
     @Inject
     lateinit var factory: MainVM.Factory
-
-
 
     @Inject
     lateinit var viewPrefsManager: ViewPreferencesManager
@@ -94,7 +92,7 @@ class MainActivity : RelicActivity() {
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) = mainVM.apply {
         accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
         userChangedEventLiveData.observeConsumable(lifecycleOwner) { handleUserChangedEvent(it) }
-        navigationLiveData.observeConsumable(lifecycleOwner) { handleNavigationEvent(it) }
+        navigationEventLiveData.observeConsumable(lifecycleOwner) { handleNavigationEvent(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -161,8 +159,6 @@ class MainActivity : RelicActivity() {
         recreate()
     }
 
-    // region livedata handlers
-
     private fun displayLoginDialog() {
         AlertDialog.Builder(this)
             .setTitle("Welcome to Relic")
@@ -174,6 +170,8 @@ class MainActivity : RelicActivity() {
             .create()
             .show()
     }
+
+    // region livedata handlers
 
     private fun handleUserChangedEvent(newUser: UserModel) {
         bottom_navigation.resetBottomNavigation()
@@ -242,6 +240,10 @@ class MainActivity : RelicActivity() {
                 val args = DisplayPostFragmentArgs(postFullName = navData.postId, subredditName = navData.subredditName).toBundle()
                 currentNavController?.value?.navigate(R.id.displayPostFragment, args)
             }
+            is NavigationData.ToUser -> {
+                val args = DisplayUserFragmentArgs(navData.username).toBundle()
+                currentNavController?.value?.navigate(R.id.displayUserFragment, args)
+            }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
                 val args = DisplayImageFragmentArgs(url = navData.thumbnail).toBundle()
@@ -292,10 +294,8 @@ class MainActivity : RelicActivity() {
     }
 
     private fun openPostReplyEditor(parentFullname: String) {
-        // this option is for replying to parent
-        // Should also allow user to do it inline, but that can be saved for a later task
-        val editorFragment = ReplyEditorFragment.create(parentFullname, true)
-        transitionToFragment(editorFragment)
+        val args = ReplyEditorFragmentArgs(parentFullname, true).toBundle()
+        currentNavController?.value?.navigate(R.id.replyEditorFragment, args)
     }
 
 }

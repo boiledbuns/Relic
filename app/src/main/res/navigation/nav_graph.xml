@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nag_graph"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nag_graph"
     app:startDestination="@id/placeholderFragment">
 
     <fragment
@@ -10,7 +11,11 @@
     <fragment
         android:id="@+id/displayUserFragment"
         android:name="com.relic.presentation.displayuser.DisplayUserFragment"
-        android:label="DisplayUserFragment" />
+        android:label="DisplayUserFragment">
+        <argument
+            android:name="username"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.relic.presentation.settings.SettingsFragment"
@@ -49,15 +54,11 @@
     <fragment
         android:id="@+id/displaySubFragment"
         android:name="com.relic.presentation.displaysub.DisplaySubFragment"
-        android:label="DisplaySubFragment" >
+        android:label="DisplaySubFragment">
         <argument
             android:name="subName"
             app:argType="string" />
     </fragment>
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.relic.presentation.login.LoginFragment"
-        android:label="LoginFragment" />
     <dialog
         android:id="@+id/displayImageFragment"
         android:name="com.relic.presentation.media.DisplayImageFragment"
@@ -74,4 +75,15 @@
             android:name="url"
             app:argType="string" />
     </dialog>
+    <fragment
+        android:id="@+id/replyEditorFragment"
+        android:name="com.relic.presentation.editor.ReplyEditorFragment"
+        android:label="ReplyEditorFragment">
+        <argument
+            android:name="parentFullname"
+            app:argType="string" />
+        <argument
+            android:name="isPost"
+            app:argType="boolean" />
+    </fragment>
 </navigation>

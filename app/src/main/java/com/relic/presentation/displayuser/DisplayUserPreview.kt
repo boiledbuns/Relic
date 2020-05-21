@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.relic.R
+import com.relic.interactor.Contract
+import com.relic.interactor.UserInteraction
 import com.relic.presentation.base.RelicBottomSheetDialog
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
@@ -17,6 +19,8 @@ import kotlinx.android.synthetic.main.display_user_preview.view.*
 import javax.inject.Inject
 
 class DisplayUserPreview : RelicBottomSheetDialog() {
+
+    @Inject lateinit var userInteractor : Contract.UserAdapterDelegate
 
     @Inject lateinit var factory : DisplayUserVM.Factory
 
@@ -43,10 +47,7 @@ class DisplayUserPreview : RelicBottomSheetDialog() {
             userPreviewUser.text = resources.getString(R.string.user_prefix_label, username)
             userPreviewUser.setOnClickListener {
                 dismiss()
-
-                val fullUserFrag = DisplayUserFragment.create(username)
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .add(R.id.main_content_frame, fullUserFrag).addToBackStack(TAG).commit()
+                userInteractor.interact(UserInteraction.ViewUser(username))
             }
         }
     }
