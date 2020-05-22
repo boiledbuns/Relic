@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
@@ -148,8 +149,13 @@ class MainActivity : RelicActivity() {
             fragmentManager = supportFragmentManager,
             containerId = R.id.main_content_frame,
             initialPosition = 2,
-            menuItemToDestinationMap = menuToDestinationMap
+            menuItemToDestinationMap = menuToDestinationMap,
+            onItemReselected = { item -> onItemReselected(item)}
         )
+    }
+
+    private fun onItemReselected(menuItem: MenuItem) {
+        onBackPressed()
     }
 
     private fun setTheme() {
@@ -164,8 +170,8 @@ class MainActivity : RelicActivity() {
 
     private fun displayLoginDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Welcome to Relic")
-            .setMessage("Relic is still under development and only supports logged in users for now :)")
+            .setTitle(R.string.welcome_dialog_title)
+            .setMessage(R.string.welcome_dialog_body)
             .setCancelable(false)
             .setPositiveButton("Login") { _, _ ->
                 LoginActivity.startForResult(this@MainActivity)

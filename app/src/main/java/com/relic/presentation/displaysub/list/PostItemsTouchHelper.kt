@@ -22,6 +22,8 @@ class PostItemsTouchHelper(
     private val swipeRightColor = context.resources.getColor(R.color.upvote)
     private val swipeLeftColor = context.resources.getColor(R.color.downvote)
     private val marginTop = context.resources.getDimension(R.dimen.padding_xs).roundToInt()
+    private val margin = context.resources.getDimension(R.dimen.padding_l).roundToInt()
+    private val iconSize = context.resources.getDimension(R.dimen.swipe_icon_size).roundToInt()
     private val iconColor = context.resources.getColor(R.color.white)
     private val upvoteIcon = context.getDrawable(R.drawable.ic_upvote)!!
     private val downvoteIcon = context.getDrawable(R.drawable.ic_downvote)!!
@@ -81,8 +83,6 @@ class PostItemsTouchHelper(
                     )
 
                     val vhHeight = viewHolder.itemView.bottom - viewHolder.itemView.top
-                    val icWidth = vhHeight / 2
-                    val icHeight = icWidth
 
                     if (dX == 0F) {
                         // from right swipe to release
@@ -98,10 +98,10 @@ class PostItemsTouchHelper(
                         // left, top, right, bottom
                         upvoteIcon.apply {
                             bounds = Rect(
-                                marginTop,
-                                viewHolder.itemView.top + vhHeight / 2 - icHeight / 2,
-                                marginTop + icWidth,
-                                viewHolder.itemView.bottom - vhHeight / 2 + icHeight / 2
+                                margin,
+                                viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+                                margin + iconSize,
+                                viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
                             )
                             setTint(iconColor)
                             draw(canvas)
@@ -110,10 +110,10 @@ class PostItemsTouchHelper(
                         drawColor(swipeLeftColor)
                         downvoteIcon.apply {
                             bounds = Rect(
-                                viewHolder.itemView.right - icWidth - marginTop,
-                                viewHolder.itemView.top + vhHeight / 2 - icHeight / 2,
-                                viewHolder.itemView.right - marginTop,
-                                viewHolder.itemView.bottom - vhHeight / 2 + icHeight / 2
+                                viewHolder.itemView.right - iconSize - margin,
+                                viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+                                viewHolder.itemView.right - margin,
+                                viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
                             )
                             setTint(iconColor)
                             draw(canvas)

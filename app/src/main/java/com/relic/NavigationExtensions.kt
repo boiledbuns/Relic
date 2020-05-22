@@ -18,6 +18,7 @@ package com.relic
 
 import android.content.Intent
 import android.util.SparseArray
+import android.view.MenuItem
 import androidx.core.util.forEach
 import androidx.core.util.set
 import androidx.core.view.forEachIndexed
@@ -42,7 +43,8 @@ fun BottomNavigationView.setupWithNavController(
     fragmentManager: FragmentManager,
     containerId: Int,
     initialPosition: Int,
-    menuItemToDestinationMap: Map<Int, Int>
+    menuItemToDestinationMap: Map<Int, Int>,
+    onItemReselected: (menuItem: MenuItem) -> Unit
 ): LiveData<NavController> {
     // get the id of the default item from the menu
     val firstItemId = this.menu[initialPosition].itemId
@@ -136,7 +138,7 @@ fun BottomNavigationView.setupWithNavController(
     }
 
     // Optional: on item reselected, pop back stack to the destination of the graph
-    setupItemReselected(itemIdToTagMap, fragmentManager)
+    setOnNavigationItemReselectedListener(onItemReselected)
 
     // Handle deep link
 //    setupDeepLinks(navGraphIds, fragmentManager, containerId, intent)
@@ -185,22 +187,6 @@ private fun BottomNavigationView.setupDeepLinks(
             && selectedItemId != navHostFragment.navController.graph.id) {
             this.selectedItemId = navHostFragment.navController.graph.id
         }
-    }
-}
-
-private fun BottomNavigationView.setupItemReselected(
-    graphIdToTagMap: SparseArray<String>,
-    fragmentManager: FragmentManager
-) {
-    setOnNavigationItemReselectedListener { item ->
-        val newlySelectedItemTag = graphIdToTagMap[item.itemId]
-        val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
-            as NavHostFragment
-        val navController = selectedFragment.navController
-        // Pop the back stack to the start destination of the current navController graph
-        navController.popBackStack(
-            navController.graph.startDestination, false
-        )
     }
 }
 
