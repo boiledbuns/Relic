@@ -89,13 +89,14 @@ class NetworkRequestManager @Inject constructor(
     }
 
     // get the oauth token from the app's shared preferences
-    private suspend fun checkToken(): String {
+    private suspend fun checkToken(): String? {
         // get the name of the current account
         val name = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
             .getString(KEY_CURR_ACCOUNT, null)
 
+        // TODO if the token is expired, we need to refresh it
         return withContext(Dispatchers.IO) {
-            tokenStore.getTokenStore(name).access
+            name?.let { tokenStore.getTokenStore(it).access }
         }
     }
 }

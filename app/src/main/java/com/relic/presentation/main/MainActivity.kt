@@ -173,7 +173,7 @@ class MainActivity : RelicActivity() {
             .setTitle(R.string.welcome_dialog_title)
             .setMessage(R.string.welcome_dialog_body)
             .setCancelable(false)
-            .setPositiveButton("Login") { _, _ ->
+            .setPositiveButton(R.string.welcome_dialog_login) { _, _ ->
                 LoginActivity.startForResult(this@MainActivity)
             }
             .create()
