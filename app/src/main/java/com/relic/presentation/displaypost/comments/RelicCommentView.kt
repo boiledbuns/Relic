@@ -27,9 +27,17 @@ class RelicCommentView (
     private var replyAction : (text : String) -> Unit = { }
     private lateinit var comment : CommentModel
 
+    private val defaultColor: Int
+    private val downvotedColor: Int
+    private val upvotedColor: Int
+
     init {
         LayoutInflater.from(context).inflate(R.layout.comment_item, this)
         commentReplyView.setOnClickListener { openReplyEditor() }
+
+        defaultColor = context.resources.getColor(R.color.white)
+        downvotedColor = context.resources.getColor(R.color.downvote)
+        upvotedColor = context.resources.getColor(R.color.upvote)
     }
 
     fun displayParent(display : Boolean) {
@@ -110,16 +118,16 @@ class RelicCommentView (
     private fun updateVoteView() {
         when (comment.userUpvoted) {
             1 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
+                commentUpvoteView.setColorFilter(upvotedColor)
+                commentDownvoteView.setColorFilter(defaultColor)
             }
             0 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote)
+                commentUpvoteView.setColorFilter(defaultColor)
+                commentDownvoteView.setColorFilter(defaultColor)
             }
             -1 -> {
-                commentUpvoteView.setImageResource(R.drawable.ic_upvote)
-                commentDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+                commentUpvoteView.setColorFilter(defaultColor)
+                commentDownvoteView.setColorFilter(downvotedColor)
             }
         }
 

@@ -208,20 +208,18 @@ class DisplaySubFragment : RelicFragment() {
         val postItem = postAdapter.getPostList()[postItemVH.layoutPosition]
         // TODO don't handle manually -> need to check preferences
         val interaction = when (direction) {
-            ItemTouchHelper.LEFT -> PostInteraction.Upvote
+            ItemTouchHelper.RIGHT -> PostInteraction.Upvote
             else -> PostInteraction.Downvote
         }
 
         displaySubVM.interact(postItem, interaction)
+        postAdapter.notifyItemChanged(postItemVH.layoutPosition)
     }
 
     // region LiveData handlers
 
     private fun updateLoadedPosts(postModels: List<PostModel>) {
         postAdapter.setPostList(postModels)
-        // updates post list size info
-//        sub(postModels.size)
-
         // unlock scrolling to allow more posts to be loaded
         scrollLocked = false
         displaySubProgress.visibility = View.GONE
