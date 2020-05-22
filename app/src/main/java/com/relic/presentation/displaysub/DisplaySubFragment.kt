@@ -88,12 +88,15 @@ class DisplaySubFragment : RelicFragment() {
         subPostsRecyclerView.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(context)
+            itemAnimator = null
         }
 
         initializeToolbar()
         initializeOnClicks()
         attachScrollListeners()
-        touchHelperCallback = PostItemsTouchHelper(this, requireContext())
+        touchHelperCallback = PostItemsTouchHelper(requireContext()) { vh, direction ->
+            handleVHSwipeAction(vh, direction)
+        }
         subItemTouchHelper = ItemTouchHelper(touchHelperCallback)
         subItemTouchHelper.attachToRecyclerView(subPostsRecyclerView)
         displaySubFAB.hide()
@@ -203,7 +206,7 @@ class DisplaySubFragment : RelicFragment() {
         }
     }
 
-    fun handleVHSwipeAction(vh: RecyclerView.ViewHolder, direction: Int) {
+    private fun handleVHSwipeAction(vh: RecyclerView.ViewHolder, direction: Int) {
         val postItemVH = vh as PostItemAdapter.PostItemVH
         val postItem = postAdapter.getPostList()[postItemVH.layoutPosition]
         // TODO don't handle manually -> need to check preferences

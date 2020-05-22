@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
@@ -15,10 +16,12 @@ import com.relic.data.Auth
 import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.interactor.Contract
+import com.relic.interactor.PostInteraction
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.displaysub.list.PostItemAdapter
+import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
 import timber.log.Timber
@@ -71,9 +74,14 @@ class FrontpageFragment : RelicFragment() {
         frontpageRecyclerView = frontpagePostsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = postAdapter
+            itemAnimator = null
         }
 
         attachViewListeners()
+        val touchHelperCallback = PostItemsTouchHelper(requireContext()) { vh, direction ->
+            handleVHSwipeAction(vh, direction)
+        }
+        ItemTouchHelper(touchHelperCallback).attachToRecyclerView(frontpagePostsRecyclerView)
     }
 
     private fun attachViewListeners() {
@@ -107,6 +115,18 @@ class FrontpageFragment : RelicFragment() {
         // observe the live data list of posts for this subreddit
         frontpageVM.postListLiveData.observe(lifecycleOwner) { handlePosts(it) }
         frontpageVM.refreshLiveData.observe (lifecycleOwner) { handleRefresh(it) }
+    }
+
+    private fun handleVHSwipeAction(vh: RecyclerView.ViewHolder, direction: Int) {
+        val postItemVH = vh as PostItemAdapter.PostItemVH
+        val postItem = postAdapter.getPostList()[postItemVH.layoutPosition]
+        val interaction = when (direction) {
+            ItemTouchHelper.RIGHT -> PostInteraction.Upvote
+            else -> PostInteraction.Downvote
+        }
+
+        postInteractor.interact(postItem, interaction)
+        postAdapter.notifyItemChanged(postItemVH.layoutPosition)
     }
 
     // region live data handlers

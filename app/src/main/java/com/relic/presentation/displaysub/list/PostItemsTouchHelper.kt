@@ -6,14 +6,13 @@ import android.graphics.Rect
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
-import com.relic.presentation.displaysub.DisplaySubFragment
 import timber.log.Timber
 import kotlin.math.roundToInt
 
 // TODO add custom lengths for swipe and release actions - currently any length will trigger
 class PostItemsTouchHelper(
-    private val fragment: DisplaySubFragment,
-    private val context: Context
+    private val context: Context,
+    private val swipeCallback: (vh: RecyclerView.ViewHolder, direction: Int) -> Unit
 ) : ItemTouchHelper.Callback() {
 
     private val translationScale = 0.5
@@ -89,10 +88,10 @@ class PostItemsTouchHelper(
                         // from right swipe to release
                         if (previousXTranslation > 0F) {
                             Timber.d("touch helper right %s", dX.toString())
-                            fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.RIGHT)
+                            swipeCallback.invoke(viewHolder, ItemTouchHelper.RIGHT)
                         } else if (previousXTranslation < 0F) {
                             Timber.d("touch helper left %s", dX.toString())
-                            fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.LEFT)
+                            swipeCallback.invoke(viewHolder, ItemTouchHelper.LEFT)
                         }
                     } else if (dX > 0) {
                         drawColor(swipeRightColor)
