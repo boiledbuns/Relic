@@ -10,7 +10,9 @@ import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
 import com.relic.data.PostSource
+import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubPreviewModel
+import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
@@ -22,6 +24,7 @@ import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.shopify.livedataktx.nonNull
 import kotlinx.android.synthetic.main.display_search.*
 import javax.inject.Inject
+
 
 class SearchFragment : RelicFragment() {
     @Inject
@@ -42,17 +45,12 @@ class SearchFragment : RelicFragment() {
     @Inject
     lateinit var postInteractor: Contract.PostAdapterDelegate
 
-    private val countDownTimer: SearchInputCountdown by lazy {
-        SearchInputCountdown {
-            val searchOptions = generateSearchOptions()
-            searchVM.search(searchOptions)
-        }
-    }
+    private val countDownTimer = SearchInputCountdown()
 
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private val optionToResultTypeMap = mapOf(
         Pair(R.id.optionSubs, SearchResultType.SUB),
-        Pair(R.id.optionPosts,  SearchResultType.POST),
+        Pair(R.id.optionPosts, SearchResultType.POST),
         Pair(R.id.optionUsers, SearchResultType.USER)
     )
 
@@ -68,14 +66,21 @@ class SearchFragment : RelicFragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = searchResultsAdapter
         }
+    }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        // initialize listeners AFTER state has been restored
         searchView.initSearchWidget()
         initializeSearchOptions(searchVM.currentSearchType)
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         searchVM.apply {
-            subredditResultsLiveData.nonNull().observe(lifecycleOwner) { handleSearchResults(it) }
+            subredditResultsLiveData.observe(lifecycleOwner) { handleSearchResults(subs = it) }
+            postResultsLiveData.observe(lifecycleOwner) { handleSearchResults(posts = it) }
+            userResultsLiveData.observe(lifecycleOwner) { handleSearchResults(users = it) }
+
             navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             subSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
             loadingLiveData.nonNull().observe(lifecycleOwner) { handleLoading(it) }
@@ -83,9 +88,15 @@ class SearchFragment : RelicFragment() {
     }
 
     // region livedata handlers
-    private fun handleSearchResults(subResults: List<SubPreviewModel>) {
-        searchResultsAdapter.updateSearchResults(subResults)
-//        onlineSubsResultSize.text = getString(R.string.sub_search_results_size, subreddits.size)
+    private fun handleSearchResults(
+        subs: List<SubPreviewModel>? = null,
+        posts: List<PostModel>? = null,
+        users: List<UserModel>? = null
+    ) {
+        subs?.let { searchResultsAdapter.updateSearchResults(newSubSearchResults = it) }
+        posts?.let { searchResultsAdapter.updateSearchResults(newPostSearchResults = it) }
+        users?.let { searchResultsAdapter.updateSearchResults(newUserSearchResults = it) }
+        //        onlineSubsResultSize.text = getString(R.string.sub_search_results_size, subreddits.size)
     }
 
     private fun handleNavigation(navigationData: NavigationData) {
@@ -120,6 +131,7 @@ class SearchFragment : RelicFragment() {
     private fun handleLoading(loading: Boolean) {
         if (loading) {
             searchProgress.visibility = View.VISIBLE
+            searchResultsAdapter.clear()
         } else {
             searchProgress.visibility = View.INVISIBLE
         }
@@ -130,12 +142,13 @@ class SearchFragment : RelicFragment() {
         setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                // cancel previous timer and start new one for new texts
                 countDownTimer.cancel()
-                countDownTimer.start()
-                searchVM.updateQuery(newText.toString())
+                countDownTimer.start {
+                    searchVM.updateQuery(newText)
+                    searchVM.search(generateSearchOptions())
+                }
 
-                val options = generateSearchOptions()
-                searchVM.search(options)
                 renderCard(newText)
                 // action is handled by listener
                 return true
@@ -163,7 +176,7 @@ class SearchFragment : RelicFragment() {
     // sets up the onclicks for search options
     private fun initializeSearchOptions(selectedType: SearchResultType) {
         searchOptions.apply {
-            val initialIdMap = optionToResultTypeMap.filter { pair -> pair.value == selectedType}
+            val initialIdMap = optionToResultTypeMap.filter { pair -> pair.value == selectedType }
             check(initialIdMap.keys.first())
 
             setOnCheckedChangeListener { _, checkedId ->

@@ -26,13 +26,13 @@ import javax.inject.Inject
 
 class PostSearchFragment : RelicFragment() {
     @Inject
-    lateinit var factory : PostSearchResultsVM.Factory
+    lateinit var factory: PostSearchResultsVM.Factory
 
     @Inject
     lateinit var postAdapterDelegate: Contract.PostAdapterDelegate
 
     @Inject
-    lateinit var viewPrefsManager : ViewPreferencesManager
+    lateinit var viewPrefsManager: ViewPreferencesManager
 
     private lateinit var pagerAdapter: PostsSearchPagerAdapter
 
@@ -45,12 +45,9 @@ class PostSearchFragment : RelicFragment() {
         }).get(PostSearchResultsVM::class.java)
     }
 
-    private lateinit var postSource : PostSource
+    private lateinit var postSource: PostSource
 
-    private var countDownTimer : SearchInputCountdown = SearchInputCountdown {
-        val searchOptions = generateSearchOptions()
-        searchResultsVM.search(searchOptions)
-    }
+    private var countDownTimer = SearchInputCountdown()
 
     // region lifecycle hooks
 
@@ -84,7 +81,10 @@ class PostSearchFragment : RelicFragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 countDownTimer.cancel()
-                countDownTimer.start()
+                countDownTimer.start {
+                    val searchOptions = generateSearchOptions()
+                    searchResultsVM.search(searchOptions)
+                }
 
                 searchResultsVM.updateQuery(newText.toString())
 
@@ -102,7 +102,7 @@ class PostSearchFragment : RelicFragment() {
         })
     }
 
-    private fun generateSearchOptions() : PostSearchOptions{
+    private fun generateSearchOptions(): PostSearchOptions {
         return PostSearchOptions(
             restrictToSource = true
         )
@@ -115,13 +115,13 @@ class PostSearchFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : RelicError?) {
-        when(error) {
+    private fun handleError(error: RelicError?) {
+        when (error) {
             is RelicError.NetworkUnavailable -> {
                 Snackbar.make(
-                        postSearchRoot,
-                        resources.getString(R.string.network_unavailable),
-                        Snackbar.LENGTH_INDEFINITE
+                    postSearchRoot,
+                    resources.getString(R.string.network_unavailable),
+                    Snackbar.LENGTH_INDEFINITE
                 ).apply {
                     // TODO add functionality for continuing from new search or load more results
 //                    setAction(resources.getString(R.string.refresh)) {
@@ -140,7 +140,7 @@ class PostSearchFragment : RelicFragment() {
     companion object {
         val ARG_SOURCE = "post_source"
 
-        fun create(source  : PostSource) : PostSearchFragment {
+        fun create(source: PostSource): PostSearchFragment {
             val bundle = Bundle()
             bundle.putParcelable(ARG_SOURCE, source)
 

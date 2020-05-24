@@ -35,12 +35,7 @@ class UserSearchFragment : RelicFragment() {
         }).get(UserSearchVM::class.java)
     }
 
-    private val countDownTimer : SearchInputCountdown by lazy {
-        SearchInputCountdown {
-            val searchOptions = generateSearchOptions()
-            userSearchVM.search(searchOptions)
-        }
-    }
+    private val countDownTimer = SearchInputCountdown()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.display_user_search, container, false)
@@ -57,7 +52,10 @@ class UserSearchFragment : RelicFragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 countDownTimer.cancel()
-                countDownTimer.start()
+                countDownTimer.start {
+                    val searchOptions = generateSearchOptions()
+                    userSearchVM.search(searchOptions)
+                }
                 userSearchVM.updateQuery(newText.toString())
 
                 // action is handled by listener

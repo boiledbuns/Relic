@@ -116,4 +116,8 @@ class UserRepositoryImpl @Inject constructor(
             throw DomainTransfer.handleException("retrieve account", e) ?: e
         }
     }
+
+    override suspend fun searchUsers(query: String): List<UserModel> {
+        TODO("Not yet implemented")
+    }
 }

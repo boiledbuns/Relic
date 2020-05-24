@@ -37,13 +37,17 @@ class SearchResultsAdapter(
 //        ResultType.USER -> userSearchResults.size
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return currentType.type
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (currentType) {
-            ResultType.SUB -> {
+        return when (viewType) {
+            ResultType.SUB.type -> {
                 val subPreviewView = SearchSubPreviewView(parent.context)
                 SubPreviewVH(subPreviewView)
             }
-            ResultType.POST -> {
+           else -> {
                 val postView = RelicPostItemView(parent.context, postLayout = viewPrefsManager.getPostCardStyle())
                 PostItemVH(postView)
             }
@@ -52,16 +56,23 @@ class SearchResultsAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (currentType) {
-            ResultType.SUB -> {
+        when (getItemViewType(position)) {
+            ResultType.SUB.type -> {
                 (holder as SubPreviewVH).bindSubredditName(subSearchResults[position])
             }
-            ResultType.POST -> {
+            else -> {
                 (holder as PostItemVH).bindPost(postSearchResults[position])
             }
 //            ResultType.USER -> { }
         }
 
+    }
+
+    fun clear() {
+        subSearchResults = emptyList()
+        postSearchResults= emptyList()
+        userSearchResults = emptyList()
+        notifyDataSetChanged()
     }
 
     fun updateSearchResults(
@@ -74,7 +85,7 @@ class SearchResultsAdapter(
             subSearchResults = it
         }
         newPostSearchResults?.let {
-            currentType = ResultType.SUB
+            currentType = ResultType.POST
             postSearchResults = it
         }
 //        newUserSearchResults?.let {

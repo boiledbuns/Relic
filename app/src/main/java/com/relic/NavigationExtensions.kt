@@ -45,52 +45,46 @@ fun BottomNavigationView.initializeNavHostFragments(
     fragmentManager: FragmentManager,
     containerId: Int,
     initialItemId: Int?,
-    menuItemToDestinationMap: Map<Int, Int>
+    menuItemToDestinationMap: Map<Int, Int>,
+    onItemReselected: (menuItem: MenuItem) -> Unit
 ): LiveData<NavController> {
     // set initial item id if it's specified (ie. not restored)
     initialItemId?.let { selectedItemId = it }
+    val shouldRestore = initialItemId == null
 
-    // First create a NavHostFragment for each NavGraph ID
-    this.menu.forEachIndexed { index, item ->
-        val fragmentTag = getFragmentTag(index)
-        val itemId = item.itemId
+    if (!shouldRestore) {
+        // First create a NavHostFragment for each NavGraph ID
+        this.menu.forEachIndexed { index, item ->
+            val fragmentTag = getFragmentTag(index)
+            val itemId = item.itemId
 
-        // Find or create the Navigation host fragment
-        obtainNavHostFragment(
-            fragmentManager,
-            fragmentTag,
-            itemId,
-            containerId
-        ).let { navHostFragment ->
-            // replace the placeholder fragment with the actual fragment associated with the menu item
-            // and remove it from the back stack
-            menuItemToDestinationMap[itemId]?.let { destinationId ->
-                navHostFragment.findNavController().apply {
-                    popBackStack()
-                    navigate(destinationId)
+            // Find or create the Navigation host fragment
+            obtainNavHostFragment(fragmentManager, fragmentTag, itemId, containerId).let { navHostFragment ->
+                // replace the placeholder fragment with the actual fragment associated with the menu item
+                // and remove it from the back stack
+                menuItemToDestinationMap[itemId]?.let { destinationId ->
+                    navHostFragment.findNavController().apply {
+                        popBackStack()
+                        navigate(destinationId)
+                    }
                 }
-            }
-            // Save to the map
-            itemIdToTagMap[itemId] = fragmentTag
+                // Save to the map
+                itemIdToTagMap[itemId] = fragmentTag
 
-            // Attach or detach nav host fragment depending on whether it's the selected item.
-            if (selectedItemId == itemId) {
-                // Update livedata with the selected graph
-                selectedNavController.value = navHostFragment.navController
-                attachNavHostFragment(fragmentManager, navHostFragment, true)
-            } else {
-                detachNavHostFragment(fragmentManager, navHostFragment)
+                // Attach or detach nav host fragment depending on whether it's the selected item.
+                if (selectedItemId == itemId) {
+                    attachNavHostFragment(fragmentManager, navHostFragment, true)
+                } else {
+                    detachNavHostFragment(fragmentManager, navHostFragment)
+                }
             }
         }
     }
 
-    return selectedNavController
-}
+    // Update livedata with the selected graph
+    val selectedTag = itemIdToTagMap[selectedItemId]
+    selectedNavController.value = obtainNavHostFragment(fragmentManager, selectedTag, selectedItemId, containerId).navController
 
-fun BottomNavigationView.initializeListeners(
-    fragmentManager: FragmentManager,
-    onItemReselected: (menuItem: MenuItem) -> Unit
-) {
     // Now connect selecting an item with swapping Fragments
     var selectedItemTag = itemIdToTagMap[selectedItemId]
     val firstFragmentTag = itemIdToTagMap[selectedItemId]
@@ -108,9 +102,7 @@ fun BottomNavigationView.initializeListeners(
                 fragmentManager.popBackStack(firstFragmentTag,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
-                // temp fix, will cleanup later
-                val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
-                    as NavHostFragment
+                val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag) as NavHostFragment
 
                 // Exclude the first fragment tag because it's always in the back stack.
                 if (firstFragmentTag != newlySelectedItemTag) {
@@ -161,6 +153,8 @@ fun BottomNavigationView.initializeListeners(
             }
         }
     }
+
+    return selectedNavController
 }
 
 fun BottomNavigationView.resetBottomNavigation() {
