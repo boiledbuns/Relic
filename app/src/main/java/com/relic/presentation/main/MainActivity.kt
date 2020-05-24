@@ -15,7 +15,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
@@ -34,8 +33,6 @@ import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.presentation.search.subreddit.SubSearchFragment
-import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
@@ -243,12 +240,6 @@ class MainActivity : RelicActivity() {
 
     private fun handleNavMenuOnclick(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.search_subs -> SubSearchFragment.create().apply {
-                transitionToFragment(this)
-            }
-            R.id.search_users -> UserSearchFragment.create().apply {
-                transitionToFragment(this)
-            }
             R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 

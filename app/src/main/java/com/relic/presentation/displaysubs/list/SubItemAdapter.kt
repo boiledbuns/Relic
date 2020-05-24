@@ -1,6 +1,6 @@
 package com.relic.presentation.displaysubs.list
 
-import android.view.LayoutInflater
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -11,7 +11,6 @@ import com.relic.domain.models.SubredditModel
 import com.relic.interactor.Contract.SubAdapterDelegate
 import com.relic.interactor.SubInteraction
 import com.relic.presentation.base.RelicAdapter
-import com.relic.presentation.displaysubs.list.SubItemAdapter.SubItemVH
 import com.relic.presentation.displaysubs.pinned.SubsHeaderView
 import kotlinx.coroutines.launch
 import java.util.*
@@ -20,35 +19,17 @@ private const val TYPE_HEADER = 0
 private const val TYPE_SUBS = 1
 
 class SubItemAdapter(
+    private val context: Context,
     private val subAdapterDelegate: SubAdapterDelegate
 ) : RelicAdapter<RecyclerView.ViewHolder>() {
-    private var subsHeaderView : SubsHeaderView? = null
+    private val subsHeaderView: SubsHeaderView
     private var subList: MutableList<SubredditModel> = ArrayList()
 
-    inner class SubItemVH(var subItemView: SubItemView) : RecyclerView.ViewHolder(subItemView) {
-        fun bind(subModel: SubredditModel?) {
-            subItemView.bind(subModel!!)
-        }
-
-        init {
-            subItemView.setOnClickListener { v: View? ->
-                subAdapterDelegate.interact(
-                    PostSource.Subreddit(subList[absoluteAdapterPosition].subName),
-                    SubInteraction.Visit)
-            }
-            subItemView.setOnLongClickListener { v: View? ->
-                subAdapterDelegate.interact(
-                    PostSource.Subreddit(subList[absoluteAdapterPosition].subName),
-                    SubInteraction.Preview
-                )
-                true
-            }
+    init {
+        subsHeaderView = SubsHeaderView(context) { postSource ->
+            subAdapterDelegate.interact(postSource, SubInteraction.Visit)
         }
     }
-
-    inner class SubsHeaderVH(
-        var subsHeaderView: SubsHeaderView
-    ) : RecyclerView.ViewHolder(subsHeaderView)
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
@@ -58,14 +39,9 @@ class SubItemAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when(viewType) {
+        return when (viewType) {
             TYPE_HEADER -> {
-                SubsHeaderView(parent.context) { postSource ->
-                    subAdapterDelegate.interact(postSource, SubInteraction.Visit)
-                }.run {
-                    subsHeaderView = this
-                    SubsHeaderVH(this)
-                }
+                SubsHeaderVH(subsHeaderView)
             }
             else -> {
                 val subItemView = SubItemView(parent.context)
@@ -75,13 +51,15 @@ class SubItemAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when(getItemViewType(position)) {
-            TYPE_SUBS -> (holder as SubItemVH).bind(subList[position])
+        when (getItemViewType(position)) {
+            TYPE_SUBS -> (holder as SubItemVH).bind(subList[position - 1])
         }
     }
 
     override fun getItemCount(): Int {
-        return subList.size
+        // setting the item count to 0 when the sublist is empty prevents the recyclerview from
+        // jumping to the very bottom once the actuals sub items are loaded
+        return if (subList.isEmpty()) 0 else subList.size + 1
     }
 
     fun setList(newSubs: MutableList<SubredditModel>) {
@@ -92,7 +70,7 @@ class SubItemAdapter(
     }
 
     fun setPinnedSubs(pinnedSubs: List<SubredditModel>) {
-        subsHeaderView?.setPinnedSubreddits(pinnedSubs)
+        subsHeaderView.setPinnedSubreddits(pinnedSubs)
     }
 
     private fun calculateDiff(newSubs: List<SubredditModel>): DiffResult {
@@ -115,9 +93,30 @@ class SubItemAdapter(
         })
     }
 
-    fun clearList() {
-        subList.clear()
-        notifyDataSetChanged()
+    // region viewholders
+    inner class SubItemVH(var subItemView: SubItemView) : RecyclerView.ViewHolder(subItemView) {
+        fun bind(subModel: SubredditModel?) {
+            subItemView.bind(subModel!!)
+        }
+
+        init {
+            subItemView.setOnClickListener { v: View? ->
+                subAdapterDelegate.interact(
+                    PostSource.Subreddit(subList[absoluteAdapterPosition -1].subName),
+                    SubInteraction.Visit)
+            }
+            subItemView.setOnLongClickListener { v: View? ->
+                subAdapterDelegate.interact(
+                    PostSource.Subreddit(subList[absoluteAdapterPosition - 1].subName),
+                    SubInteraction.Preview
+                )
+                true
+            }
+        }
     }
 
+    inner class SubsHeaderVH(
+        subsHeaderView: SubsHeaderView
+    ) : RecyclerView.ViewHolder(subsHeaderView)
+    // endregion viewholders
 }

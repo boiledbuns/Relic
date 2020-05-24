@@ -1,4 +1,4 @@
-package com.relic.presentation.search.subreddit
+package com.relic.presentation.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,8 +9,6 @@ import com.relic.domain.models.SubredditModel
 import com.relic.presentation.base.RelicViewModel
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.main.RelicError
-import com.relic.presentation.search.DisplaySearchContract
-import com.relic.presentation.search.SubredditSearchOptions
 import com.shopify.livedataktx.SingleLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,15 +16,15 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class SubSearchVM(
+class SearchVM(
     private val subRepo: SubRepository
 ) : RelicViewModel(), DisplaySearchContract.SubredditSearchVM {
 
     class Factory @Inject constructor(
         private val subRepo: SubRepository
     ) {
-        fun create(): SubSearchVM {
-            return SubSearchVM(subRepo)
+        fun create(): SearchVM {
+            return SearchVM(subRepo)
         }
     }
 

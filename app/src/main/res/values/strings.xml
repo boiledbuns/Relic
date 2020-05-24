@@ -165,5 +165,6 @@
     <string name="welcome_dialog_title">Welcome to Relic</string>
     <string name="welcome_dialog_body">Relic is still under development and only supports logged in users for now :)</string>
     <string name="welcome_dialog_login">Login</string>
+    <string name="search_direct_navigation">Navigate directly to</string>
 
 </resources>
