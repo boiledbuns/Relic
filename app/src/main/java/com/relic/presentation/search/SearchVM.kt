@@ -16,6 +16,12 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+sealed class SearchResultType {
+    object SUB: SearchResultType()
+    object POST: SearchResultType()
+    object USER: SearchResultType()
+}
+
 class SearchVM(
     private val subRepo: SubRepository
 ) : RelicViewModel(), DisplaySearchContract.SubredditSearchVM {
@@ -32,13 +38,16 @@ class SearchVM(
     private val _subredditResultsLiveData = MutableLiveData<List<SubPreviewModel>>()
     private val _localSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
     private val _navigationLiveData = SingleLiveData<NavigationData>()
+    private val _loadingLiveData = MutableLiveData<Boolean>()
 
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
     override val subredditResultsLiveData: LiveData<List<SubPreviewModel>> = _subredditResultsLiveData
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _localSubredditResultsLiveData
-    override val navigationLiveData : LiveData<NavigationData> = _navigationLiveData
+    override val navigationLiveData: LiveData<NavigationData> = _navigationLiveData
+    val loadingLiveData: LiveData<Boolean> = _loadingLiveData
 
-    private var query : String? = null
+    private var query: String? = null
+    var currentSearchType : SearchResultType = SearchResultType.SUB
 
     init {
         // init empty search results
@@ -52,13 +61,15 @@ class SearchVM(
 
     override fun search(newOptions: SubredditSearchOptions) {
         if (query.isNullOrEmpty()) {
-            _subredditResultsLiveData.postValue(null)
-            _localSubredditResultsLiveData.postValue(null)
+            _subredditResultsLiveData.postValue(emptyList())
+            _localSubredditResultsLiveData.postValue(emptyList())
         } else {
+            _loadingLiveData.postValue(true)
             query?.let {
                 launch {
                     val onlineResults = subRepo.searchSubreddits(it, displayNSFW = true, exact = false)
                     _subredditResultsLiveData.postValue(onlineResults)
+                    _loadingLiveData.postValue(false)
 
                     val offlineResults = subRepo.searchOfflineSubreddits(it)
                     _localSubredditResultsLiveData.postValue(offlineResults)
@@ -67,19 +78,24 @@ class SearchVM(
         }
     }
 
+    fun changeSearchResultType(resultType: SearchResultType, newOptions: SubredditSearchOptions) {
+        currentSearchType = resultType
+        search(newOptions)
+    }
+
     // region SubredditSearchDelegate
 
-    override fun preview(subreddit : String) {
+    override fun preview(subreddit: String) {
         val sub = PostSource.Subreddit(subreddit)
         _navigationLiveData.postValue(NavigationData.PreviewPostSource(sub))
     }
 
-    override fun visit(subreddit : String) {
+    override fun visit(subreddit: String) {
         val sub = PostSource.Subreddit(subreddit)
         _navigationLiveData.postValue(NavigationData.ToPostSource(sub))
     }
 
-    override fun subscribe(subscribe : Boolean, subreddit : String) {
+    override fun subscribe(subscribe: Boolean, subreddit: String) {
         launch(Dispatchers.Main) {
             subRepo.getSubGateway().subscribe(subscribe, subreddit)
         }

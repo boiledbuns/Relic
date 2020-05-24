@@ -38,9 +38,9 @@
         android:layout_marginTop="@dimen/padding_m"
         android:layout_marginBottom="@dimen/padding_m"
         android:background="@color/colorAccent"
+        android:visibility="gone"
         app:cardCornerRadius="@dimen/padding_m"
         app:contentPadding="@dimen/padding_m"
-        android:visibility="gone"
         tools:visibility="visible">
 
         <LinearLayout
@@ -70,6 +70,46 @@
                 tools:text="View u/test_user" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <RadioGroup
+        android:id="@+id/searchOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/optionSubs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_s"
+            android:text="subs" />
+
+        <RadioButton
+            android:id="@+id/optionPosts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_s"
+            android:text="posts" />
+
+        <RadioButton
+            android:id="@+id/optionUsers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_s"
+            android:text="users" />
+
+    </RadioGroup>
+
+    <ProgressBar
+        android:id="@+id/searchProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/postContentView"
+        android:indeterminateTint="@color/colorAccent"
+        tools:visibility="visible"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchResultsRV"

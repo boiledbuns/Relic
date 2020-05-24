@@ -164,6 +164,7 @@
             android:layout_marginTop="@dimen/padding_s"
             android:paddingTop="@dimen/padding_xs"
             android:src="@drawable/ic_upvote"
+            android:tint="?attr/relicIconColor"
             app:layout_constraintTop_toBottomOf="@id/postSelfTextBarrier"/>
 
         <TextView
@@ -184,6 +185,7 @@
             android:layout_marginStart="@dimen/padding_s"
             android:paddingTop="@dimen/padding_xs"
             android:src="@drawable/ic_downvote"
+            android:tint="?attr/relicIconColor"
             app:layout_constraintStart_toEndOf="@id/postVoteCountView"
             app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
 
@@ -204,6 +206,7 @@
             android:src="@drawable/ic_save"
             android:layout_marginTop="@dimen/padding_l"
             android:layout_marginStart="@dimen/padding_l"
+            android:tint="?attr/relicIconColor"
             app:layout_constraintStart_toEndOf="@id/postCommentCountView"
             app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
 

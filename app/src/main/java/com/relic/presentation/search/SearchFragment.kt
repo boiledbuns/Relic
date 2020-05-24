@@ -50,6 +50,11 @@ class SearchFragment : RelicFragment() {
     }
 
     private lateinit var searchResultsAdapter: SearchResultsAdapter
+    private val optionToResultTypeMap = mapOf(
+        Pair(R.id.optionSubs, SearchResultType.SUB),
+        Pair(R.id.optionPosts,  SearchResultType.POST),
+        Pair(R.id.optionUsers, SearchResultType.USER)
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.display_search, container, false)
@@ -65,13 +70,15 @@ class SearchFragment : RelicFragment() {
         }
 
         searchView.initSearchWidget()
+        initializeSearchOptions(searchVM.currentSearchType)
     }
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         searchVM.apply {
-            subredditResultsLiveData.nonNull().observe(lifecycleOwner){ handleSearchResults(it)}
+            subredditResultsLiveData.nonNull().observe(lifecycleOwner) { handleSearchResults(it) }
             navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             subSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
+            loadingLiveData.nonNull().observe(lifecycleOwner) { handleLoading(it) }
         }
     }
 
@@ -81,9 +88,8 @@ class SearchFragment : RelicFragment() {
 //        onlineSubsResultSize.text = getString(R.string.sub_search_results_size, subreddits.size)
     }
 
-
     private fun handleNavigation(navigationData: NavigationData) {
-        when(navigationData) {
+        when (navigationData) {
             is NavigationData.ToPostSource -> {
                 if (navigationData.source is PostSource.Subreddit) {
                     val subFrag = DisplaySubFragment.create(navigationData.source.subredditName)
@@ -103,15 +109,22 @@ class SearchFragment : RelicFragment() {
         }
     }
 
-    private fun handleError(error : RelicError?) {
+    private fun handleError(error: RelicError?) {
         if (error == null) {
             // hide the toast
         } else {
             Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
         }
     }
-    // endregion livedata handlers
 
+    private fun handleLoading(loading: Boolean) {
+        if (loading) {
+            searchProgress.visibility = View.VISIBLE
+        } else {
+            searchProgress.visibility = View.INVISIBLE
+        }
+    }
+    // endregion livedata handlers
 
     private fun SearchView.initSearchWidget() {
         setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -123,7 +136,7 @@ class SearchFragment : RelicFragment() {
 
                 val options = generateSearchOptions()
                 searchVM.search(options)
-
+                renderCard(newText)
                 // action is handled by listener
                 return true
             }
@@ -136,8 +149,32 @@ class SearchFragment : RelicFragment() {
         })
     }
 
+    // sets up rendering for the direct navigation card
+    private fun renderCard(newText: String?) {
+        if (newText.isNullOrEmpty()) {
+            directNavigationCard.visibility = View.GONE
+        } else {
+            directToSub.text = "r/$newText"
+            directToUser.text = "u/$newText"
+            directNavigationCard.visibility = View.VISIBLE
+        }
+    }
+
+    // sets up the onclicks for search options
+    private fun initializeSearchOptions(selectedType: SearchResultType) {
+        searchOptions.apply {
+            val initialIdMap = optionToResultTypeMap.filter { pair -> pair.value == selectedType}
+            check(initialIdMap.keys.first())
+
+            setOnCheckedChangeListener { _, checkedId ->
+                optionToResultTypeMap[checkedId]?.let {
+                    searchVM.changeSearchResultType(it, generateSearchOptions())
+                }
+            }
+        }
+    }
+
     private fun generateSearchOptions(): SubredditSearchOptions {
         return SubredditSearchOptions()
     }
-
 }
