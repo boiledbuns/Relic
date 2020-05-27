@@ -117,7 +117,14 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchUsers(query: String): List<UserModel> {
-        TODO("Not yet implemented")
+    override suspend fun searchUsers(query: String): Listing<UserModel> {
+        val url = "${ENDPOINT}users/search?q=$query"
+        try {
+            val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
+            return userDeserializer.parseUsers(response)
+        }
+        catch (e : Exception){
+            throw DomainTransfer.handleException("search users", e) ?: e
+        }
     }
 }

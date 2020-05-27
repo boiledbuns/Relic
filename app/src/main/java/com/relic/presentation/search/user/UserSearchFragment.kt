@@ -95,7 +95,7 @@ class UserSearchFragment : RelicFragment() {
                 }
             }
 
-            username.text = user.name
+            username.text = user.fullName
             userPreview.setUser(user)
 
         } ?: userNotFound.apply {

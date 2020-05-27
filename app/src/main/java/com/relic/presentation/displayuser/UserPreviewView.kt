@@ -28,7 +28,7 @@ class UserPreviewView @JvmOverloads constructor(
         userPreviewCommentKarma.text = userModel.commentKarma.toString()
         userPreviewTotalKarma.text = (userModel.linkKarma + userModel.commentKarma).toString()
 
-        userPreviewCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
+//        userPreviewCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
     }
 
     private fun getUserCreatedString(created : Long) : String {

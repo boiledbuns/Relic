@@ -45,7 +45,7 @@ interface Contract {
     interface UserDeserializer {
         suspend fun parseUser(userResponse: String, trophiesResponse : String) : UserModel
 
-        suspend fun parseUsers(usersResponse: String) : List<UserModel>
+        suspend fun parseUsers(response: String) : Listing<UserModel>
 
         suspend fun parseUsername(response: String) : String
     }

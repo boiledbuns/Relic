@@ -40,6 +40,8 @@ open class PostModel : ListingItem() {
     var archived: Boolean = false
     var spoiler : Boolean = false
 
+    var subreddit : String? = null
+
     var platinum: Int = 0
     var gold: Int = 0
     var silver: Int = 0

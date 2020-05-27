@@ -94,7 +94,7 @@ class SearchVM(
                     }
                     SearchResultType.USER -> {
                         val searchResults = userRepo.searchUsers(localQuery)
-                        _userResultsLiveData.postValue(searchResults)
+                        _userResultsLiveData.postValue(searchResults.data.children)
                     }
                 }
                 _loadingLiveData.postValue(false)

@@ -139,7 +139,7 @@ class DisplayUserFragment : RelicFragment() {
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         displayUserVM.userLiveData.observe(lifecycleOwner, androidx.lifecycle.Observer { user ->
             user?.let {
-                (userToolbar as Toolbar).title = getString(R.string.user_prefix_label, it.name)
+                (userToolbar as Toolbar).title = getString(R.string.user_prefix_label, it.fullName)
                 userUserPreview.setUser(it)
             }
         })

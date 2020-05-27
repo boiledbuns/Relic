@@ -10,6 +10,7 @@ import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.search.subreddit.view.SearchSubPreviewView
+import com.relic.presentation.search.user.view.UserSearchItemView
 import kotlinx.android.synthetic.main.sub_search_preview_item.view.*
 
 sealed class ResultType(
@@ -17,7 +18,7 @@ sealed class ResultType(
 ) {
     object SUB: ResultType(1)
     object POST : ResultType(2)
-//    object USER: ResultType()
+    object USER: ResultType(3)
 }
 
 class SearchResultsAdapter(
@@ -34,7 +35,7 @@ class SearchResultsAdapter(
     override fun getItemCount(): Int = when (currentType) {
         ResultType.SUB -> subSearchResults.size
         ResultType.POST -> postSearchResults.size
-//        ResultType.USER -> userSearchResults.size
+        ResultType.USER -> userSearchResults.size
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -47,11 +48,14 @@ class SearchResultsAdapter(
                 val subPreviewView = SearchSubPreviewView(parent.context)
                 SubPreviewVH(subPreviewView)
             }
-           else -> {
+            ResultType.USER.type -> {
+                val userSearchItemView = UserSearchItemView(parent.context)
+                UserVH(userSearchItemView)
+            }
+            else -> {
                 val postView = RelicPostItemView(parent.context, postLayout = viewPrefsManager.getPostCardStyle())
                 PostItemVH(postView)
             }
-//            ResultType.USER -> { }
         }
     }
 
@@ -60,10 +64,12 @@ class SearchResultsAdapter(
             ResultType.SUB.type -> {
                 (holder as SubPreviewVH).bindSubredditName(subSearchResults[position])
             }
+            ResultType.USER.type -> {
+                (holder as UserVH).bind(userSearchResults[position])
+            }
             else -> {
                 (holder as PostItemVH).bindPost(postSearchResults[position])
             }
-//            ResultType.USER -> { }
         }
 
     }
@@ -88,10 +94,10 @@ class SearchResultsAdapter(
             currentType = ResultType.POST
             postSearchResults = it
         }
-//        newUserSearchResults?.let {
-//            currentType = ResultType.USER
-//            userSearchResults = it
-//        }
+        newUserSearchResults?.let {
+            currentType = ResultType.USER
+            userSearchResults = it
+        }
         notifyDataSetChanged()
     }
 
@@ -115,6 +121,15 @@ class SearchResultsAdapter(
 
         fun bindSubredditName(name: SubPreviewModel) {
             view.bind(name)
+        }
+    }
+
+    inner class UserVH(
+        private val view : UserSearchItemView
+    ) : RecyclerView.ViewHolder(view) {
+
+        fun bind(user: UserModel) {
+            view.bind(user)
         }
     }
 
