@@ -91,8 +91,8 @@ class DisplayUserFragment : RelicFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var override = true
-        var sortType: SortType?
-        var sortScope: SortScope?
+        val sortType: SortType?
+        val sortScope: SortScope?
 
         when (item.itemId) {
             // when the sorting type is changed
@@ -117,6 +117,11 @@ class DisplayUserFragment : RelicFragment() {
         }
 
         return override
+    }
+
+    override fun handleNavReselected(): Boolean {
+        // primary if displaying current user
+        return args.username == null
     }
 
     // region livedata handlers

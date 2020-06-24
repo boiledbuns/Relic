@@ -66,6 +66,10 @@ class DisplaySubsFragment : RelicFragment() {
         attachScrollListeners()
     }
 
+    override fun handleNavReselected(): Boolean {
+        return true
+    }
+
     // region view model binding and handlers
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {

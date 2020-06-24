@@ -87,6 +87,9 @@ class SearchFragment : RelicFragment() {
         }
     }
 
+    override fun handleNavReselected(): Boolean {
+        return true
+    }
     // region livedata handlers
     private fun handleSearchResults(
         subs: List<SubPreviewModel>? = null,

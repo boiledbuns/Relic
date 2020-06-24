@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.relic.presentation.base.RelicFragment
 
 // mapping between items and tag of fragments currently being managed
 val itemIdToTagMap = SparseArray<String>()

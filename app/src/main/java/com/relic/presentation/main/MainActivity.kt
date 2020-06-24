@@ -15,7 +15,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
-import androidx.navigation.get
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
@@ -30,6 +29,7 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragmentArgs
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragmentArgs
+import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
@@ -44,8 +44,6 @@ import com.relic.resetBottomNavigation
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
-
-const val KEY_CURRENT_TAB = "KEY_CURRENT_TAB"
 
 class MainActivity : RelicActivity() {
     @Inject
@@ -161,15 +159,9 @@ class MainActivity : RelicActivity() {
 
     private fun onBottomNavItemReselected(menuItem: MenuItem) {
         supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.apply {
-            navControllerLiveData!!.value!!.apply {
-                graph.startDestination
-                // this ensures no onbackpressed if no items on back stack
-                if (graph.startDestination != currentDestination!!.id) {
-                    (fragments.last() as? RelicFragment?)?.apply {
-                        val handled = handleNavReselected()
-                        if (!handled) onBackPressed()
-                    }
-                }
+            (fragments.last() as? RelicFragment?)?.let { relicFragment ->
+                val handled = relicFragment.handleNavReselected()
+                if (!handled) onBackPressed()
             }
         }
     }

@@ -61,7 +61,7 @@ open class RelicFragment: Fragment(), RelicInjectable {
 
     @return: whether the home pressed is handled by the fragment, otherwise will default to parent
      */
-    open fun handleNavReselected() : Boolean { return false }
+    open fun handleNavReselected(): Boolean { return false }
 
     protected fun checkInternetConnectivity() : Boolean {
         return connectivityManager.activeNetworkInfo?.isConnected ?: false

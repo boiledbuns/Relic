@@ -88,8 +88,4 @@
             android:name="isPost"
             app:argType="boolean" />
     </fragment>
-    <fragment
-        android:id="@+id/subSearchFragment"
-        android:name="com.relic.presentation.search.subreddit.SubSearchFragment"
-        android:label="SubSearchFragment" />
 </navigation>
