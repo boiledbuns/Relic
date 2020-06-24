@@ -55,6 +55,14 @@ open class RelicFragment: Fragment(), RelicInjectable {
 
     protected open fun bindViewModel(lifecycleOwner : LifecycleOwner) { }
 
+    /*
+    handles behaviour when the current navigation item is pressed again
+    ex. on "home" navigation item -> open post -> press home" navigation item again
+
+    @return: whether the home pressed is handled by the fragment, otherwise will default to parent
+     */
+    open fun handleNavReselected() : Boolean { return false }
+
     protected fun checkInternetConnectivity() : Boolean {
         return connectivityManager.activeNetworkInfo?.isConnected ?: false
     }

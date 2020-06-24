@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.navigation.get
 import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
@@ -22,6 +23,7 @@ import com.relic.domain.models.UserModel
 import com.relic.initializeNavHostFragments
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragmentArgs
 import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
@@ -158,15 +160,18 @@ class MainActivity : RelicActivity() {
     }
 
     private fun onBottomNavItemReselected(menuItem: MenuItem) {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            onBackPressed()
+        supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.apply {
+            navControllerLiveData!!.value!!.apply {
+                graph.startDestination
+                // this ensures no onbackpressed if no items on back stack
+                if (graph.startDestination != currentDestination!!.id) {
+                    (fragments.last() as? RelicFragment?)?.apply {
+                        val handled = handleNavReselected()
+                        if (!handled) onBackPressed()
+                    }
+                }
+            }
         }
-        // tries to allow fragment to handle backstack if relic fragment
-//        navControllerLiveData?.value?.apply {
-//            if (currentDestination != null)
-//                popBackStack()
-////                onBackPressed()
-//        }
     }
 
     private fun setTheme() {

@@ -88,7 +88,6 @@ fun BottomNavigationView.initializeNavHostFragments(
     // Now connect selecting an item with swapping Fragments
     var selectedItemTag = itemIdToTagMap[selectedItemId]
     val firstFragmentTag = itemIdToTagMap[selectedItemId]
-    var isOnFirstFragment = selectedItemTag == firstFragmentTag
 
     // When a navigation item is selected
     setOnNavigationItemSelectedListener { item ->
