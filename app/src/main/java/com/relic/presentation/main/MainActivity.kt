@@ -152,13 +152,21 @@ class MainActivity : RelicActivity() {
                 containerId = R.id.main_content_frame,
                 initialItemId = initialItemId,
                 menuItemToDestinationMap = menuToDestinationMap,
-                onItemReselected = { item -> onItemReselected(item) }
+                onItemReselected = { item -> onBottomNavItemReselected(item) }
             )
         }
     }
 
-    private fun onItemReselected(menuItem: MenuItem) {
-        onBackPressed()
+    private fun onBottomNavItemReselected(menuItem: MenuItem) {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            onBackPressed()
+        }
+        // tries to allow fragment to handle backstack if relic fragment
+//        navControllerLiveData?.value?.apply {
+//            if (currentDestination != null)
+//                popBackStack()
+////                onBackPressed()
+//        }
     }
 
     private fun setTheme() {

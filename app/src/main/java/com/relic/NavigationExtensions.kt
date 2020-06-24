@@ -96,16 +96,16 @@ fun BottomNavigationView.initializeNavHostFragments(
         if (fragmentManager.isStateSaved) {
             false
         } else {
+            val originalSelectedItemTag = itemIdToTagMap[selectedItemId]
             val newlySelectedItemTag = itemIdToTagMap[item.itemId]
-            if (selectedItemTag != newlySelectedItemTag) {
-                // Pop everything above the first fragment (the "fixed start destination")
-                fragmentManager.popBackStack(firstFragmentTag,
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            if (originalSelectedItemTag != newlySelectedItemTag) {
+                // Pop everything including the first fragment
+                fragmentManager.popBackStack(firstFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
                 val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag) as NavHostFragment
 
                 // Exclude the first fragment tag because it's always in the back stack.
-                if (firstFragmentTag != newlySelectedItemTag) {
+//                if (firstFragmentTag != newlySelectedItemTag) {
                     // Commit a transaction that cleans the back stack and adds the first fragment
                     // to it, creating the fixed started destination.
                     fragmentManager.beginTransaction()
@@ -113,18 +113,18 @@ fun BottomNavigationView.initializeNavHostFragments(
                         .setPrimaryNavigationFragment(selectedFragment)
                         .apply {
                             // Detach all other Fragments
-                            itemIdToTagMap.forEach { _, fragmentTagIter ->
-                                if (fragmentTagIter != newlySelectedItemTag) {
-                                    detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                            itemIdToTagMap.forEach { _, fragmentTag ->
+                                if (fragmentTag != newlySelectedItemTag) {
+                                    detach(fragmentManager.findFragmentByTag(fragmentTag)!!)
                                 }
                             }
                         }
-                        .addToBackStack(firstFragmentTag)
+//                        .addToBackStack(firstFragmentTag)
                         .setReorderingAllowed(true)
                         .commit()
-                }
+//                }
                 selectedItemTag = newlySelectedItemTag
-                isOnFirstFragment = selectedItemTag == firstFragmentTag
+//                isOnFirstFragment = selectedItemTag == firstFragmentTag
                 selectedNavController.value = selectedFragment.navController
                 true
             } else {
@@ -140,19 +140,19 @@ fun BottomNavigationView.initializeNavHostFragments(
 //    setupDeepLinks(navGraphIds, fragmentManager, containerId, intent)
 
     // Finally, ensure that we update our BottomNavigationView when the back stack changes
-    fragmentManager.addOnBackStackChangedListener {
-        if (!isOnFirstFragment && !fragmentManager.isOnBackStack(firstFragmentTag)) {
-            this.selectedItemId = selectedItemId
-        }
-
-        // Reset the graph if the currentDestination is not valid (happens when the back
-        // stack is popped after using the back button).
-        selectedNavController.value?.let { controller ->
-            if (controller.currentDestination == null) {
-                controller.navigate(controller.graph.id)
-            }
-        }
-    }
+//    fragmentManager.addOnBackStackChangedListener {
+//        if (!isOnFirstFragment && !fragmentManager.isOnBackStack(firstFragmentTag)) {
+//            this.selectedItemId = selectedItemId
+//        }
+//
+////        // Reset the graph if the currentDestination is not valid (happens when the back
+////        // stack is popped after using the back button).
+////        selectedNavController.value?.let { controller ->
+////            if (controller.currentDestination == null) {
+////                controller.navigate(controller.graph.id)
+////            }
+////        }
+//    }
 
     return selectedNavController
 }
