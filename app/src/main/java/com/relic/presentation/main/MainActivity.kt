@@ -19,28 +19,28 @@ import com.relic.R
 import com.relic.data.PostSource
 import com.relic.domain.models.AccountModel
 import com.relic.domain.models.UserModel
+import com.relic.initializeNavHostFragments
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicActivity
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostFragmentArgs
 import com.relic.presentation.displaysub.DisplaySubFragmentArgs
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragmentArgs
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragmentArgs
+import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
-import com.relic.presentation.search.subreddit.SubSearchFragment
-import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RequestCodes
 import com.relic.presentation.util.observeConsumable
 import com.relic.resetBottomNavigation
-import com.relic.setupWithNavController
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -61,10 +61,18 @@ class MainActivity : RelicActivity() {
         }).get(MainVM::class.java)
     }
 
+    private val menuToDestinationMap = mapOf(
+        Pair(R.id.nav_account, R.id.displayUserFragment),
+        Pair(R.id.nav_subs, R.id.displaySubsFragment),
+        Pair(R.id.nav_home, R.id.homeFragment),
+        Pair(R.id.nav_search, R.id.searchFragment),
+        Pair(R.id.nav_settings, R.id.settingsFragment)
+    )
+
     private lateinit var relicGD: GestureDetectorCompat
 
     private var itemSelectedDelegate: ((item: MenuItem?) -> Boolean)? = null
-    private var currentNavController: LiveData<NavController>? = null
+    private var navControllerLiveData: LiveData<NavController>? = null
     private var currentInitDialog: Dialog? = null
 
     // region lifecycle hooks
@@ -75,21 +83,21 @@ class MainActivity : RelicActivity() {
         setContentView(R.layout.activity_main)
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
-        if (savedInstanceState == null) {
-            // set up navigation if none to restore
-            setupBottomNav()
-        } else {
-            // wait for bottom navigation bar to restore its state (selected item)
-            // before setting up it up again
-            // TODO handle selected items
-            setupBottomNav()
-        }
+        // set up bottom nav if no saved instance state
+        if (savedInstanceState == null) setupBottomNav(false)
 
         bindViewModel(this)
         if (!mainVM.isAuthenticated()) {
             displayLoginDialog()
         }
     }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        // set up after bottom navigation state has been restored
+        setupBottomNav(true)
+    }
+
 
     private fun bindViewModel(lifecycleOwner: LifecycleOwner) = mainVM.apply {
         accountsLiveData.observe(lifecycleOwner) { accounts -> accounts?.let { handleAccounts(it) } }
@@ -133,23 +141,29 @@ class MainActivity : RelicActivity() {
 
     // endregion lifecycle hooks
 
-    private fun setupBottomNav() {
-        val menuToDestinationMap = mapOf(
-            Pair(R.id.nav_account, R.id.displayUserFragment),
-            Pair(R.id.nav_subs, R.id.displaySubsFragment),
-            Pair(R.id.nav_home, R.id.homeFragment),
-            Pair(R.id.nav_search, R.id.searchFragment),
-            Pair(R.id.nav_settings, R.id.settingsFragment)
-        )
+    // use the solution from the google navigation components repo for now since there isn't
+    // a clear solution for managing multiple backstacks currently
+    private fun setupBottomNav(shouldRestore: Boolean) {
+        val initialItemId = if (shouldRestore) null else R.id.nav_home
 
-        // use the solution from the google navigation components repo for now since there isn't
-        // a clear solution for managing multiple backstacks currently
-        currentNavController = bottom_navigation.setupWithNavController(
-            fragmentManager = supportFragmentManager,
-            containerId = R.id.main_content_frame,
-            initialPosition = 2,
-            menuItemToDestinationMap = menuToDestinationMap
-        )
+        bottom_navigation.apply {
+            navControllerLiveData = initializeNavHostFragments(
+                fragmentManager = supportFragmentManager,
+                containerId = R.id.main_content_frame,
+                initialItemId = initialItemId,
+                menuItemToDestinationMap = menuToDestinationMap,
+                onItemReselected = { item -> onBottomNavItemReselected(item) }
+            )
+        }
+    }
+
+    private fun onBottomNavItemReselected(menuItem: MenuItem) {
+        supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.apply {
+            (fragments.last() as? RelicFragment?)?.let { relicFragment ->
+                val handled = relicFragment.handleNavReselected()
+                if (!handled) onBackPressed()
+            }
+        }
     }
 
     private fun setTheme() {
@@ -164,21 +178,21 @@ class MainActivity : RelicActivity() {
 
     private fun displayLoginDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Welcome to Relic")
-            .setMessage("Relic is still under development and only supports logged in users for now :)")
+            .setTitle(R.string.welcome_dialog_title)
+            .setMessage(R.string.welcome_dialog_body)
             .setCancelable(false)
-            .setPositiveButton("Login") { _, _ ->
+            .setPositiveButton(R.string.welcome_dialog_login) { _, _ ->
                 LoginActivity.startForResult(this@MainActivity)
             }
             .create()
             .show()
     }
 
-    // region livedata handlers
+// region livedata handlers
 
     private fun handleUserChangedEvent(newUser: UserModel) {
         bottom_navigation.resetBottomNavigation()
-        setupBottomNav()
+        setupBottomNav(false)
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -231,41 +245,35 @@ class MainActivity : RelicActivity() {
                 }
         }
     }
-    // endregion livedata handlers
+// endregion livedata handlers
 
-    // region navigation view handlers
+// region navigation view handlers
 
     private fun handleNavMenuOnclick(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.search_subs -> SubSearchFragment.create().apply {
-                transitionToFragment(this)
-            }
-            R.id.search_users -> UserSearchFragment.create().apply {
-                transitionToFragment(this)
-            }
             R.id.preferences -> PreferencesActivity.startForResult(this)
         }
 
         return true
     }
 
-    // endregion navigation view handlers
+// endregion navigation view handlers
 
     private fun handleNavigationEvent(navData: NavigationData) {
         when (navData) {
             // navigates to display post
             is NavigationData.ToPost -> {
                 val args = DisplayPostFragmentArgs(postFullName = navData.postId, subredditName = navData.subredditName).toBundle()
-                currentNavController?.value?.navigate(R.id.displayPostFragment, args)
+                navControllerLiveData?.value?.navigate(R.id.displayPostFragment, args)
             }
             is NavigationData.ToUser -> {
                 val args = DisplayUserFragmentArgs(navData.username).toBundle()
-                currentNavController?.value?.navigate(R.id.displayUserFragment, args)
+                navControllerLiveData?.value?.navigate(R.id.displayUserFragment, args)
             }
             // navigates to display image on top of current fragment
             is NavigationData.ToImage -> {
                 val args = DisplayImageFragmentArgs(url = navData.thumbnail).toBundle()
-                currentNavController?.value?.navigate(R.id.displayImageFragment, args)
+                navControllerLiveData?.value?.navigate(R.id.displayImageFragment, args)
             }
             // let browser handle navigation to url
             is NavigationData.ToExternal -> {
@@ -280,10 +288,10 @@ class MainActivity : RelicActivity() {
                 when (navData.source) {
                     is PostSource.Subreddit -> {
                         val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
-                        currentNavController?.value?.navigate(R.id.displaySubFragment, args)
+                        navControllerLiveData?.value?.navigate(R.id.displaySubFragment, args)
                     }
                     is PostSource.Frontpage -> {
-                        currentNavController?.value?.navigate(R.id.frontpageFragment)
+                        navControllerLiveData?.value?.navigate(R.id.frontpageFragment)
                     }
                 }
 
@@ -302,7 +310,7 @@ class MainActivity : RelicActivity() {
         when (navMediaData.mediaType) {
             MediaType.Gfycat -> {
                 val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
-                currentNavController?.value?.navigate(R.id.displayImageFragment, args)
+                navControllerLiveData?.value?.navigate(R.id.displayImageFragment, args)
             }
             else -> {
                 Toast.makeText(baseContext, "Media type $navMediaData doesn't have a handler yet", Toast.LENGTH_SHORT).show()
@@ -313,7 +321,7 @@ class MainActivity : RelicActivity() {
 
     private fun openPostReplyEditor(parentFullname: String) {
         val args = ReplyEditorFragmentArgs(parentFullname, true).toBundle()
-        currentNavController?.value?.navigate(R.id.replyEditorFragment, args)
+        navControllerLiveData?.value?.navigate(R.id.replyEditorFragment, args)
     }
 
 }

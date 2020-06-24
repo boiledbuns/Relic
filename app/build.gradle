@@ -73,10 +73,15 @@ dependencies {
     def kMockito_ver ="2.1.0"
     def archTesting_ver = "2.0.0"
     def coroutineTesting_ver = "1.3.0-M1"
+    def testRunner_ver = "1.1.0"
+    def testRules_ver = "1.2.0"
+    def espresso_ver = "3.1.0"
 
     testImplementation "junit:junit:4.12"
-    androidTestImplementation "androidx.test:runner:1.1.0"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.1.0"
+    androidTestImplementation "androidx.test:runner:$testRunner_ver"
+    androidTestImplementation "androidx.test:rules:$testRules_ver"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_ver"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espresso_ver"
 
     testImplementation "org.mockito:mockito-core:$mockito_ver"
     testImplementation "androidx.arch.core:core-testing:$archTesting_ver"

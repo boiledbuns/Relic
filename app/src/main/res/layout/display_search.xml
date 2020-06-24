@@ -1,11 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/relicBackgroundColor">
+    android:background="?attr/relicBackgroundColor"
+    android:orientation="vertical">
 
-    <TextView
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/subSearchAppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/subSearchContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_m">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/relicBackgroundColor"
+                app:iconifiedByDefault="false"
+                app:queryBackground="@android:color/transparent"
+                app:queryHint="@string/search_sub" />
+
+        </androidx.cardview.widget.CardView>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/directNavigationCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_l"
+        android:layout_marginTop="@dimen/padding_m"
+        android:layout_marginBottom="@dimen/padding_m"
+        android:background="@color/colorAccent"
+        android:visibility="gone"
+        app:cardCornerRadius="@dimen/padding_m"
+        app:contentPadding="@dimen/padding_m"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/padding_xs"
+                android:text="@string/search_direct_navigation"
+                android:textSize="@dimen/title_size_m" />
+
+            <TextView
+                android:id="@+id/directToSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/padding_xs"
+                tools:text="View r/test_subreddit" />
+
+            <TextView
+                android:id="@+id/directToUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/padding_xs"
+                tools:text="View u/test_user" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <RadioGroup
+        android:id="@+id/searchOptions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/nav_search"/>
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/optionSubs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_s"
+            android:text="subs" />
+
+        <RadioButton
+            android:id="@+id/optionPosts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_s"
+            android:text="posts" />
+
+        <RadioButton
+            android:id="@+id/optionUsers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_s"
+            android:text="users" />
+
+    </RadioGroup>
+
+    <ProgressBar
+        android:id="@+id/searchProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/postContentView"
+        android:indeterminateTint="@color/colorAccent"
+        tools:visibility="visible"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchResultsRV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

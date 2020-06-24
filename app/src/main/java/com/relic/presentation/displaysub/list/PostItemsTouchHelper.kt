@@ -6,25 +6,27 @@ import android.graphics.Rect
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.relic.R
-import com.relic.presentation.displaysub.DisplaySubFragment
 import timber.log.Timber
 import kotlin.math.roundToInt
 
 // TODO add custom lengths for swipe and release actions - currently any length will trigger
 class PostItemsTouchHelper(
-    private val fragment: DisplaySubFragment,
-    private val context : Context
+    private val context: Context,
+    private val swipeCallback: (vh: RecyclerView.ViewHolder, direction: Int) -> Unit
 ) : ItemTouchHelper.Callback() {
 
     private val translationScale = 0.5
     private var previousXTranslation = 0F
 
     // initialize values needed for swipe so we don't have to retrieve them each time
-    private val swipeRightColor  = context.resources.getColor(R.color.upvote)
-    private val swipeLeftColor  = context.resources.getColor(R.color.downvote)
+    private val swipeRightColor = context.resources.getColor(R.color.upvote)
+    private val swipeLeftColor = context.resources.getColor(R.color.downvote)
     private val marginTop = context.resources.getDimension(R.dimen.padding_xs).roundToInt()
-    private val upvoteIcon = context.getDrawable(R.drawable.ic_upvote)
-    private val downvoteIcon = context.getDrawable(R.drawable.ic_downvote)
+    private val margin = context.resources.getDimension(R.dimen.padding_l).roundToInt()
+    private val iconSize = context.resources.getDimension(R.dimen.swipe_icon_size).roundToInt()
+    private val iconColor = context.resources.getColor(R.color.white)
+    private val upvoteIcon = context.getDrawable(R.drawable.ic_upvote)!!
+    private val downvoteIcon = context.getDrawable(R.drawable.ic_downvote)!!
 
     override fun getMovementFlags(p0: RecyclerView, p1: RecyclerView.ViewHolder): Int {
         return makeFlag(
@@ -34,9 +36,9 @@ class PostItemsTouchHelper(
     }
 
     override fun onMove(
-            p0: RecyclerView,
-            p1: RecyclerView.ViewHolder,
-            p2: RecyclerView.ViewHolder
+        p0: RecyclerView,
+        p1: RecyclerView.ViewHolder,
+        p2: RecyclerView.ViewHolder
     ): Boolean {
         // return false to indicate that we nothing has been moved
         return false
@@ -58,13 +60,13 @@ class PostItemsTouchHelper(
     }
 
     override fun onChildDraw(
-            canvas: Canvas,
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            dX: Float,
-            dY: Float,
-            actionState: Int,
-            isCurrentlyActive: Boolean
+        canvas: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
     ) {
         Timber.d("touch helper %s", dX.toString())
         when (actionState) {
@@ -86,32 +88,36 @@ class PostItemsTouchHelper(
                         // from right swipe to release
                         if (previousXTranslation > 0F) {
                             Timber.d("touch helper right %s", dX.toString())
-                            fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.RIGHT)
-                        } else if (previousXTranslation < 0F){
+                            swipeCallback.invoke(viewHolder, ItemTouchHelper.RIGHT)
+                        } else if (previousXTranslation < 0F) {
                             Timber.d("touch helper left %s", dX.toString())
-                            fragment.handleVHSwipeAction(viewHolder, ItemTouchHelper.LEFT)
+                            swipeCallback.invoke(viewHolder, ItemTouchHelper.LEFT)
                         }
-                    }
-                    else if (dX > 0) {
+                    } else if (dX > 0) {
                         drawColor(swipeRightColor)
                         // left, top, right, bottom
-                        upvoteIcon.bounds = Rect(
-                            marginTop,
-                            viewHolder.itemView.top + marginTop,
-                            marginTop + vhHeight/2,
-                            viewHolder.itemView.top + marginTop + vhHeight/2
-                        )
-                        upvoteIcon.draw(canvas)
-                    }
-                    else if (dX < 0) {
+                        upvoteIcon.apply {
+                            bounds = Rect(
+                                margin,
+                                viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+                                margin + iconSize,
+                                viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
+                            )
+                            setTint(iconColor)
+                            draw(canvas)
+                        }
+                    } else if (dX < 0) {
                         drawColor(swipeLeftColor)
-                        downvoteIcon.bounds = Rect(
-                            marginTop,
-                            viewHolder.itemView.top + marginTop,
-                            marginTop + vhHeight/2,
-                            viewHolder.itemView.top + marginTop + vhHeight/2
-                        )
-                        downvoteIcon.draw(canvas)
+                        downvoteIcon.apply {
+                            bounds = Rect(
+                                viewHolder.itemView.right - iconSize - margin,
+                                viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+                                viewHolder.itemView.right - margin,
+                                viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
+                            )
+                            setTint(iconColor)
+                            draw(canvas)
+                        }
                     }
 
                 }

@@ -85,7 +85,7 @@ class DisplayUserVM(
     fun requestPosts(tab: UserTab, refresh: Boolean) {
         // subscribe to the appropriate livedata based on tab selected
         val userRetrievalOption = toRetrievalOption(tab)
-        val postSource = PostSource.User(_userLiveData.value!!.name, userRetrievalOption)
+        val postSource = PostSource.User(_userLiveData.value!!.fullName, userRetrievalOption)
 
         launch(Dispatchers.Main) {
             val listing = if (refresh) {

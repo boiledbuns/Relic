@@ -18,6 +18,6 @@ class UserSearchItemView @JvmOverloads constructor(
     }
 
     fun bind(user : UserModel) {
-        username.text = user.name
+        username.text = user.fullName
     }
 }

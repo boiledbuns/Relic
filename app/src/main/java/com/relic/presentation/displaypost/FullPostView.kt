@@ -28,8 +28,15 @@ class FullPostView @JvmOverloads constructor(
     private val markwon = Markwon.create(context)
     private lateinit var post : PostModel
 
+    private val defaultColor: Int
+    private val downvotedColor: Int
+    private val upvotedColor: Int
+
     init {
         LayoutInflater.from(context).inflate(R.layout.full_post, this, true)
+        defaultColor = context.resources.getColor(R.color.white)
+        downvotedColor = context.resources.getColor(R.color.downvote)
+        upvotedColor = context.resources.getColor(R.color.upvote)
     }
 
     fun setPost(postModel : PostModel) {
@@ -82,16 +89,16 @@ class FullPostView @JvmOverloads constructor(
     private fun updateVoteView() {
         when (post.userUpvoted) {
             1 -> {
-                postUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                postDownvoteView.setImageResource(R.drawable.ic_downvote)
+                postUpvoteView.setColorFilter(upvotedColor)
+                postDownvoteView.setColorFilter(defaultColor)
             }
             0 -> {
-                postUpvoteView.setImageResource(R.drawable.ic_upvote)
-                postDownvoteView.setImageResource(R.drawable.ic_downvote)
+                postUpvoteView.setColorFilter(defaultColor)
+                postDownvoteView.setColorFilter(defaultColor)
             }
             -1 -> {
-                postUpvoteView.setImageResource(R.drawable.ic_upvote)
-                postDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+                postUpvoteView.setColorFilter(defaultColor)
+                postDownvoteView.setColorFilter(downvotedColor)
             }
         }
     }

@@ -27,7 +27,7 @@ interface DisplaySearchContract {
         val subscribedSubredditResultsLiveData : LiveData<List<SubredditModel>>
         val navigationLiveData : LiveData<NavigationData>
 
-        fun updateQuery(newQuery : String)
+        fun updateQuery(newQuery : String?)
         fun search(newOptions : SubredditSearchOptions)
     }
 
@@ -47,6 +47,11 @@ interface DisplaySearchContract {
     }
 }
 
+/**
+ * this interactor interface exists solely because the subreddit preview that is generated
+ * by a search is not the same as the subreddit model. It would be possible to manipulate the
+ * data and coerce it into that form, but i find this approach simpler to manage
+ */
 interface SubredditSearchDelegate {
     fun visit(subreddit : String)
     fun preview(subreddit : String)

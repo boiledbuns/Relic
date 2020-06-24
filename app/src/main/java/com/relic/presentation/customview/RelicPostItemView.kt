@@ -33,6 +33,10 @@ class RelicPostItemView @JvmOverloads constructor(
     private val backgroundColor: Int
     private val backgroundVisitedColor: Int
 
+    private val defaultColor: Int
+    private val downvotedColor: Int
+    private val upvotedColor: Int
+
     private lateinit var post : PostModel
 
     init {
@@ -51,6 +55,10 @@ class RelicPostItemView @JvmOverloads constructor(
             resolveAttribute(R.attr.relicStickiedColor, typedVal, true)
             stickiedColor = typedVal.data
         }
+
+        defaultColor = context.resources.getColor(R.color.white)
+        downvotedColor = context.resources.getColor(R.color.downvote)
+        upvotedColor = context.resources.getColor(R.color.upvote)
 
         val layout = when (postLayout) {
             POST_LAYOUT_CARD -> R.layout.post_item_card
@@ -135,16 +143,16 @@ class RelicPostItemView @JvmOverloads constructor(
     private fun updateVoteView() {
         when (post.userUpvoted) {
             1 -> {
-                postItemUpvoteView.setImageResource(R.drawable.ic_upvote_active)
-                postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
+                postItemUpvoteView.setColorFilter(upvotedColor)
+                postItemDownvoteView.setColorFilter(defaultColor)
             }
             0 -> {
-                postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
-                postItemDownvoteView.setImageResource(R.drawable.ic_downvote)
+                postItemUpvoteView.setColorFilter(defaultColor)
+                postItemDownvoteView.setColorFilter(defaultColor)
             }
             -1 -> {
-                postItemUpvoteView.setImageResource(R.drawable.ic_upvote)
-                postItemDownvoteView.setImageResource(R.drawable.ic_downvote_active)
+                postItemUpvoteView.setColorFilter(defaultColor)
+                postItemDownvoteView.setColorFilter(downvotedColor)
             }
         }
     }

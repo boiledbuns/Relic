@@ -11,6 +11,7 @@
         <item name="colorAccent">@color/paleGray</item>
         <item name="relicBackgroundColor">@color/paleDarkGray</item>
         <item name="relicBackgroundColorB">@color/backgroundSecondaryB</item>
+        <item name="relicIconColor">@color/white</item>
 
         <item name="android:textColor">@color/paleGray</item>
         <item name="android:navigationBarColor">@color/paleDarkGray</item>
@@ -24,6 +25,7 @@
         <item name="colorAccent">@color/paleDarkGray</item>
         <item name="relicBackgroundColor">@color/paleGray</item>
         <item name="relicBackgroundColorB">@color/almostWhite</item>
+        <item name="relicIconColor">@color/darkGray</item>
 
         <item name="android:textColor">@color/paleBlueGray</item>
         <item name="relicStickiedColor">@color/stickied</item>

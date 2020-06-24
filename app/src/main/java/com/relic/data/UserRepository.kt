@@ -21,6 +21,8 @@ interface UserRepository {
     @Throws(UserRepoError::class)
     suspend fun retrieveAccount(name : String)
 
+    suspend fun searchUsers(query : String): Listing<UserModel>
+
     // search by username isn't actually supported by reddit api
 
     fun getAccounts() : LiveData<List<AccountModel>>

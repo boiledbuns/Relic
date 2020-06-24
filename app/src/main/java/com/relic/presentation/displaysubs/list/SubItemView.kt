@@ -11,9 +11,9 @@ import kotlinx.android.synthetic.main.sub_item.view.*
 import timber.log.Timber
 
 class SubItemView @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     init {
@@ -22,14 +22,16 @@ class SubItemView @JvmOverloads constructor(
 
     fun bind(subredditModel: SubredditModel) {
         sub_name.text = subredditModel.subName
-        subredditModel.iconUrl?.let {
-            if (it.isNotEmpty()) {
-                try {
-                    Picasso.get().load(it).into(sub_icon)
-                } catch (e: Error) {
-                    Timber.d("error loading image $e")
-                }
+        val url = subredditModel.iconUrl
+        if (url != null && url.isNotEmpty()) {
+            try {
+                Picasso.get().load(url).into(sub_icon)
+            } catch (e: Error) {
+                Timber.d("error loading image $e")
             }
+        } else {
+            // clear the image for the icon if it's null
+            sub_icon.setImageResource(0)
         }
     }
 }

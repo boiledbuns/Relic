@@ -6,11 +6,17 @@ import android.os.CountDownTimer
 const val millisCountdown = 550L
 const val millisTick = 2000L
 
-class SearchInputCountdown(
-    private val callback : () -> Unit
-) : CountDownTimer(millisCountdown, millisTick) {
+class SearchInputCountdown : CountDownTimer(millisCountdown, millisTick) {
+    private var callback: (() -> Unit)? = null
 
-    override fun onFinish() = callback()
+    fun start(newCallBack: () -> Unit) {
+        start()
+        callback = newCallBack
+    }
+
+    override fun onFinish() {
+        callback?.invoke()
+    }
 
     // do nothing for the ticks
     override fun onTick(millisUntilFinished: Long) {}

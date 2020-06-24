@@ -20,7 +20,6 @@ import com.relic.presentation.preferences.appearance.PostLayoutFragment
 import com.relic.presentation.preferences.appearance.ThemeFragment
 import com.relic.presentation.search.SearchFragment
 import com.relic.presentation.search.post.PostSearchResultsFragment
-import com.relic.presentation.search.subreddit.SubSearchFragment
 import com.relic.presentation.search.user.UserSearchFragment
 import com.relic.presentation.settings.SettingsFragment
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
@@ -86,9 +85,6 @@ abstract class FragBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun postSearchResults() : PostSearchResultsFragment
-
-    @ContributesAndroidInjector
-    abstract fun subSearchFragment() : SubSearchFragment
 
     @ContributesAndroidInjector
     abstract fun userSearchFragment() : UserSearchFragment

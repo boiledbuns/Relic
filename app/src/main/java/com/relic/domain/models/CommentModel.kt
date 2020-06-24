@@ -31,6 +31,8 @@ open class CommentModel: ListingItem() {
     @Json(name = "is_submitter")
     var isSubmitter: Boolean = false
 
+    var subreddit : String? = null
+
     @Date
     var edited: java.util.Date? = null
 

@@ -32,7 +32,6 @@ open class ListingItem {
     var gildings : Gildings? = null
 
     var saved: Boolean = false
-    open var subreddit : String? = null
 
     var userSubmittedPosition: Int = 0
     var userCommentsPosition: Int = 0

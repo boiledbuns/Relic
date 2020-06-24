@@ -28,13 +28,12 @@ class UserPreviewView @JvmOverloads constructor(
         userPreviewCommentKarma.text = userModel.commentKarma.toString()
         userPreviewTotalKarma.text = (userModel.linkKarma + userModel.commentKarma).toString()
 
-        userPreviewCreated.text = getUserCreatedString(userModel.created.toDouble().toLong())
+        userPreviewCreated.text = getUserCreatedString(userModel.created!!)
     }
 
-    private fun getUserCreatedString(created : Long) : String {
+    private fun getUserCreatedString(createdDate : Date) : String {
         // initialize the date formatter and date for "now"
         val formatter = SimpleDateFormat("MMM dd',' YYYY", Locale.CANADA)
-        val createdDate = Date(created * 1000)
 
         val userAge = DateHelper.getDateDifferenceString(createdDate, Date())
         val userCreationDate = formatter.format(createdDate)

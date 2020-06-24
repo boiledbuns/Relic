@@ -53,7 +53,7 @@ class DisplaySubsFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subAdapter = SubItemAdapter(subredditInteractor).apply {
+        subAdapter = SubItemAdapter(requireContext(), subredditInteractor).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
 
@@ -66,6 +66,10 @@ class DisplaySubsFragment : RelicFragment() {
         attachScrollListeners()
     }
 
+    override fun handleNavReselected(): Boolean {
+        return true
+    }
+
     // region view model binding and handlers
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
@@ -73,6 +77,7 @@ class DisplaySubsFragment : RelicFragment() {
         viewModel.subscribedSubsList.observe(lifecycleOwner) { subs ->
             subs?.let {
                 display_subs_swiperefreshlayout.isRefreshing = false
+                subAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
                 subAdapter.setList(ArrayList(it))
             }
         }
@@ -89,7 +94,6 @@ class DisplaySubsFragment : RelicFragment() {
     private fun attachScrollListeners() {
         display_subs_swiperefreshlayout.setOnRefreshListener {
             // refresh the current list and retrieve more posts
-            subAdapter.clearList()
             viewModel.refreshSubs()
         }
     }

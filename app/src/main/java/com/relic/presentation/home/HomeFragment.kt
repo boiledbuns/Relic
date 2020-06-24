@@ -49,6 +49,10 @@ class HomeFragment : RelicFragment() {
         }
     }
 
+    override fun handleNavReselected(): Boolean {
+        return true
+    }
+
     // endregion lifecycle hooks
 
     private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

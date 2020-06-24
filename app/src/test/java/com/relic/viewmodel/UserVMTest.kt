@@ -121,7 +121,7 @@ class UserVMTest {
 
     private fun mockUser() : UserModel {
         return UserModel().apply {
-            name = username
+            username = username
         }
     }
 }
