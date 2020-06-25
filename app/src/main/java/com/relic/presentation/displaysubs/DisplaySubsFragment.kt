@@ -2,10 +2,8 @@ package com.relic.presentation.displaysubs
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -40,9 +38,6 @@ class DisplaySubsFragment : RelicFragment() {
 
     @Inject
     lateinit var networkUtil: NetworkUtil
-
-    private lateinit var searchView: SearchView
-    private lateinit var searchMenuItem: MenuItem
 
     private lateinit var subAdapter: SubItemAdapter
 

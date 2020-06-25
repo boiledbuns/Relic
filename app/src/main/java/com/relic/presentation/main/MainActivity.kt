@@ -29,7 +29,6 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragmentArgs
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragmentArgs
-import com.relic.presentation.home.HomeFragment
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
@@ -291,7 +290,13 @@ class MainActivity : RelicActivity() {
                         navControllerLiveData?.value?.navigate(R.id.displaySubFragment, args)
                     }
                     is PostSource.Frontpage -> {
-                        navControllerLiveData?.value?.navigate(R.id.frontpageFragment)
+                        navControllerLiveData?.value?.navigate(R.id.multiFragment)
+                    }
+                    is PostSource.All -> {
+                        navControllerLiveData?.value?.navigate(R.id.multiFragment)
+                    }
+                    is PostSource.Popular -> {
+                        navControllerLiveData?.value?.navigate(R.id.multiFragment)
                     }
                 }
 

@@ -50,9 +50,13 @@
             app:argType="boolean" />
     </fragment>
     <fragment
-        android:id="@+id/frontpageFragment"
-        android:name="com.relic.presentation.home.frontpage.FrontpageFragment"
-        android:label="FrontpageFragment" />
+        android:id="@+id/multiFragment"
+        android:name="com.relic.presentation.home.frontpage.MultiFragment"
+        android:label="MultiFragment" >
+        <argument
+            android:name="multiName"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/displaySubFragment"
         android:name="com.relic.presentation.displaysub.DisplaySubFragment"

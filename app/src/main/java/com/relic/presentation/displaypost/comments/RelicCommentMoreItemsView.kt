@@ -26,6 +26,10 @@ class RelicCommentMoreItemsView(
     fun setLoadMore(comment : CommentModel) {
         this.comment = comment
         loadMoreItemText.text = resources.getString(R.string.load_comments, comment.replyCount)
+
+        if (comment.depth >= 0){
+            displayReplyDepth(comment.depth)
+        }
     }
 
     fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier: ItemNotifier) {

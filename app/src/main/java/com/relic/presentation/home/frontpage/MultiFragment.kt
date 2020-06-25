@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +32,7 @@ import javax.inject.Inject
  * consider changing to DisplayMultiFragment
  * -> encompasses all multireddits
  */
-class FrontpageFragment : RelicFragment() {
+class MultiFragment : RelicFragment() {
     @Inject
     lateinit var factory : DisplaySubVM.Factory
 
@@ -47,10 +48,18 @@ class FrontpageFragment : RelicFragment() {
     private val frontpageVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(PostSource.Frontpage) as T
+                val postSource = when(args.multiName) {
+                    PostSource.Frontpage.getSourceName() -> PostSource.Frontpage
+                    PostSource.All.getSourceName() -> PostSource.All
+                    PostSource.Popular.getSourceName() -> PostSource.Popular
+                    else -> null
+                }
+                return factory.create(postSource!!) as T
             }
         }).get(DisplaySubVM::class.java)
     }
+
+    private val args: MultiFragmentArgs by navArgs()
 
     private lateinit var postAdapter: PostItemAdapter
     private lateinit var frontpageRecyclerView : RecyclerView

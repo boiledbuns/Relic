@@ -21,14 +21,12 @@ interface DisplaySearchContract {
         fun retrieveMorePostResults()
     }
 
-    interface SubredditSearchVM : SubredditSearchDelegate {
+    interface SubredditSearchVM {
         val subSearchErrorLiveData : LiveData<RelicError?>
         val subredditResultsLiveData : LiveData<List<SubPreviewModel>>
         val subscribedSubredditResultsLiveData : LiveData<List<SubredditModel>>
-        val navigationLiveData : LiveData<NavigationData>
 
-        fun updateQuery(newQuery : String?)
-        fun search(newOptions : SubredditSearchOptions)
+        fun search(query : String?, newOptions : SubredditSearchOptions)
     }
 
     interface UserSearchVM {

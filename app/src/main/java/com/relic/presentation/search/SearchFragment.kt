@@ -9,18 +9,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
-import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.displaysub.DisplaySubFragment
-import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.helper.SearchInputCountdown
 import com.relic.presentation.main.RelicError
-import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.shopify.livedataktx.nonNull
 import kotlinx.android.synthetic.main.display_search.*
 import javax.inject.Inject
@@ -40,10 +36,14 @@ class SearchFragment : RelicFragment() {
     }
 
     @Inject
-    lateinit var viewPrefsManager: ViewPreferencesManager
-
+    lateinit var subInteractor: Contract.SubAdapterDelegate
     @Inject
     lateinit var postInteractor: Contract.PostAdapterDelegate
+    @Inject
+    lateinit var userInteractor: Contract.UserAdapterDelegate
+
+    @Inject
+    lateinit var viewPrefsManager: ViewPreferencesManager
 
     private val countDownTimer = SearchInputCountdown()
 
@@ -61,11 +61,16 @@ class SearchFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchResultsAdapter = SearchResultsAdapter(ResultType.SUB, searchVM, postInteractor, viewPrefsManager)
+        searchResultsAdapter = SearchResultsAdapter(SearchResultType.SUB, subInteractor, postInteractor, userInteractor, viewPrefsManager)
         searchResultsRV.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = searchResultsAdapter
         }
+
+        // TODO convert interactors
+        // setup the direct navigation cards
+        directToSub.setOnClickListener { }
+        directToUser.setOnClickListener { }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -81,7 +86,6 @@ class SearchFragment : RelicFragment() {
             postResultsLiveData.observe(lifecycleOwner) { handleSearchResults(posts = it) }
             userResultsLiveData.observe(lifecycleOwner) { handleSearchResults(users = it) }
 
-            navigationLiveData.nonNull().observe(lifecycleOwner) { handleNavigation(it) }
             subSearchErrorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
             loadingLiveData.nonNull().observe(lifecycleOwner) { handleLoading(it) }
         }
@@ -90,6 +94,7 @@ class SearchFragment : RelicFragment() {
     override fun handleNavReselected(): Boolean {
         return true
     }
+
     // region livedata handlers
     private fun handleSearchResults(
         subs: List<SubPreviewModel>? = null,
@@ -99,28 +104,6 @@ class SearchFragment : RelicFragment() {
         subs?.let { searchResultsAdapter.updateSearchResults(newSubSearchResults = it) }
         posts?.let { searchResultsAdapter.updateSearchResults(newPostSearchResults = it) }
         users?.let { searchResultsAdapter.updateSearchResults(newUserSearchResults = it) }
-        //        onlineSubsResultSize.text = getString(R.string.sub_search_results_size, subreddits.size)
-    }
-
-    private fun handleNavigation(navigationData: NavigationData) {
-        when (navigationData) {
-            is NavigationData.ToPostSource -> {
-                if (navigationData.source is PostSource.Subreddit) {
-                    val subFrag = DisplaySubFragment.create(navigationData.source.subredditName)
-                    requireActivity().supportFragmentManager
-                        .beginTransaction()
-                        .add(R.id.main_content_frame, subFrag)
-                        .addToBackStack(TAG)
-                        .commit()
-                }
-            }
-            is NavigationData.PreviewPostSource -> {
-                if (navigationData.source is PostSource.Subreddit) {
-                    SubInfoBottomSheetDialog.create(navigationData.source.subredditName)
-                        .show(requireActivity().supportFragmentManager, TAG)
-                }
-            }
-        }
     }
 
     private fun handleError(error: RelicError?) {
@@ -148,8 +131,7 @@ class SearchFragment : RelicFragment() {
                 // cancel previous timer and start new one for new texts
                 countDownTimer.cancel()
                 countDownTimer.start {
-                    searchVM.updateQuery(newText)
-                    searchVM.search(generateSearchOptions())
+                    searchVM.search(newText, generateSearchOptions())
                 }
 
                 renderCard(newText)
@@ -183,8 +165,9 @@ class SearchFragment : RelicFragment() {
             check(initialIdMap.keys.first())
 
             setOnCheckedChangeListener { _, checkedId ->
-                optionToResultTypeMap[checkedId]?.let {
-                    searchVM.changeSearchResultType(it, generateSearchOptions())
+                optionToResultTypeMap[checkedId]?.let { resultType ->
+                    searchVM.changeSearchResultType(resultType, generateSearchOptions())
+                    searchResultsAdapter.setResultType(resultType)
                 }
             }
         }

@@ -2,10 +2,12 @@ package com.relic.presentation.search
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
+import com.relic.interactor.SubInteraction
 import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
@@ -13,18 +15,11 @@ import com.relic.presentation.search.subreddit.view.SearchSubPreviewView
 import com.relic.presentation.search.user.view.UserSearchItemView
 import kotlinx.android.synthetic.main.sub_search_preview_item.view.*
 
-sealed class ResultType(
-    val type : Int
-) {
-    object SUB: ResultType(1)
-    object POST : ResultType(2)
-    object USER: ResultType(3)
-}
-
 class SearchResultsAdapter(
-    var currentType: ResultType,
-    private val subSearchInteractor: SubredditSearchDelegate,
+    var currentType: SearchResultType,
+    private val subInteractor: Contract.SubAdapterDelegate,
     private val postInteractor: Contract.PostAdapterDelegate,
+    private val userInteractor: Contract.UserAdapterDelegate,
     private val viewPrefsManager: PostViewPreferences
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -33,22 +28,27 @@ class SearchResultsAdapter(
     private var userSearchResults: List<UserModel> = emptyList()
 
     override fun getItemCount(): Int = when (currentType) {
-        ResultType.SUB -> subSearchResults.size
-        ResultType.POST -> postSearchResults.size
-        ResultType.USER -> userSearchResults.size
+        SearchResultType.SUB -> subSearchResults.size
+        SearchResultType.POST -> postSearchResults.size
+        SearchResultType.USER -> userSearchResults.size
+    }
+
+    fun setResultType(type: SearchResultType) {
+        currentType = type
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {
-        return currentType.type
+        return currentType.getType()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ResultType.SUB.type -> {
+            SearchResultType.SUB.getType() -> {
                 val subPreviewView = SearchSubPreviewView(parent.context)
                 SubPreviewVH(subPreviewView)
             }
-            ResultType.USER.type -> {
+            SearchResultType.USER.getType() -> {
                 val userSearchItemView = UserSearchItemView(parent.context)
                 UserVH(userSearchItemView)
             }
@@ -61,10 +61,10 @@ class SearchResultsAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
-            ResultType.SUB.type -> {
+            SearchResultType.SUB.getType() -> {
                 (holder as SubPreviewVH).bindSubredditName(subSearchResults[position])
             }
-            ResultType.USER.type -> {
+            SearchResultType.USER.getType() -> {
                 (holder as UserVH).bind(userSearchResults[position])
             }
             else -> {
@@ -87,15 +87,12 @@ class SearchResultsAdapter(
         newUserSearchResults: List<UserModel>? = null
     ) {
         newSubSearchResults?.let {
-            currentType = ResultType.SUB
             subSearchResults = it
         }
         newPostSearchResults?.let {
-            currentType = ResultType.POST
             postSearchResults = it
         }
         newUserSearchResults?.let {
-            currentType = ResultType.USER
             userSearchResults = it
         }
         notifyDataSetChanged()
@@ -106,14 +103,15 @@ class SearchResultsAdapter(
         private val view: SearchSubPreviewView
     ) : RecyclerView.ViewHolder(view) {
 
-        fun bindOnClick() {
+        init {
             view.apply {
                 root.setOnClickListener {
-                    subSearchInteractor.visit(subSearchResults[absoluteAdapterPosition].name)
+                    val postSource = PostSource.Subreddit(subSearchResults[absoluteAdapterPosition].name)
+                    subInteractor.interact(postSource, SubInteraction.Visit)
                 }
-
                 root.setOnLongClickListener {
-                    subSearchInteractor.preview(subSearchResults[absoluteAdapterPosition].name)
+                    val postSource = PostSource.Subreddit(subSearchResults[absoluteAdapterPosition].name)
+                    subInteractor.interact(postSource, SubInteraction.Preview)
                     true
                 }
             }
@@ -125,27 +123,35 @@ class SearchResultsAdapter(
     }
 
     inner class UserVH(
-        private val view : UserSearchItemView
-    ) : RecyclerView.ViewHolder(view) {
+        private val userItemView : UserSearchItemView
+    ) : RecyclerView.ViewHolder(userItemView) {
+        init {
+            userItemView.setViewDelegate(userInteractor)
+        }
 
         fun bind(user: UserModel) {
-            view.bind(user)
+            userItemView.bind(user)
         }
     }
 
     inner class PostItemVH(
         private val postItemView: RelicPostItemView
     ) : RecyclerView.ViewHolder(postItemView), ItemNotifier {
+        init {
+            postItemView.setViewDelegate(postInteractor, this)
+        }
 
         override fun notifyItem() {
             notifyItemChanged(layoutPosition)
         }
 
-        init {
-            postItemView.setViewDelegate(postInteractor, this)
-        }
-
         fun bindPost(postModel: PostModel) = postItemView.setPost(postModel)
     }
     // endregion viewholders
+}
+
+private fun SearchResultType.getType() = when (this) {
+    SearchResultType.SUB -> 1
+    SearchResultType.POST -> 2
+    SearchResultType.USER -> 3
 }
