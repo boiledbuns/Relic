@@ -8,7 +8,8 @@ import com.gfycat.core.GfyCoreInitializationBuilder
 import com.gfycat.core.GfyCoreInitializer
 import com.gfycat.core.GfycatApplicationInfo
 import com.relic.dagger.AppInjector
-import com.relic.scheduler.PostSyncWorker
+import com.relic.data.Auth
+import com.relic.network.NetworkRequestManager
 import com.relic.scheduler.RelicWorkerFactory
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -23,6 +24,12 @@ class RelicApp : Application(), HasActivityInjector{
 
     @Inject
     lateinit var relicWorkerFactory : RelicWorkerFactory
+
+    @Inject
+    lateinit var auth: Auth
+
+    @Inject
+    lateinit var networkRequestManager: NetworkRequestManager
 
     override fun onCreate() {
         AppInjector.init(this)
@@ -47,6 +54,11 @@ class RelicApp : Application(), HasActivityInjector{
           .setWorkerFactory(relicWorkerFactory)
           .build()
         WorkManager.initialize(this, config)
+
+        // workaround for circular dep b/ request manager and auth
+        // auth has the network req manager via di
+        // network req manager needs to refresh tokens on auth failures which is auth's responsibility
+        networkRequestManager.authManager = auth
     }
 
     override fun activityInjector(): AndroidInjector<Activity> {

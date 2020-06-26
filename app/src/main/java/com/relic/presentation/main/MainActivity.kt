@@ -29,6 +29,7 @@ import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.displayuser.DisplayUserFragmentArgs
 import com.relic.presentation.displayuser.DisplayUserPreview
 import com.relic.presentation.editor.ReplyEditorFragmentArgs
+import com.relic.presentation.home.frontpage.MultiFragmentArgs
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
@@ -289,8 +290,9 @@ class MainActivity : RelicActivity() {
                         val args = DisplaySubFragmentArgs(subName = navData.source.getSourceName()).toBundle()
                         navControllerLiveData?.value?.navigate(R.id.displaySubFragment, args)
                     }
-                    is PostSource.Frontpage -> {
-                        navControllerLiveData?.value?.navigate(R.id.multiFragment)
+                    is PostSource.Frontpage, PostSource.All, PostSource.Popular -> {
+                        val args = MultiFragmentArgs(multiName = navData.source.getSourceName()).toBundle()
+                        navControllerLiveData?.value?.navigate(R.id.multiFragment, args)
                     }
                     is PostSource.All -> {
                         navControllerLiveData?.value?.navigate(R.id.multiFragment)

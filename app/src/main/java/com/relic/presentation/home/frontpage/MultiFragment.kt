@@ -25,7 +25,6 @@ import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -45,7 +44,7 @@ class MultiFragment : RelicFragment() {
     @Inject
     lateinit var auth: Auth
 
-    private val frontpageVM by lazy {
+    private val multiVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 val postSource = when(args.multiName) {
@@ -100,7 +99,7 @@ class MultiFragment : RelicFragment() {
                 frontpageRecyclerView.layoutManager!!.scrollToPosition(0)
                 postAdapter.clear()
                 // tells vm to clear the posts -> triggers action to retrieve more
-                frontpageVM.retrieveMorePosts(true)
+                multiVM.retrieveMorePosts(true)
             }
         }
 
@@ -114,7 +113,7 @@ class MultiFragment : RelicFragment() {
                     // lock scrolling until posts are loaded to prevent additional unwanted requests
                     scrollLocked = true
                     frontpageProgress.visibility = View.VISIBLE
-                    frontpageVM.retrieveMorePosts(false)
+                    multiVM.retrieveMorePosts(false)
                 }
             }
         })
@@ -122,8 +121,8 @@ class MultiFragment : RelicFragment() {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // observe the live data list of posts for this subreddit
-        frontpageVM.postListLiveData.observe(lifecycleOwner) { handlePosts(it) }
-        frontpageVM.refreshLiveData.observe (lifecycleOwner) { handleRefresh(it) }
+        multiVM.postListLiveData.observe(lifecycleOwner) { handlePosts(it) }
+        multiVM.refreshLiveData.observe (lifecycleOwner) { handleRefresh(it) }
     }
 
     private fun handleVHSwipeAction(vh: RecyclerView.ViewHolder, direction: Int) {
@@ -141,13 +140,15 @@ class MultiFragment : RelicFragment() {
     // region live data handlers
 
     private fun handlePosts(posts : List<PostModel>?) {
-        posts?.let {
-            Timber.d("size of frontpage %s", posts.size)
-            postAdapter.setPostList(posts)
+        posts?.let { loadedPosts ->
+            postAdapter.setPostList(loadedPosts)
+            frontpageProgress.visibility = View.GONE
 
             // unlock scrolling to allow more posts to be loaded
-            frontpageProgress.visibility = View.GONE
-            scrollLocked = false
+            // if no posts have been loaded -> prevent loading "more"
+            if (loadedPosts.isNotEmpty()) {
+                scrollLocked = false
+            }
         }
     }
 
