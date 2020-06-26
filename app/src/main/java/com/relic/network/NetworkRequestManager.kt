@@ -6,10 +6,13 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.relic.data.Auth
-import com.relic.persistence.ApplicationDB
 import com.relic.network.request.RelicOAuthRequest
+import com.relic.persistence.ApplicationDB
 import com.relic.presentation.callbacks.AuthenticationCallback
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -20,10 +23,10 @@ import kotlin.coroutines.suspendCoroutine
  * Abstraction for all network requests
  */
 class NetworkRequestManager @Inject constructor(
-    private val appContext : Context,
+    private val appContext: Context,
     appDB: ApplicationDB
 ) {
-    lateinit var authManager : Auth
+    lateinit var authManager: Auth
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
@@ -33,12 +36,12 @@ class NetworkRequestManager @Inject constructor(
     private val tokenStore = appDB.tokenStoreDao
 
     @Throws(VolleyError::class)
-    suspend fun processUnauthenticatedRequest (
+    suspend fun processUnauthenticatedRequest(
         method: Int,
         url: String,
         headers: MutableMap<String, String>? = null,
         data: MutableMap<String, String>? = null
-    ) : String {
+    ): String {
         return suspendCoroutine { cont ->
             val request = RelicOAuthRequest(
                 method = method,
@@ -63,16 +66,14 @@ class NetworkRequestManager @Inject constructor(
      * when a token is unavailable
      */
     @Throws(VolleyError::class)
-    suspend fun processRequest (
+    suspend fun processRequest(
         method: Int,
         url: String,
         authToken: String? = null,
         headers: MutableMap<String, String>? = null,
         data: MutableMap<String, String>? = null
-    ) : String {
-
+    ): String {
         val token = authToken ?: checkToken()
-//        val token = "35823412-qB2PuomlNACyVzBikhg1J53GYpA"
 
         return suspendCoroutine { cont ->
             val request = RelicOAuthRequest(

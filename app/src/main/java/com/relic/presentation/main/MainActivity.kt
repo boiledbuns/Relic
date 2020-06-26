@@ -139,6 +139,15 @@ class MainActivity : RelicActivity() {
         } ?: super.onOptionsItemSelected(item)
     }
 
+    override fun onBackPressed() {
+        supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.apply {
+            (fragments.last() as? RelicFragment?)?.let { relicFragment ->
+                val handled = relicFragment.onBackPressed()
+                if (!handled) super.onBackPressed()
+            }
+        }
+    }
+
     // endregion lifecycle hooks
 
     // use the solution from the google navigation components repo for now since there isn't

@@ -12,6 +12,10 @@ class SettingsFragment  : RelicFragment() {
         return inflater.inflate(R.layout.display_settings, container, false)
     }
 
+    override fun onBackPressed(): Boolean {
+        return true
+    }
+
     override fun handleNavReselected(): Boolean {
         return true
     }

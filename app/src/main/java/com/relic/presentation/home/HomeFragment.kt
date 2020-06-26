@@ -58,6 +58,10 @@ class HomeFragment : RelicFragment() {
         }
     }
 
+    override fun onBackPressed(): Boolean {
+        return true
+    }
+
     override fun handleNavReselected(): Boolean {
         return true
     }

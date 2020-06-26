@@ -61,6 +61,10 @@ class DisplaySubsFragment : RelicFragment() {
         attachScrollListeners()
     }
 
+    override fun onBackPressed(): Boolean {
+        return true
+    }
+
     override fun handleNavReselected(): Boolean {
         return true
     }
