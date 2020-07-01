@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import com.android.volley.VolleyError
 import com.relic.api.response.Data
 import com.relic.api.response.Listing
+import com.relic.data.auth.KEY_ACCOUNTS_DATA
+import com.relic.data.auth.KEY_CURR_ACCOUNT
 import com.relic.data.deserializer.Contract
 import com.relic.data.repository.RepoConstants.ENDPOINT
 import com.relic.domain.models.AccountModel
@@ -26,10 +28,6 @@ class UserRepositoryImpl @Inject constructor(
     private val accountDeserializer : Contract.AccountDeserializer,
     private val appDB : ApplicationDB
 ): UserRepository {
-    private val TAG = "USER_REPO"
-
-    private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
-    private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
 
     private val accountDao = appDB.accountDao
 

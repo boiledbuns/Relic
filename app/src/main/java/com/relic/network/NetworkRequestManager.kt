@@ -5,6 +5,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.relic.data.Auth
+import com.relic.data.repository.AuthException
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.GlobalScope
@@ -68,6 +69,7 @@ class NetworkRequestManager @Inject constructor(
 
         Timber.d("endpoint: %s ", url)
         return suspendCoroutine { cont ->
+            if (authToken == null && !authManager.isAuthenticated()) throw AuthException("user not logged in", null)
             val request = RelicOAuthRequest(
                 method, url,
                 Response.Listener { response: String ->

@@ -23,8 +23,8 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
-private const val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
+const val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
+const val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
 
 @Singleton
 class AuthImpl @Inject constructor(

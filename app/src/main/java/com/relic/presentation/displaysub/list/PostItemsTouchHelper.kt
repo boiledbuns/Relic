@@ -16,7 +16,10 @@ class PostItemsTouchHelper(
 ) : ItemTouchHelper.Callback() {
 
     private val translationScale = 0.5
+    private val cancelThreshold = 50F
+    private val voteThreshold = 500F
     private var previousXTranslation = 0F
+    private var thresholdReached = false
 
     // initialize values needed for swipe so we don't have to retrieve them each time
     private val swipeRightColor = context.resources.getColor(R.color.upvote)
@@ -68,7 +71,7 @@ class PostItemsTouchHelper(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        Timber.d("touch helper %s", dX.toString())
+        Timber.d("touch helper dx: $dX\naction state:$actionState \n currently active $isCurrentlyActive")
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
                 viewHolder.itemView.translationX = dX.times(translationScale).toFloat()
@@ -84,41 +87,103 @@ class PostItemsTouchHelper(
 
                     val vhHeight = viewHolder.itemView.bottom - viewHolder.itemView.top
 
-                    if (dX == 0F) {
-                        // from right swipe to release
-                        if (previousXTranslation > 0F) {
-                            Timber.d("touch helper right %s", dX.toString())
-                            swipeCallback.invoke(viewHolder, ItemTouchHelper.RIGHT)
-                        } else if (previousXTranslation < 0F) {
-                            Timber.d("touch helper left %s", dX.toString())
-                            swipeCallback.invoke(viewHolder, ItemTouchHelper.LEFT)
+                    when {
+                        dX > cancelThreshold -> { // swiping in right direction
+                            drawColor(swipeRightColor)
+                            if (dX > voteThreshold) {
+                                upvoteIcon.apply {
+                                    bounds = Rect(
+                                        margin,
+                                        viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+                                        margin + iconSize,
+                                        viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
+                                    )
+                                    setTint(iconColor)
+                                    draw(canvas)
+                                }
+                            }
+                            if (!thresholdReached && !isCurrentlyActive && dX > voteThreshold) {
+                                swipeCallback.invoke(viewHolder, ItemTouchHelper.RIGHT)
+                                thresholdReached = true
+                            }
                         }
-                    } else if (dX > 0) {
-                        drawColor(swipeRightColor)
-                        // left, top, right, bottom
-                        upvoteIcon.apply {
-                            bounds = Rect(
-                                margin,
-                                viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
-                                margin + iconSize,
-                                viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
-                            )
-                            setTint(iconColor)
-                            draw(canvas)
+                        dX < -cancelThreshold -> { // swiping in left direction
+                            drawColor(swipeLeftColor)
+                            // only draw downvote icon when user swipes far enough
+                            if (dX < -voteThreshold) {
+                                downvoteIcon.apply {
+                                    bounds = Rect(
+                                        viewHolder.itemView.right - iconSize - margin,
+                                        viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+                                        viewHolder.itemView.right - margin,
+                                        viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
+                                    )
+                                    setTint(iconColor)
+                                    draw(canvas)
+                                }
+                            }
+                            if (!thresholdReached && !isCurrentlyActive && dX < -voteThreshold) {
+                                swipeCallback.invoke(viewHolder, ItemTouchHelper.LEFT)
+                                thresholdReached = true
+                            }
                         }
-                    } else if (dX < 0) {
-                        drawColor(swipeLeftColor)
-                        downvoteIcon.apply {
-                            bounds = Rect(
-                                viewHolder.itemView.right - iconSize - margin,
-                                viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
-                                viewHolder.itemView.right - margin,
-                                viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
-                            )
-                            setTint(iconColor)
-                            draw(canvas)
+                        else -> {
+                            thresholdReached = false
                         }
                     }
+
+//                    when {
+//                        dX == 0F -> {
+//                            // if swipe threshold reached and the user has released
+//                            if (!isCurrentlyActive && thresholdReached) {
+//                                // from right swipe to release
+//                                if (previousXTranslation > 0F) {
+//                                    Timber.d("touch helper right %s", dX.toString())
+//                                    swipeCallback.invoke(viewHolder, ItemTouchHelper.RIGHT)
+//                                } else if (previousXTranslation < 0F) {
+//                                    Timber.d("touch helper left %s", dX.toString())
+//                                    swipeCallback.invoke(viewHolder, ItemTouchHelper.LEFT)
+//                                }
+//                            }
+//                            // reset threshold reached
+//                            thresholdReached = false
+//                        }
+//                        dX > 0 -> {
+//                            drawColor(swipeRightColor)
+//                            if (dX > voteThreshold) thresholdReached = true
+//                                // only draw upvote icon when user swipes far enough
+//                            if (thresholdReached) {
+//                                // left, top, right, bottom
+//                                upvoteIcon.apply {
+//                                    bounds = Rect(
+//                                        margin,
+//                                        viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+//                                        margin + iconSize,
+//                                        viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
+//                                    )
+//                                    setTint(iconColor)
+//                                    draw(canvas)
+//                                }
+//                            }
+//                        }
+//                        dX < 0 -> {
+//                            drawColor(swipeLeftColor)
+//                            if (dX < voteThreshold) thresholdReached = true
+//                            // only draw downvote icon when user swipes far enough
+//                            if (thresholdReached) {
+//                                downvoteIcon.apply {
+//                                    bounds = Rect(
+//                                        viewHolder.itemView.right - iconSize - margin,
+//                                        viewHolder.itemView.top + vhHeight / 2 - iconSize / 2,
+//                                        viewHolder.itemView.right - margin,
+//                                        viewHolder.itemView.bottom - vhHeight / 2 + iconSize / 2
+//                                    )
+//                                    setTint(iconColor)
+//                                    draw(canvas)
+//                                }
+//                            }
+//                        }
+//                    }
 
                 }
 
