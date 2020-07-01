@@ -6,9 +6,10 @@ import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.interactor.CommentInteraction
 import com.relic.interactor.Contract
 import com.relic.presentation.base.ItemNotifier
-import com.relic.interactor.CommentInteraction
+import com.relic.presentation.displaypost.DisplayPostContract
 import kotlinx.android.synthetic.main.relic_more_comments_item.view.*
 
 class RelicCommentMoreItemsView(
@@ -26,11 +27,18 @@ class RelicCommentMoreItemsView(
     fun setLoadMore(comment : CommentModel) {
         this.comment = comment
         loadMoreItemText.text = resources.getString(R.string.load_comments, comment.replyCount)
+
+        if (comment.depth >= 0){
+            displayReplyDepth(comment.depth)
+        }
     }
 
-    fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier: ItemNotifier) {
+    fun setViewDelegate(
+        delegate: DisplayPostContract.LoadMoreCommentsDelegate,
+        notifier: ItemNotifier
+    ) {
         setOnClickListener {
-            delegate.interact(comment, CommentInteraction.ExpandReplies)
+            delegate.onExpandReplies(comment)
             notifier.notifyItem()
         }
     }

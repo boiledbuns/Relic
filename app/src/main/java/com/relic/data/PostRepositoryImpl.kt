@@ -118,6 +118,9 @@ class PostRepositoryImpl @Inject constructor(
             is PostSource.User -> {
                 "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}?sort=${sortType.name.toLowerCase()}&t=${sortScope.name.toLowerCase()}"
             }
+            is PostSource.All, PostSource.Popular -> {
+                "r/${postSource.getSourceName()}"
+            }
             else -> ""
         }
 
@@ -155,6 +158,7 @@ class PostRepositoryImpl @Inject constructor(
         val ending = when (postSource) {
             is PostSource.Subreddit -> "r/${postSource.subredditName}"
             is PostSource.User -> "user/${postSource.username}/${postSource.retrievalOption.name.toLowerCase()}"
+            is PostSource.All, PostSource.Popular -> "r/${postSource.getSourceName()}"
             else -> ""
         }
 

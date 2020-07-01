@@ -24,21 +24,21 @@ import javax.inject.Inject
 class PostsTabFragment : RelicFragment() {
 
     @Inject
-    lateinit var viewPrefsManager : ViewPreferencesManager
+    lateinit var viewPrefsManager: ViewPreferencesManager
 
     @Inject
-    lateinit var postInteractor : Contract.PostAdapterDelegate
+    lateinit var postInteractor: Contract.PostAdapterDelegate
 
     @Inject
-    lateinit var commentInteractor : Contract.CommentAdapterDelegate
+    lateinit var commentInteractor: Contract.CommentAdapterDelegate
 
     private val postsTabVM by lazy {
         (requireParentFragment() as DisplayUserFragment).displayUserVM
     }
 
-    private lateinit var selectedUserTab : UserTab
+    private lateinit var selectedUserTab: UserTab
 
-    private lateinit var userPostsAdapter : ListingItemAdapter
+    private lateinit var userPostsAdapter: ListingItemAdapter
     private var scrollLocked: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,8 +68,8 @@ class PostsTabFragment : RelicFragment() {
 
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // subscribe to the appropriate livedata based on tab selected
-        postsTabVM.getTabPostsLiveData(selectedUserTab).nonNull().observe (lifecycleOwner) {
-            setListingItems(it)
+        postsTabVM.getTabPostsLiveData(selectedUserTab).nonNull().observe(lifecycleOwner) {
+            handleListingItems(it)
         }
         postsTabVM.errorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
     }
@@ -96,15 +96,11 @@ class PostsTabFragment : RelicFragment() {
         }
     }
 
-    private fun setListingItems(listingItems : List<ListingItem>) {
+    private fun handleListingItems(listingItems: List<ListingItem>) {
         tabProgress.visibility = View.GONE
-        if (listingItems.isNotEmpty()) {
-            userPostsAdapter.setItems(listingItems)
-            userTabSwipeRefreshLayout.isRefreshing = false
-            scrollLocked = false
-        } else {
-            Snackbar.make(userTabRoot, getString(R.string.no_posts), Snackbar.LENGTH_SHORT).show()
-        }
+        userPostsAdapter.setItems(listingItems)
+        userTabSwipeRefreshLayout.isRefreshing = false
+        scrollLocked = false
     }
 
     fun resetRecyclerView() {
@@ -116,10 +112,10 @@ class PostsTabFragment : RelicFragment() {
     }
 
     private fun handleError(errorData: ErrorData) {
-        when(errorData) {
+        when (errorData) {
             is ErrorData.NoMorePosts -> {
                 if (selectedUserTab == errorData.tab) {
-                    Snackbar.make(requireView(), "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(userTabRoot, "No more posts loaded for ${selectedUserTab.tabName}", Snackbar.LENGTH_SHORT).show()
                     tabProgress.visibility = View.GONE
                     userTabSwipeRefreshLayout.isRefreshing = false
                 }
@@ -131,7 +127,7 @@ class PostsTabFragment : RelicFragment() {
     companion object {
         private val ARG_USER_TAB = "arg_user_tab"
 
-        fun create(userTab : UserTab) : PostsTabFragment {
+        fun create(userTab: UserTab): PostsTabFragment {
             val bundle = Bundle()
             bundle.putParcelable(ARG_USER_TAB, userTab)
 

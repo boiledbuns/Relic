@@ -1,47 +1,48 @@
 package com.relic.data.auth
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
-import android.util.Log
-
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.android.volley.Request
 import com.relic.R
-import com.relic.data.*
-import com.relic.persistence.entities.TokenStoreEntity
+import com.relic.data.Auth
+import com.relic.data.DomainTransfer
+import com.relic.data.UserRepository
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.persistence.ApplicationDB
+import com.relic.persistence.entities.TokenStoreEntity
 import com.relic.presentation.callbacks.AuthenticationCallback
-import dagger.Reusable
-import kotlinx.coroutines.*
-
-import java.util.Calendar
-import java.util.Date
-import java.util.HashMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@Reusable
+private const val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
+private const val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
+
+@Singleton
 class AuthImpl @Inject constructor(
     private val appContext: Application,
     private val requestManager: NetworkRequestManager,
-    private val userRepo : UserRepository,
-    private val appDB : ApplicationDB,
-    private val authDeserializer : Auth.Deserializer
+    private val userRepo: UserRepository,
+    private val appDB: ApplicationDB,
+    private val authDeserializer: Auth.Deserializer
 ) : Auth {
-    private val TAG = "AUTHENTICATOR"
+    private val tokenStore = appDB.tokenStoreDao
 
     // TODO move to interface after refactoring account repo keys for data in response
     private val preference = appContext.resources.getString(R.string.AUTH_PREF)
-    private val redirectCode= appContext.resources.getString(R.string.REDIRECT_CODE)
-    private val KEY_ACCOUNTS_DATA= "PREF_ACCOUNTS_DATA"
-    private val KEY_CURR_ACCOUNT= "PREF_CURR_ACCOUNT"
+    private val redirectCode = appContext.resources.getString(R.string.REDIRECT_CODE)
+
 
     // keys for shared preferences
-    private val refreshTokenKey= appContext.resources.getString(R.string.REFRESH_TOKEN_KEY)
+    private val refreshTokenKey = appContext.resources.getString(R.string.REFRESH_TOKEN_KEY)
 
     private var lastRefresh: Date? = null
 
@@ -49,9 +50,8 @@ class AuthImpl @Inject constructor(
         return appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).contains(KEY_CURR_ACCOUNT)
     }
 
-
     private val spAccountLiveData = MutableLiveData<String?>()
-    private val listener : SharedPreferences.OnSharedPreferenceChangeListener by lazy {
+    private val listener: SharedPreferences.OnSharedPreferenceChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener { sp, key ->
             if (key == KEY_CURR_ACCOUNT) {
                 spAccountLiveData.postValue(sp.getString(KEY_CURR_ACCOUNT, null))
@@ -60,19 +60,23 @@ class AuthImpl @Inject constructor(
     }
 
     override val url = (AuthConstants.BASE + "client_id=" + appContext.getString(R.string.client_id)
-            + "&response_type=" + AuthConstants.RESPONSE_TYPE
-            + "&state=" + AuthConstants.STATE
-            + "&redirect_uri=" + AuthConstants.REDIRECT
-            + "&duration=" + AuthConstants.DURATION
-            + "&scope=" + AuthConstants.SCOPE)
+        + "&response_type=" + AuthConstants.RESPONSE_TYPE
+        + "&state=" + AuthConstants.STATE
+        + "&redirect_uri=" + AuthConstants.REDIRECT
+        + "&duration=" + AuthConstants.DURATION
+        + "&scope=" + AuthConstants.SCOPE)
 
     init {
-        // checks if the user is currently signed in by checking shared preferences
+        // workaround for circular dep b/ request manager and auth
+        // auth has the network req manager via di
+        // network req manager needs to refresh tokens on auth failures which is auth's responsibility
+        requestManager.setAuthManager(this)
 
+        // checks if the user is currently signed in by checking shared preferences
         if (isAuthenticated()) {
             // refresh the auth token
             // move the date change to the refresh method
-            Log.d(TAG, "Current date/time: " + Calendar.getInstance().time)
+            Timber.d("Current date/time: %s", Calendar.getInstance().time)
             lastRefresh = Calendar.getInstance().time
         }
     }
@@ -94,7 +98,7 @@ class AuthImpl @Inject constructor(
         }
 
         // stores the redirect "code" in shared preferences for easy access
-        Log.d(TAG, queryMap.keys.toString() + " " + queryMap[redirectCode])
+        Timber.d("${queryMap.keys.toString()} ${queryMap[redirectCode]}")
         appContext.getSharedPreferences(preference, Context.MODE_PRIVATE).edit()
             .putString(redirectCode, queryMap[redirectCode]).apply()
 
@@ -122,7 +126,7 @@ class AuthImpl @Inject constructor(
                 headers = headers
             )
 
-            Log.d(TAG, "successful response $response")
+            Timber.d("successful response $response")
             // we should control how we store the token here
             // TODO refactor the account repo into its own class in this package since the two
             // are more closely related than user <-> account
@@ -153,7 +157,7 @@ class AuthImpl @Inject constructor(
      */
     override suspend fun refreshToken(callback: AuthenticationCallback) {
         // get the name of the current account
-        val name : String = appContext
+        val name: String = appContext
             .getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
             .getString(KEY_CURR_ACCOUNT, null) ?: throw Exception() // TODO replace with custom e
 
@@ -177,7 +181,7 @@ class AuthImpl @Inject constructor(
             put("refresh_token", refreshToken)
         }
 
-        Log.d(TAG, "refresh token $refreshToken")
+        Timber.d("refresh token $refreshToken")
         try {
             val response = requestManager.processUnauthenticatedRequest(
                 method = Request.Method.POST,
@@ -198,10 +202,10 @@ class AuthImpl @Inject constructor(
         }
     }
 
-    private suspend fun retrieveUserName(accessToken : String) : String? {
+    private suspend fun retrieveUserName(accessToken: String): String? {
         val selfEndpoint = "https://oauth.reddit.com/api/v1/me"
 
-        return withContext (Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             try { // create the new request and submit it
                 val response = requestManager.processRequest(
                     method = RelicOAuthRequest.GET,
@@ -222,5 +226,17 @@ class AuthImpl @Inject constructor(
      */
     override fun getCurrentAccountName(): LiveData<String?> {
         return spAccountLiveData
+    }
+
+    // get the oauth token from the app's shared preferences
+    override suspend fun getToken(): String? {
+        // get the name of the current account
+        val name = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
+            .getString(KEY_CURR_ACCOUNT, null)
+
+        return withContext(Dispatchers.IO) {
+
+            name?.let { tokenStore.getTokenStore(it).access }
+        }
     }
 }

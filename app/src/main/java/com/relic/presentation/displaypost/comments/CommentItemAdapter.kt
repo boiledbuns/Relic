@@ -20,7 +20,7 @@ private const val VIEW_TYPE_COMMENT = 1
 private const val VIEW_TYPE_LOAD_MORE = 2
 
 class CommentItemAdapter (
-    private val delegate : DisplayPostContract.ViewModel,
+    private val delegate : DisplayPostContract.LoadMoreCommentsDelegate,
     private val commentInteractor : Contract.CommentAdapterDelegate,
     private val postInteractor : Contract.PostAdapterDelegate
 ) : RelicAdapter<RecyclerView.ViewHolder>() {
@@ -146,7 +146,7 @@ class CommentItemAdapter (
         init {
             when(viewType) {
                 VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(commentInteractor, this)
-                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(commentInteractor, this)
+                VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(delegate, this)
             }
         }
 

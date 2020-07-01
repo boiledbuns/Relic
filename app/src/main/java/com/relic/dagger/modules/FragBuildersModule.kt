@@ -12,7 +12,7 @@ import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import com.relic.presentation.editor.NewPostEditorFragment
 import com.relic.presentation.editor.ReplyEditorFragment
 import com.relic.presentation.home.HomeFragment
-import com.relic.presentation.home.frontpage.FrontpageFragment
+import com.relic.presentation.home.frontpage.MultiFragment
 import com.relic.presentation.login.SignInFragment
 import com.relic.presentation.media.DisplayImageFragment
 import com.relic.presentation.preferences.PreferencesFragment
@@ -45,7 +45,7 @@ abstract class FragBuildersModule {
     abstract fun contributeHome() : HomeFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeFrontpage() : FrontpageFragment
+    abstract fun contributeFrontpage() : MultiFragment
 
     @ContributesAndroidInjector
     abstract fun contributeSub() : DisplaySubFragment

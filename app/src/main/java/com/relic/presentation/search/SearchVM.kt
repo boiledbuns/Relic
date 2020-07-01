@@ -3,7 +3,6 @@ package com.relic.presentation.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.relic.data.PostRepository
-import com.relic.data.PostSource
 import com.relic.data.SubRepository
 import com.relic.data.UserRepository
 import com.relic.domain.models.PostModel
@@ -11,10 +10,7 @@ import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.SubredditModel
 import com.relic.domain.models.UserModel
 import com.relic.presentation.base.RelicViewModel
-import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.main.RelicError
-import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,7 +43,6 @@ class SearchVM(
     private val _postResultsLiveData = MutableLiveData<List<PostModel>>()
     private val _userResultsLiveData = MutableLiveData<List<UserModel>>()
     private val _localSubredditResultsLiveData = MutableLiveData<List<SubredditModel>>()
-    private val _navigationLiveData = SingleLiveData<NavigationData>()
     private val _loadingLiveData = MutableLiveData<Boolean>()
 
     override val subSearchErrorLiveData: LiveData<RelicError?> = _subSearchErrorLiveData
@@ -55,10 +50,9 @@ class SearchVM(
     val postResultsLiveData: LiveData<List<PostModel>> = _postResultsLiveData
     val userResultsLiveData: LiveData<List<UserModel>> = _userResultsLiveData
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _localSubredditResultsLiveData
-    override val navigationLiveData: LiveData<NavigationData> = _navigationLiveData
     val loadingLiveData: LiveData<Boolean> = _loadingLiveData
 
-    private var query: String? = null
+    private var localQuery: String? = null
     var currentSearchType: SearchResultType = SearchResultType.SUB
 
     init {
@@ -67,17 +61,21 @@ class SearchVM(
         _localSubredditResultsLiveData.postValue(emptyList())
     }
 
-    /**
-     * some search options don't have a query (ie. changing the result type) so we set serparate
-     * the updating of the query string from the search function
-     */
-    override fun updateQuery(newQuery: String?) {
-        query = newQuery
+
+    override fun search(query: String?, newOptions: SubredditSearchOptions) {
+        if (localQuery == query) return
+        localQuery = query
+        search(newOptions)
     }
 
-    override fun search(newOptions: SubredditSearchOptions) {
-        val localQuery = query
-        if (localQuery == null || localQuery.isEmpty()) {
+    fun changeSearchResultType(resultType: SearchResultType, newOptions: SubredditSearchOptions) {
+        currentSearchType = resultType
+        search(newOptions)
+    }
+
+    private fun search(newOptions: SubredditSearchOptions) {
+        val searchQuery = localQuery
+        if (searchQuery == null || searchQuery.isEmpty()) {
             _subredditResultsLiveData.postValue(emptyList())
             _localSubredditResultsLiveData.postValue(emptyList())
         } else {
@@ -85,15 +83,15 @@ class SearchVM(
             launch {
                 when (currentSearchType) {
                     SearchResultType.SUB -> {
-                        val searchResults = subRepo.searchSubreddits(localQuery, displayNSFW = true, exact = false)
+                        val searchResults = subRepo.searchSubreddits(searchQuery, displayNSFW = true, exact = false)
                         _subredditResultsLiveData.postValue(searchResults)
                     }
                     SearchResultType.POST -> {
-                        val searchResults = postRepo.searchSubPosts("all", localQuery)
+                        val searchResults = postRepo.searchSubPosts("all", searchQuery)
                         _postResultsLiveData.postValue(searchResults.data.children)
                     }
                     SearchResultType.USER -> {
-                        val searchResults = userRepo.searchUsers(localQuery)
+                        val searchResults = userRepo.searchUsers(searchQuery)
                         _userResultsLiveData.postValue(searchResults.data.children)
                     }
                 }
@@ -102,33 +100,7 @@ class SearchVM(
         }
     }
 
-    fun changeSearchResultType(resultType: SearchResultType, newOptions: SubredditSearchOptions) {
-        currentSearchType = resultType
-        search(newOptions)
-    }
-
-    // region SubredditSearchDelegate
-
-    override fun preview(subreddit: String) {
-        val sub = PostSource.Subreddit(subreddit)
-        _navigationLiveData.postValue(NavigationData.PreviewPostSource(sub))
-    }
-
-    override fun visit(subreddit: String) {
-        val sub = PostSource.Subreddit(subreddit)
-        _navigationLiveData.postValue(NavigationData.ToPostSource(sub))
-    }
-
-    override fun subscribe(subscribe: Boolean, subreddit: String) {
-        launch(Dispatchers.Main) {
-            subRepo.getSubGateway().subscribe(subscribe, subreddit)
-        }
-    }
-
-    // endregion SubredditSearchDelegate
-
     override fun handleException(context: CoroutineContext, e: Throwable) {
         Timber.e(e)
     }
-
 }

@@ -88,21 +88,22 @@ class DisplayUserVM(
         val postSource = PostSource.User(_userLiveData.value!!.fullName, userRetrievalOption)
 
         launch(Dispatchers.Main) {
-            val listing = if (refresh) {
+            if (refresh) {
                 val type = currentSortingType[tab] ?: SortType.DEFAULT
                 val scope = currentSortingScope[tab] ?: SortScope.NONE
 
-                postRepo.retrieveUserListing(postSource, type, scope)
+                val listing = postRepo.retrieveUserListing(postSource, type, scope)
+                handleListingRetrieval(tab, listing)
             } else {
                 val listingAfter = currentAfterValues[tab]
                 // only retrieve more posts if after is not null
-                if (listingAfter != null) {
-                    postRepo.retrieveNextListing(source = postSource, after = listingAfter)
-                } else null
-            }
-
-            if (listing != null) {
-                handleListingRetrieval(tab, listing)
+                if (listingAfter == null) {
+                    // tell user no more data
+                    _errorLiveData.postValue(ErrorData.NoMorePosts(tab))
+                } else {
+                    val listing = postRepo.retrieveNextListing(source = postSource, after = listingAfter)
+                    handleListingRetrieval(tab, listing)
+                }
             }
 
             // TODO based on user preferences -> save data offline
@@ -111,16 +112,16 @@ class DisplayUserVM(
 
     private fun handleListingRetrieval(tab: UserTab, listing: Listing<out ListingItem>) {
         listing.data.children?.let { items ->
-//            Log.d(TAG, "listing after ${listing.data.after}")
-//            Log.d(TAG, "listing after tab ${currentAfterValues[tab]}")
             val currentList = postsLiveData[tab]!!.value ?: emptyList()
-
+            // it's possible the user has no posts at all for a particular tab in which case
+            // we should notify them there are no posts loaded
+            // ie. if they have no gilded posts
             if (items.isEmpty()) {
                 _errorLiveData.postValue(ErrorData.NoMorePosts(tab))
-            } else {
-                postsLiveData[tab]!!.postValue(currentList.plus(items))
             }
-            // only update the "after" val for this tab if successful
+            postsLiveData[tab]!!.postValue(currentList.plus(items))
+
+            // update the after val
             currentAfterValues[tab] = listing.data.after
         }
     }

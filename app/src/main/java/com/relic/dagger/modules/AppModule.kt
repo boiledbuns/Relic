@@ -1,6 +1,8 @@
 package com.relic.dagger.modules
 
 import android.app.Application
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
 import com.relic.persistence.ApplicationDB
 import com.relic.persistence.RoomTypeConverters
 import com.relic.data.deserializer.Deserializer
@@ -39,5 +41,11 @@ class AppModule {
     @Provides
     fun provideViewPreferencesManager(app: Application) : ViewPreferencesManager {
         return ViewPreferencesManager(app)
+    }
+
+    @Singleton
+    @Provides
+    fun provideVolleyQueue(app: Application) : RequestQueue {
+        return Volley.newRequestQueue(app.applicationContext)
     }
 }

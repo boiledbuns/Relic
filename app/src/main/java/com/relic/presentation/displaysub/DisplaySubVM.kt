@@ -100,21 +100,17 @@ open class DisplaySubVM (
     }
 
     private fun retrieveSubreddit() {
-        val subName : String?  =  when (postSource) {
-            is PostSource.Subreddit -> postSource.subredditName
-            is PostSource.Frontpage -> ""
-            else -> null
-        }
-
-        if (subName != null) {
-            // TODO: STILL TESTING retrieve the banner image from the subreddit css
+        if (postSource is PostSource.Subreddit) {
             launch(Dispatchers.Main) {
-                subRepo.getSubGateway().apply {
-                    retrieveAdditionalSubInfo(subName)
-                    retrieveSidebar(subName)
-                }
+                // TODO: STILL TESTING retrieve the banner image from the subreddit css
 
-                val sub = subRepo.retrieveSingleSub(subName)
+                    subRepo.getSubGateway().apply {
+                        retrieveAdditionalSubInfo(postSource.subredditName)
+                        retrieveSidebar(postSource.subredditName)
+                    }
+
+
+                val sub = subRepo.retrieveSingleSub(postSource.subredditName)
                 _subredditMediator.postValue(sub)
                 subRepo.insertSub(sub)
             }

@@ -63,6 +63,8 @@ open class RelicFragment: Fragment(), RelicInjectable {
      */
     open fun handleNavReselected(): Boolean { return false }
 
+    open fun onBackPressed(): Boolean { return false }
+
     protected fun checkInternetConnectivity() : Boolean {
         return connectivityManager.activeNetworkInfo?.isConnected ?: false
     }

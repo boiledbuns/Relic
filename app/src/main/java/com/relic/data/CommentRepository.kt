@@ -26,6 +26,11 @@ interface CommentRepository {
      */
     suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) : CommentsAndPostData
 
+    /**
+     * retrieves child comments from a "load more" comment
+     * @param postFullName full name of a post
+     * @param moreChildrenComment the "load more" comment
+     */
     suspend fun retrieveCommentChildren(postFullName: String, moreChildrenComment: CommentModel) : List<CommentModel>
 
     suspend fun insertComments(comments : List<CommentModel>)

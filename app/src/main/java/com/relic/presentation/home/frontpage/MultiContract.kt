@@ -1,3 +1,3 @@
 package com.relic.presentation.home.frontpage
 
-interface FrontpageContract
+interface MultiContract

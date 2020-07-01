@@ -34,7 +34,7 @@ class SubsHeaderView @JvmOverloads constructor(
             delegate(PostSource.All)
         }
         default_sources.source_popular.setOnClickListener {
-            // TODO when we add the "popular" page
+            delegate(PostSource.Popular)
         }
     }
 

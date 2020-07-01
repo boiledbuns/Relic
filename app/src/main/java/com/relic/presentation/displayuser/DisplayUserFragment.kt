@@ -119,6 +119,11 @@ class DisplayUserFragment : RelicFragment() {
         return override
     }
 
+    override fun onBackPressed(): Boolean {
+        // primary if displaying current user
+        return args.username == null
+    }
+
     override fun handleNavReselected(): Boolean {
         // primary if displaying current user
         return args.username == null

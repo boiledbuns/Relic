@@ -48,8 +48,6 @@ class CommentRepositoryImpl @Inject constructor(
 
         try {
             val response = requestManager.processRequest(RelicOAuthRequest.GET, url)
-            Timber.d("$response")
-
             return commentDeserializer.parseCommentsAndPost(response)
         }
         catch (e : Exception) {

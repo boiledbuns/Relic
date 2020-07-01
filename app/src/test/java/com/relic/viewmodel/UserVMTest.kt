@@ -103,8 +103,8 @@ class UserVMTest {
         vm.errorLiveData.observeForever(errorObserver)
 
         verify(postRepo, times(1)).retrieveUserListing(any(), any(), any())
-        // listing livedata shouldn't be updated, but an "error" should be posted
-        verify(listingObserver, never()).onChanged(any())
+        // listing livedata should be updated with an "error" should be posted
+        verify(listingObserver, times(1)).onChanged(any())
         verify(errorObserver, times(1)).onChanged(ErrorData.NoMorePosts(tab))
     }
 

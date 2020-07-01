@@ -10,8 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.relic.R
+import com.relic.data.PostSource
 import com.relic.presentation.base.RelicFragment
-import com.relic.presentation.home.frontpage.FrontpageFragment
+import com.relic.presentation.home.frontpage.MultiFragment
+import com.relic.presentation.home.frontpage.MultiFragmentArgs
 import kotlinx.android.synthetic.main.home.*
 
 class HomeFragment : RelicFragment() {
@@ -33,7 +35,14 @@ class HomeFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
-            tabFragments.add(FrontpageFragment())
+            val frontpageFragment = MultiFragment().apply {
+                arguments = MultiFragmentArgs(PostSource.Frontpage.getSourceName()).toBundle()
+            }
+            val allFragment = MultiFragment().apply {
+                arguments = MultiFragmentArgs(PostSource.All.getSourceName()).toBundle()
+            }
+            tabFragments.add(frontpageFragment)
+            tabFragments.add(allFragment)
         }
 
         homeViewPager.adapter = pagerAdapter
@@ -49,6 +58,10 @@ class HomeFragment : RelicFragment() {
         }
     }
 
+    override fun onBackPressed(): Boolean {
+        return true
+    }
+
     override fun handleNavReselected(): Boolean {
         return true
     }
@@ -56,7 +69,7 @@ class HomeFragment : RelicFragment() {
     // endregion lifecycle hooks
 
     private inner class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        val tabFragmentTitles = listOf("FRONTPAGE")
+        val tabFragmentTitles = listOf("FRONTPAGE", "ALL")
         val tabFragments = ArrayList<Fragment>()
 
         override fun getPageTitle(position: Int): CharSequence? {
