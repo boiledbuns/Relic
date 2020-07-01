@@ -180,4 +180,9 @@ class SearchFragment : RelicFragment() {
     private fun generateSearchOptions(): SubredditSearchOptions {
         return SubredditSearchOptions()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        countDownTimer.cancel()
+    }
 }
