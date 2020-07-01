@@ -16,13 +16,15 @@ import com.relic.network.request.RelicOAuthRequest
 import com.relic.persistence.ApplicationDB
 import com.relic.persistence.entities.TokenStoreEntity
 import com.relic.presentation.callbacks.AuthenticationCallback
-import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
+private const val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
 
 @Singleton
 class AuthImpl @Inject constructor(
@@ -32,11 +34,12 @@ class AuthImpl @Inject constructor(
     private val appDB: ApplicationDB,
     private val authDeserializer: Auth.Deserializer
 ) : Auth {
+    private val tokenStore = appDB.tokenStoreDao
+
     // TODO move to interface after refactoring account repo keys for data in response
     private val preference = appContext.resources.getString(R.string.AUTH_PREF)
     private val redirectCode = appContext.resources.getString(R.string.REDIRECT_CODE)
-    private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
-    private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
+
 
     // keys for shared preferences
     private val refreshTokenKey = appContext.resources.getString(R.string.REFRESH_TOKEN_KEY)
@@ -73,7 +76,7 @@ class AuthImpl @Inject constructor(
         if (isAuthenticated()) {
             // refresh the auth token
             // move the date change to the refresh method
-            Timber.d("Current date/time: " + Calendar.getInstance().time)
+            Timber.d("Current date/time: %s", Calendar.getInstance().time)
             lastRefresh = Calendar.getInstance().time
         }
     }
@@ -95,7 +98,7 @@ class AuthImpl @Inject constructor(
         }
 
         // stores the redirect "code" in shared preferences for easy access
-        Timber.d(queryMap.keys.toString() + " " + queryMap[redirectCode])
+        Timber.d("${queryMap.keys.toString()} ${queryMap[redirectCode]}")
         appContext.getSharedPreferences(preference, Context.MODE_PRIVATE).edit()
             .putString(redirectCode, queryMap[redirectCode]).apply()
 
@@ -223,5 +226,17 @@ class AuthImpl @Inject constructor(
      */
     override fun getCurrentAccountName(): LiveData<String?> {
         return spAccountLiveData
+    }
+
+    // get the oauth token from the app's shared preferences
+    override suspend fun getToken(): String? {
+        // get the name of the current account
+        val name = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
+            .getString(KEY_CURR_ACCOUNT, null)
+
+        return withContext(Dispatchers.IO) {
+
+            name?.let { tokenStore.getTokenStore(it).access }
+        }
     }
 }

@@ -1,18 +1,14 @@
 package com.relic.network
 
-import android.content.Context
 import com.android.volley.AuthFailureError
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.relic.data.Auth
 import com.relic.network.request.RelicOAuthRequest
-import com.relic.persistence.ApplicationDB
 import com.relic.presentation.callbacks.AuthenticationCallback
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,17 +21,9 @@ import kotlin.coroutines.suspendCoroutine
  */
 @Singleton
 class NetworkRequestManager @Inject constructor(
-    private val appContext: Context,
-    appDB: ApplicationDB
+    private val volleyQueue: RequestQueue
 ) {
     private lateinit var authManager: Auth
-
-    private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
-    private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
-
-    // TODO move this to be injected
-    private val volleyQueue: RequestQueue = VolleyAccessor.getInstance(appContext).requestQueue
-    private val tokenStore = appDB.tokenStoreDao
 
     @Throws(VolleyError::class)
     suspend fun processUnauthenticatedRequest(
@@ -73,9 +61,10 @@ class NetworkRequestManager @Inject constructor(
         url: String,
         authToken: String? = null,
         headers: MutableMap<String, String>? = null,
-        data: MutableMap<String, String>? = null
+        data: MutableMap<String, String>? = null,
+        retryAuthAllowed: Boolean = true
     ): String {
-        val token = authToken ?: checkToken()
+        val token = authToken ?: authManager.getToken()
 
         Timber.d("endpoint: %s ", url)
         return suspendCoroutine { cont ->
@@ -88,7 +77,7 @@ class NetworkRequestManager @Inject constructor(
                 Response.ErrorListener { e: VolleyError ->
                     // check if the failure is the result of an unauthenticated token
                     // try to refresh token and try request
-                    if (e is AuthFailureError) {
+                    if (e is AuthFailureError && retryAuthAllowed) {
                         GlobalScope.launch { handleAuthError(method, url, headers, data, cont) }
                     } else {
                         cont.resumeWithException(e)
@@ -111,27 +100,16 @@ class NetworkRequestManager @Inject constructor(
         data: MutableMap<String, String>? = null,
         cont: Continuation<String>
     ) {
+        Timber.d("refresh token")
         authManager.refreshToken(callback = AuthenticationCallback {
             GlobalScope.launch {
-                val response = processRequest(method, url, null, headers, data)
+                val response = processRequest(method, url, null, headers, data, false)
                 cont.resumeWith(Result.success(response))
             }
         })
     }
 
-    // get the oauth token from the app's shared preferences
-    private suspend fun checkToken(): String? {
-        // get the name of the current account
-        val name = appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE)
-            .getString(KEY_CURR_ACCOUNT, null)
-
-        // TODO if the token is expired, we need to refresh it
-        return withContext(Dispatchers.IO) {
-            name?.let { tokenStore.getTokenStore(it).access }
-        }
-    }
-
-    fun setAuthManager(auth : Auth) {
+    fun setAuthManager(auth: Auth) {
         authManager = auth
     }
 }

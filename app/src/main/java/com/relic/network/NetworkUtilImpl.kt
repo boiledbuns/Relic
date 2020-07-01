@@ -3,7 +3,6 @@ package com.relic.network
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import com.relic.network.NetworkUtil
 import javax.inject.Inject
 
 class NetworkUtilImpl @Inject constructor(

@@ -7,22 +7,23 @@ interface Auth {
     suspend fun retrieveAccessToken(redirectUrl: String, callback: AuthenticationCallback)
     suspend fun refreshToken(callback: AuthenticationCallback)
 
-    fun isAuthenticated() : Boolean
-    fun getCurrentAccountName() : LiveData<String?>
-    val url : String
+    fun isAuthenticated(): Boolean
+    fun getCurrentAccountName(): LiveData<String?>
+    suspend fun getToken(): String?
+    val url: String
 
     interface Deserializer {
-        fun parseAuthResponse(response: String) : AuthResponseData
-        fun parseRefreshResponse(response: String) : RefreshResponseData
-        fun parseGetUsernameResponse(response: String) : String?
+        fun parseAuthResponse(response: String): AuthResponseData
+        fun parseRefreshResponse(response: String): RefreshResponseData
+        fun parseGetUsernameResponse(response: String): String?
     }
 }
 
 data class AuthResponseData(
-    val access : String,
-    val refresh : String
+    val access: String,
+    val refresh: String
 )
 
 data class RefreshResponseData(
-    val access : String
+    val access: String
 )
