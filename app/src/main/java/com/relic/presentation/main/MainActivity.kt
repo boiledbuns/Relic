@@ -272,7 +272,7 @@ class MainActivity : RelicActivity() {
         when (navData) {
             // navigates to display post
             is NavigationData.ToPost -> {
-                val args = DisplayPostFragmentArgs(postFullName = navData.postId, subredditName = navData.subredditName).toBundle()
+                val args = DisplayPostFragmentArgs(postFullName = navData.postFullname, subredditName = navData.subredditName).toBundle()
                 navControllerLiveData?.value?.navigate(R.id.displayPostFragment, args)
             }
             is NavigationData.ToUser -> {

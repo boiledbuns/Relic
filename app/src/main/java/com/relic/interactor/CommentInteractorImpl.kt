@@ -7,11 +7,7 @@ import com.relic.domain.models.CommentModel
 import com.relic.presentation.displaysub.NavigationData
 import com.relic.presentation.util.RelicEvent
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,11 +19,11 @@ class CommentInteractorImpl @Inject constructor(
 ) : Contract.CommentAdapterDelegate, CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
-        Timber.e(e,  "caught exception")
+        Timber.e(e, "caught exception")
     }
 
     private val _navigationLiveData = SingleLiveData<RelicEvent<NavigationData>>()
-    override val navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
+    override val navigationLiveData: LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     override fun interact(comment: CommentModel, interaction: CommentInteraction) {
         when (interaction) {
@@ -48,11 +44,11 @@ class CommentInteractorImpl @Inject constructor(
         }
 
         // send request only if value changed
-        launch(Dispatchers.Main) { commentGateway.voteOnComment(comment.fullName, comment.userUpvoted)}
+        launch(Dispatchers.Main) { commentGateway.voteOnComment(comment.fullName, comment.userUpvoted) }
     }
 
     private fun onReplyPressed(parent: CommentModel, text: String) {
-        launch(Dispatchers.Main) { commentRepo.postComment(parent.fullName, text)}
+        launch(Dispatchers.Main) { commentRepo.postComment(parent.fullName, text) }
     }
 
     private fun onPreviewUser(comment: CommentModel) {
@@ -64,6 +60,15 @@ class CommentInteractorImpl @Inject constructor(
     }
 
     private fun onVisit(comment: CommentModel) {
+        val sub = comment.subreddit ?: return
+        val link = comment.linkFullname ?: return
+
+        val toPost = NavigationData.ToPost(
+            subredditName = sub,
+            postFullname = link,
+            commentId = comment.id
+        )
+        _navigationLiveData.postValue(RelicEvent(toPost))
         comment.visited = true
     }
 }

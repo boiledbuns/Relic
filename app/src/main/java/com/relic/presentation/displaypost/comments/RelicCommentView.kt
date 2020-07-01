@@ -1,28 +1,25 @@
 package com.relic.presentation.displaypost.comments
 
 import android.content.Context
-import android.text.Html
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.interactor.CommentInteraction
 import com.relic.interactor.Contract
 import com.relic.presentation.base.ItemNotifier
-import com.relic.interactor.CommentInteraction
 import com.relic.presentation.helper.DateHelper
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
 
-class RelicCommentView (
+class RelicCommentView @JvmOverloads constructor(
     context: Context,
     attrs : AttributeSet? = null,
     defStyleAttr : Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private var displayParent : Boolean = false
     private lateinit var replyAnchor : LinearLayout
     private var replyAction : (text : String) -> Unit = { }
     private lateinit var comment : CommentModel
@@ -40,21 +37,6 @@ class RelicCommentView (
         upvotedColor = context.resources.getColor(R.color.upvote)
     }
 
-    fun displayParent(display : Boolean) {
-        displayParent = display
-        if (displayParent) {
-            parentBlock.visibility = View.VISIBLE
-            parent_separator.visibility = View.VISIBLE
-            indentCommentIcon.visibility = View.VISIBLE
-            // width, height
-            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
-                topMargin = resources.getDimensionPixelSize(R.dimen.postitem_margin)
-                bottomMargin = 0
-                commentRoot.layoutParams = this
-            }
-        }
-    }
-
     fun setComment(commentModel : CommentModel) {
         comment = commentModel
 
@@ -66,7 +48,7 @@ class RelicCommentView (
         commentModel.created?.let { commentCreatedView.text = DateHelper.getDateDifferenceString(it) }
 
         commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
-        commentBodyView.text = Html.fromHtml(Html.fromHtml(commentModel.body).toString())
+        commentBodyView.text = commentModel.body
 
         if (commentModel.isSubmitter) {
             commentAuthorView.setBackgroundResource(R.drawable.tag)
@@ -79,13 +61,7 @@ class RelicCommentView (
             commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
         }
 
-        // update parent fields only if they are supposed to be displayed
-        if (displayParent) {
-            parentTitle.text = commentModel.linkTitle
-            parentAuthor.text = commentModel.linkAuthor
-            parentSubreddit.text = commentModel.subreddit
-        }
-        else if (commentModel.depth >= 0){
+        if (commentModel.depth >= 0){
             displayReplyDepth(commentModel.depth)
         }
     }
