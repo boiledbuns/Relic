@@ -10,7 +10,8 @@ import com.relic.interactor.Contract
 import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
-import com.relic.presentation.displaypost.comments.RelicCommentView
+import com.relic.presentation.displaypost.comments.RelicPostCommentView
+import kotlinx.android.synthetic.main.post_comment_item.view.*
 import ru.noties.markwon.Markwon
 
 private const val VIEW_TYPE_POST = 0
@@ -42,10 +43,8 @@ class ListingItemAdapter(
             VIEW_TYPE_POST ->  PostItemVH(RelicPostItemView(parent.context, postLayout = postLayout))
             // TODO complete the custom comment VH and view for displaying within the tab
             else -> {
-                val commentView = RelicCommentView(parent.context).apply {
-                    displayParent(true)
-                }
-                CommentItemVH(commentView)
+                val postCommentView = RelicPostCommentView(parent.context)
+                PostCommentItemVH(postCommentView)
             }
         }
     }
@@ -53,7 +52,7 @@ class ListingItemAdapter(
     override fun onBindViewHolder(vh: RecyclerView.ViewHolder, position : Int) {
         when (val item = listingItems[position]) {
             is PostModel -> (vh as PostItemVH).bind(item)
-            is CommentModel -> (vh as CommentItemVH).bind(item)
+            is CommentModel -> (vh as PostCommentItemVH).bind(item)
         }
     }
 
@@ -87,14 +86,15 @@ class ListingItemAdapter(
         notifyDataSetChanged()
     }
 
-    private inner class CommentItemVH (
-      private val commentView : RelicCommentView
-    ): RecyclerView.ViewHolder(commentView), ItemNotifier{
+    private inner class PostCommentItemVH (
+      private val postCommentView : RelicPostCommentView
+    ): RecyclerView.ViewHolder(postCommentView), ItemNotifier{
 
-        init { commentView.setViewDelegate(commentInteractor, this) }
+        init { postCommentView.post_comment.setViewDelegate(commentInteractor, this) }
 
         fun bind(commentModel : CommentModel) {
-            commentView.setComment(commentModel)
+            postCommentView.setComment(commentModel)
+            postCommentView.post_comment.setComment(commentModel)
         }
 
         override fun notifyItem() {

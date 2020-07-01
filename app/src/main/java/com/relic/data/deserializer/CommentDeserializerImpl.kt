@@ -117,13 +117,4 @@ class CommentDeserializerImpl @Inject constructor(
     }
 
     // endregion interface methods
-
-    // removes the type associated with the comment, leaving only its id
-    override fun removeTypePrefix(fullName : String) : String {
-        return if (fullName.length >= 4) {
-            fullName.removeRange(0, 3)
-        } else {
-            ""
-        }
-    }
 }

@@ -12,13 +12,17 @@ import com.squareup.moshi.JsonClass
 open class CommentModel: ListingItem() {
 
     @Json(name = "body_html")
+    var bodyHtml: String = ""
+
     var body: String = ""
 
-    // fullname of this comment's direct ancestor (could be a post or comment)
+    // id of this comment's direct ancestor (could be a post or comment)
+    // this is a fullname (ignore the fact the field says id)
     @Json(name = "parent_id")
     var parentFullname: String = ""
 
     // fullname of this comment's root post
+    // this is a fullname (ignore the fact the field says id)
     @Json(name = "link_id")
     var linkFullname: String? = null
 

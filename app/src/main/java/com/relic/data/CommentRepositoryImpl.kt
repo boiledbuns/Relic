@@ -7,6 +7,7 @@ import com.relic.domain.models.CommentModel
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
 import com.relic.persistence.ApplicationDB
+import com.relic.presentation.util.RedditTypeHelper
 import dagger.Reusable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,7 +39,7 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     override suspend fun retrieveComments(subName: String, postFullName: String, refresh : Boolean) : CommentsAndPostData {
-        val postName = commentDeserializer.removeTypePrefix(postFullName)
+        val postName = RedditTypeHelper.getIdFromFullname(postFullName)
         var url = "${RepoConstants.ENDPOINT}r/$subName/comments/$postName?count=20"
 
         if (refresh) {

@@ -38,8 +38,6 @@ interface Contract {
             moreChildrenComment: CommentModel,
             response : String
         ) : List<CommentModel>
-
-        fun removeTypePrefix(fullName : String) : String
     }
 
     interface UserDeserializer {

@@ -11,96 +11,14 @@
     android:padding="@dimen/displaypost_rvpadding"
     android:background="?attr/colorPrimary">
 
-    <ImageView
-        android:id="@+id/indentCommentIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_comment_indent"
-        android:visibility="gone"
-        android:layout_marginTop="@dimen/padding_xl"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible"/>
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier_indent_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="indentCommentIcon"
-        app:barrierDirection="end"/>
-
-    <!-- region display parent - TODO consider extracting this out into another view-->
-    <LinearLayout
-        android:id="@+id/parentBlock"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding_s"
-        android:layout_marginStart="@dimen/padding_m"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <TextView
-            android:id="@+id/parentSubreddit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/displaypost_paddingside"
-            tools:text="subreddit"/>
-
-        <TextView
-            android:id="@+id/parentTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="@dimen/text_l"
-            tools:text="Blah Blah Blah here is my title super long idc show me"/>
-
-        <TextView
-            android:id="@+id/parentAuthor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/displaypost_paddingside"
-            android:layout_marginBottom="@dimen/padding_s"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground"
-            tools:text="u/random_person"/>
-    </LinearLayout>
-
-    <View
-        android:id="@+id/parent_separator"
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/primaryText"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/parentBlock"
-        android:layout_marginStart="@dimen/padding_m"
-        android:layout_marginEnd="@dimen/padding_m"
-        android:paddingBottom="@dimen/padding_m"
-        tools:visibility="visible"/>
-
-    <!-- endregion display parent -->
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/parent_block_barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="parent_separator"
-        app:barrierDirection="bottom"/>
-
     <!-- region comment info -->
-
     <TextView
         android:id="@+id/commentAuthorView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/commentFlairView"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -112,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/commentAuthorView"
         app:layout_constraintEnd_toStartOf="@id/commentScoreView"
         tools:text="flair_boi"/>
@@ -122,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/commentFlairView"
         app:layout_constraintEnd_toStartOf="@id/commentCreatedView"
         tools:text="100"/>
@@ -132,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        app:layout_constraintTop_toBottomOf="@id/parent_block_barrier"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="24 hours ago"/>
 
@@ -143,19 +61,20 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/text_spacing_s"
+        android:paddingBottom="@dimen/text_spacing_s"
         android:textSize="@dimen/text_m"
         app:layout_constraintTop_toBottomOf="@id/commentAuthorView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible"
-        tools:text="@tools:sample/lorem/random"/>
+        tools:text="asdasdsadsad\n asdasda\nasdasd"/>
 
     <ImageView
         android:id="@+id/commentUpvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
-        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        app:layout_constraintStart_toStartOf="parent"
         tools:src="@drawable/ic_upvote"/>
 
     <ImageView
@@ -183,6 +102,7 @@
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- for inline reply -->
     <LinearLayout
         android:id="@+id/commentReplyInlineAnchor"
         android:layout_width="match_parent"

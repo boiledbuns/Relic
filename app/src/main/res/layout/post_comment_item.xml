@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/commentRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/padding_xs"
+    android:padding="@dimen/displaypost_rvpadding"
+    android:background="?attr/colorPrimary">
+
+    <ImageView
+        android:id="@+id/indentCommentIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_comment_indent"
+        android:layout_marginTop="@dimen/padding_xl"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_indent_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="indentCommentIcon"
+        app:barrierDirection="end"/>
+
+    <!-- region display parent -->
+    <LinearLayout
+        android:id="@+id/parentBlock"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_s"
+        android:layout_marginStart="@dimen/padding_m"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/barrier_indent_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/parentSubreddit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/displaypost_paddingside"
+            tools:text="subreddit"/>
+
+        <TextView
+            android:id="@+id/parentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="@dimen/text_l"
+            tools:text="Blah Blah Blah here is my title super long idc show me"/>
+
+        <TextView
+            android:id="@+id/parentAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/displaypost_paddingside"
+            android:layout_marginBottom="@dimen/padding_s"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            tools:text="u/random_person"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/parent_separator"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/primaryText"
+        app:layout_constraintTop_toBottomOf="@id/parentBlock"
+        android:layout_marginStart="@dimen/padding_m"
+        android:layout_marginEnd="@dimen/padding_m"
+        android:paddingBottom="@dimen/padding_m"/>
+
+    <!-- endregion display parent -->
+
+    <com.relic.presentation.displaypost.comments.RelicCommentView
+        android:id="@+id/post_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_xs"
+        app:layout_constraintTop_toBottomOf="@id/parent_separator"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

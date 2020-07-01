@@ -1,19 +1,18 @@
 package com.relic.presentation.displaypost.tabs
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
-import com.relic.presentation.base.RelicFragment
 import com.relic.interactor.CommentInteractorImpl
-import com.relic.presentation.displaypost.DisplayPostFragment
+import com.relic.interactor.PostInteractorImpl
+import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.displaypost.DisplayPostVM
 import com.relic.presentation.displaypost.comments.CommentItemAdapter
-import com.relic.interactor.PostInteractorImpl
 import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.tab_comments.*
@@ -58,9 +57,7 @@ class CommentsFragment : RelicFragment() {
         super.bindViewModel(lifecycleOwner)
 
         commentsVM.commentListLiveData.nonNull().observe(lifecycleOwner) {
-            commentAdapter.setComments(it) {
-                (parentFragment as DisplayPostFragment).onPostDataLoaded()
-            }
+            commentAdapter.setComments(it) {}
 
             commentsTabSwipeRefresh.isRefreshing = false
         }

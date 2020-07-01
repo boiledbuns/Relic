@@ -23,7 +23,7 @@ interface DisplaySubContract {
 // TODO extract out of this interface
 sealed class NavigationData {
     data class ToPost(
-        val postId: String,
+        val postFullname: String,
         val subredditName: String,
         val commentId: String? = null
     ) : NavigationData()

@@ -2,7 +2,6 @@ package com.relic.presentation.displaypost
 
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -36,13 +35,16 @@ import javax.inject.Inject
 class DisplayPostFragment : RelicFragment(), CoroutineScope {
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
-    @Inject lateinit var postInteractor: PostInteractorImpl
+    @Inject
+    lateinit var postInteractor: PostInteractorImpl
 
-    @Inject lateinit var commentInteractor: CommentInteractorImpl
+    @Inject
+    lateinit var commentInteractor: CommentInteractorImpl
 
-    @Inject lateinit var factory : DisplayPostVM.Factory
+    @Inject
+    lateinit var factory: DisplayPostVM.Factory
 
-    private val displayPostVM : DisplayPostVM by lazy {
+    private val displayPostVM: DisplayPostVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -57,9 +59,9 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
     private val subredditName by lazy { args.subredditName }
     private val enableVisitSub by lazy { args.enableVisitSub }
 
-    private lateinit var pagerAdapter : DisplayPostPagerAdapter
-    private lateinit var tabTitleView : View
-    private var previousError : PostErrorData? = null
+    private lateinit var pagerAdapter: DisplayPostPagerAdapter
+    private lateinit var tabTitleView: View
+    private var previousError: PostErrorData? = null
 
     // region lifecycle hooks
 
@@ -128,7 +130,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
 
     // region live data handlers
 
-    private fun handleError(error : PostErrorData?) {
+    private fun handleError(error: PostErrorData?) {
         if (previousError != error) {
             // default details for unhandled exceptions to be displayed
             var snackbarMessage = resources.getString(R.string.unknown_error)
@@ -154,7 +156,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
-    private fun handlePost(post : PostModel) {
+    private fun handlePost(post: PostModel) {
         tabTitleCommentCount.text = post.commentCount.toString()
     }
 
@@ -179,10 +181,6 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
         }
     }
 
-    fun onPostDataLoaded() {
-        Toast.makeText(context, "Comments loaded", Toast.LENGTH_SHORT).show()
-    }
-
     companion object {
         private const val TAG = "DISPLAYPOST_VIEW"
         private const val ARG_POST_FULLNAME = "full_name"
@@ -195,7 +193,7 @@ class DisplayPostFragment : RelicFragment(), CoroutineScope {
          * visiting post from different source than its sub (ie frontpage, all, etc) to prevent
          * continuously chaining open subreddit actions
          */
-        fun create(postId : String, subreddit : String, enableVisitSub : Boolean = false) : DisplayPostFragment {
+        fun create(postId: String, subreddit: String, enableVisitSub: Boolean = false): DisplayPostFragment {
             // create a new bundle for the post id
             val bundle = Bundle().apply {
                 putString(ARG_POST_FULLNAME, postId)

@@ -45,13 +45,14 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="postSubNameView,postDateView"/>
 
-
     <TextView
         android:id="@+id/titleView"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:textSize="@dimen/text_l"
         android:textStyle="bold"
+        android:paddingTop="@dimen/padding_xxs"
+        android:paddingBottom="@dimen/padding_xxs"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topRowBarrier"
         app:layout_constraintEnd_toStartOf="@id/thumbnailContainer"
@@ -91,6 +92,7 @@
         android:layout_marginTop="@dimen/padding_s"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/padding_xxs"
         app:layout_constraintTop_toBottomOf="@id/authorFlairBarrier"/>
 
     <androidx.cardview.widget.CardView
