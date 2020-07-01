@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -22,11 +23,12 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Abstraction for all network requests
  */
+@Singleton
 class NetworkRequestManager @Inject constructor(
     private val appContext: Context,
     appDB: ApplicationDB
 ) {
-    lateinit var authManager: Auth
+    private lateinit var authManager: Auth
 
     private val KEY_ACCOUNTS_DATA = "PREF_ACCOUNTS_DATA"
     private val KEY_CURR_ACCOUNT = "PREF_CURR_ACCOUNT"
@@ -75,6 +77,7 @@ class NetworkRequestManager @Inject constructor(
     ): String {
         val token = authToken ?: checkToken()
 
+        Timber.d("endpoint: %s ", url)
         return suspendCoroutine { cont ->
             val request = RelicOAuthRequest(
                 method, url,
@@ -126,5 +129,9 @@ class NetworkRequestManager @Inject constructor(
         return withContext(Dispatchers.IO) {
             name?.let { tokenStore.getTokenStore(it).access }
         }
+    }
+
+    fun setAuthManager(auth : Auth) {
+        authManager = auth
     }
 }

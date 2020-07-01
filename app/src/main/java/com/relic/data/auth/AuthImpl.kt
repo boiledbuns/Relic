@@ -22,8 +22,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@Reusable
+@Singleton
 class AuthImpl @Inject constructor(
     private val appContext: Application,
     private val requestManager: NetworkRequestManager,
@@ -46,7 +47,6 @@ class AuthImpl @Inject constructor(
         return appContext.getSharedPreferences(KEY_ACCOUNTS_DATA, Context.MODE_PRIVATE).contains(KEY_CURR_ACCOUNT)
     }
 
-
     private val spAccountLiveData = MutableLiveData<String?>()
     private val listener: SharedPreferences.OnSharedPreferenceChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener { sp, key ->
@@ -64,8 +64,12 @@ class AuthImpl @Inject constructor(
         + "&scope=" + AuthConstants.SCOPE)
 
     init {
-        // checks if the user is currently signed in by checking shared preferences
+        // workaround for circular dep b/ request manager and auth
+        // auth has the network req manager via di
+        // network req manager needs to refresh tokens on auth failures which is auth's responsibility
+        requestManager.setAuthManager(this)
 
+        // checks if the user is currently signed in by checking shared preferences
         if (isAuthenticated()) {
             // refresh the auth token
             // move the date change to the refresh method

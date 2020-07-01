@@ -13,7 +13,6 @@ import javax.inject.Singleton
 abstract class UtilModule {
 
     @Binds
-    @Singleton
     abstract fun bindNetworkUtil(networkUtilImpl: NetworkUtilImpl) : NetworkUtil
 
     @Binds
