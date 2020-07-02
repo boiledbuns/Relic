@@ -25,6 +25,7 @@ import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.frontpage.*
+import kotlinx.android.synthetic.main.home.*
 import javax.inject.Inject
 
 /**
@@ -135,6 +136,20 @@ class MultiFragment : RelicFragment() {
 
         postInteractor.interact(postItem, interaction)
         postAdapter.notifyItemChanged(postItemVH.layoutPosition)
+    }
+
+    override fun handleNavReselected(): Boolean {
+        return when (frontpagePostsRecyclerView.canScrollVertically(-1)) {
+            true -> {
+                // can still scroll up, so reselection should scroll to top
+                frontpagePostsRecyclerView.smoothScrollToPosition(0)
+                true
+            }
+            false -> {
+                // already at top, we don't handle
+                false
+            }
+        }
     }
 
     // region live data handlers

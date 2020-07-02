@@ -63,6 +63,13 @@ class HomeFragment : RelicFragment() {
     }
 
     override fun handleNavReselected(): Boolean {
+        val activeFragment = pagerAdapter.getItem(homeViewPager.currentItem)
+
+        (activeFragment as? RelicFragment?)?.let { relicFrag ->
+            return relicFrag.handleNavReselected()
+        }
+
+        // always return true since this is a base fragment we don't want back press
         return true
     }
 
