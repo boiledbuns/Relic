@@ -7,7 +7,7 @@ interface SubGateway {
 
     suspend fun getIsSubscribed(subredditName: String): Boolean
 
-    suspend fun subscribe(subscribe : Boolean, subreddit: String)
+    suspend fun subscribe(isSubbed: Boolean, subreddit: String)
 
     suspend fun retrieveSubBanner(subreddit: String)
 }

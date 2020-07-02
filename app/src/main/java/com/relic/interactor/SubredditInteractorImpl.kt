@@ -16,6 +16,7 @@ import javax.inject.Singleton
 class SubredditInteractorImpl @Inject constructor(
     private val subGateway: SubGateway
 ) : Contract.SubAdapterDelegate, CoroutineScope {
+
     override fun interact(postSource: PostSource, subInteraction: SubInteraction) {
         when (subInteraction) {
             SubInteraction.Visit, SubInteraction.Preview -> {
@@ -34,6 +35,6 @@ class SubredditInteractorImpl @Inject constructor(
     override val navigationLiveData: LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     fun subscribe(subreddit: SubredditModel) {
-        launch { subGateway.subscribe(!subreddit.isSubscribed, subreddit.subName) }
+        launch { subGateway.subscribe(subreddit.isSubscribed, subreddit.subName) }
     }
 }

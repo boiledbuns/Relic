@@ -1,19 +1,16 @@
 package com.relic.data.gateway
 
 import android.text.Html
-import android.util.Log
-
-import com.relic.persistence.ApplicationDB
 import com.relic.data.DomainTransfer
 import com.relic.network.NetworkRequestManager
 import com.relic.network.request.RelicOAuthRequest
-
+import com.relic.persistence.ApplicationDB
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import org.json.simple.parser.ParseException
-
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class SubGatewayImpl @Inject constructor(
@@ -34,15 +31,15 @@ class SubGatewayImpl @Inject constructor(
     override suspend fun retrieveAdditionalSubInfo(subredditName: String): String {
         // get sub info
         val end = ENDPOINT + "r/" + subredditName + "/about"
-        Log.d(TAG, "from $end")
+        Timber.d("from $end")
 
         return try {
             // TODO move this into deserializer
             val response = requestManager.processRequest(RelicOAuthRequest.GET, end)
             val parser = JSONParser()
-            Log.d(TAG, response)
+            Timber.d(response)
             val subInfoObject = (parser.parse(response) as JSONObject)["data"] as JSONObject?
-            Log.d(TAG, subInfoObject!!.keys.toString())
+            Timber.d(subInfoObject!!.keys.toString())
 
             // user_is_moderator, header_title, subreddit_type, submit_text, display_name, accounts_active, submit_text_html, description_html
             // user_has_favorited, user_is_contributor, user_is_moderator, public_description, active_user_count, user_is_banned
@@ -52,7 +49,7 @@ class SubGatewayImpl @Inject constructor(
                 "---- accounts active " + subInfoObject["active_user_count"]!!.toString() +
                 "---- description html " + Html.fromHtml(Html.fromHtml(subInfoObject["description_html"] as String?).toString()) +
                 "---- submit text " + subInfoObject["submit_text"]
-            Log.d(TAG, info)
+            Timber.d(info)
 
             info.apply {
                 withContext(Dispatchers.IO) {
@@ -72,7 +69,7 @@ class SubGatewayImpl @Inject constructor(
     override suspend fun retrieveSidebar(subredditName: String): String {
         // get sub sidebar
         val end = ENDPOINT + "r/" + subredditName + "about/sidebar"
-        Log.d(TAG, "from $end")
+        Timber.d("from $end")
 
         return try {
             requestManager.processRequest(RelicOAuthRequest.GET, end)
@@ -87,14 +84,14 @@ class SubGatewayImpl @Inject constructor(
         }
     }
 
-    override suspend fun subscribe(subscribe : Boolean, subName: String) {
-        val action = if (subscribe) "sub" else "unsub"
+    override suspend fun subscribe(isSubbed : Boolean, subName: String) {
+        val action = if (isSubbed) "unsub" else "sub"
         val end = ENDPOINT + "api/subscribe?action=$action&sr_name=" + subName
-        Log.d(TAG, "Subscribing to $end")
+        Timber.d("Subscribing to $end")
 
         try {
             requestManager.processRequest(RelicOAuthRequest.POST, end)
-            Log.d(TAG, "Subscribed to $subName")
+            Timber.d("Subscribed to $subName")
 
             withContext(Dispatchers.IO) {
                 // update local entity to reflect the changes once successfully subscribed
@@ -110,7 +107,7 @@ class SubGatewayImpl @Inject constructor(
 
         try {
             var response = requestManager.processRequest(RelicOAuthRequest.GET, end)
-            Log.d(TAG, "subname css : $response")
+            Timber.d("subname css : $response")
 
             val position = response.indexOf("#header")
             response = response.substring(position)
@@ -121,7 +118,7 @@ class SubGatewayImpl @Inject constructor(
 
             // proceed if a background image was found at all
             if (bannerUrlPosition == backgroundProp.length + 1) {
-                Log.d(TAG, " position of banner URL $bannerUrlPosition")
+                Timber.d(" position of banner URL $bannerUrlPosition")
 
                 var complete = false
                 val stringBuilder = StringBuilder()
@@ -136,7 +133,7 @@ class SubGatewayImpl @Inject constructor(
                         bannerUrlPosition++
                     }
                 }
-                Log.d(TAG, " banner url = $stringBuilder")
+                Timber.d(" banner url = $stringBuilder")
             }
         } catch (e : Exception) {
             throw DomainTransfer.handleException("retrieve sub banner", e) ?: e
@@ -153,9 +150,9 @@ class SubGatewayImpl @Inject constructor(
         val parser = JSONParser()
 
         try {
-            Log.d(TAG, response)
+            Timber.d(response)
             val subInfoObject = (parser.parse(response) as JSONObject)["data"] as JSONObject?
-            Log.d(TAG, subInfoObject!!.keys.toString())
+            Timber.d(subInfoObject!!.keys.toString())
 
             // user_is_moderator, header_title, subreddit_type, submit_text, display_name, accounts_active, submit_text_html, description_html
             // user_has_favorited, user_is_contributor, user_is_moderator, public_description, active_user_count, user_is_banned
@@ -167,7 +164,7 @@ class SubGatewayImpl @Inject constructor(
                 subInfoObject["description_html"] as String?
 
         } catch (e: ParseException) {
-            Log.d(TAG, "Error parsing the response")
+            Timber.d("Error parsing the response")
             info = "Error parsing the response"
         }
 
