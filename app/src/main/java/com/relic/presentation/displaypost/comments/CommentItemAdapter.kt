@@ -142,7 +142,6 @@ class CommentItemAdapter (
       private val viewType : Int
     ) : RecyclerView.ViewHolder(view), ItemNotifier {
 
-
         init {
             when(viewType) {
                 VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(commentInteractor, this)

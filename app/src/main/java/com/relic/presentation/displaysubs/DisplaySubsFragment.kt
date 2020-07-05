@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.reddit.indicatorfastscroll.FastScrollItemIndicator
 import com.relic.R
 import com.relic.interactor.Contract
 import com.relic.network.NetworkUtil
@@ -66,7 +67,17 @@ class DisplaySubsFragment : RelicFragment() {
     }
 
     override fun handleNavReselected(): Boolean {
-        return true
+        return when (display_subs_recyclerview.canScrollVertically(-1)) {
+            true -> {
+                // can still scroll up, so reselection should scroll to top
+                display_subs_recyclerview.smoothScrollToPosition(0)
+                true
+            }
+            false -> {
+                // already at top, we don't handle
+                false
+            }
+        }
     }
 
     // region view model binding and handlers
@@ -78,6 +89,21 @@ class DisplaySubsFragment : RelicFragment() {
                 display_subs_swiperefreshlayout.isRefreshing = false
                 subAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
                 subAdapter.setList(ArrayList(it))
+
+                // set up side bar
+                fastscroller.setupWithRecyclerView(
+                    recyclerView = display_subs_recyclerview,
+                    getItemIndicator = { position ->
+                        when (position)  {
+                            // first item is always the header view
+                            0 ->  { null }
+                            else -> {
+                                val item = subs[position - 1]
+                                FastScrollItemIndicator.Text(item.subName.substring(0, 1).toUpperCase())
+                            }
+                        }
+                    }
+                )
             }
         }
 

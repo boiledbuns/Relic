@@ -66,7 +66,6 @@
         app:layout_constraintTop_toBottomOf="@id/commentAuthorView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="visible"
         tools:text="asdasdsadsad\n asdasda\nasdasd"/>
 
     <ImageView
@@ -75,7 +74,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
         app:layout_constraintStart_toStartOf="parent"
-        tools:src="@drawable/ic_upvote"/>
+        android:src="@drawable/ic_upvote"/>
 
     <ImageView
         android:id="@+id/commentDownvoteView"
@@ -83,7 +82,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/commentBodyView"
         app:layout_constraintStart_toEndOf="@id/commentUpvoteView"
-        tools:src="@drawable/ic_downvote"/>
+        android:src="@drawable/ic_downvote"/>
 
     <TextView
         android:id="@+id/commentReplyCount"

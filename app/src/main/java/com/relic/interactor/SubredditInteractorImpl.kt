@@ -37,4 +37,8 @@ class SubredditInteractorImpl @Inject constructor(
     fun subscribe(subreddit: SubredditModel) {
         launch { subGateway.subscribe(subreddit.isSubscribed, subreddit.subName) }
     }
+
+    fun openSearch(subreddit: SubredditModel) {
+        launch { subGateway.subscribe(subreddit.isSubscribed, subreddit.subName) }
+    }
 }
