@@ -61,7 +61,6 @@ class MultiFragment : RelicFragment() {
     private val args: MultiFragmentArgs by navArgs()
 
     private lateinit var postAdapter: PostItemAdapter
-    private lateinit var frontpageRecyclerView : RecyclerView
 
     private var scrollLocked: Boolean = false
 
@@ -79,7 +78,7 @@ class MultiFragment : RelicFragment() {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
 
-        frontpageRecyclerView = frontpagePostsRecyclerView.apply {
+        frontpagePostsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = postAdapter
             itemAnimator = null
@@ -96,7 +95,7 @@ class MultiFragment : RelicFragment() {
         frontpageSwipeRefreshLayout.apply {
             setOnRefreshListener {
                 // empties current items to show that it's being refreshed
-                frontpageRecyclerView.layoutManager!!.scrollToPosition(0)
+                frontpagePostsRecyclerView.layoutManager!!.scrollToPosition(0)
                 postAdapter.clear()
                 // tells vm to clear the posts -> triggers action to retrieve more
                 multiVM.retrieveMorePosts(true)
@@ -104,7 +103,7 @@ class MultiFragment : RelicFragment() {
         }
 
         // attach listener for checking if the user has scrolled to the bottom of the recycler view
-        frontpageRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        frontpagePostsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 // TODO : add animation for loading posts

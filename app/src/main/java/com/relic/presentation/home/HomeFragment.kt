@@ -23,17 +23,8 @@ class HomeFragment : RelicFragment() {
 
     // region lifecycle hooks
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.home, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
             val frontpageFragment = MultiFragment().apply {
                 arguments = MultiFragmentArgs(PostSource.Frontpage.getSourceName()).toBundle()
@@ -44,6 +35,18 @@ class HomeFragment : RelicFragment() {
             tabFragments.add(frontpageFragment)
             tabFragments.add(allFragment)
         }
+    }
+    
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.home, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         homeViewPager.adapter = pagerAdapter
         homeViewPager.offscreenPageLimit = 1
