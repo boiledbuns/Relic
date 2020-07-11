@@ -1,13 +1,23 @@
 package com.relic.persistence
 
 import androidx.room.TypeConverter
+import com.relic.domain.models.Award
 import com.relic.domain.models.Gildings
+import com.relic.domain.models.MediaList
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import java.util.*
 
+/**
+ * handles conversion of complex fields for db serialization
+ */
 class RoomTypeConverters {
 
     private val gildingsAdapter = moshi.adapter(Gildings::class.java)!!
+    private val mediaListAdapter = moshi.adapter(MediaList::class.java)!!
+
+    private val awards = Types.newParameterizedType(List::class.java, Award::class.java)
+    private val awardsAdapter = moshi.adapter<List<Award>>(awards)!!
 
     @TypeConverter
     fun fromMoreList(moreList: List<String>?): String? {
@@ -58,7 +68,6 @@ class RoomTypeConverters {
         return timestamp?.let { Date(it) }
     }
 
-
     @TypeConverter
     fun fromGildings(gildings: Gildings?): String? {
         return when (gildings) {
@@ -70,6 +79,32 @@ class RoomTypeConverters {
     @TypeConverter
     fun toGildings(gildings:  String?): Gildings? {
         return gildings?.let { gildingsAdapter.fromJson(it)}
+    }
+
+    @TypeConverter
+    fun fromMediaList(mediaList: MediaList?): String? {
+        return when (mediaList) {
+            null -> null
+            else -> mediaListAdapter.toJson(mediaList)
+        }
+    }
+
+    @TypeConverter
+    fun toMediaList(mediaList:  String?): MediaList? {
+        return mediaList?.let { mediaListAdapter.fromJson(it) }
+    }
+
+    @TypeConverter
+    fun fromAwards(awards: List<Award>?): String? {
+        return when (awards) {
+            null -> null
+            else -> awardsAdapter.toJson(awards)
+        }
+    }
+
+    @TypeConverter
+    fun toAward(awards:  String?): List<Award>? {
+        return awards?.let { awardsAdapter.fromJson(it) }
     }
 
     companion object {

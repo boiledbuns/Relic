@@ -27,9 +27,13 @@ open class ListingItem {
     var visited: Boolean = false
 
     @Json(name = "likes")
-    @Likes var userUpvoted: Int = 0
+    @Likes
+    var userUpvoted: Int = 0
 
-    var gildings : Gildings? = null
+    var gildings: Gildings? = null
+
+    @Json(name = "all_awardings")
+    var awards: List<Award>? = null
 
     var saved: Boolean = false
 
