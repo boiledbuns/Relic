@@ -8,12 +8,13 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
+import androidx.core.view.setPadding
 import com.relic.R
 import com.relic.domain.models.PostModel
 import com.relic.interactor.Contract
+import com.relic.interactor.PostInteraction
 import com.relic.preference.POST_LAYOUT_CARD
 import com.relic.presentation.base.ItemNotifier
-import com.relic.interactor.PostInteraction
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_item_content.view.*
@@ -22,9 +23,9 @@ import timber.log.Timber
 
 class RelicPostItemView @JvmOverloads constructor(
     context: Context,
-    attrs : AttributeSet? = null,
-    defStyleAttr : Int = 0,
-    postLayout : Int
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    postLayout: Int
 ) : RelativeLayout(context, attrs, defStyleAttr) {
     // TODO need to think about increasing min api level from 21
     // TODO set color based on theme, still trying to figure out the best way to do this
@@ -37,7 +38,7 @@ class RelicPostItemView @JvmOverloads constructor(
     private val downvotedColor: Int
     private val upvotedColor: Int
 
-    private lateinit var post : PostModel
+    private lateinit var post: PostModel
 
     init {
         val typedVal = TypedValue()
@@ -67,7 +68,7 @@ class RelicPostItemView @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(layout, this, true)
     }
 
-    fun setPost(postModel : PostModel) {
+    fun setPost(postModel: PostModel) {
         post = postModel
         postItemRootView?.apply {
             updateVisited()
@@ -78,11 +79,19 @@ class RelicPostItemView @JvmOverloads constructor(
             titleView.setTextColor(titleColor)
 
             if (!postModel.thumbnail.isNullOrBlank()) {
-                val thumbnail = postModel.thumbnail!!
+                if (postModel.nsfw) {
+                    postItemThumbnailView.apply {
+                        setPadding(16)
+                        setImageResource(R.drawable.ic_nsfw)
+                    }
+                } else {
+                    postItemThumbnailView.setPadding(0)
+                    setThumbnail(postModel.thumbnail!!)
+                    domainTag.visibility = View.VISIBLE
+                    domainTag.text = postModel.domain
+                }
+
                 postItemThumbnailView.visibility = View.VISIBLE
-                setThumbnail(thumbnail)
-                domainTag.visibility = View.VISIBLE
-                domainTag.text = postModel.domain
             } else {
                 postItemThumbnailView.visibility = View.GONE
                 domainTag.visibility = View.GONE
@@ -99,8 +108,7 @@ class RelicPostItemView @JvmOverloads constructor(
                 @Suppress("DEPRECATION")
                 postBodyView.text = Html.fromHtml(postModel.selftext).toString()
                 postBodyView.visibility = View.VISIBLE
-            }
-            else {
+            } else {
                 postBodyView.visibility = View.GONE
             }
 
@@ -109,7 +117,7 @@ class RelicPostItemView @JvmOverloads constructor(
         }
     }
 
-    fun setViewDelegate(delegate : Contract.PostAdapterDelegate, notifier : ItemNotifier) {
+    fun setViewDelegate(delegate: Contract.PostAdapterDelegate, notifier: ItemNotifier) {
         delegate.apply {
             setOnClickListener {
                 interact(post, PostInteraction.Visit)
@@ -170,7 +178,7 @@ class RelicPostItemView @JvmOverloads constructor(
     }
     // endregion update view
 
-    private fun setThumbnail(thumbnailUrl : String) {
+    private fun setThumbnail(thumbnailUrl: String) {
         try {
             Timber.d("URL = $thumbnailUrl")
             Picasso.get().load(thumbnailUrl).fit().centerCrop().into(postItemThumbnailView)
@@ -188,7 +196,9 @@ class RelicPostItemView @JvmOverloads constructor(
                 @Suppress("DEPRECATION")
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE
-            } else { visibility = View.GONE }
+            } else {
+                visibility = View.GONE
+            }
         }
     }
 }
