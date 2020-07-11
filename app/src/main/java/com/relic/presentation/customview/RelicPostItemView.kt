@@ -79,7 +79,7 @@ class RelicPostItemView @JvmOverloads constructor(
             titleView.setTextColor(titleColor)
 
             if (!postModel.thumbnail.isNullOrBlank()) {
-                if (postModel.nsfw) {
+                if (postModel.nsfw || postModel.spoiler) {
                     postItemThumbnailView.apply {
                         setPadding(16)
                         setImageResource(R.drawable.ic_nsfw)
