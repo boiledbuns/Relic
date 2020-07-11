@@ -1,5 +1,7 @@
 version: 2
 jobs:
+  run: yes | sdkmanager --licenses || exit 0
+  run: yes | sdkmanager --update || exit 0
   build:
     working_directory: ~/code
     docker:
