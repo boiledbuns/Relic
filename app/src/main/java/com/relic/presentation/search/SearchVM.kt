@@ -52,7 +52,7 @@ class SearchVM(
     override val subscribedSubredditResultsLiveData: LiveData<List<SubredditModel>> = _localSubredditResultsLiveData
     val loadingLiveData: LiveData<Boolean> = _loadingLiveData
 
-    private var localQuery: String? = null
+    var localQuery: String? = null
     var currentSearchType: SearchResultType = SearchResultType.SUB
 
     init {

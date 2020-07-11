@@ -94,6 +94,7 @@ class ListingItemAdapter(
 
         fun bind(commentModel : CommentModel) {
             postCommentView.setComment(commentModel)
+            postCommentView.setViewDelegate(commentInteractor, this)
             postCommentView.post_comment.setComment(commentModel)
         }
 

@@ -272,7 +272,7 @@ class MainActivity : RelicActivity() {
         when (navData) {
             // navigates to display post
             is NavigationData.ToPost -> {
-                val args = DisplayPostFragmentArgs(postFullName = navData.postFullname, subredditName = navData.subredditName).toBundle()
+                val args = DisplayPostFragmentArgs(postFullName = navData.postFullname, subredditName = navData.subredditName, enableVisitSub = true).toBundle()
                 navControllerLiveData?.value?.navigate(R.id.displayPostFragment, args)
             }
             is NavigationData.ToUser -> {
@@ -326,7 +326,7 @@ class MainActivity : RelicActivity() {
         when (navMediaData.mediaType) {
             MediaType.Gfycat -> {
                 val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
-                navControllerLiveData?.value?.navigate(R.id.displayImageFragment, args)
+                navControllerLiveData?.value?.navigate(R.id.displayGfycatFragment, args)
             }
             else -> {
                 Toast.makeText(baseContext, "Media type $navMediaData doesn't have a handler yet", Toast.LENGTH_SHORT).show()

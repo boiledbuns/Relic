@@ -85,9 +85,6 @@ class RelicCommentView @JvmOverloads constructor(
         setOnReplyAction { text ->
             delegate.interact(comment, CommentInteraction.NewReply(text))
         }
-        setOnClickListener {
-            delegate.interact(comment, CommentInteraction.Visit)
-        }
     }
 
     // region update view

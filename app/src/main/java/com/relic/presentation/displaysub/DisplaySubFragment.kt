@@ -219,6 +219,22 @@ class DisplaySubFragment : RelicFragment() {
         postAdapter.notifyItemChanged(postItemVH.layoutPosition)
     }
 
+    override fun handleNavReselected(): Boolean {
+        // for double click, second click will try to access view when removed
+        subPostsRecyclerView ?: return false
+        return when (subPostsRecyclerView.canScrollVertically(-1)) {
+            true -> {
+                // can still scroll up, so reselection should scroll to top
+                subPostsRecyclerView.smoothScrollToPosition(0)
+                true
+            }
+            false -> {
+                // already at top, we don't handle
+                false
+            }
+        }
+    }
+
     // region LiveData handlers
 
     private fun updateLoadedPosts(postModels: List<PostModel>) {

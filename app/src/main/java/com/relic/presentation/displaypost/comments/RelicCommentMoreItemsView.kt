@@ -26,7 +26,8 @@ class RelicCommentMoreItemsView(
 
     fun setLoadMore(comment : CommentModel) {
         this.comment = comment
-        loadMoreItemText.text = resources.getString(R.string.load_comments, comment.replyCount)
+        val moreToLoad = comment.more?.size ?: 0
+        loadMoreItemText.text = resources.getString(R.string.load_comments, moreToLoad)
 
         if (comment.depth >= 0){
             displayReplyDepth(comment.depth)

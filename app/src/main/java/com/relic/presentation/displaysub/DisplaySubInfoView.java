@@ -1,20 +1,21 @@
 package com.relic.presentation.displaysub;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.relic.R;
-import com.relic.domain.models.SubredditModel;
 import com.relic.databinding.DisplaySubInfoBinding;
+import com.relic.domain.models.SubredditModel;
 import com.relic.presentation.base.RelicBottomSheetDialog;
 import com.squareup.picasso.Picasso;
+
+import timber.log.Timber;
 
 @Deprecated
 public class DisplaySubInfoView extends RelicBottomSheetDialog {
@@ -56,7 +57,7 @@ public class DisplaySubInfoView extends RelicBottomSheetDialog {
       String iconUrl = subModel.getSubIcon();
 
       if (iconUrl != null && !iconUrl.isEmpty()) {
-        Log.d(TAG, "Loading icon for " + subModel.getSubName() + " : " + subModel.getSubIcon());
+        Timber.d("Loading icon for " + subModel.getSubName() + " : " + subModel.getSubIcon());
         Picasso.get().load(subModel.getSubIcon()).fit().centerCrop().into(icon);
       }
 
@@ -99,12 +100,12 @@ public class DisplaySubInfoView extends RelicBottomSheetDialog {
 
 //    displaySubInfoVM.getSubreddit().observe(this, (SubredditModel subModel) -> {
 //      if (subModel == null) {
-//        Log.d(TAG, "EMPTY");
+//        Timber.d("EMPTY");
 //        // retrieve single subreddit from api
 //        displaySubInfoVM.retrieveSubreddit();
 //      }
 //      else {
-//        Log.d(TAG, "NOT EMPTY");
+//        Timber.d("NOT EMPTY");
 //        displaySubInfoBinding.setSubModel(subModel);
 //      }
 //      displaySubInfoBinding.executePendingBindings();
@@ -115,7 +116,7 @@ public class DisplaySubInfoView extends RelicBottomSheetDialog {
 //      @Override
 //      public void onChanged(@Nullable String description) {
 //        if (description != null) {
-//          Log.d(TAG, "Change observed " + description);
+//          Timber.d("Change observed " + description);
 //          //displaySubinfoBinding.setSubDescription(description);
 //          displaySubinfoBinding.executePendingBindings();
 //        }

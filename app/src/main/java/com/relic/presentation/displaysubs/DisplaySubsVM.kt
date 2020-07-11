@@ -2,6 +2,7 @@ package com.relic.presentation.displaysubs
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import com.relic.data.Auth
 
 import com.relic.data.ListingRepository
@@ -36,6 +37,9 @@ class DisplaySubsVM (
     val subscribedSubsList : LiveData<List<SubredditModel>>
         get() = subRepository.getSubscribedSubs()
 
+    private val _isLoadingLiveData = MutableLiveData<Boolean>()
+    val isLoadingLiveData : LiveData<Boolean> = _isLoadingLiveData
+
     private val _searchResults = MediatorLiveData <List<String>> ()
     val searchResults: LiveData<List<String>> = _searchResults
 
@@ -45,9 +49,11 @@ class DisplaySubsVM (
     private var searchExact : Boolean = false
 
     override fun refreshSubs() {
+        _isLoadingLiveData.value = true
         launch (Dispatchers.Main) {
             val posts = subRepository.retrieveAllSubscribedSubs()
             subRepository.clearAndInsertSubs(posts)
+            _isLoadingLiveData.value = false
         }
     }
 

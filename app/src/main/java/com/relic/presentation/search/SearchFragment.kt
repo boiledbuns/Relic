@@ -9,10 +9,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.relic.R
+import com.relic.data.PostSource
 import com.relic.domain.models.PostModel
 import com.relic.domain.models.SubPreviewModel
 import com.relic.domain.models.UserModel
 import com.relic.interactor.Contract
+import com.relic.interactor.SubInteraction
+import com.relic.interactor.UserInteraction
 import com.relic.preference.ViewPreferencesManager
 import com.relic.presentation.base.RelicFragment
 import com.relic.presentation.helper.SearchInputCountdown
@@ -69,8 +72,16 @@ class SearchFragment : RelicFragment() {
 
         // TODO convert interactors
         // setup the direct navigation cards
-        directToSub.setOnClickListener { }
-        directToUser.setOnClickListener { }
+        directToSub.setOnClickListener {
+            searchVM.localQuery?.let { query ->
+                subInteractor.interact(PostSource.Subreddit(query), SubInteraction.Visit)
+            }
+        }
+        directToUser.setOnClickListener {
+            searchVM.localQuery?.let { query ->
+                userInteractor.interact(UserInteraction.ViewUser(query))
+            }
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

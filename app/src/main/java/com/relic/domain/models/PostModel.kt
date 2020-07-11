@@ -1,7 +1,6 @@
 package com.relic.domain.models
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -59,7 +58,8 @@ open class PostModel : ListingItem() {
 
 //    @Json(name = "media_embed")
 //    var embeddedMedia : String? = null
-//    var media : String? = null
+
+    var media : MediaList? = null
 
     companion object {
         var TYPE = "t3"

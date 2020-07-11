@@ -6,24 +6,35 @@ import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.relic.R
 import com.relic.domain.models.CommentModel
+import com.relic.interactor.CommentInteraction
+import com.relic.interactor.Contract
+import com.relic.presentation.base.ItemNotifier
 import kotlinx.android.synthetic.main.post_comment_item.view.*
 
-class RelicPostCommentView (
+class RelicPostCommentView(
     context: Context,
-    attrs : AttributeSet? = null,
-    defStyleAttr : Int = 0
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
+
+    private lateinit var comment : CommentModel
 
     init {
         LayoutInflater.from(context).inflate(R.layout.post_comment_item, this)
     }
 
-    fun setComment(commentModel : CommentModel) {
+    fun setComment(commentModel: CommentModel) {
+        comment = commentModel
         // update parent fields only
         parentTitle.text = commentModel.linkTitle
         parentAuthor.text = commentModel.linkAuthor
         parentSubreddit.text = commentModel.subreddit
     }
 
+    fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier: ItemNotifier) {
+        setOnClickListener {
+            delegate.interact(comment, CommentInteraction.Visit)
+        }
+    }
     // endregion update view
 }

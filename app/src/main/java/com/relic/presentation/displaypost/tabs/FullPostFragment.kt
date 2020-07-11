@@ -25,12 +25,15 @@ class FullPostFragment : RelicFragment() {
     @Inject
     lateinit var postInteractor: PostInteractorImpl
 
-    private val countDownTimer = object : CountDownTimer(1500, 10000) {
-        var active = true
+    private val countDownTimer = object : CountDownTimer(1000, 10000) {
+        var isActive = true
 
         override fun onFinish() {
-            postTabSwipeRefresh.isRefreshing = false
-            active = false
+            isActive = false
+            // only disable refresh if post is already loaded
+            if (fullPostVM.postLiveData.value != null) {
+                postTabSwipeRefresh.isRefreshing = false
+            }
         }
 
         override fun onTick(millisUntilFinished: Long) {}
@@ -61,7 +64,8 @@ class FullPostFragment : RelicFragment() {
             fullPostView.setPost(it)
 
             // hide refreshing if enough time has passed st there is no jarring animation
-            if (!countDownTimer.active) {
+            // only disable refresh when timer is no longer active
+            if (!countDownTimer.isActive) {
                 postTabSwipeRefresh.isRefreshing = false
             }
         }

@@ -12,7 +12,6 @@ import com.relic.interactor.Contract.SubAdapterDelegate
 import com.relic.interactor.SubInteraction
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.displaysubs.pinned.SubsHeaderView
-import kotlinx.coroutines.launch
 import java.util.*
 
 private const val TYPE_HEADER = 0
@@ -62,11 +61,16 @@ class SubItemAdapter(
         return if (subList.isEmpty()) 0 else subList.size + 1
     }
 
+    fun getList() = subList
+
     fun setList(newSubs: MutableList<SubredditModel>) {
-        launch {
-            calculateDiff(newSubs).dispatchUpdatesTo(this@SubItemAdapter)
-            subList = newSubs
-        }
+        // use this temporarily for now because the calculating the diffs requires the update to
+        // be dipatched immediately. this will break the fast scroller because it'll try to access
+        // items from the old list
+        subList = newSubs
+        notifyDataSetChanged()
+//        val diff = calculateDiff(newSubs)
+//        diff.dispatchUpdatesTo(this@SubItemAdapter)
     }
 
     fun setPinnedSubs(pinnedSubs: List<SubredditModel>) {

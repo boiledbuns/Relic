@@ -20,6 +20,9 @@
     <string name="sync_config_menu">sync settings</string>
     <string name="search_subreddit_hint">subreddit name</string>
 
+    <!-- display subs menu -->
+    <string name="refresh_subs">refresh</string>
+
     <!-- appbarlayout --> 
     <!--<string name="appbar_scrolling_view_behavior">android.support.</string>-->
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
