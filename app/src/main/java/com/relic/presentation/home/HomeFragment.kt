@@ -36,7 +36,7 @@ class HomeFragment : RelicFragment() {
             tabFragments.add(allFragment)
         }
     }
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

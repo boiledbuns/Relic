@@ -129,6 +129,7 @@ class RelicPostItemView @JvmOverloads constructor(
             }
             postItemThumbnailView.setOnClickListener {
                 interact(post, PostInteraction.VisitLink)
+                notifier.notifyItem()
             }
             postItemCommentView.setOnClickListener {
                 interact(post, PostInteraction.NewReply)

@@ -65,6 +65,8 @@ class PostInteractorImpl @Inject constructor(
 
             navData?.let { _navigationLiveData.postValue(RelicEvent(it)) }
         }
+
+        post.visited = true
     }
 
     private fun previewUser(post: PostModel) {

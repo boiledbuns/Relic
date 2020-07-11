@@ -326,7 +326,7 @@ class MainActivity : RelicActivity() {
         when (navMediaData.mediaType) {
             MediaType.Gfycat -> {
                 val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
-                navControllerLiveData?.value?.navigate(R.id.displayImageFragment, args)
+                navControllerLiveData?.value?.navigate(R.id.displayGfycatFragment, args)
             }
             else -> {
                 Toast.makeText(baseContext, "Media type $navMediaData doesn't have a handler yet", Toast.LENGTH_SHORT).show()

@@ -2,6 +2,7 @@ package com.relic.presentation.displaysubs
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
@@ -58,6 +59,18 @@ class DisplaySubsFragment : RelicFragment() {
             adapter = subAdapter
         }
 
+        display_subs_toolbar.apply {
+            inflateMenu(R.menu.display_subs_menu)
+            setOnMenuItemClickListener { item ->
+                if (item.itemId == R.id.display_subs_refresh) {
+                    // refresh the current list and retrieve more posts
+                    viewModel.refreshSubs()
+                    true
+                } else {
+                    super.onOptionsItemSelected(item)
+                }
+            }
+        }
         // attach the actions associated with loading the posts
         attachScrollListeners()
     }
@@ -81,29 +94,12 @@ class DisplaySubsFragment : RelicFragment() {
     }
 
     // region view model binding and handlers
-
     override fun bindViewModel(lifecycleOwner: LifecycleOwner) {
         // allows the list to be updated as subreddits are retrieved from the network
         viewModel.subscribedSubsList.observe(lifecycleOwner) { subs ->
             subs?.let {
-                display_subs_swiperefreshlayout.isRefreshing = false
                 subAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
                 subAdapter.setList(ArrayList(it))
-
-                // set up side bar
-                fastscroller.setupWithRecyclerView(
-                    recyclerView = display_subs_recyclerview,
-                    getItemIndicator = { position ->
-                        when (position)  {
-                            // first item is always the header view
-                            0 ->  { null }
-                            else -> {
-                                val item = subs[position - 1]
-                                FastScrollItemIndicator.Text(item.subName.substring(0, 1).toUpperCase())
-                            }
-                        }
-                    }
-                )
             }
         }
 
@@ -112,14 +108,33 @@ class DisplaySubsFragment : RelicFragment() {
                 subAdapter.setPinnedSubs(it)
             }
         }
+
+        viewModel.isLoadingLiveData.observe(lifecycleOwner) {
+            it?.let { isLoading ->
+                val visibility = if (isLoading) View.VISIBLE else View.GONE
+                displaySubsProgress.visibility = visibility
+            }
+        }
     }
 
     // endregion view model binding and handlers
 
     private fun attachScrollListeners() {
-        display_subs_swiperefreshlayout.setOnRefreshListener {
-            // refresh the current list and retrieve more posts
-            viewModel.refreshSubs()
-        }
+        // set up fast scroller
+        fastscroller.setupWithRecyclerView(
+            recyclerView = display_subs_recyclerview,
+            getItemIndicator = { position ->
+                when (position) {
+                    // first item is always the header view
+                    0 -> {
+                        FastScrollItemIndicator.Icon(R.drawable.ic_star)
+                    }
+                    else -> {
+                        val item = subAdapter.getList()[position - 1]
+                        FastScrollItemIndicator.Text(item.subName.substring(0, 1).toUpperCase())
+                    }
+                }
+            }
+        )
     }
 }
