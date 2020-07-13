@@ -121,6 +121,6 @@
 
     <!-- subreddits -->
     <dimen name="source_icon_size">42dp</dimen>
-
+    <dimen name="award_icon_size">32dp</dimen>
     <dimen name="swipe_icon_size">56dp</dimen>
 </resources>

@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/commentRoot"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/margin_xxxs"
-    android:padding="@dimen/displaypost_rvpadding"
-    android:background="?attr/colorPrimary">
+    android:background="?attr/colorPrimary"
+    android:padding="@dimen/displaypost_rvpadding">
 
     <!-- region comment info -->
     <TextView
@@ -18,41 +17,47 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/commentFlairView"
-        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintHorizontal_bias="0"
-        tools:text="user_name"/>
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="user_name" />
 
     <TextView
         android:id="@+id/commentFlairView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/commentAuthorView"
         app:layout_constraintEnd_toStartOf="@id/commentScoreView"
-        tools:text="flair_boi"/>
+        app:layout_constraintStart_toEndOf="@id/commentAuthorView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="flair_boi" />
 
     <TextView
         android:id="@+id/commentScoreView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/displaypost_paddingside"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/commentFlairView"
         app:layout_constraintEnd_toStartOf="@id/commentCreatedView"
-        tools:text="100"/>
+        app:layout_constraintStart_toEndOf="@id/commentFlairView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="100" />
 
     <TextView
         android:id="@+id/commentCreatedView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="24 hours ago"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="24 hours ago" />
+
+    <com.relic.presentation.customview.RelicAwardsView
+        android:id="@+id/awardsView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/commentAuthorView" />
 
     <!-- endregion comment info -->
 
@@ -63,51 +68,51 @@
         android:layout_marginTop="@dimen/text_spacing_s"
         android:paddingBottom="@dimen/text_spacing_s"
         android:textSize="@dimen/text_m"
-        app:layout_constraintTop_toBottomOf="@id/commentAuthorView"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="asdasdsadsad\n asdasda\nasdasd"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/awardsView"
+        tools:text="asdasdsadsad\n asdasda\nasdasd" />
 
     <ImageView
         android:id="@+id/commentUpvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        android:src="@drawable/ic_upvote"
         app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/ic_upvote"/>
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView" />
 
     <ImageView
         android:id="@+id/commentDownvoteView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        android:src="@drawable/ic_downvote"
         app:layout_constraintStart_toEndOf="@id/commentUpvoteView"
-        android:src="@drawable/ic_downvote"/>
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView" />
 
     <TextView
         android:id="@+id/commentReplyCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
         app:layout_constraintStart_toEndOf="@id/commentDownvoteView"
-        tools:text="100"/>
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
+        tools:text="100" />
 
     <ImageView
         android:id="@+id/commentReplyView"
-        android:src="@drawable/ic_reply"
-        android:tint="@color/primaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/commentBodyView"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:src="@drawable/ic_reply"
+        android:tint="@color/primaryText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/commentBodyView" />
 
     <!-- for inline reply -->
     <LinearLayout
         android:id="@+id/commentReplyInlineAnchor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/commentReplyView"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical"/>
+        app:layout_constraintTop_toBottomOf="@id/commentReplyView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

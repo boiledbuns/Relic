@@ -74,6 +74,8 @@ class FullPostView @JvmOverloads constructor(
         } else {
             postNoComments.visibility = View.GONE
         }
+
+        awardsView.setAwards(post.awards)
     }
 
     fun setViewDelegate(delegate: Contract.PostAdapterDelegate) {

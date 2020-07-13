@@ -76,6 +76,8 @@ class RelicCommentView @JvmOverloads constructor(
         if (commentModel.depth >= 0) {
             displayReplyDepth(commentModel.depth)
         }
+
+        awardsView.setAwards(comment.awards)
     }
 
     fun setOnReplyAction(action: (text: String) -> Unit) {
