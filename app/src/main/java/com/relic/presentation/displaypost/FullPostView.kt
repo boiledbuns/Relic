@@ -15,8 +15,8 @@ import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.full_post.view.*
-import ru.noties.markwon.Markwon
 
 class FullPostView @JvmOverloads constructor(
     context : Context,
