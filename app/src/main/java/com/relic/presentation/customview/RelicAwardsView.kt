@@ -1,6 +1,8 @@
 package com.relic.presentation.customview
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -20,12 +22,13 @@ class RelicAwardsView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
-    private val iconSize = 72
+    private val iconSize = 80
     private val iconLayoutParams = LinearLayout.LayoutParams(iconSize,iconSize)
     init {
         LayoutInflater.from(context).inflate(R.layout.awards_view, this, true)
     }
 
+    @SuppressLint("SetTextI18n")
     fun setAwards(awards: List<Award>?) {
         root.removeAllViews()
         if (!awards.isNullOrEmpty()) {
@@ -33,7 +36,9 @@ class RelicAwardsView @JvmOverloads constructor(
             awards.forEach { award ->
                 val awardImageView = ImageView(context)
                 Picasso.get().load(award.icon_url).fit().into(awardImageView)
-                awardImageView.tooltipText = award.name
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    awardImageView.tooltipText = award.name
+                }
                 awardImageView.layoutParams = iconLayoutParams
                 awardImageView.setPadding(10)
                 root.addView(awardImageView)
@@ -41,7 +46,7 @@ class RelicAwardsView @JvmOverloads constructor(
                 if (award.count > 1) {
                     val countTextView = TextView(context)
                     countTextView.text = "x${award.count}"
-                    countTextView.setPadding(0, 10, 16, 0)
+                    countTextView.setPadding(0, 0, 16, 0)
                     root.addView(countTextView)
                 }
             }
