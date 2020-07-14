@@ -2,7 +2,6 @@ package com.relic.presentation.customview
 
 import android.content.Context
 import android.graphics.PorterDuff
-import android.text.Html
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -17,6 +16,7 @@ import com.relic.preference.POST_LAYOUT_CARD
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
+import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.post_item_content.view.*
 import kotlinx.android.synthetic.main.post_tags.view.*
 import timber.log.Timber
@@ -37,6 +37,8 @@ class RelicPostItemView @JvmOverloads constructor(
     private val defaultColor: Int
     private val downvotedColor: Int
     private val upvotedColor: Int
+
+    private val markwon = Markwon.create(context)
 
     private lateinit var post: PostModel
 
@@ -97,6 +99,8 @@ class RelicPostItemView @JvmOverloads constructor(
                 domainTag.visibility = View.GONE
             }
 
+            awardsView.setAwards(post.awards)
+
             postSubNameView.text = resources.getString(R.string.sub_prefix_label, postModel.subreddit)
             postDateView.text = DateHelper.getDateDifferenceString(postModel.created!!)
             titleView.text = postModel.title
@@ -104,9 +108,10 @@ class RelicPostItemView @JvmOverloads constructor(
             postItemTags.setPostTags(postModel)
             setAuthorFlair(postModel)
 
-            if (!postModel.selftext.isNullOrEmpty()) {
+            val selfText = postModel.selftext
+            if (!selfText.isNullOrEmpty()) {
                 @Suppress("DEPRECATION")
-                postBodyView.text = Html.fromHtml(postModel.selftext).toString()
+                markwon.setMarkdown(postBodyView, selfText)
                 postBodyView.visibility = View.VISIBLE
             } else {
                 postBodyView.visibility = View.GONE
@@ -120,6 +125,10 @@ class RelicPostItemView @JvmOverloads constructor(
     fun setViewDelegate(delegate: Contract.PostAdapterDelegate, notifier: ItemNotifier) {
         delegate.apply {
             setOnClickListener {
+                interact(post, PostInteraction.Visit)
+                notifier.notifyItem()
+            }
+            postBodyView.setOnClickListener {
                 interact(post, PostInteraction.Visit)
                 notifier.notifyItem()
             }

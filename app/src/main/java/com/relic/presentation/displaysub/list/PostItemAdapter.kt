@@ -9,8 +9,8 @@ import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.base.RelicAdapter
 import com.relic.presentation.customview.RelicPostItemView
+import io.noties.markwon.Markwon
 import kotlinx.coroutines.launch
-import ru.noties.markwon.Markwon
 
 class PostItemAdapter (
     private val viewPrefsManager: PostViewPreferences,

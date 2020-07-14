@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fullPostRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone"
-    tools:visibility="visible"
+    android:layout_marginBottom="@dimen/displaypost_bottommargin"
     android:orientation="vertical"
-    android:layout_marginBottom="@dimen/displaypost_bottommargin">
+    android:visibility="gone"
+    tools:visibility="visible">
 
     <!-- image displayed if the post is an image link -->
     <ImageView
@@ -17,30 +16,30 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/displaypost_image_height"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/postContentView"
-        tools:visibility="visible"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/displayPostProgress"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="?android:attr/progressBarStyleHorizontal"
         android:indeterminate="true"
+        android:indeterminateTint="@color/colorAccent"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/postContentView"
-        android:indeterminateTint="@color/colorAccent"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <!-- groups post data together -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:theme="@style/ItemTheme"
         android:id="@+id/postContentView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
         android:padding="@dimen/padding_m"
-        app:layout_constraintTop_toBottomOf="@id/postImageView"
-        android:background="?attr/colorPrimary">
+        android:theme="@style/ItemTheme"
+        app:layout_constraintTop_toBottomOf="@id/postImageView">
 
         <TextView
             android:id="@+id/postAuthorView"
@@ -48,47 +47,60 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_spacing_s"
             android:textSize="@dimen/title_size_s"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/postTitleView"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="u/test_author"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/postTitleView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_xs"
-            android:textSize="@dimen/title_size_m"
             android:fontFamily="sans-serif"
+            android:textSize="@dimen/title_size_m"
             android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/postAuthorView"
             app:layout_constraintVertical_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
             tools:text="Post Title"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/postTitleBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="postTitleView"/>
+            app:constraint_referenced_ids="postTitleView" />
+
+        <com.relic.presentation.customview.RelicAwardsView
+            android:id="@+id/awardsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/postTitleBarrier" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/awardsViewBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="awardsView" />
 
         <com.relic.presentation.displaypost.view.PostTagsView
             android:id="@+id/fullPostTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_s"
-            app:layout_constraintTop_toBottomOf="@id/postTitleBarrier"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/awardsViewBarrier" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/postTagsBottomBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="fullPostTags"/>
+            app:constraint_referenced_ids="fullPostTags" />
 
         <!-- card link displayed if the post is a link to another site -->
         <androidx.cardview.widget.CardView
@@ -96,10 +108,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/card_thumbnail_size"
             android:layout_marginTop="@dimen/padding_m"
-            app:layout_goneMarginBottom="@dimen/padding_m"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/postTagsBottomBarrier"
             app:cardBackgroundColor="?attr/relicBackgroundColor"
+            app:layout_constraintTop_toBottomOf="@id/postTagsBottomBarrier"
+            app:layout_goneMarginBottom="@dimen/padding_m"
             tools:visibility="visible">
 
             <RelativeLayout
@@ -117,14 +129,14 @@
                     android:maxLines="3"
                     android:padding="@dimen/card_padding_small"
                     android:textSize="@dimen/title_size_s"
-                    tools:text="@tools:sample/lorem/random"/>
+                    tools:text="@tools:sample/lorem/random" />
 
                 <ImageView
                     android:id="@+id/postLinkThumbnail"
                     android:layout_width="@dimen/card_thumbnail_size"
                     android:layout_height="@dimen/card_thumbnail_size"
                     android:layout_alignParentEnd="true"
-                    tools:background="?android:textColor"/>
+                    tools:background="?android:textColor" />
 
             </RelativeLayout>
 
@@ -136,7 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="postLinkCard"/>
+            app:constraint_referenced_ids="postLinkCard" />
 
         <TextView
             android:id="@+id/postSelfText"
@@ -147,15 +159,15 @@
             android:textSize="@dimen/title_size_s"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/postLinkCardBarrier"
-            tools:visibility="visible"
-            tools:text="@string/sample_post"/>
+            tools:text="@string/sample_post"
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/postSelfTextBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="postSelfText"/>
+            app:constraint_referenced_ids="postSelfText" />
 
         <ImageView
             android:id="@+id/postUpvoteView"
@@ -165,50 +177,50 @@
             android:paddingTop="@dimen/padding_xs"
             android:src="@drawable/ic_upvote"
             android:tint="?attr/relicIconColor"
-            app:layout_constraintTop_toBottomOf="@id/postSelfTextBarrier"/>
+            app:layout_constraintTop_toBottomOf="@id/postSelfTextBarrier" />
 
         <TextView
             android:id="@+id/postVoteCountView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_l"
             android:layout_marginStart="@dimen/padding_s"
-            tools:text="@string/sample_upvotes"
+            android:layout_marginTop="@dimen/padding_l"
             app:layout_constraintStart_toEndOf="@id/postUpvoteView"
-            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
+            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"
+            tools:text="@string/sample_upvotes" />
 
         <ImageView
             android:id="@+id/postDownvoteView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_s"
             android:layout_marginStart="@dimen/padding_s"
+            android:layout_marginTop="@dimen/padding_s"
             android:paddingTop="@dimen/padding_xs"
             android:src="@drawable/ic_downvote"
             android:tint="?attr/relicIconColor"
             app:layout_constraintStart_toEndOf="@id/postVoteCountView"
-            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
+            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier" />
 
         <TextView
             android:id="@+id/postCommentCountView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_l"
             android:layout_marginStart="@dimen/padding_l"
-            tools:text="@string/sample_comments"
+            android:layout_marginTop="@dimen/padding_l"
             app:layout_constraintStart_toEndOf="@id/postDownvoteView"
-            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
+            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"
+            tools:text="@string/sample_comments" />
 
         <ImageView
             android:id="@+id/postSaveView"
             android:layout_width="@dimen/ic_width_s"
             android:layout_height="@dimen/ic_height_s"
-            android:src="@drawable/ic_save"
-            android:layout_marginTop="@dimen/padding_l"
             android:layout_marginStart="@dimen/padding_l"
+            android:layout_marginTop="@dimen/padding_l"
+            android:src="@drawable/ic_save"
             android:tint="?attr/relicIconColor"
             app:layout_constraintStart_toEndOf="@id/postCommentCountView"
-            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
+            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier" />
 
         <TextView
             android:id="@+id/postReplyView"
@@ -217,7 +229,7 @@
             android:layout_marginTop="@dimen/padding_l"
             android:text="@string/reply"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier"/>
+            app:layout_constraintTop_toTopOf="@id/postSelfTextBarrier" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -225,14 +237,14 @@
         android:id="@+id/postNoComments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_comments"
-        android:visibility="gone"
-        android:textSize="@dimen/title_text_m"
         android:layout_marginTop="@dimen/padding_xl"
-        app:layout_constraintTop_toBottomOf="@id/postContentView"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/no_comments"
+        android:textSize="@dimen/title_text_m"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/postContentView"
         tools:text="@string/no_comments"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

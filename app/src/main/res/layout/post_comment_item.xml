@@ -79,7 +79,7 @@
 
     <!-- endregion display parent -->
 
-    <com.relic.presentation.displaypost.comments.RelicCommentView
+    <com.relic.presentation.displaypost.comments.RelicCommentItemView
         android:id="@+id/post_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

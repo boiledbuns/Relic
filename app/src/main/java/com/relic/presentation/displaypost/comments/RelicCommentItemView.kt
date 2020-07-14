@@ -1,6 +1,7 @@
 package com.relic.presentation.displaypost.comments
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -11,18 +12,22 @@ import com.relic.interactor.CommentInteraction
 import com.relic.interactor.Contract
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.helper.DateHelper
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
 
-class RelicCommentView @JvmOverloads constructor(
+class RelicCommentItemView @JvmOverloads constructor(
     context: Context,
-    attrs : AttributeSet? = null,
-    defStyleAttr : Int = 0
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private lateinit var replyAnchor : LinearLayout
-    private var replyAction : (text : String) -> Unit = { }
-    private lateinit var comment : CommentModel
+    private val markwon = Markwon.create(context)
+
+    private lateinit var replyAnchor: LinearLayout
+    private var replyAction: (text: String) -> Unit = { }
+    private lateinit var comment: CommentModel
 
     private val defaultColor: Int
     private val downvotedColor: Int
@@ -37,7 +42,7 @@ class RelicCommentView @JvmOverloads constructor(
         upvotedColor = context.resources.getColor(R.color.upvote)
     }
 
-    fun setComment(commentModel : CommentModel) {
+    fun setComment(commentModel: CommentModel) {
         comment = commentModel
 
         updateVoteView()
@@ -48,7 +53,8 @@ class RelicCommentView @JvmOverloads constructor(
         commentModel.created?.let { commentCreatedView.text = DateHelper.getDateDifferenceString(it) }
 
         commentModel.edited?.let { commentCreatedView.setTextColor(resources.getColor(R.color.edited)) }
-        commentBodyView.text = commentModel.body
+        commentBodyView.movementMethod = LinkMovementMethod.getInstance()
+        markwon.setMarkdown(commentBodyView, commentModel.body)
 
         if (commentModel.isSubmitter) {
             commentAuthorView.setBackgroundResource(R.drawable.tag)
@@ -61,16 +67,18 @@ class RelicCommentView @JvmOverloads constructor(
             commentReplyCount.text = resources.getString(R.string.reply_count, commentModel.replyCount)
         }
 
-        if (commentModel.depth >= 0){
+        if (commentModel.depth >= 0) {
             displayReplyDepth(commentModel.depth)
         }
+
+        awardsView.setAwards(comment.awards)
     }
 
-    fun setOnReplyAction(action : (text : String) -> Unit) {
+    fun setOnReplyAction(action: (text: String) -> Unit) {
         replyAction = action
     }
 
-    fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier : ItemNotifier) {
+    fun setViewDelegate(delegate: Contract.CommentAdapterDelegate, notifier: ItemNotifier) {
         commentUpvoteView.setOnClickListener {
             delegate.interact(comment, CommentInteraction.Upvote)
             notifier.notifyItem()
@@ -125,7 +133,7 @@ class RelicCommentView @JvmOverloads constructor(
         }
     }
 
-    private fun displayReplyDepth(depth : Int) {
+    private fun displayReplyDepth(depth: Int) {
         // width, height
         LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
             marginStart = resources.getDimensionPixelSize(R.dimen.padding_s) * depth

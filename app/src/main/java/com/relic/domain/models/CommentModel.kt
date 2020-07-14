@@ -1,7 +1,7 @@
 package com.relic.domain.models
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.relic.api.qualifier.ConvertHtml
 import com.relic.api.qualifier.Date
 import com.relic.api.qualifier.More
 import com.squareup.moshi.Json
@@ -11,9 +11,11 @@ import com.squareup.moshi.JsonClass
 @Entity
 open class CommentModel: ListingItem() {
 
+    @ConvertHtml
     @Json(name = "body_html")
     var bodyHtml: String = ""
 
+    @ConvertHtml
     var body: String = ""
 
     // id of this comment's direct ancestor (could be a post or comment)

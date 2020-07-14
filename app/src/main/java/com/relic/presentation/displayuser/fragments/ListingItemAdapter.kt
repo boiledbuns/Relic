@@ -11,8 +11,8 @@ import com.relic.preference.PostViewPreferences
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.customview.RelicPostItemView
 import com.relic.presentation.displaypost.comments.RelicPostCommentView
+import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.post_comment_item.view.*
-import ru.noties.markwon.Markwon
 
 private const val VIEW_TYPE_POST = 0
 private const val VIEW_TYPE_COMMENT = 1

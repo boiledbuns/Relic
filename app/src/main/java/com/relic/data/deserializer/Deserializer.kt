@@ -6,6 +6,7 @@ import com.relic.api.adapter.PostAdapter
 import com.relic.api.adapter.SubAdapter
 import com.relic.api.adapter.UserAdapter
 import com.relic.api.qualifier.DateAdapter
+import com.relic.api.qualifier.HtmlTextAdapter
 import com.relic.api.qualifier.LikesAdapter
 import com.relic.api.qualifier.MoreAdapter
 import com.relic.domain.models.CommentModel
@@ -26,6 +27,7 @@ class Deserializer {
                     .add(LikesAdapter())
                     .add(MoreAdapter())
                     .add(DateAdapter())
+                    .add(HtmlTextAdapter())
                     .add(
                         PolymorphicJsonAdapterFactory.of(ListingItem::class.java, "kind")
                             .withSubtype(PostModel::class.java, Type.Post.name)
