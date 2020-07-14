@@ -190,6 +190,9 @@ dependencies {
     implementation "de.hdodenhof:circleimageview:$circleimageview_ver"
     implementation "com.reddit:indicator-fast-scroll:$fastscroll_ver"
     // endregion 3rd partly view libs
+
+    def commons_text = "1.8"
+    implementation "org.apache.commons:commons-text:$commons_text"
 }
 
 def dev

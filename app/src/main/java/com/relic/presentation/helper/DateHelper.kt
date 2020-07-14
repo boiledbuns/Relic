@@ -31,7 +31,7 @@ object DateHelper {
             millisecondDiff < HOUR_IN_ML -> "${TimeUnit.MINUTES.convert(millisecondDiff, TimeUnit.MILLISECONDS)} minutes"
             millisecondDiff < DAY_IN_ML -> "${TimeUnit.HOURS.convert(millisecondDiff, TimeUnit.MILLISECONDS)} hours"
             millisecondDiff < YEAR_IN_ML -> "${TimeUnit.DAYS.convert(millisecondDiff, TimeUnit.MILLISECONDS)} days"
-            else -> "~${TimeUnit.DAYS.convert(millisecondDiff, TimeUnit.MILLISECONDS).div(365)} years"
+            else -> "${TimeUnit.DAYS.convert(millisecondDiff, TimeUnit.MILLISECONDS).div(365)} years"
         }
     }
 

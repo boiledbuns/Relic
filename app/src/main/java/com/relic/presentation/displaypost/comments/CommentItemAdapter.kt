@@ -52,7 +52,7 @@ class CommentItemAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_POST -> FullPostVH(FullPostView(parent.context))
-            VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentView(parent.context), viewType)
+            VIEW_TYPE_COMMENT -> CommentItemVH(RelicCommentItemView(parent.context), viewType)
             else -> CommentItemVH(RelicCommentMoreItemsView(parent.context), viewType)
         }
     }
@@ -143,14 +143,14 @@ class CommentItemAdapter(
 
         init {
             when (viewType) {
-                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setViewDelegate(commentInteractor, this)
+                VIEW_TYPE_COMMENT -> (view as RelicCommentItemView).setViewDelegate(commentInteractor, this)
                 VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setViewDelegate(delegate, this)
             }
         }
 
         fun bind(commentModel: CommentModel) {
             when (viewType) {
-                VIEW_TYPE_COMMENT -> (view as RelicCommentView).setComment(commentModel)
+                VIEW_TYPE_COMMENT -> (view as RelicCommentItemView).setComment(commentModel)
                 VIEW_TYPE_LOAD_MORE -> (view as RelicCommentMoreItemsView).setLoadMore(commentModel)
             }
         }

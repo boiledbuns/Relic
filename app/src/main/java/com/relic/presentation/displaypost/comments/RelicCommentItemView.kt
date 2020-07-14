@@ -17,19 +17,13 @@ import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.inline_reply.view.*
 
-class RelicCommentView @JvmOverloads constructor(
+class RelicCommentItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private val markwon = Markwon.builder(context)
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun processMarkdown(markdown: String): String {
-                return markdown
-                    .replace("&gt;".toRegex(), ">")
-            }
-        }).build()
+    private val markwon = Markwon.create(context)
 
     private lateinit var replyAnchor: LinearLayout
     private var replyAction: (text: String) -> Unit = { }

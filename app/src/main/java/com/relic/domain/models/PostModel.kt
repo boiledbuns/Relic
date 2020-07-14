@@ -1,6 +1,7 @@
 package com.relic.domain.models
 
 import androidx.room.Entity
+import com.relic.api.qualifier.ConvertHtml
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -8,7 +9,9 @@ import com.squareup.moshi.JsonClass
 @Entity
 open class PostModel : ListingItem() {
 
+    @ConvertHtml
     var title: String = ""
+    @ConvertHtml
     var selftext: String? = null
 
     @Json(name = "num_comments")
@@ -25,9 +28,11 @@ open class PostModel : ListingItem() {
             field = thumbnail
         }
 
+    @ConvertHtml
     @Json(name = "author_flair_text")
     var authorFlair: String? = null
 
+    @ConvertHtml
     @Json(name = "link_flair_text")
     var linkFlair: String? = null
 
