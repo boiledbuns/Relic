@@ -4,6 +4,13 @@ package com.relic.deserializer.response
  * Just some example responses for testing. This is by no means exhaustive
  * and will merely serve as a sanity check
  */
+const val SELF_TEXT = """
+&gt; Let\u2019s say you\u2019re 
+"""
+
+const val EXPECTED_SELF_TEXT = """
+> Let’s say you’re 
+"""
 
 const val POST = """
 {
@@ -11,7 +18,7 @@ const val POST = """
     "data": {
         "approved_at_utc": null,
         "subreddit": "worldbuilding",
-        "selftext": "test",
+        "selftext": "$SELF_TEXT",
         "user_reports": [],
         "saved": false,
         "mod_reason_title": null,
