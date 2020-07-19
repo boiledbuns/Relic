@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-
-    <LinearLayout
-        android:id="@+id/root"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/award_icon_size"
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/padding_xs" />
-</HorizontalScrollView>
+    android:layout_height="@dimen/award_icon_size"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/padding_xs" />
 

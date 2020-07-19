@@ -16,7 +16,6 @@ import com.relic.preference.POST_LAYOUT_CARD
 import com.relic.presentation.base.ItemNotifier
 import com.relic.presentation.helper.DateHelper
 import com.squareup.picasso.Picasso
-import io.noties.markwon.Markwon
 import kotlinx.android.synthetic.main.post_item_content.view.*
 import kotlinx.android.synthetic.main.post_tags.view.*
 import timber.log.Timber
@@ -37,8 +36,6 @@ class RelicPostItemView @JvmOverloads constructor(
     private val defaultColor: Int
     private val downvotedColor: Int
     private val upvotedColor: Int
-
-    private val markwon = Markwon.create(context)
 
     private lateinit var post: PostModel
 
@@ -110,8 +107,6 @@ class RelicPostItemView @JvmOverloads constructor(
 
             val selfText = postModel.selftext
             if (!selfText.isNullOrEmpty()) {
-                @Suppress("DEPRECATION")
-                markwon.setMarkdown(postBodyView, selfText)
                 postBodyView.visibility = View.VISIBLE
             } else {
                 postBodyView.visibility = View.GONE
