@@ -124,10 +124,6 @@ class RelicPostItemView @JvmOverloads constructor(
                 interact(post, PostInteraction.Visit)
                 notifier.notifyItem()
             }
-            postBodyView.setOnClickListener {
-                interact(post, PostInteraction.Visit)
-                notifier.notifyItem()
-            }
             postItemSaveView.setOnClickListener {
                 interact(post, PostInteraction.Save)
                 notifier.notifyItem()
