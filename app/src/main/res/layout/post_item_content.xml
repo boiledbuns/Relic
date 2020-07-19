@@ -93,13 +93,20 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/authorFlairBarrier" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/awardsViewBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="awardsView" />
+
     <com.relic.presentation.displaypost.view.PostTagsView
         android:id="@+id/postItemTags"
         android:layout_marginTop="@dimen/padding_s"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/padding_xxs"
-        app:layout_constraintTop_toBottomOf="@id/awardsView"/>
+        app:layout_constraintTop_toBottomOf="@id/awardsViewBarrier"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/thumbnailContainer"

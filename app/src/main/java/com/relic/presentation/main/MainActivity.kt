@@ -45,6 +45,8 @@ import com.shopify.livedataktx.observe
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
+private const val SELECTED_NAV_ITEM_ID_KEY = "SELECTED_NAV_ITEM_ID_KEY"
+
 class MainActivity : RelicActivity() {
     @Inject
     lateinit var factory: MainVM.Factory
@@ -84,7 +86,7 @@ class MainActivity : RelicActivity() {
         relicGD = GestureDetectorCompat(this, GestureDetector.SimpleOnGestureListener())
 
         // set up bottom nav if no saved instance state
-        if (savedInstanceState == null) setupBottomNav(false)
+        if (savedInstanceState == null) setupBottomNav()
 
         bindViewModel(this)
         if (!mainVM.isAuthenticated()) {
@@ -94,8 +96,15 @@ class MainActivity : RelicActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
+
         // set up after bottom navigation state has been restored
-        setupBottomNav(true)
+        val selectedItemId = savedInstanceState?.getInt(SELECTED_NAV_ITEM_ID_KEY)
+        setupBottomNav(selectedItemId = selectedItemId)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(SELECTED_NAV_ITEM_ID_KEY, bottom_navigation.selectedItemId)
+        super.onSaveInstanceState(outState)
     }
 
 
@@ -152,8 +161,9 @@ class MainActivity : RelicActivity() {
 
     // use the solution from the google navigation components repo for now since there isn't
     // a clear solution for managing multiple backstacks currently
-    private fun setupBottomNav(shouldRestore: Boolean) {
-        val initialItemId = if (shouldRestore) null else R.id.nav_home
+    private fun setupBottomNav(selectedItemId: Int? = null) {
+        // setup default nav item is selected item id is not provided
+        val initialItemId = selectedItemId ?: R.id.nav_home
 
         bottom_navigation.apply {
             navControllerLiveData = initializeNavHostFragments(
@@ -201,7 +211,7 @@ class MainActivity : RelicActivity() {
 
     private fun handleUserChangedEvent(newUser: UserModel) {
         bottom_navigation.resetBottomNavigation()
-        setupBottomNav(false)
+        setupBottomNav(bottom_navigation.selectedItemId)
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {

@@ -48,6 +48,7 @@
     <string name="sort_by_info_no_scope">sorting by %s</string>
 
     <string name="nsfw">NSFW</string>
+    <string name="spoiler">spoiler</string>
     <string name="reply">reply</string>
     <string name="comments">comments</string>
     <string name="load_comments">load %d more comments…</string>
