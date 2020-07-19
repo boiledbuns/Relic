@@ -22,6 +22,7 @@ class PostTagsView @JvmOverloads constructor(
     fun setPostTags(postModel: PostModel) {
         //secondaryMetaTextview.text = resources.getString(R.string.user_prefix_label, postModel.author + " " + postModel.domain + " " + postModel.linkFlair)
         nsfwTag.visibility = if (postModel.nsfw) View.VISIBLE else View.GONE
+        spoilerTag.visibility = if (postModel.spoiler) View.VISIBLE else View.GONE
 
         postTag.apply {
             if (postModel.linkFlair != null) {
