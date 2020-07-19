@@ -107,6 +107,7 @@ class RelicPostItemView @JvmOverloads constructor(
 
             val selfText = postModel.selftext
             if (!selfText.isNullOrEmpty()) {
+                postBodyView.text = selfText
                 postBodyView.visibility = View.VISIBLE
             } else {
                 postBodyView.visibility = View.GONE
