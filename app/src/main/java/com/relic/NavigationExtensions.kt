@@ -46,12 +46,12 @@ fun BottomNavigationView.initializeNavHostFragments(
     fragmentManager: FragmentManager,
     containerId: Int,
     initialItemId: Int?,
+    shouldRestore: Boolean = false,
     menuItemToDestinationMap: Map<Int, Int>,
     onItemReselected: (menuItem: MenuItem) -> Unit
 ): LiveData<NavController> {
     // set initial item id if it's specified (ie. not restored)
     initialItemId?.let { selectedItemId = it }
-    val shouldRestore = initialItemId == null
 
     if (!shouldRestore) {
         // First create a NavHostFragment for each NavGraph ID
@@ -87,7 +87,6 @@ fun BottomNavigationView.initializeNavHostFragments(
     selectedNavController.value = obtainNavHostFragment(fragmentManager, selectedTag, selectedItemId, containerId).navController
 
     // Now connect selecting an item with swapping Fragments
-    var selectedItemTag = itemIdToTagMap[selectedItemId]
     val firstFragmentTag = itemIdToTagMap[selectedItemId]
 
     // When a navigation item is selected
@@ -119,7 +118,6 @@ fun BottomNavigationView.initializeNavHostFragments(
                     }
                     .setReorderingAllowed(true)
                     .commit()
-                selectedItemTag = newlySelectedItemTag
                 selectedNavController.value = selectedFragment.navController
                 true
             } else {

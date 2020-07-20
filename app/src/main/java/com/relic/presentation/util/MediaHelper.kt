@@ -30,7 +30,7 @@ object MediaHelper {
                 if (media.video != null) {
                     type = MediaType.VReddit
                 }
-                else if (media.oembed != null && media.oembed.type == "gfycat.com") {
+                else if (media.oembed != null && media.oembed.provider_name == "Gfycat") {
                     type = MediaType.Gfycat
                 }
             }

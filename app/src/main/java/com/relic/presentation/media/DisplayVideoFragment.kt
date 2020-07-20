@@ -7,23 +7,29 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.relic.R
 import kotlinx.android.synthetic.main.display_video.*
 
+private const val KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION"
 
 class DisplayVideoFragment : DialogFragment() {
     private val args: DisplayVideoFragmentArgs by navArgs()
     private val url by lazy { args.url }
 
     private lateinit var player : SimpleExoPlayer
+    private var position : Long? = null
 
     override fun getTheme(): Int = R.style.FullScreenDialogTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState?.let {
+            position = it.getLong(KEY_CURRENT_POSITION)
+        }
         player = SimpleExoPlayer.Builder(requireContext()).build()
     }
 
@@ -41,6 +47,13 @@ class DisplayVideoFragment : DialogFragment() {
         val dataSourceFactory = DefaultDataSourceFactory(requireContext(), "no-user-agent")
         val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(url.toUri())
         player.prepare(mediaSource)
+
+        position?.let { player.seekTo(it) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLong(KEY_CURRENT_POSITION, player.currentPosition)
     }
 
     override fun onDestroy() {
