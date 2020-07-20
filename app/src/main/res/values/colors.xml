@@ -45,5 +45,6 @@
     <color name="downvote">#3F51B5</color>
 
     <color name="transparent60">#99000000</color>
+    <color name="opaque">#FF000000</color>
 
 </resources>
