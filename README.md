@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/13ABEL/Relic.svg?style=svg)](https://circleci.com/gh/13ABEL/Relic)
+[![CircleCI](https://circleci.com/gh/boiledbuns/Relic.svg?style=svg)](https://circleci.com/gh/boiledbuns/Relic)
 # Relic
 
 The project is currently a WIP. Updates and progress can be found [here](./docs/updates.md)

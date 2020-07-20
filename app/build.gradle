@@ -182,6 +182,7 @@ dependencies {
     def gfycat_ver = "0.7.3"
     def circleimageview_ver = "3.1.0"
     def fastscroll_ver = "1.3.0"
+    def exoplayer_ver ="2.11.7"
 
     implementation "com.squareup.picasso:picasso:$picasso_ver"
     implementation "com.github.chrisbanes:PhotoView:$photoview_release_ver"
@@ -189,6 +190,7 @@ dependencies {
     implementation "com.gfycat.android:gfycat-webp-player:$gfycat_ver"
     implementation "de.hdodenhof:circleimageview:$circleimageview_ver"
     implementation "com.reddit:indicator-fast-scroll:$fastscroll_ver"
+    implementation "com.google.android.exoplayer:exoplayer:$exoplayer_ver"
     // endregion 3rd partly view libs
 
     def commons_text = "1.8"

@@ -33,6 +33,7 @@ import com.relic.presentation.home.frontpage.MultiFragmentArgs
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
+import com.relic.presentation.media.DisplayVideoFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
@@ -337,6 +338,10 @@ class MainActivity : RelicActivity() {
             MediaType.Gfycat -> {
                 val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
                 navControllerLiveData?.value?.navigate(R.id.displayGfycatFragment, args)
+            }
+            MediaType.VReddit -> {
+                val args = DisplayVideoFragmentArgs(navMediaData.mediaUrl).toBundle()
+                navControllerLiveData?.value?.navigate(R.id.displayVideoFragment, args)
             }
             else -> {
                 Toast.makeText(baseContext, "Media type $navMediaData doesn't have a handler yet", Toast.LENGTH_SHORT).show()

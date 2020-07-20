@@ -58,9 +58,11 @@ class PostInteractorImpl @Inject constructor(
         post.url?.let { url ->
             val navData = when (val mediaType = MediaHelper.determineType(post)) {
                 is MediaType.Image -> NavigationData.ToImage(url)
-                MediaType.Link -> NavigationData.ToExternal(url)
+                is MediaType.Link -> NavigationData.ToExternal(url)
+                is MediaType.VReddit -> NavigationData.ToMedia(mediaType, post.media!!.video!!.fallback_url!!)
+                is MediaType.Gfycat -> NavigationData.ToMedia(mediaType, url)
                 null -> null
-                else -> NavigationData.ToMedia(mediaType, url)
+                else -> NavigationData.ToExternal(url)
             }
 
             navData?.let { _navigationLiveData.postValue(RelicEvent(it)) }

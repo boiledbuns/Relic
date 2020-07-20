@@ -23,6 +23,8 @@ class DisplayGfycatFragment : DialogFragment() {
 
     private val gfycatLiveData: MutableLiveData<Gfycat> = MutableLiveData()
 
+    override fun getTheme(): Int = R.style.FullScreenDialogTheme
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,8 +47,6 @@ class DisplayGfycatFragment : DialogFragment() {
 
         loadGfyCat()
     }
-
-    override fun getTheme(): Int = R.style.FullScreenDialogTheme
 
     override fun onDestroyView() {
         displayGfycat.release()

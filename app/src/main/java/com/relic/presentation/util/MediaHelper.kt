@@ -25,10 +25,14 @@ object MediaHelper {
 
         // check url ending to see if it's an image
         if (postModel.url != null) {
-            if (postModel.domain == "gfycat.com") {
-                type = MediaType.Gfycat
-            } else if (postModel.domain == "v.redd.it") {
-                type = MediaType.VReddit
+            val media = postModel.media
+            if (media != null) {
+                if (media.video != null) {
+                    type = MediaType.VReddit
+                }
+                else if (media.oembed != null && media.oembed.type == "gfycat.com") {
+                    type = MediaType.Gfycat
+                }
             }
             else {
                 val url = postModel.url!!
