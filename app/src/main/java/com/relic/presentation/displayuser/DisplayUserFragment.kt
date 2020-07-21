@@ -38,13 +38,18 @@ class DisplayUserFragment : RelicFragment() {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(args.username) as T
+                return factory.create(username) as T
             }
         }).get(DisplayUserVM::class.java)
     }
 
     private val args: DisplayUserFragmentArgs by navArgs()
+    private val username by lazy {
+        args.username
+    }
 
+    private val isSelf: Boolean
+        get() = username == null
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
 
@@ -61,7 +66,8 @@ class DisplayUserFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
-            for (tabType in tabTypes) {
+            val displayTabTypes = if (isSelf) selfTabTypes else tabTypes
+            for (tabType in displayTabTypes) {
                 contentFragments.add(PostsTabFragment.create(tabType))
             }
         }

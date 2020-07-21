@@ -62,7 +62,8 @@ class DisplayUserVM(
     private val retrieveUserJob: Job
 
     init {
-        for (tabType in tabTypes) {
+        val displayTabType = if (username == null) selfTabTypes else tabTypes
+        for (tabType in displayTabType) {
             postsLiveData[tabType] = MediatorLiveData()
         }
 

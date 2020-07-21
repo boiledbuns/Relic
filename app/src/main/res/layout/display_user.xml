@@ -40,9 +40,9 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/userTabLayout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_gravity="bottom|center_horizontal"
                 app:tabMode="scrollable"
                 app:tabSelectedTextColor="?attr/relicTitleColor"
                 app:tabTextColor="?android:textColor"/>
