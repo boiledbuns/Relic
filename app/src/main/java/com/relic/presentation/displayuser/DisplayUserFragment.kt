@@ -131,8 +131,15 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     override fun handleNavReselected(): Boolean {
-        // primary if displaying current user
-        return args.username == null
+        val relicFragment = (pagerAdapter.getItem(userViewPager.currentItem) as? RelicFragment?)
+
+        if (isSelf) {
+            // primary navigation item if displaying current user, so only scroll up
+            relicFragment?.handleNavReselected()
+            return false
+        } else {
+            return relicFragment?.handleNavReselected() ?: true
+        }
     }
 
     // region livedata handlers
