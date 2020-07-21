@@ -45,13 +45,12 @@ private val selectedNavController = MutableLiveData<NavController>()
 fun BottomNavigationView.initializeNavHostFragments(
     fragmentManager: FragmentManager,
     containerId: Int,
-    initialItemId: Int?,
+    initialItemId: Int,
     shouldRestore: Boolean = false,
     menuItemToDestinationMap: Map<Int, Int>,
     onItemReselected: (menuItem: MenuItem) -> Unit
 ): LiveData<NavController> {
-    // set initial item id if it's specified (ie. not restored)
-    initialItemId?.let { selectedItemId = it }
+    selectedItemId = initialItemId
 
     if (!shouldRestore) {
         // First create a NavHostFragment for each NavGraph ID
@@ -83,7 +82,7 @@ fun BottomNavigationView.initializeNavHostFragments(
     }
 
     // Update livedata with the selected graph
-    val selectedTag = itemIdToTagMap[selectedItemId]
+    val selectedTag = itemIdToTagMap[initialItemId]
     selectedNavController.value = obtainNavHostFragment(fragmentManager, selectedTag, selectedItemId, containerId).navController
 
     // Now connect selecting an item with swapping Fragments

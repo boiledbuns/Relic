@@ -164,14 +164,14 @@ class MainActivity : RelicActivity() {
     // a clear solution for managing multiple backstacks currently
     private fun setupBottomNav(selectedItemId: Int? = null) {
         // setup default nav item is selected item id is not provided
-        val restoredItemID = selectedItemId ?: R.id.nav_home
+        val itemId = selectedItemId ?: R.id.nav_home
 
         bottom_navigation.apply {
             navControllerLiveData = initializeNavHostFragments(
                 fragmentManager = supportFragmentManager,
                 containerId = R.id.main_content_frame,
                 shouldRestore =  selectedItemId != null,
-                initialItemId = restoredItemID,
+                initialItemId = itemId,
                 menuItemToDestinationMap = menuToDestinationMap,
                 onItemReselected = { item -> onBottomNavItemReselected(item) }
             )
@@ -212,8 +212,9 @@ class MainActivity : RelicActivity() {
 // region livedata handlers
 
     private fun handleUserChangedEvent(newUser: UserModel) {
+        // here we want to reset the bottom nav without restoring it
         bottom_navigation.resetBottomNavigation()
-        setupBottomNav(bottom_navigation.selectedItemId)
+        setupBottomNav(null)
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
