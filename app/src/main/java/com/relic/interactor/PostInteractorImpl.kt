@@ -8,11 +8,7 @@ import com.relic.presentation.util.MediaHelper
 import com.relic.presentation.util.MediaType
 import com.relic.presentation.util.RelicEvent
 import com.shopify.livedataktx.SingleLiveData
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,18 +21,18 @@ import javax.inject.Singleton
  */
 @Singleton
 class PostInteractorImpl @Inject constructor(
-  private val postGateway: PostGateway
+    private val postGateway: PostGateway
 ) : Contract.PostAdapterDelegate, CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob() + CoroutineExceptionHandler { context, e ->
-        Timber.e(e,  "caught exception")
+        Timber.e(e, "caught exception")
     }
 
     private val _navigationLiveData = SingleLiveData<RelicEvent<NavigationData>>()
-    override val navigationLiveData : LiveData<RelicEvent<NavigationData>> = _navigationLiveData
+    override val navigationLiveData: LiveData<RelicEvent<NavigationData>> = _navigationLiveData
 
     override fun interact(post: PostModel, interaction: PostInteraction) {
-        when(interaction) {
+        when (interaction) {
             is PostInteraction.Visit -> visitPost(post)
             is PostInteraction.Upvote -> voteOnPost(post, 1)
             is PostInteraction.Downvote -> voteOnPost(post, -1)
@@ -59,8 +55,10 @@ class PostInteractorImpl @Inject constructor(
             val navData = when (val mediaType = MediaHelper.determineType(post)) {
                 is MediaType.Image -> NavigationData.ToImage(url)
                 is MediaType.Link -> NavigationData.ToExternal(url)
-                is MediaType.VReddit -> NavigationData.ToMedia(mediaType, post.media!!.video!!.fallback_url!!)
-                is MediaType.Gfycat -> NavigationData.ToMedia(mediaType, url)
+                is MediaType.VReddit -> {
+                    NavigationData.ToMedia(mediaType)
+                }
+                is MediaType.Gfycat -> NavigationData.ToMedia(mediaType)
                 null -> null
                 else -> NavigationData.ToExternal(url)
             }

@@ -130,7 +130,7 @@ class FullPostView @JvmOverloads constructor(
 
                 postImageView.visibility = View.VISIBLE
             }
-            MediaType.Gfycat -> {
+            is MediaType.Gfycat -> {
                 displayPostProgress.visibility  = View.VISIBLE
                 Picasso.get()
                         .load(postModel.thumbnail).fit().centerCrop()
@@ -145,7 +145,22 @@ class FullPostView @JvmOverloads constructor(
                         })
                 postImageView.visibility = View.VISIBLE
             }
-            else -> {
+            is MediaType.VReddit -> {
+                displayPostProgress.visibility  = View.VISIBLE
+                Picasso.get()
+                    .load(postModel.thumbnail).fit().centerCrop()
+                    .into(postImageView, object : Callback {
+                        override fun onSuccess() {
+                            displayPostProgress.visibility = View.GONE
+                        }
+
+                        override fun onError(e: Exception?) {
+                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        }
+                    })
+                postImageView.visibility = View.VISIBLE
+            }
+            MediaType.Link -> {
                 postModel.thumbnail?.apply {
                     Picasso.get().load(postModel.thumbnail).fit().centerCrop().into(postLinkThumbnail)
                     postLinkUrl.text = postModel.url

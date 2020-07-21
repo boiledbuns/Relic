@@ -335,13 +335,13 @@ class MainActivity : RelicActivity() {
     }
 
     private fun openMedia(navMediaData: NavigationData.ToMedia) {
-        when (navMediaData.mediaType) {
-            MediaType.Gfycat -> {
-                val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
+        when (val mediaType = navMediaData.mediaType) {
+            is MediaType.Gfycat -> {
+                val args = DisplayGfycatFragmentArgs(mediaType.mediaUrl).toBundle()
                 navControllerLiveData?.value?.navigate(R.id.displayGfycatFragment, args)
             }
-            MediaType.VReddit -> {
-                val args = DisplayVideoFragmentArgs(navMediaData.mediaUrl).toBundle()
+            is MediaType.VReddit -> {
+                val args = DisplayVideoFragmentArgs(url = mediaType.mediaUrl, audioUrl = mediaType.audioUrl).toBundle()
                 navControllerLiveData?.value?.navigate(R.id.displayVideoFragment, args)
             }
             else -> {

@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.navArgs
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.MergingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.relic.R
@@ -19,6 +19,7 @@ private const val KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION"
 class DisplayVideoFragment : DialogFragment() {
     private val args: DisplayVideoFragmentArgs by navArgs()
     private val url by lazy { args.url }
+    private val audioUrl by lazy { args.audioUrl }
 
     private lateinit var player : SimpleExoPlayer
     private var position : Long? = null
@@ -46,7 +47,9 @@ class DisplayVideoFragment : DialogFragment() {
 
         val dataSourceFactory = DefaultDataSourceFactory(requireContext(), "no-user-agent")
         val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(url.toUri())
-        player.prepare(mediaSource)
+        val audioSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUrl.toUri())
+
+        player.prepare(MergingMediaSource(mediaSource, audioSource))
 
         position?.let { player.seekTo(it) }
     }

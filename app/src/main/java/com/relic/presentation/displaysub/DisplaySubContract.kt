@@ -54,8 +54,7 @@ sealed class NavigationData {
     ) : NavigationData()
 
     data class ToMedia(
-        val mediaType: MediaType,
-        val mediaUrl: String
+        val mediaType: MediaType
     ) : NavigationData()
 
     data class ToReply(
