@@ -61,9 +61,10 @@ class DisplayUserVM(
     private lateinit var currentTab: UserTab
     private val retrieveUserJob: Job
 
+    private val displayTabTypes = if (username == null) selfTabTypes else tabTypes
+
     init {
-        val displayTabType = if (username == null) selfTabTypes else tabTypes
-        for (tabType in displayTabType) {
+        for (tabType in displayTabTypes) {
             postsLiveData[tabType] = MediatorLiveData()
         }
 

@@ -48,7 +48,7 @@ class DisplayUserFragment : RelicFragment() {
         args.username
     }
 
-    private val isSelf: Boolean
+    private val isBaseNavFragment: Boolean
         get() = username == null
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
@@ -66,7 +66,7 @@ class DisplayUserFragment : RelicFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
-            val displayTabTypes = if (isSelf) selfTabTypes else tabTypes
+            val displayTabTypes = if (isBaseNavFragment) selfTabTypes else tabTypes
             for (tabType in displayTabTypes) {
                 contentFragments.add(PostsTabFragment.create(tabType))
             }
@@ -133,7 +133,7 @@ class DisplayUserFragment : RelicFragment() {
     override fun handleNavReselected(): Boolean {
         val relicFragment = (pagerAdapter.getItem(userViewPager.currentItem) as? RelicFragment?)
 
-        if (isSelf) {
+        if (isBaseNavFragment) {
             // primary navigation item if displaying current user, so only scroll up
             relicFragment?.handleNavReselected()
             return false
@@ -151,9 +151,11 @@ class DisplayUserFragment : RelicFragment() {
             pActivity.setSupportActionBar(this)
         }
 
-        pActivity.supportActionBar?.apply {
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
+        if (!isBaseNavFragment) {
+            pActivity.supportActionBar?.apply {
+                setHomeButtonEnabled(true)
+                setDisplayHomeAsUpEnabled(true)
+            }
         }
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
