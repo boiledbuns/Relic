@@ -81,6 +81,17 @@
             android:name="url"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/displayVideoFragment"
+        android:name="com.relic.presentation.media.DisplayVideoFragment"
+        android:label="DisplayVideoFragment">
+        <argument
+            android:name="url"
+            app:argType="string" />
+        <argument
+            android:name="audio_url"
+            app:argType="string" />
+    </dialog>
     <fragment
         android:id="@+id/replyEditorFragment"
         android:name="com.relic.presentation.editor.ReplyEditorFragment"

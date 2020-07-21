@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/13ABEL/Relic.svg?style=svg)](https://circleci.com/gh/13ABEL/Relic)
+[![CircleCI](https://circleci.com/gh/boiledbuns/Relic.svg?style=svg)](https://circleci.com/gh/boiledbuns/Relic)
 # Relic
 
 The project is currently a WIP. Updates and progress can be found [here](./docs/updates.md)
@@ -25,10 +25,10 @@ Here are some screenshots showing off what relic looks like in different situati
 
 |||||
 |---|---|---|---|
-| **overview of a current user** | **overview of subreddits** | **subreddit with primarily text-base content** | **subreddit with primarily image-base content** |
-| ![](https://i.imgur.com/XVvXmOk.png) | ![](https://i.imgur.com/iOeXGXC.png) | ![](https://i.imgur.com/5glGf8F.png) | ![](https://i.imgur.com/BshKB1a.png)|
-| **expanded full text post** | **comment section of post** | **user preview panel** | **prototype image viewer** |
-| ![](https://i.imgur.com/foRqxeu.png) | ![](https://i.imgur.com/E2nLVbK.png) | ![](https://i.imgur.com/b6Yy670.png)| ![](https://i.imgur.com/6Rsokz6.png) |
+| **home screen** | **overview of a current user** | **overview of subreddits** | **search** |
+| ![](https://i.imgur.com/YunFKJ0.png) | ![](https://i.imgur.com/OZDSrwO.png) | ![](https://i.imgur.com/62e8PnI.png) | ![](https://i.imgur.com/EE53pGv.png) |
+| **subreddit** | **expanded full text post** | **comment section of a post** | **user preview panel** |
+| ![](https://i.imgur.com/OF2FQGX.png) | ![](https://i.imgur.com/9vkEnhP.png) | ![](https://i.imgur.com/pJVNZcw.png) | ![](https://i.imgur.com/b6Yy670.png)|
 
 
 ## roadmap to v1 milestone

@@ -5,8 +5,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.view.setPadding
 import com.relic.R
 import com.relic.domain.models.PostModel
+import kotlinx.android.synthetic.main.post_item_content.view.*
 import kotlinx.android.synthetic.main.post_tags.view.*
 
 class PostTagsView @JvmOverloads constructor(
@@ -32,6 +34,13 @@ class PostTagsView @JvmOverloads constructor(
                 background?.setTint(resources.getColor(R.color.discussion_tag))
                 visibility = View.VISIBLE
             } else { visibility = View.GONE }
+        }
+
+        if (postModel.domain.isNullOrEmpty()) {
+            domainTag.visibility = View.GONE
+        } else {
+            domainTag.text = postModel.domain
+            domainTag.visibility = View.VISIBLE
         }
     }
 }

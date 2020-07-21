@@ -10,9 +10,7 @@ data class MediaList(
     val oembed: Oembed?
 )
 
-interface Media {
-
-}
+interface Media
 
 @JsonClass(generateAdapter = true)
 data class RedditVideo(

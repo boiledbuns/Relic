@@ -33,6 +33,7 @@ import com.relic.presentation.home.frontpage.MultiFragmentArgs
 import com.relic.presentation.login.LoginActivity
 import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
+import com.relic.presentation.media.DisplayVideoFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
 import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
@@ -163,13 +164,14 @@ class MainActivity : RelicActivity() {
     // a clear solution for managing multiple backstacks currently
     private fun setupBottomNav(selectedItemId: Int? = null) {
         // setup default nav item is selected item id is not provided
-        val initialItemId = selectedItemId ?: R.id.nav_home
+        val itemId = selectedItemId ?: R.id.nav_home
 
         bottom_navigation.apply {
             navControllerLiveData = initializeNavHostFragments(
                 fragmentManager = supportFragmentManager,
                 containerId = R.id.main_content_frame,
-                initialItemId = initialItemId,
+                shouldRestore =  selectedItemId != null,
+                initialItemId = itemId,
                 menuItemToDestinationMap = menuToDestinationMap,
                 onItemReselected = { item -> onBottomNavItemReselected(item) }
             )
@@ -210,8 +212,9 @@ class MainActivity : RelicActivity() {
 // region livedata handlers
 
     private fun handleUserChangedEvent(newUser: UserModel) {
+        // here we want to reset the bottom nav without restoring it
         bottom_navigation.resetBottomNavigation()
-        setupBottomNav(bottom_navigation.selectedItemId)
+        setupBottomNav(null)
     }
 
     private fun handleAccounts(accounts: List<AccountModel>) {
@@ -333,10 +336,14 @@ class MainActivity : RelicActivity() {
     }
 
     private fun openMedia(navMediaData: NavigationData.ToMedia) {
-        when (navMediaData.mediaType) {
-            MediaType.Gfycat -> {
-                val args = DisplayGfycatFragmentArgs(navMediaData.mediaUrl).toBundle()
+        when (val mediaType = navMediaData.mediaType) {
+            is MediaType.Gfycat -> {
+                val args = DisplayGfycatFragmentArgs(mediaType.mediaUrl).toBundle()
                 navControllerLiveData?.value?.navigate(R.id.displayGfycatFragment, args)
+            }
+            is MediaType.VReddit -> {
+                val args = DisplayVideoFragmentArgs(url = mediaType.mediaUrl, audioUrl = mediaType.audioUrl).toBundle()
+                navControllerLiveData?.value?.navigate(R.id.displayVideoFragment, args)
             }
             else -> {
                 Toast.makeText(baseContext, "Media type $navMediaData doesn't have a handler yet", Toast.LENGTH_SHORT).show()
