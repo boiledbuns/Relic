@@ -74,7 +74,7 @@ class UserVMTest {
         val listing = mockListing(mockListingItems)
         whenever(postRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
 
-        val tab = UserTab.Saved
+        val tab = UserTab.Submitted
         val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
 
         val observer : Observer<List<ListingItem>> = mock()
@@ -93,7 +93,7 @@ class UserVMTest {
         val localPostRepo = postRepo
         whenever(localPostRepo.retrieveUserListing(any(), any(), any())).doReturn(listing)
 
-        val tab = UserTab.Saved
+        val tab = UserTab.Submitted
         val vm = DisplayUserVM(postRepo, userRepo, postGateway, username)
 
         val listingObserver : Observer<List<ListingItem>> = mock()
