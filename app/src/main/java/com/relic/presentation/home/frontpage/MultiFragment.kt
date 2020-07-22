@@ -47,7 +47,7 @@ class MultiFragment : RelicFragment() {
     private val multiVM by lazy {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                val postSource = when(args.multiName) {
+                val postSource = when(multiName) {
                     PostSource.Frontpage.getSourceName() -> PostSource.Frontpage
                     PostSource.All.getSourceName() -> PostSource.All
                     PostSource.Popular.getSourceName() -> PostSource.Popular
@@ -59,6 +59,7 @@ class MultiFragment : RelicFragment() {
     }
 
     private val args: MultiFragmentArgs by navArgs()
+    val multiName by lazy { args.multiName }
 
     private lateinit var postAdapter: PostItemAdapter
 

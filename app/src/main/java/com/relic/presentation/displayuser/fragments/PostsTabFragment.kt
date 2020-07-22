@@ -36,7 +36,7 @@ class PostsTabFragment : RelicFragment() {
         (requireParentFragment() as DisplayUserFragment).displayUserVM
     }
 
-    private lateinit var selectedUserTab: UserTab
+    lateinit var selectedUserTab: UserTab
 
     private lateinit var userPostsAdapter: ListingItemAdapter
     private var scrollLocked: Boolean = false

@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MergingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.relic.R
 import kotlinx.android.synthetic.main.display_video.*
 
@@ -47,9 +50,21 @@ class DisplayVideoFragment : DialogFragment() {
 
         val dataSourceFactory = DefaultDataSourceFactory(requireContext(), "no-user-agent")
         val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(url.toUri())
-        val audioSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUrl.toUri())
 
-        player.prepare(MergingMediaSource(mediaSource, audioSource))
+        player.addListener(object: Player.EventListener{
+            override fun onPlayerError(error: ExoPlaybackException) {
+                super.onPlayerError(error)
+                if (err)
+            }
+        })
+
+        try {
+            // some videos may not have audio, so need to try it first
+            val audioSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUrl.toUri())
+            player.prepare(MergingMediaSource(mediaSource, audioSource))
+        } catch (e : HttpDataSource.InvalidResponseCodeException) {
+            player.prepare(mediaSource)
+        }
 
         position?.let { player.seekTo(it) }
     }

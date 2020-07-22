@@ -21,6 +21,8 @@ import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import kotlinx.android.synthetic.main.display_user.*
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class DisplayUserFragment : RelicFragment() {
 
@@ -65,10 +67,25 @@ class DisplayUserFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
+            // need to restore "zombie" fragments instead of creating new ones when activity is recreated
+            val toRestore = HashMap<UserTab, PostsTabFragment>()
+            for (tabFragment in childFragmentManager.fragments) {
+                (tabFragment as? PostsTabFragment?)?.let {
+                    toRestore[it.selectedUserTab] = it
+                }
+            }
+
             val displayTabTypes = if (isBaseNavFragment) selfTabTypes else tabTypes
+
             for (tabType in displayTabTypes) {
-                contentFragments.add(PostsTabFragment.create(tabType))
+                val restoredTab = toRestore[tabType]
+                if (restoredTab == null) {
+                    contentFragments.add(PostsTabFragment.create(tabType))
+                } else {
+                    contentFragments.add(restoredTab)
+                }
             }
         }
 
