@@ -26,14 +26,21 @@ class HomeFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
-            val frontpageFragment = MultiFragment().apply {
-                arguments = MultiFragmentArgs(PostSource.Frontpage.getSourceName()).toBundle()
+            if (childFragmentManager.fragments.size == 2) {
+                val detachedFrontpageFragment = childFragmentManager.fragments.get(0)
+                val detachedAllFragment = childFragmentManager.fragments[1]
+                tabFragments.add(detachedFrontpageFragment)
+                tabFragments.add(detachedAllFragment)
+            } else {
+                val frontpageFragment = MultiFragment().apply {
+                    arguments = MultiFragmentArgs(PostSource.Frontpage.getSourceName()).toBundle()
+                }
+                val allFragment = MultiFragment().apply {
+                    arguments = MultiFragmentArgs(PostSource.All.getSourceName()).toBundle()
+                }
+                tabFragments.add(frontpageFragment)
+                tabFragments.add(allFragment)
             }
-            val allFragment = MultiFragment().apply {
-                arguments = MultiFragmentArgs(PostSource.All.getSourceName()).toBundle()
-            }
-            tabFragments.add(frontpageFragment)
-            tabFragments.add(allFragment)
         }
     }
 

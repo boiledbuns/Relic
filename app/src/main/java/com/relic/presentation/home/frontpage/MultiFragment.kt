@@ -24,7 +24,7 @@ import com.relic.presentation.displaysub.DisplaySubVM
 import com.relic.presentation.displaysub.list.PostItemAdapter
 import com.relic.presentation.displaysub.list.PostItemsTouchHelper
 import com.shopify.livedataktx.observe
-import kotlinx.android.synthetic.main.frontpage.*
+import kotlinx.android.synthetic.main.display_multi.*
 import javax.inject.Inject
 
 /**
@@ -69,7 +69,7 @@ class MultiFragment : RelicFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.frontpage, container, false)
+        return inflater.inflate(R.layout.display_multi, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,7 +78,7 @@ class MultiFragment : RelicFragment() {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
 
-        frontpagePostsRecyclerView.apply {
+        multiPostsRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = postAdapter
             itemAnimator = null
@@ -88,14 +88,14 @@ class MultiFragment : RelicFragment() {
         val touchHelperCallback = PostItemsTouchHelper(requireContext()) { vh, direction ->
             handleVHSwipeAction(vh, direction)
         }
-        ItemTouchHelper(touchHelperCallback).attachToRecyclerView(frontpagePostsRecyclerView)
+        ItemTouchHelper(touchHelperCallback).attachToRecyclerView(multiPostsRecyclerView)
     }
 
     private fun attachViewListeners() {
-        frontpageSwipeRefreshLayout.apply {
+        multiSwipeRefreshLayout.apply {
             setOnRefreshListener {
                 // empties current items to show that it's being refreshed
-                frontpagePostsRecyclerView.layoutManager!!.scrollToPosition(0)
+                multiPostsRecyclerView.layoutManager!!.scrollToPosition(0)
                 postAdapter.clear()
                 // tells vm to clear the posts -> triggers action to retrieve more
                 multiVM.retrieveMorePosts(true)
@@ -103,7 +103,7 @@ class MultiFragment : RelicFragment() {
         }
 
         // attach listener for checking if the user has scrolled to the bottom of the recycler view
-        frontpagePostsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        multiPostsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 // TODO : add animation for loading posts
@@ -111,7 +111,7 @@ class MultiFragment : RelicFragment() {
                 if (!recyclerView.canScrollVertically(1) && !scrollLocked) {
                     // lock scrolling until posts are loaded to prevent additional unwanted requests
                     scrollLocked = true
-                    frontpageProgress.visibility = View.VISIBLE
+                    multiProgress.visibility = View.VISIBLE
                     multiVM.retrieveMorePosts(false)
                 }
             }
@@ -138,11 +138,11 @@ class MultiFragment : RelicFragment() {
 
     override fun handleNavReselected(): Boolean {
         // for double click, second click will try to access view when removed
-        frontpagePostsRecyclerView ?: return false
-        return when (frontpagePostsRecyclerView.canScrollVertically(-1)) {
+        multiPostsRecyclerView ?: return false
+        return when (multiPostsRecyclerView.canScrollVertically(-1)) {
             true -> {
                 // can still scroll up, so reselection should scroll to top
-                frontpagePostsRecyclerView.smoothScrollToPosition(0)
+                multiPostsRecyclerView.smoothScrollToPosition(0)
                 true
             }
             false -> {
@@ -157,7 +157,7 @@ class MultiFragment : RelicFragment() {
     private fun handlePosts(posts : List<PostModel>?) {
         posts?.let { loadedPosts ->
             postAdapter.setPostList(loadedPosts)
-            frontpageProgress.visibility = View.GONE
+            multiProgress.visibility = View.GONE
 
             // unlock scrolling to allow more posts to be loaded
             // if no posts have been loaded -> prevent loading "more"
@@ -170,7 +170,7 @@ class MultiFragment : RelicFragment() {
     private fun handleRefresh(refreshing : Boolean?) {
         // niche case to hide loading on first open of app when user is not logged in
         if (auth.isAuthenticated()) {
-            refreshing?.let { frontpageSwipeRefreshLayout.isRefreshing = it }
+            refreshing?.let { multiSwipeRefreshLayout.isRefreshing = it }
         }
     }
 
