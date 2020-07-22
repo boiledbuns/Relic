@@ -35,7 +35,6 @@ import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.media.DisplayVideoFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
-import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
@@ -170,7 +169,7 @@ class MainActivity : RelicActivity() {
             navControllerLiveData = initializeNavHostFragments(
                 fragmentManager = supportFragmentManager,
                 containerId = R.id.main_content_frame,
-                shouldRestore =  selectedItemId != null,
+                shouldRestore = selectedItemId != null,
                 initialItemId = itemId,
                 menuItemToDestinationMap = menuToDestinationMap,
                 onItemReselected = { item -> onBottomNavItemReselected(item) }

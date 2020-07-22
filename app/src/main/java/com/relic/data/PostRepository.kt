@@ -114,17 +114,17 @@ sealed class PostSource : Parcelable {
 
     @Parcelize
     object Frontpage : PostSource() {
-        override fun getSourceName() = "Frontpage"
+        override fun getSourceName() = "frontpage"
     }
 
     @Parcelize
     object All : PostSource() {
-        override fun getSourceName() = "All"
+        override fun getSourceName() = "all"
     }
 
     @Parcelize
     object Popular : PostSource() {
-        override fun getSourceName() = "Popular"
+        override fun getSourceName() = "popular"
     }
 
     @Parcelize
