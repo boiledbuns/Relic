@@ -29,7 +29,9 @@ sealed class UserTab(
     @Parcelize object Hidden: UserTab("Hidden")
 }
 
-val tabTypes = listOf(UserTab.Submitted, UserTab.Comments, UserTab.Saved, UserTab.Upvoted, UserTab.Downvoted, UserTab.Gilded, UserTab.Hidden)
+val selfTabTypes = listOf(UserTab.Submitted, UserTab.Comments, UserTab.Saved, UserTab.Upvoted, UserTab.Downvoted, UserTab.Gilded, UserTab.Hidden)
+
+val tabTypes = listOf(UserTab.Submitted, UserTab.Comments)
 
 sealed class ErrorData {
     data class NoMorePosts(val tab : UserTab) : ErrorData()

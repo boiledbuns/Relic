@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.relic">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- TODO add deep link capabilities :eyes -->
     <application
@@ -17,37 +17,44 @@
         android:theme="@style/RelicThemePrimary">
         <activity android:name=".presentation.main.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                       android:resource="@xml/subreddit_searchable"/>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/subreddit_searchable" />
         </activity>
 
         <activity android:name=".presentation.handler.LinkHandlerActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="www.reddit.com"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="www.reddit.com" />
+                <data android:host="amp.reddit.com" />
+                <data android:host="reddit.com" />
+                <data android:host="old.reddit.com" />
+                <data android:host="m.reddit.com" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".presentation.preferences.PreferencesActivity"
-            android:parentActivityName=".presentation.main.MainActivity">
-        </activity>
+            android:parentActivityName=".presentation.main.MainActivity" />
 
         <activity
             android:name=".presentation.login.LoginActivity"
-            android:parentActivityName=".presentation.main.MainActivity">
-        </activity>
-        
+            android:parentActivityName=".presentation.main.MainActivity" />
+
         <provider
-            android:authorities="${applicationId}.workmanager-init"
             android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
             android:exported="false"
-            tools:node="remove"/>
+            tools:node="remove" />
     </application>
 
 </manifest>

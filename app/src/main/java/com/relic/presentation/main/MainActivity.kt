@@ -35,7 +35,6 @@ import com.relic.presentation.media.DisplayGfycatFragmentArgs
 import com.relic.presentation.media.DisplayImageFragmentArgs
 import com.relic.presentation.media.DisplayVideoFragmentArgs
 import com.relic.presentation.preferences.PreferenceLink
-import com.relic.presentation.preferences.PreferencesActivity
 import com.relic.presentation.preferences.PreferencesActivity.Companion.KEY_RESULT_PREF_LINKS
 import com.relic.presentation.subinfodialog.SubInfoBottomSheetDialog
 import com.relic.presentation.util.MediaType
@@ -170,7 +169,7 @@ class MainActivity : RelicActivity() {
             navControllerLiveData = initializeNavHostFragments(
                 fragmentManager = supportFragmentManager,
                 containerId = R.id.main_content_frame,
-                shouldRestore =  selectedItemId != null,
+                shouldRestore = selectedItemId != null,
                 initialItemId = itemId,
                 menuItemToDestinationMap = menuToDestinationMap,
                 onItemReselected = { item -> onBottomNavItemReselected(item) }
@@ -232,22 +231,6 @@ class MainActivity : RelicActivity() {
             TextView(this).apply {
                 text = account.name
                 layoutParams = params
-                // TODO switch to different way of viewing accounts
-//                navHeader.findViewById<LinearLayout>(R.id.navHeaderAccounts).addView(this)
-//
-//                setOnClickListener {
-//                    // TODO consider switching to preference listener for a cleaner class
-//                    mainVM.onAccountSelected(account.name)
-//                    // need to close drawer and dropdown
-//                    navigationDrawer.closeDrawers()
-//                    navHeader.findViewById<LinearLayout>(R.id.navHeaderDropdown).visibility = View.GONE
-//
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        getString(R.string.switched_account, account.name),
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
             }
         }
     }
@@ -267,19 +250,6 @@ class MainActivity : RelicActivity() {
                 }
         }
     }
-// endregion livedata handlers
-
-// region navigation view handlers
-
-    private fun handleNavMenuOnclick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.preferences -> PreferencesActivity.startForResult(this)
-        }
-
-        return true
-    }
-
-// endregion navigation view handlers
 
     private fun handleNavigationEvent(navData: NavigationData) {
         when (navData) {
@@ -334,6 +304,8 @@ class MainActivity : RelicActivity() {
             is NavigationData.ToReply -> openPostReplyEditor(navData.parentFullname)
         }
     }
+
+// endregion livedata handlers
 
     private fun openMedia(navMediaData: NavigationData.ToMedia) {
         when (val mediaType = navMediaData.mediaType) {

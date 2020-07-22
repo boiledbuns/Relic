@@ -10,6 +10,7 @@ import com.relic.network.request.RelicOAuthRequest
 import com.relic.presentation.callbacks.AuthenticationCallback
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -68,6 +69,7 @@ class NetworkRequestManager @Inject constructor(
         val token = authToken ?: authManager.getToken()
 
         Timber.d("endpoint: %s ", url)
+
         return suspendCoroutine { cont ->
             if (authToken == null && !authManager.isAuthenticated()) throw AuthException("user not logged in", null)
             val request = RelicOAuthRequest(
@@ -80,6 +82,7 @@ class NetworkRequestManager @Inject constructor(
                     // check if the failure is the result of an unauthenticated token
                     // try to refresh token and try request
                     if (e is AuthFailureError && retryAuthAllowed) {
+                        // TODO global scope is ugly here, should change in future
                         GlobalScope.launch { handleAuthError(method, url, headers, data, cont) }
                     } else {
                         cont.resumeWithException(e)
@@ -105,8 +108,12 @@ class NetworkRequestManager @Inject constructor(
         Timber.d("refresh token")
         authManager.refreshToken(callback = AuthenticationCallback {
             GlobalScope.launch {
-                val response = processRequest(method, url, null, headers, data, false)
-                cont.resumeWith(Result.success(response))
+                try {
+                    val response = processRequest(method, url, null, headers, data, false)
+                    cont.resumeWith(Result.success(response))
+                } catch (e: Exception) {
+                    cont.resumeWith(Result.failure(e))
+                }
             }
         })
     }

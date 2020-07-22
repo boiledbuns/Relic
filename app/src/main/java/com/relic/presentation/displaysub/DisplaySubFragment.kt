@@ -393,16 +393,4 @@ class DisplaySubFragment : RelicFragment() {
     }
 
     // endregion view functions
-
-    companion object {
-        private const val ARG_SUBREDDIT_NAME = "arg_subreddit_name"
-
-        fun create(subredditName: String): DisplaySubFragment {
-            return DisplaySubFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_SUBREDDIT_NAME, subredditName)
-                }
-            }
-        }
-    }
 }

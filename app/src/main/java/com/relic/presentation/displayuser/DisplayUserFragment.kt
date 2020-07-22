@@ -21,6 +21,8 @@ import com.relic.presentation.displayuser.fragments.PostsTabFragment
 import kotlinx.android.synthetic.main.display_user.*
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class DisplayUserFragment : RelicFragment() {
 
@@ -38,13 +40,18 @@ class DisplayUserFragment : RelicFragment() {
         ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return factory.create(args.username) as T
+                return factory.create(username) as T
             }
         }).get(DisplayUserVM::class.java)
     }
 
     private val args: DisplayUserFragmentArgs by navArgs()
+    private val username by lazy {
+        args.username
+    }
 
+    private val isBaseNavFragment: Boolean
+        get() = username == null
 
     private lateinit var pagerAdapter: UserContentPagerAdapter
 
@@ -60,9 +67,25 @@ class DisplayUserFragment : RelicFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         pagerAdapter = UserContentPagerAdapter(childFragmentManager).apply {
-            for (tabType in tabTypes) {
-                contentFragments.add(PostsTabFragment.create(tabType))
+            // need to restore "zombie" fragments instead of creating new ones when activity is recreated
+            val toRestore = HashMap<UserTab, PostsTabFragment>()
+            for (tabFragment in childFragmentManager.fragments) {
+                (tabFragment as? PostsTabFragment?)?.let {
+                    toRestore[it.selectedUserTab] = it
+                }
+            }
+
+            val displayTabTypes = if (isBaseNavFragment) selfTabTypes else tabTypes
+
+            for (tabType in displayTabTypes) {
+                val restoredTab = toRestore[tabType]
+                if (restoredTab == null) {
+                    contentFragments.add(PostsTabFragment.create(tabType))
+                } else {
+                    contentFragments.add(restoredTab)
+                }
             }
         }
 
@@ -125,8 +148,15 @@ class DisplayUserFragment : RelicFragment() {
     }
 
     override fun handleNavReselected(): Boolean {
-        // primary if displaying current user
-        return args.username == null
+        val relicFragment = (pagerAdapter.getItem(userViewPager.currentItem) as? RelicFragment?)
+
+        if (isBaseNavFragment) {
+            // primary navigation item if displaying current user, so only scroll up
+            relicFragment?.handleNavReselected()
+            return false
+        } else {
+            return relicFragment?.handleNavReselected() ?: true
+        }
     }
 
     // region livedata handlers
@@ -138,9 +168,11 @@ class DisplayUserFragment : RelicFragment() {
             pActivity.setSupportActionBar(this)
         }
 
-        pActivity.supportActionBar?.apply {
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
+        if (!isBaseNavFragment) {
+            pActivity.supportActionBar?.apply {
+                setHomeButtonEnabled(true)
+                setDisplayHomeAsUpEnabled(true)
+            }
         }
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }

@@ -36,7 +36,7 @@ class PostsTabFragment : RelicFragment() {
         (requireParentFragment() as DisplayUserFragment).displayUserVM
     }
 
-    private lateinit var selectedUserTab: UserTab
+    lateinit var selectedUserTab: UserTab
 
     private lateinit var userPostsAdapter: ListingItemAdapter
     private var scrollLocked: Boolean = false
@@ -72,6 +72,22 @@ class PostsTabFragment : RelicFragment() {
             handleListingItems(it)
         }
         postsTabVM.errorLiveData.nonNull().observe(lifecycleOwner) { handleError(it) }
+    }
+
+    override fun handleNavReselected(): Boolean {
+        // for double click, second click will try to access view when removed
+        userTabRecyclerView ?: return false
+        return when (userTabRecyclerView.canScrollVertically(-1)) {
+            true -> {
+                // can still scroll up, so reselection should scroll to top
+                userTabRecyclerView.smoothScrollToPosition(0)
+                true
+            }
+            false -> {
+                // already at top, we don't handle
+                false
+            }
+        }
     }
 
     private fun attachScrollListeners() {

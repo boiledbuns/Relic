@@ -26,11 +26,21 @@ class HomeFragment : RelicFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pagerAdapter = HomePagerAdapter(childFragmentManager).apply {
-            val frontpageFragment = MultiFragment().apply {
-                arguments = MultiFragmentArgs(PostSource.Frontpage.getSourceName()).toBundle()
+            // need to restore "zombie" fragments instead of creating new ones when activity is recreated
+            val toRestore = HashMap<String, RelicFragment>()
+            for (multiFragment in childFragmentManager.fragments) {
+                (multiFragment as? MultiFragment?)?.let {
+                    toRestore[it.multiName] = it
+                }
             }
-            val allFragment = MultiFragment().apply {
-                arguments = MultiFragmentArgs(PostSource.All.getSourceName()).toBundle()
+            val frontpageName = PostSource.Frontpage.getSourceName()
+            val allName = PostSource.All.getSourceName()
+
+            val frontpageFragment = toRestore[frontpageName] ?: MultiFragment().apply {
+                arguments = MultiFragmentArgs(frontpageName).toBundle()
+            }
+            val allFragment = toRestore[allName] ?: MultiFragment().apply {
+                arguments = MultiFragmentArgs(allName).toBundle()
             }
             tabFragments.add(frontpageFragment)
             tabFragments.add(allFragment)
