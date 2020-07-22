@@ -13,9 +13,11 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MergingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.relic.R
 import kotlinx.android.synthetic.main.display_video.*
+import java.io.IOException
 
 private const val KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION"
 
@@ -24,8 +26,8 @@ class DisplayVideoFragment : DialogFragment() {
     private val url by lazy { args.url }
     private val audioUrl by lazy { args.audioUrl }
 
-    private lateinit var player : SimpleExoPlayer
-    private var position : Long? = null
+    private lateinit var player: SimpleExoPlayer
+    private var position: Long? = null
 
     override fun getTheme(): Int = R.style.FullScreenDialogTheme
 
@@ -51,20 +53,29 @@ class DisplayVideoFragment : DialogFragment() {
         val dataSourceFactory = DefaultDataSourceFactory(requireContext(), "no-user-agent")
         val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(url.toUri())
 
-        player.addListener(object: Player.EventListener{
+        player.addListener(object : Player.EventListener {
+            // only retry once
+            var hasFailed = false
+
+            override fun onLoadingChanged(isLoading: Boolean) {
+                if (!isLoading) loadingView.visibility = View.GONE
+            }
+
             override fun onPlayerError(error: ExoPlaybackException) {
-                super.onPlayerError(error)
-                if (err)
+                if (error.type == ExoPlaybackException.TYPE_SOURCE) {
+                    val cause = error.cause
+                    if (!hasFailed && cause is HttpDataSource.InvalidResponseCodeException && cause.responseCode == 403) {
+                        hasFailed = true
+                        // some videos may not have audio, so loading a source will fail
+                        player.prepare(mediaSource)
+                        position?.let { player.seekTo(it) }
+                    }
+                }
             }
         })
 
-        try {
-            // some videos may not have audio, so need to try it first
-            val audioSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUrl.toUri())
-            player.prepare(MergingMediaSource(mediaSource, audioSource))
-        } catch (e : HttpDataSource.InvalidResponseCodeException) {
-            player.prepare(mediaSource)
-        }
+        val audioSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUrl.toUri())
+        player.prepare(MergingMediaSource(mediaSource, audioSource))
 
         position?.let { player.seekTo(it) }
     }
